@@ -15,6 +15,11 @@ target_link_libraries(${PPV_TARGET_NAME}
         Halcon
 )
 
+target_link_libraries(${PPV_TARGET_NAME}
+    PRIVATE
+        Qt6::Core Qt6::Widgets
+)
+
 get_target_property(HALCON_DLLS Halcon HALCON_DLL_FILES)
 if(HALCON_DLLS)
     add_custom_command(TARGET ${PPV_TARGET_NAME} POST_BUILD
@@ -24,3 +29,8 @@ if(HALCON_DLLS)
         COMMENT "Copying Halcon DLLs to output directory..."
     )
 endif()
+
+add_custom_command(TARGET ${PPV_TARGET_NAME} POST_BUILD
+	COMMAND ${QT_DIR}/bin/windeployqt.exe --no-compiler-runtime --no-opengl-sw $<TARGET_FILE:${PPV_TARGET_NAME}>
+	COMMENT "Running windeployqt to package Qt dependencies for ${PPV_TARGET_NAME}"
+)
