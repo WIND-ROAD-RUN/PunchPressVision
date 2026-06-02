@@ -1,3 +1,4 @@
 add_subdirectory(UI)
 add_subdirectory(infrastructure)
 add_subdirectory(Business)
+add_subdirectory(global)
