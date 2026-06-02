@@ -2,7 +2,6 @@
 
 #include "rwul/oso/oso_StorageContext.hpp"
 
-
 namespace inf
 {
 	ConfigModule::ConfigModule()

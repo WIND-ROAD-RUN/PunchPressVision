@@ -1,15 +1,18 @@
 set(Inf_TARGET ConfigModule)
 
+file(GLOB OSO_FILES "${CMAKE_CURRENT_SOURCE_DIR}/osoFile/*.oso")
+oso_wrap_oso(GENERATED_HEADERS ${OSO_FILES} OUTPUT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/infrastructure/ConfigModule/Config)
+
 file(GLOB_RECURSE INCLUDE_LIST CONFIGURE_DEPENDS
-	"${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/include/*.h"
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/**/*.hpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/include/**/*.h"
 )
 file(GLOB_RECURSE SRC_LIST CONFIGURE_DEPENDS
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 )
 list(APPEND SRC_LIST ${INCLUDE_LIST})
 
-add_library(${Inf_TARGET} STATIC ${SRC_LIST} )
+add_library(${Inf_TARGET} STATIC ${SRC_LIST} ${GENERATED_HEADERS})
 
 target_link_libraries(${Inf_TARGET} PRIVATE RWUL::oso)
 
