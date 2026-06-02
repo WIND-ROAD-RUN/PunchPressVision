@@ -17,6 +17,14 @@ namespace inf
 	void ConfigModule::build()
 	{
 		storageContext_ = std::make_unique<rw::oso::StorageContext>(rw::oso::StorageType::Xml);
+
+		try
+		{
+			
+		}
+		catch (...)
+		{
+		}
 	}
 
 	void ConfigModule::destroy()

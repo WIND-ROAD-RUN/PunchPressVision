@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "infrastructure/ConfigModule/Config/baseCfg.hpp"
 
 namespace rw::oso
 {
@@ -17,6 +18,8 @@ namespace inf
 		~ConfigModule();
 	private:
 		std::unique_ptr<rw::oso::StorageContext> storageContext_;
+	public:
+		Config::BaseCfg baseCfg;
 	public:
 		void build();
 		void destroy();
