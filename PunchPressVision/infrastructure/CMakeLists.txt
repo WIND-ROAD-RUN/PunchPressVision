@@ -1,4 +1,6 @@
 add_subdirectory(infrastructure)
 add_subdirectory(CameraModule)
 add_subdirectory(ConfigModule)
+add_subdirectory(CalibConfigModule)
+add_subdirectory(ConfigModule)
 add_subdirectory(ShapeModelManagerModule)
