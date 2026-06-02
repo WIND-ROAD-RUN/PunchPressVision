@@ -1,6 +1,12 @@
 #pragma once
 
-#include "rwul/oso/oso_StorageContext.hpp"
+#include <memory>
+
+
+namespace rw::oso
+{
+	class StorageContext;
+}
 
 namespace inf
 {
