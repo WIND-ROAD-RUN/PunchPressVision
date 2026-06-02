@@ -1,0 +1,1 @@
+#include "infrastructure/CameraModule/CameraModule.hpp"
