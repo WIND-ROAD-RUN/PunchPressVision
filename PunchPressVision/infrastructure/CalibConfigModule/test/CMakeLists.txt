@@ -1,4 +1,4 @@
-set(Inf_TARGET Test_CalibConfigModule)
+set(Inf_TARGET Test_inf_CalibConfigModule)
 
 file(GLOB_RECURSE INCLUDE_LIST CONFIGURE_DEPENDS
 	"${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp"

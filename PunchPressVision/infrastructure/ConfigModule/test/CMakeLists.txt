@@ -1,4 +1,4 @@
-set(Inf_TARGET Test_ConfigModule)
+set(Inf_TARGET Test_inf_ConfigModule)
 
 file(GLOB_RECURSE INCLUDE_LIST CONFIGURE_DEPENDS
 	"${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp"

@@ -1,4 +1,4 @@
-set(Inf_TARGET Test_CameraModule)
+set(Inf_TARGET Test_inf_CameraModule)
 
 file(GLOB_RECURSE INCLUDE_LIST CONFIGURE_DEPENDS
 	"${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp"
