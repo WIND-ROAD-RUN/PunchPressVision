@@ -16,6 +16,8 @@ add_library(${Inf_TARGET} STATIC ${SRC_LIST} ${GENERATED_HEADERS})
 
 target_link_libraries(${Inf_TARGET} PRIVATE RWUL::oso)
 
+target_link_libraries(${Inf_TARGET} PRIVATE global::global)
+
 set_target_properties(${Inf_TARGET} PROPERTIES
 	DEBUG_POSTFIX "d"
 	RELEASE_POSTFIX ""
