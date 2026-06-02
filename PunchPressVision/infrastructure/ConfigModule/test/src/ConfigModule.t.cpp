@@ -1,4 +1,4 @@
-#include "CameraModule.t.hpp"
+#include "ConfigModule.t.hpp"
 
 int main()
 {
