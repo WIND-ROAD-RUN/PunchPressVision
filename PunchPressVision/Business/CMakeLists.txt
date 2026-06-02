@@ -1,1 +1,2 @@
 add_subdirectory(CameraBun)
+add_subdirectory(TwoCameraSpliceBun)
