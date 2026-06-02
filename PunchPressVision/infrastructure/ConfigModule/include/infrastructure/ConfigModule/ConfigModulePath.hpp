@@ -4,5 +4,8 @@
 
 namespace inf
 {
-
+	inline struct 
+	{
+		std::string RootPath = global::ProjectRootPath + "/config";
+	}ConfigModulePath;
 }
