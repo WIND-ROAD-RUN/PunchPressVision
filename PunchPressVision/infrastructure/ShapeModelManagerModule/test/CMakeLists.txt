@@ -18,6 +18,6 @@ target_include_directories(${Inf_TARGET}
 )
 
 target_link_libraries(${Inf_TARGET} PRIVATE
-    inf::ConfigModule
+    inf::ShapeModelManagerModule
 )
 

@@ -16,6 +16,11 @@ set_target_properties(${Inf_TARGET} PROPERTIES
 	RELEASE_POSTFIX ""
 )
 
+target_link_libraries(${Inf_TARGET} 
+	PUBLIC global::global
+	PUBLIC Halcon
+)
+
 target_include_directories(${Inf_TARGET} 
 	PUBLIC 
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
