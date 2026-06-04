@@ -20,6 +20,22 @@ namespace inf
 		//九点标定换算的矩阵
 			HalconCpp::HTuple outHomMat2D ;
 
+			//标定板参数
+		
+			int xnumber = 7;
+			int ynumber = 7;
+			double distance = 0.007;
+			double scale = 0.5;
+			/**7 :x方向圆点数量
+				* 7 : y方向圆点数量
+				* 0.007 两个圆之间的距离， 单位米
+				* 0.5 比例值： Mark直径比上Mark中心距离
+				* caltab.descr 描述文件，用于标定文件的生成
+				* caltab.ps 标定文件，用于生产标定板*/
+				//gen_caltab(7, 7, 0.007, 0.5, 'D:/caltab.descr', 'D:/caltab.ps')
+
+			
+
 
 
 
