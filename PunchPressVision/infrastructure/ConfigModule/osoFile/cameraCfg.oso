@@ -1,0 +1,12 @@
+#include<string>
+
+namespace Config{
+	class cameraCfg
+	{
+	public:
+		exposureTime1 : int : default = 200;
+		exposureTime2 : int : default = 200;
+		gain1 : int : default = 1;
+		gain2 : int : default = 1;
+	};
+}
