@@ -23,6 +23,11 @@ target_include_directories(${Inf_TARGET}
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/private/include>
 )
 
+target_link_libraries(${Inf_TARGET} 
+	PUBLIC RWUL::rqwcm 
+	PUBLIC global::global inf::ConfigModule
+)
+
 add_library(inf::${Inf_TARGET} ALIAS ${Inf_TARGET})
 
 add_subdirectory(./test)
