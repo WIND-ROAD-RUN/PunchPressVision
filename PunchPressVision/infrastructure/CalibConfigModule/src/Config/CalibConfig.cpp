@@ -6,10 +6,16 @@ namespace inf
 	{
 		void CalibConfig::saveInDir(const std::string& dirPath)
 		{
+
+
 		}
 
 		void CalibConfig::loadInDir(const std::string& dirPath)
 		{
+
+
+
+
 		}
 	}
 }
