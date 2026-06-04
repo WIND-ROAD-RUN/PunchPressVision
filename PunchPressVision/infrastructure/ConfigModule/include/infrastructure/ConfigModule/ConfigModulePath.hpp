@@ -9,6 +9,9 @@ namespace inf
 	public:
 		std::string RootPath = global::ProjectRootPath + "/config";
 	public:
+		std::string baseCfgName = "baseCfg.xml";
+		std::string cameraCfgName = "cameraCfg.xml";
+	public:
 
 	}ConfigModulePath;
 }
