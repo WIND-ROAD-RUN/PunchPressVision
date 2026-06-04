@@ -28,9 +28,10 @@ target_link_libraries(${Inf_TARGET}
 		inf::CameraModule
 		inf::ConfigModule
 		inf::CalibConfigModule
-		inf::ShapeModelManagerModule
 		inf::TwoCameraSpliceModule
 		inf::NinePointModule
+		#inf::ShapeModelManagerModule
+
 )
 
 add_library(inf::${Inf_TARGET} ALIAS ${Inf_TARGET})
