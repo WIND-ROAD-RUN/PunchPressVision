@@ -4,9 +4,12 @@ namespace inf
 {
 	namespace Config
 	{
-		class CalibConfig
+		void CalibConfig::saveInDir(const std::string& dirPath)
 		{
-			//TODO:完成畸变矫正的序列化和反序列化以及参数
-		};
+		}
+
+		void CalibConfig::loadInDir(const std::string& dirPath)
+		{
+		}
 	}
 }

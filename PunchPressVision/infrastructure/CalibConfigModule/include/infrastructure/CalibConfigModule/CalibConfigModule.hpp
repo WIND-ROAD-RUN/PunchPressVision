@@ -7,6 +7,10 @@ namespace inf
 	class CalibConfigModule
 	{
 	public:
-
+		Config::CalibConfig calibConfig;
+	public:
+		void build();
+		void destroy();
+		void save();
 	};
 }
