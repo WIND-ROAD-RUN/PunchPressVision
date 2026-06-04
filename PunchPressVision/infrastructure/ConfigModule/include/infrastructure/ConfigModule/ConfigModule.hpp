@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "Config/VisionCfg.hpp"
 #include "infrastructure/ConfigModule/Config/cameraCfg.hpp"
 #include "infrastructure/ConfigModule/Config/baseCfg.hpp"
 
@@ -22,6 +23,7 @@ namespace inf
 	public:
 		Config::BaseCfg baseCfg;
 		Config::cameraCfg cameraCfg;
+		Config::visionCfg visionCfg;
 	public:
 		void build();
 		void destroy();
