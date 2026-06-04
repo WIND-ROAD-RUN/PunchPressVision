@@ -11,6 +11,11 @@ list(APPEND SRC_LIST ${INCLUDE_LIST})
 
 add_library(${Inf_TARGET} STATIC ${SRC_LIST} )
 
+target_link_libraries(${Inf_TARGET} 
+	PUBLIC global::global
+	PUBLIC Halcon
+)
+
 set_target_properties(${Inf_TARGET} PROPERTIES
 	DEBUG_POSTFIX "d"
 	RELEASE_POSTFIX ""
