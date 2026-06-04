@@ -30,7 +30,12 @@ namespace inf
 
 	void ConfigModule::destroy()
 	{
-		//TODO:保存配置文件，序列化baseCfg和cameraCfg到文件
+		save();
 		storageContext_.reset();
+	}
+
+	void ConfigModule::save()
+	{
+		//TODO:保存配置文件，序列化baseCfg和cameraCfg到文件
 	}
 }

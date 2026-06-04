@@ -27,5 +27,6 @@ namespace inf
 	public:
 		void build();
 		void destroy();
+		void save();
 	};
 }
