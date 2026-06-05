@@ -7,6 +7,15 @@ namespace bun
 	{
 	}
 
+	void NinePointBun::calculateNinePointConfig()
+	{
+		Config::NinePointCfg ninePointCfg;
+
+		//TODO:
+
+		inf_.nine_point_module_->ninePointConfig = ninePointCfg;
+	}
+
 	void NinePointBun::build()
 	{
 	}
