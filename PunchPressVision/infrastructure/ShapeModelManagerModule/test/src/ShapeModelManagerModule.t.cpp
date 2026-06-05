@@ -11,9 +11,11 @@ namespace test
         inf::ShapeModelManagerModule manager;
         manager.build();
 
+        inf::Config::ShapeModelData data;
         inf::Config::ShapeModelInfo info;
-		
-        info.loadInDir(R"(C:\Users\zfkjCompile\Desktop\1)");
+		info.name = "TestModel";
+        manager.addShapeModelItem(data, info);
+
         manager.destroy();
     }
 }
