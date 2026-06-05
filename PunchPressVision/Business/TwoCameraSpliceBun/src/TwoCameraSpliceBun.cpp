@@ -12,6 +12,9 @@ namespace bun
 	{
 		Config::TwoCameraSpliceCfg result;
 		//TODO: 补充双相机拼接的算法
+
+
+
 		inf_.two_camera_splice_module_->twoCameraSpliceConfig = result;
 	}
 
