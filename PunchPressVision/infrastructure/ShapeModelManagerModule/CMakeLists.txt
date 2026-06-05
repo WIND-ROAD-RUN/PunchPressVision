@@ -19,6 +19,7 @@ set_target_properties(${Inf_TARGET} PROPERTIES
 target_link_libraries(${Inf_TARGET} 
 	PUBLIC global::global
 	PUBLIC Halcon
+	PUBLIC JsonCpp::JsonCpp
 )
 
 target_include_directories(${Inf_TARGET} 
