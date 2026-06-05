@@ -19,7 +19,7 @@ namespace inf
     public:
         void readAllShapeModelInfos();
     public:
-        void addShapeModelItem(const Config::ShapeModelData & data,Config::ShapeModelInfo info);
+        Config::ShapeModelInfo addShapeModelItem(const Config::ShapeModelData & data,Config::ShapeModelInfo::BaseInfo baseInfo);
         void deleteShapeModelItem(const std::string& id);
     public:
         static std::string getCurrentTime_yyMMddHHmmsszzz();

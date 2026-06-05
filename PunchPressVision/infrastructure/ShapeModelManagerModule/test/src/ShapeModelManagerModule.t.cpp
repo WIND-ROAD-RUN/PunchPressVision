@@ -13,12 +13,15 @@ namespace test
         manager.build();
 
         inf::Config::ShapeModelData data;
-        inf::Config::ShapeModelInfo info;
-		info.name = "TestModel";
-        manager.addShapeModelItem(data, info);
+        inf::Config::ShapeModelInfo::BaseInfo baseInfo;
+        baseInfo.name = "TestModel";
+        manager.addShapeModelItem(data, baseInfo);
         std::this_thread::sleep_for(std::chrono::seconds(1));
-        info.name = "TestModel1";
-        manager.addShapeModelItem(data, info);
+
+        baseInfo.name = "TestModel1";
+        auto info = manager.addShapeModelItem(data, baseInfo);
+
+        manager.deleteShapeModelItem(info.getId());
 
         manager.destroy();
     }

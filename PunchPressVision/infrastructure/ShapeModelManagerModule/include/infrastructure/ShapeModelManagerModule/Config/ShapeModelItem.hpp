@@ -13,11 +13,17 @@ namespace inf
             void saveInDir(const std::string & dir);
         };
 
+        
 
         struct ShapeModelInfo
         {
         public:
-            std::string name;
+            struct BaseInfo
+            {
+                std::string name;
+            };
+        public:
+			BaseInfo base_info;
         private:
             std::string id_;
             std::string create_time_;

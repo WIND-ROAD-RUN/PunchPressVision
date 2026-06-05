@@ -48,20 +48,24 @@ namespace inf
         }
     }
 
-    void ShapeModelManagerModule::addShapeModelItem(const Config::ShapeModelData& data, Config::ShapeModelInfo info)
+    Config::ShapeModelInfo ShapeModelManagerModule::addShapeModelItem(const Config::ShapeModelData& data, Config::ShapeModelInfo::BaseInfo baseInfo)
     {
+        Config::ShapeModelInfo info;
         auto currentTime = getCurrentTime_yyMMddHHmmsszzz();
         info.setCreateTime(currentTime);
         info.setUpdateTime(currentTime);
         info.setFolderPath(ShapeModelManagerModulePath.RootPath+ currentTime);
         info.setId(QUuid::createUuid().toString(QUuid::WithoutBraces).toStdString() + "_" + currentTime);
+		info.base_info = std::move(baseInfo);
 
 		Config::ShapeModelItem item;
 		item.info = info;
 		item.data = data;
 
         item.saveInDir(info.getFolderPath());
-        shape_model_infos.push_back(std::move(info));
+        shape_model_infos.push_back(info);
+
+        return info;
     }
 
     void ShapeModelManagerModule::deleteShapeModelItem(const std::string& id)

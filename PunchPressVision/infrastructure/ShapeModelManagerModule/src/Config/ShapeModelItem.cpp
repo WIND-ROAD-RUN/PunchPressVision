@@ -81,7 +81,7 @@ namespace inf
 					return;
 
 				id_ = root.get("id", id_).asString();
-				name = root.get("name", name).asString();
+				base_info.name = root.get("name", base_info.name).asString();
 				create_time_ = root.get("createTime", create_time_).asString();
 				update_time_ = root.get("updateTime", update_time_).asString();
 				folder_path_ = root.get("folderPath", folder_path_).asString();
@@ -100,7 +100,7 @@ namespace inf
 
 				Json::Value root;
 				root["id"] = id_;
-				root["name"] = name;
+				root["name"] = base_info.name;
 				root["createTime"] = create_time_;
 				root["updateTime"] = update_time_;
 				root["folderPath"] = folder_path_.empty() ? dirPath.string() : folder_path_;
