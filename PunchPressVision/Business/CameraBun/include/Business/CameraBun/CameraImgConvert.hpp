@@ -1,6 +1,6 @@
 #pragma once
 
-#include <halconcpp/HImage.h>
+#include "halconcpp/HalconCpp.h"
 #include "opencv2/core/mat.hpp"
 
 namespace bun
