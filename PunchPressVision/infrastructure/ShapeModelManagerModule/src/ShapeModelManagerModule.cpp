@@ -50,7 +50,7 @@ namespace inf
 
     void ShapeModelManagerModule::addShapeModelItem(const Config::ShapeModelData& data, Config::ShapeModelInfo info)
     {
-        auto currentTime = getCurrentTime_yyMMddHHmmss();
+        auto currentTime = getCurrentTime_yyMMddHHmmsszzz();
         info.setCreateTime(currentTime);
         info.setUpdateTime(currentTime);
         info.setFolderPath(ShapeModelManagerModulePath.RootPath+ currentTime);
@@ -61,17 +61,46 @@ namespace inf
 		item.data = data;
 
         item.saveInDir(info.getFolderPath());
-        readAllShapeModelInfos();
+        shape_model_infos.push_back(std::move(info));
     }
 
-    std::string ShapeModelManagerModule::getCurrentTime_yyMMddHHmmss()
+    void ShapeModelManagerModule::deleteShapeModelItem(const std::string& id)
     {
-        return QDateTime::currentDateTime().toString("yyyyMMddHHmmss").toStdString();
+        try
+        {
+            namespace fs = std::filesystem;
+
+            const auto it = std::find_if(shape_model_infos.begin(), shape_model_infos.end(),
+                [&id](const Config::ShapeModelInfo& info)
+                {
+                    return info.getId() == id;
+                });
+
+            if (it == shape_model_infos.end())
+                return;
+
+            const fs::path dirPath(it->getFolderPath());
+            if (!dirPath.empty() && fs::exists(dirPath))
+            {
+                fs::remove_all(dirPath);
+            }
+
+            shape_model_infos.erase(it);
+        }
+        catch (...)
+        {
+            // Ignore delete errors
+        }
+    }
+
+    std::string ShapeModelManagerModule::getCurrentTime_yyMMddHHmmsszzz()
+    {
+        return QDateTime::currentDateTime().toString("yyyyMMddHHmmsszzz").toStdString();
     }
 
     void ShapeModelManagerModule::build()
     {
-
+        readAllShapeModelInfos();
     }
 
     void ShapeModelManagerModule::destroy()
