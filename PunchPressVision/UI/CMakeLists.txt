@@ -30,7 +30,4 @@ if(HALCON_DLLS)
     )
 endif()
 
-add_custom_command(TARGET ${PPV_TARGET_NAME} POST_BUILD
-	COMMAND ${QT_DIR}/bin/windeployqt.exe --no-compiler-runtime --no-opengl-sw $<TARGET_FILE:${PPV_TARGET_NAME}>
-	COMMENT "Running windeployqt to package Qt dependencies for ${PPV_TARGET_NAME}"
-)
+add_windeployqt(${PPV_TARGET_NAME})
