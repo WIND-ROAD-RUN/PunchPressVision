@@ -12,6 +12,9 @@ namespace inf
 	class infrastructure
 	{
 	public:
+		infrastructure();
+		~infrastructure();
+	public:
 		void build();
 		void destroy();
 	public:
