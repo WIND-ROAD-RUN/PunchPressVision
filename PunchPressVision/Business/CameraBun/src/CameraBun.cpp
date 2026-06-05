@@ -2,5 +2,8 @@
 
 namespace bun
 {
-	
+	CameraBun::CameraBun(inf::infrastructure& inf)
+		: inf_(inf)
+	{
+	}
 }
