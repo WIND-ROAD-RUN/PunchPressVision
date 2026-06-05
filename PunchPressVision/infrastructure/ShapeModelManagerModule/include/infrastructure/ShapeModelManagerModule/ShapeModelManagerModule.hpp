@@ -4,12 +4,14 @@
 #include <string>
 #include <vector>
 
+#include "global/GlobalInterface.hpp"
 #include "infrastructure/ShapeModelManagerModule/ShapeModelManagerModuleTypes.hpp"
 #include "infrastructure/ShapeModelManagerModule/Config/ShapeModelItem.hpp"
 
 namespace inf
 {
     class ShapeModelManagerModule
+        : public global::IInfrastructure
     {
     public:
         ShapeModelManagerModule();
@@ -30,7 +32,7 @@ namespace inf
     public:
         static std::string getCurrentTime_yyMMddHHmmsszzz();
     public:
-        void build();
-        void destroy();
+        void build() override;
+        void destroy() override;
     };
 }

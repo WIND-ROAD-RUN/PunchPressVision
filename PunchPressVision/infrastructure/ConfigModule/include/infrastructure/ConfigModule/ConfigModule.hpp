@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "global/GlobalInterface.hpp"
 #include "Config/VisionCfg.hpp"
 #include "infrastructure/ConfigModule/Config/cameraCfg.hpp"
 #include "infrastructure/ConfigModule/Config/baseCfg.hpp"
@@ -14,6 +15,7 @@ namespace rw::oso
 namespace inf
 {
 	class ConfigModule
+		: public global::IInfrastructure
 	{
 	public:
 		ConfigModule();
@@ -25,8 +27,8 @@ namespace inf
 		Config::cameraCfg cameraCfg;
 		Config::visionCfg visionCfg;
 	public:
-		void build();
-		void destroy();
+		void build() override;
+		void destroy() override;
 		void save();
 	};
 }

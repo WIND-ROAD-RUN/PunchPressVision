@@ -2,7 +2,7 @@
 
 namespace inf
 {
-	void CameraModule::build(const Config::cameraCfg& cfg)
+	void CameraModule::build()
 	{
 		//TODO:这里构建相机
 		//参考如下
