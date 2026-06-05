@@ -4,137 +4,134 @@
 #include <fstream>
 #include <string>
 
-namespace inf
+namespace Config
 {
-	namespace Config
+	namespace
 	{
-		namespace
+		namespace fs = std::filesystem;
+
+		constexpr const char* kCameraParametersFile = "camera_parameters.tup";
+		constexpr const char* kCameraPoseFile = "camera_pose.tup";
+		constexpr const char* kSettingsFile = "camera_settings.txt";
+
+		std::string trimCr(const std::string& s)
 		{
-			namespace fs = std::filesystem;
+			if (!s.empty() && s.back() == '\r')
+				return s.substr(0, s.size() - 1);
+			return s;
+		}
 
-			constexpr const char* kCameraParametersFile = "camera_parameters.tup";
-			constexpr const char* kCameraPoseFile = "camera_pose.tup";
-			constexpr const char* kSettingsFile = "camera_settings.txt";
-
-			std::string trimCr(const std::string& s)
+		void replaceFile(const fs::path& tmp, const fs::path& target)
+		{
+			if (fs::exists(target))
 			{
-				if (!s.empty() && s.back() == '\r')
-					return s.substr(0, s.size() - 1);
-				return s;
+				try { fs::remove(target); }
+				catch (...) {}
 			}
+			fs::rename(tmp, target);
+		}
 
-			void replaceFile(const fs::path& tmp, const fs::path& target)
+		void writeTupleSafe(const fs::path& filePath, const HalconCpp::HTuple& tuple)
+		{
+			fs::create_directories(filePath.parent_path());
+			fs::path tmp = filePath;
+			tmp += ".tmp";
+			HalconCpp::WriteTuple(tuple, tmp.string().c_str());
+			replaceFile(tmp, filePath);
+		}
+
+		bool readTupleSafe(const fs::path& filePath, HalconCpp::HTuple& tuple)
+		{
+			if (!fs::exists(filePath))
+				return false;
+			try
 			{
-				if (fs::exists(target))
-				{
-					try { fs::remove(target); }
-					catch (...) {}
-				}
-				fs::rename(tmp, target);
+				HalconCpp::ReadTuple(filePath.string().c_str(), &tuple);
 			}
-
-			void writeTupleSafe(const fs::path& filePath, const HalconCpp::HTuple& tuple)
+			catch (...)
 			{
-				fs::create_directories(filePath.parent_path());
-				fs::path tmp = filePath;
-				tmp += ".tmp";
-				HalconCpp::WriteTuple(tuple, tmp.string().c_str());
-				replaceFile(tmp, filePath);
+				return false;
 			}
+			return true;
+		}
 
-			bool readTupleSafe(const fs::path& filePath, HalconCpp::HTuple& tuple)
+		void writeSettingsSafe(const fs::path& filePath, double exposure, double gain)
+		{
+			fs::create_directories(filePath.parent_path());
+			fs::path tmp = filePath;
+			tmp += ".tmp";
+			std::ofstream ofs(tmp);
+			if (!ofs)
+				return;
+			ofs << "cameraExposure=" << exposure << '\n';
+			ofs << "cameraGain=" << gain << '\n';
+			ofs.close();
+			replaceFile(tmp, filePath);
+		}
+
+		bool readSettingsSafe(const fs::path& filePath, double& exposure, double& gain)
+		{
+			if (!fs::exists(filePath))
+				return false;
+			std::ifstream ifs(filePath);
+			if (!ifs)
+				return false;
+			std::string line;
+			while (std::getline(ifs, line))
 			{
-				if (!fs::exists(filePath))
-					return false;
+				line = trimCr(line);
+				if (line.empty() || line.front() == '#')
+					continue;
+				const auto pos = line.find('=');
+				if (pos == std::string::npos)
+					continue;
+				const std::string key = line.substr(0, pos);
+				const std::string value = line.substr(pos + 1);
 				try
 				{
-					HalconCpp::ReadTuple(filePath.string().c_str(), &tuple);
+					if (key == "cameraExposure")
+						exposure = std::stod(value);
+					else if (key == "cameraGain")
+						gain = std::stod(value);
 				}
 				catch (...)
 				{
-					return false;
+					continue;
 				}
-				return true;
 			}
-
-			void writeSettingsSafe(const fs::path& filePath, double exposure, double gain)
-			{
-				fs::create_directories(filePath.parent_path());
-				fs::path tmp = filePath;
-				tmp += ".tmp";
-				std::ofstream ofs(tmp);
-				if (!ofs)
-					return;
-				ofs << "cameraExposure=" << exposure << '\n';
-				ofs << "cameraGain=" << gain << '\n';
-				ofs.close();
-				replaceFile(tmp, filePath);
-			}
-
-			bool readSettingsSafe(const fs::path& filePath, double& exposure, double& gain)
-			{
-				if (!fs::exists(filePath))
-					return false;
-				std::ifstream ifs(filePath);
-				if (!ifs)
-					return false;
-				std::string line;
-				while (std::getline(ifs, line))
-				{
-					line = trimCr(line);
-					if (line.empty() || line.front() == '#')
-						continue;
-					const auto pos = line.find('=');
-					if (pos == std::string::npos)
-						continue;
-					const std::string key = line.substr(0, pos);
-					const std::string value = line.substr(pos + 1);
-					try
-					{
-						if (key == "cameraExposure")
-							exposure = std::stod(value);
-						else if (key == "cameraGain")
-							gain = std::stod(value);
-					}
-					catch (...)
-					{
-						continue;
-					}
-				}
-				return true;
-			}
+			return true;
 		}
+	}
 
-		void CalibConfig::saveInDir(const std::string& dirPath)
+	void CalibConfig::saveInDir(const std::string& dirPath)
+	{
+		try
 		{
-			try
-			{
-				const fs::path dir(dirPath);
-				writeTupleSafe(dir / kCameraParametersFile, cameraParameters);
-				writeTupleSafe(dir / kCameraPoseFile, cameraPose);
-				writeSettingsSafe(dir / kSettingsFile, cameraExposure, cameraGain);
-			}
-			catch (...)
-			{
-				// Ignore save errors to avoid crashing the application.
-			}
+			const fs::path dir(dirPath);
+			writeTupleSafe(dir / kCameraParametersFile, cameraParameters);
+			writeTupleSafe(dir / kCameraPoseFile, cameraPose);
+			writeSettingsSafe(dir / kSettingsFile, cameraExposure, cameraGain);
 		}
-
-		void CalibConfig::loadInDir(const std::string& dirPath)
+		catch (...)
 		{
-			try
-			{
-				const fs::path dir(dirPath);
-				cameraExposure = 10000.0;
-				cameraGain = 5.0;
-				readTupleSafe(dir / kCameraParametersFile, cameraParameters);
-				readTupleSafe(dir / kCameraPoseFile, cameraPose);
-				readSettingsSafe(dir / kSettingsFile, cameraExposure, cameraGain);
-			}
-			catch (...)
-			{
-				// Ignore load errors; missing files keep the default values.
-			}
+			// Ignore save errors to avoid crashing the application.
+		}
+	}
+
+	void CalibConfig::loadInDir(const std::string& dirPath)
+	{
+		try
+		{
+			const fs::path dir(dirPath);
+			cameraExposure = 10000.0;
+			cameraGain = 5.0;
+			readTupleSafe(dir / kCameraParametersFile, cameraParameters);
+			readTupleSafe(dir / kCameraPoseFile, cameraPose);
+			readSettingsSafe(dir / kSettingsFile, cameraExposure, cameraGain);
+		}
+		catch (...)
+		{
+			// Ignore load errors; missing files keep the default values.
 		}
 	}
 }

@@ -1,31 +1,28 @@
 #pragma once
 #include <string>
 #include "halconcpp/HalconCpp.h"
-namespace inf
+namespace Config
 {
-	namespace Config
+	class NinePointCfg
 	{
-		class NinePointCfg
-		{
-		private:
-			// Measurement rectangle parameters
-			double MeasureLength1 = 100;
-			double MeasureLength2 = 50;
-			double MeasureThreshold = 1;
-			double num_Measure = 5;
+	private:
+		// Measurement rectangle parameters
+		double MeasureLength1 = 100;
+		double MeasureLength2 = 50;
+		double MeasureThreshold = 1;
+		double num_Measure = 5;
 
-			// Homography matrix from nine-point calibration
-			HalconCpp::HTuple outHomMat2D;
+		// Homography matrix from nine-point calibration
+		HalconCpp::HTuple outHomMat2D;
 
-			// Calibration plate parameters
-			int xnumber = 7;
-			int ynumber = 7;
-			double distance = 0.007;
-			double scale = 0.5;
+		// Calibration plate parameters
+		int xnumber = 7;
+		int ynumber = 7;
+		double distance = 0.007;
+		double scale = 0.5;
 
-		public:
-			void saveInDir(const std::string& dirPath);
-			void loadInDir(const std::string& dirPath);
-		};
-	}
+	public:
+		void saveInDir(const std::string& dirPath);
+		void loadInDir(const std::string& dirPath);
+	};
 }

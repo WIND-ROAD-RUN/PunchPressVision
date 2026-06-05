@@ -4,7 +4,7 @@
 
 int main()
 {
-	inf::Config::CalibConfig config;
+	Config::CalibConfig config;
 	config.loadInDir("path/to/config/dir");
 	config.saveInDir("path/to/config/dir");
 	return 0;

@@ -30,7 +30,7 @@ target_link_libraries(${Inf_TARGET}
 		inf::CalibConfigModule
 		inf::TwoCameraSpliceModule
 		inf::NinePointModule
-		#inf::ShapeModelManagerModule
+		inf::ShapeModelManagerModule
 
 )
 

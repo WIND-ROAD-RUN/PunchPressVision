@@ -12,8 +12,8 @@ namespace test
         inf::ShapeModelManagerModule manager;
         manager.build();
 
-        inf::Config::ShapeModelData data;
-        inf::Config::ShapeModelInfo::BaseInfo baseInfo;
+        Config::ShapeModelData data;
+        Config::ShapeModelInfo::BaseInfo baseInfo;
         baseInfo.name = "TestModel";
         manager.addShapeModelItem(data, baseInfo);
         std::this_thread::sleep_for(std::chrono::seconds(1));
