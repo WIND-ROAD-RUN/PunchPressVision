@@ -11,6 +11,11 @@ list(APPEND SRC_LIST ${INCLUDE_LIST})
 
 add_library(${Bun_TARGET} STATIC ${SRC_LIST} )
 
+target_link_libraries(${Bun_TARGET}
+	PUBLIC
+		inf::infrastructure
+)
+
 set_target_properties(${Bun_TARGET} PROPERTIES
 	DEBUG_POSTFIX "d"
 	RELEASE_POSTFIX ""
