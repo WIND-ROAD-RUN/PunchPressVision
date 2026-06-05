@@ -6,4 +6,20 @@ namespace bun
 		: inf_(inf)
 	{
 	}
+
+	void TwoCameraSpliceBun::build()
+	{
+	}
+
+	void TwoCameraSpliceBun::destroy()
+	{
+	}
+
+	void TwoCameraSpliceBun::start()
+	{
+	}
+
+	void TwoCameraSpliceBun::stop()
+	{
+	}
 }

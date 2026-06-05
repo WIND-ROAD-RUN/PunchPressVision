@@ -6,4 +6,20 @@ namespace bun
 		: inf_(inf)
 	{
 	}
+
+	void CameraBun::build()
+	{
+	}
+
+	void CameraBun::destroy()
+	{
+	}
+
+	void CameraBun::start()
+	{
+	}
+
+	void CameraBun::stop()
+	{
+	}
 }

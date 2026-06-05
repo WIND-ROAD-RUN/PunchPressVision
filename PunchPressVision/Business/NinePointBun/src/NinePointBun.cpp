@@ -6,4 +6,20 @@ namespace bun
 		: inf_(inf)
 	{
 	}
+
+	void NinePointBun::build()
+	{
+	}
+
+	void NinePointBun::destroy()
+	{
+	}
+
+	void NinePointBun::start()
+	{
+	}
+
+	void NinePointBun::stop()
+	{
+	}
 }

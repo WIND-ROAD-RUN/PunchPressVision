@@ -6,4 +6,20 @@ namespace bun
 		: inf_(inf)
 	{
 	}
+
+	void ShapeModeManagerBun::build()
+	{
+	}
+
+	void ShapeModeManagerBun::destroy()
+	{
+	}
+
+	void ShapeModeManagerBun::start()
+	{
+	}
+
+	void ShapeModeManagerBun::stop()
+	{
+	}
 }

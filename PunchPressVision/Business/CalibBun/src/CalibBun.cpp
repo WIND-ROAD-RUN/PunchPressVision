@@ -6,4 +6,20 @@ namespace bun
 		: inf_(inf)
 	{
 	}
+
+	void CalibBun::build()
+	{
+	}
+
+	void CalibBun::destroy()
+	{
+	}
+
+	void CalibBun::start()
+	{
+	}
+
+	void CalibBun::stop()
+	{
+	}
 }
