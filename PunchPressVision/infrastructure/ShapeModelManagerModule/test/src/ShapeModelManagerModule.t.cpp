@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include"infrastructure/ShapeModelManagerModule/Config/ShapeModelItem.hpp"
+
 namespace test
 {
     void ShapeModelManagerModuleTest::runBasicTest()
@@ -9,8 +11,9 @@ namespace test
         inf::ShapeModelManagerModule manager;
         manager.build();
 
-        // TODO: 添加测试用例
-
+        inf::Config::ShapeModelInfo info;
+		
+        info.loadInDir(R"(C:\Users\zfkjCompile\Desktop\1)");
         manager.destroy();
     }
 }

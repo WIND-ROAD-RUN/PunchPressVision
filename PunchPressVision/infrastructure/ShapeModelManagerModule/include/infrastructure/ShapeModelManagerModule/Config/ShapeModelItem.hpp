@@ -17,11 +17,21 @@ namespace inf
         struct ShapeModelInfo
         {
         public:
-            std::string id;
             std::string name;
-            std::string createTime;
-            std::string updateTime;
-            std::string folderPath;
+        private:
+            std::string id_;
+            std::string create_time_;
+            std::string update_time_;
+            std::string folder_path_;
+        public:
+			std::string getId() const { return id_; }
+			std::string getCreateTime() const { return create_time_; }
+			std::string getUpdateTime() const { return update_time_; }
+			std::string getFolderPath() const { return folder_path_; }
+            void setId(const std::string & id){ this->id_ = id; }
+            void setCreateTime(const std::string & createTime){ this->create_time_ = createTime; }
+            void setUpdateTime(const std::string & updateTime){ this->update_time_ = updateTime; }
+            void setFolderPath(const std::string & folderPath){ this->folder_path_ = folderPath; }
         public:
             void loadInDir(const std::string& dir);
             void saveInDir(const std::string& dir);

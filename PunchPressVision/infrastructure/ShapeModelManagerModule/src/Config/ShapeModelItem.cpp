@@ -74,17 +74,17 @@ namespace inf
 			try
 			{
 				const fs::path dirPath(dir);
-				folderPath = dirPath.string();
+				folder_path_ = dirPath.string();
 
 				Json::Value root;
 				if (!readJsonSafe(dirPath / kModelInfoFile, root))
 					return;
 
-				id = root.get("id", id).asString();
+				id_ = root.get("id", id_).asString();
 				name = root.get("name", name).asString();
-				createTime = root.get("createTime", createTime).asString();
-				updateTime = root.get("updateTime", updateTime).asString();
-				folderPath = root.get("folderPath", folderPath).asString();
+				create_time_ = root.get("createTime", create_time_).asString();
+				update_time_ = root.get("updateTime", update_time_).asString();
+				folder_path_ = root.get("folderPath", folder_path_).asString();
 			}
 			catch (...)
 			{
@@ -99,11 +99,11 @@ namespace inf
 				const fs::path dirPath(dir);
 
 				Json::Value root;
-				root["id"] = id;
+				root["id"] = id_;
 				root["name"] = name;
-				root["createTime"] = createTime;
-				root["updateTime"] = updateTime;
-				root["folderPath"] = folderPath.empty() ? dirPath.string() : folderPath;
+				root["createTime"] = create_time_;
+				root["updateTime"] = update_time_;
+				root["folderPath"] = folder_path_.empty() ? dirPath.string() : folder_path_;
 
 				writeJsonSafe(dirPath / kModelInfoFile, root);
 			}
