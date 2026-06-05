@@ -2,5 +2,8 @@
 
 namespace bun
 {
-	
+	TwoCameraSpliceBun::TwoCameraSpliceBun(inf::infrastructure& inf)
+		: inf_(inf)
+	{
+	}
 }
