@@ -14,9 +14,7 @@ list(APPEND SRC_LIST ${INCLUDE_LIST})
 
 add_library(${Inf_TARGET} STATIC ${SRC_LIST} ${GENERATED_HEADERS})
 
-target_link_libraries(${Inf_TARGET} PUBLIC RWUL::oso RWUL::core)
-
-target_link_libraries(${Inf_TARGET} PRIVATE global::global)
+target_link_libraries(${Inf_TARGET} PUBLIC RWUL::oso RWUL::core global::global)
 
 set_target_properties(${Inf_TARGET} PROPERTIES
 	DEBUG_POSTFIX "d"
