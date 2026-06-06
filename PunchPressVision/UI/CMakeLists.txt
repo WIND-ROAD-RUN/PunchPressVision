@@ -1,5 +1,7 @@
 set(PPV_TARGET_NAME "PunchPressVision")
 
+add_subdirectory(UIModule)
+
 file(GLOB INCLUDE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h)
 file(GLOB SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 
@@ -9,6 +11,11 @@ target_include_directories(${PPV_TARGET_NAME}
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/UIModule/include
+)
+
+target_link_libraries(${PPV_TARGET_NAME}
+    PRIVATE
+        UI::UIModule
 )
 
 target_link_libraries(${PPV_TARGET_NAME}

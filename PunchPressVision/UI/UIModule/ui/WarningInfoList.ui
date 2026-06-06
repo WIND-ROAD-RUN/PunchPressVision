@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>WarningInfoListClass</class>
+ <widget class="QDialog" name="WarningInfoListClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1280</width>
+    <height>1024</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>WarningInfoList</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="3,1">
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string/>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QTableView" name="tableView">
+        <property name="styleSheet">
+         <string notr="true">/* 基础表格视图 */
+QTableView {
+    border: 1px solid #AAAAAA;
+    border-radius: 3px;
+    background: #FFFFFF;
+    color: #444444;
+    font-size: 14px;
+    outline: 0;
+    gridline-color: #EEEEEE;  /* 网格线颜色 */
+    alternate-background-color: #FAFAFA;  /* 交替行背景 */
+    selection-background-color: #666666;  /* 选中背景 */
+    selection-color: #FFFFFF;  /* 选中文字 */
+}
+
+/* 表头系统 */
+QHeaderView {
+    background: #FFFFFF;
+    border: none;
+    border-bottom: 2px solid #DDDDDD;
+}
+
+QHeaderView::section {
+    background: #F8F8F8;
+    border: none;
+    border-right: 1px solid #DDDDDD;
+    padding: 8px 12px;
+    color: #666666;
+    font-weight: 500;
+    qproperty-defaultAlignment: AlignLeft|AlignVCenter;
+}
+
+QHeaderView::section:last-child {
+    border-right: none;
+}
+
+/* 排序指示器 */
+QHeaderView::down-arrow {
+    image: url(:/icons/sort_desc_gray.svg);
+    margin-right: 4px;
+}
+
+QHeaderView::up-arrow {
+    image: url(:/icons/sort_asc_gray.svg);
+    margin-right: 4px;
+}
+
+/* 单元格样式 */
+QTableView::item {
+    padding: 6px 12px;
+    border: 1px solid transparent;
+    min-height: 32px;
+}
+
+/* 悬停效果 */
+QTableView::item:hover {
+    background: #F8F8F8;
+    border-color: #888888;
+}
+
+/* 选中状态 */
+QTableView::item:selected {
+    border-color: #555555;
+}
+
+/* 焦点单元格 */
+QTableView::item:focus {
+    border: 1px solid #888888;
+    background: #FFFFFF;
+}
+
+/* 禁用状态 */
+QTableView:disabled {
+    border-color: #DDDDDD;
+    color: #AAAAAA;
+}
+
+QTableView::item:disabled {
+    background: #F5F5F5;
+    color: #AAAAAA;
+}
+
+/* 紧凑型变体 */
+QTableView.compact {
+    font-size: 13px;
+    gridline-color: #F0F0F0;
+}
+
+QTableView.compact::item {
+    min-height: 28px;
+    padding: 4px 8px;
+}
+
+/* 编辑状态 */
+QTableView::item:edit {
+    border: 1px solid #888888;
+    background: #FFFFFF;
+}
+
+/* 滚动条系统 */
+QScrollBar:horizontal {
+    height: 10px;
+    background: #FFFFFF;
+}
+
+QScrollBar::handle:horizontal {
+    background: #CCCCCC;
+    border-radius: 4px;
+    min-width: 20px;
+}
+
+/* 角部处理 */
+QTableView QTableCornerButton::section {
+    background: #F8F8F8;
+    border-bottom: 2px solid #DDDDDD;
+}</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_4">
+     <property name="styleSheet">
+      <string notr="true">QGroupBox {
+    border: 1px solid #DDD;
+    border-radius: 4px;
+    font: bold 14px;
+    color: #666;
+    background-color: rgb(161, 161, 161);
+    padding: 2px; 
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    left: 10px;
+    padding: 0 5px;
+}</string>
+     </property>
+     <property name="title">
+      <string/>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QPushButton" name="pbtn_exit">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+    padding: 6px 14px;
+    border: 2px solid #CCC;
+    border-radius: 4px;
+    background-color: white;
+    color: #444;
+    font-size: 30px; 
+}
+
+QPushButton:hover {
+    border-color: #999;
+    background-color: #F5F5F5;
+}
+
+QPushButton:pressed {
+    border-color: #777;
+    background-color: #EEE;
+}</string>
+        </property>
+        <property name="text">
+         <string>退出</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pbtn_clear">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+    padding: 6px 14px;
+    border: 2px solid #CCC;
+    border-radius: 4px;
+    background-color: white;
+    color: #444;
+    font-size: 30px; 
+}
+
+QPushButton:hover {
+    border-color: #999;
+    background-color: #F5F5F5;
+}
+
+QPushButton:pressed {
+    border-color: #777;
+    background-color: #EEE;
+}</string>
+        </property>
+        <property name="text">
+         <string>清除所有</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

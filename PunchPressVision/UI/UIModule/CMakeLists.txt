@@ -39,9 +39,9 @@ target_link_libraries(${DEMO_TARGET}
 	#PUBLIC ${OpenCV_LIBS}
 )
 
-target_link_directories(${DEMO_TARGET}
-	#PUBLIC ${OpenCV_INCLUDE_DIRS}
-)
+#target_link_directories(${DEMO_TARGET}
+#	PUBLIC ${OpenCV_INCLUDE_DIRS}
+#)
 
 target_link_libraries(${DEMO_TARGET}
 	PRIVATE RWUL::rqwu

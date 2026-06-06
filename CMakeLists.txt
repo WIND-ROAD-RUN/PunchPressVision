@@ -17,6 +17,6 @@ set(CMAKE_AUTORCC ON)
 find_package(OpenCV REQUIRED)
 find_package(jsoncpp REQUIRED)
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets Gui Concurrent Network)
-find_package(RWUL REQUIRED COMPONENTS oso core rqwcm)
+find_package(RWUL REQUIRED COMPONENTS oso core rqwcm rqwu)
 
 add_subdirectory(PunchPressVision)
