@@ -16,7 +16,7 @@ namespace bun
 
 		inf_.calib_config_module_->calibConfig = calibConfig;
 	}
-
+	
 	bool CalibBun::calibrateFromImages(const std::vector<HalconCpp::HImage>& himages,
 		double focalLengthMm,
 		double plateThicknessMm,
@@ -155,6 +155,115 @@ namespace bun
 			try { ClearCalibData(hv_CalibHandle); }
 			catch (...) {}
 			if (errorMsg) *errorMsg = std::string("标定异常: ") + except.ErrorMessage().Text();
+			return false;
+		}
+	}
+	//测试发现，FindCalibObject 成功时会返回标记点坐标，但如果没有找到标定板，则不会抛出异常，而是返回空坐标。因此在后续获取坐标时需要检查是否成功找到标定板。
+	bool CalibBun::drawCalibMarks(const HalconCpp::HImage& src,
+		Config::CalibConfig& cfg,
+		bool& isOk,
+		HalconCpp::HObject& outMarksXld,
+		HalconCpp::HObject& outMarksRegion,
+		std::string* errorMsg)
+	{
+		using namespace HalconCpp;
+
+		isOk = false;
+
+		GenEmptyObj(&outMarksXld);
+		GenEmptyObj(&outMarksRegion);
+
+		if (!src.IsInitialized())
+		{
+			if (errorMsg) *errorMsg = "输入图像未初始化";
+			return false;
+		}
+
+		if (cfg.calibBoardDescrPath.empty())
+		{
+			if (errorMsg) *errorMsg = "标定板描述文件路径为空";
+			return false;
+		}
+
+		HTuple hv_W, hv_H;
+		try
+		{
+			src.GetImageSize(&hv_W, &hv_H);
+		}
+		catch (const HException&)
+		{
+			if (errorMsg) *errorMsg = "获取图像尺寸失败";
+			return false;
+		}
+
+		HTuple StartParameters;
+		StartParameters[0] = "area_scan_polynomial";
+		StartParameters[1] = 0.008;
+		StartParameters[2] = 0;
+		StartParameters[3] = 0;
+		StartParameters[4] = 0;
+		StartParameters[5] = 0;
+		StartParameters[6] = 0;
+		StartParameters[7] = 2.4e-06;
+		StartParameters[8] = 2.4e-06;
+		StartParameters[9] = hv_W[0].D() / 2.0;
+		StartParameters[10] = hv_H[0].D() / 2.0;
+		StartParameters[11] = hv_W;
+		StartParameters[12] = hv_H;
+
+		HTuple hv_FindCalObjParNames, hv_FindCalObjParValues;
+		hv_FindCalObjParNames[0] = "gap_tolerance";
+		hv_FindCalObjParValues[0] = 1;
+		hv_FindCalObjParNames[1] = "alpha";
+		hv_FindCalObjParValues[1] = 1;
+		hv_FindCalObjParNames[2] = "skip_find_caltab";
+		hv_FindCalObjParValues[2] = "false";
+
+		HTuple hv_CalibHandle;
+		try
+		{
+			CreateCalibData("calibration_object", 1, 1, &hv_CalibHandle);
+			SetCalibDataCamParam(hv_CalibHandle, 0, HTuple(), StartParameters);
+			SetCalibDataCalibObject(hv_CalibHandle, 0, cfg.calibBoardDescrPath.c_str());
+
+			// 转灰度再找板（更稳）
+			HImage hGray;
+			HTuple hv_Channels;
+			CountChannels(src, &hv_Channels);
+			if (hv_Channels.TupleLength() > 0 && hv_Channels[0].I() == 3)
+				Rgb1ToGray(src, &hGray);
+			else
+				hGray = src;
+
+			FindCalibObject(hGray, hv_CalibHandle, 0, 0, 0, hv_FindCalObjParNames, hv_FindCalObjParValues);
+
+			HTuple hv_MarkRows, hv_MarkColumns, hv_Ind, hv_CameraPose;
+			GetCalibDataObservPoints(hv_CalibHandle, 0, 0, 0, &hv_MarkRows, &hv_MarkColumns, &hv_Ind, &hv_CameraPose);
+
+			if (hv_MarkRows.TupleLength() == 0 || hv_MarkColumns.TupleLength() == 0)
+			{
+				isOk = false;
+				ClearCalibData(hv_CalibHandle);
+				if (errorMsg) *errorMsg = "未找到标定板标记点";
+				return false;
+			}
+
+			// 输出 XLD：每个点十字（保留，便于看到原点位置）
+			GenCrossContourXld(&outMarksXld, hv_MarkRows, hv_MarkColumns, 12, 0.785398);
+
+			// 注意：这里不再生成整体外接矩形区域（避免在显示时叠加一个大矩形）。
+			// outMarksRegion 保持为空对象即可。
+
+			isOk = true;
+			ClearCalibData(hv_CalibHandle);
+			return true;
+		}
+		catch (const HException& except)
+		{
+			try { ClearCalibData(hv_CalibHandle); }
+			catch (...) {}
+			isOk = false;
+			if (errorMsg) *errorMsg = std::string("查找标定板标记异常: ") + except.ErrorMessage().Text();
 			return false;
 		}
 	}

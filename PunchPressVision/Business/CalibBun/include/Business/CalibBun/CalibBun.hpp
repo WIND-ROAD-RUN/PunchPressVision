@@ -20,6 +20,12 @@ namespace bun
 			double plateThicknessMm,
 			int referenceIndex = 0,
 			std::string* errorMsg = nullptr);
+		bool drawCalibMarks(const HalconCpp::HImage& src,
+			Config::CalibConfig& cfg,
+			bool& isOk,
+			HalconCpp::HObject& outMarksXld,
+			HalconCpp::HObject& outMarksRegion,
+			std::string* errorMsg = nullptr);
 		HalconCpp::HImage undistortImage(const HalconCpp::HImage& himage);
 	private:
 		inf::infrastructure& inf_;
