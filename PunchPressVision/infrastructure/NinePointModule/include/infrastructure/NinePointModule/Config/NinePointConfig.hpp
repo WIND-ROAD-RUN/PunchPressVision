@@ -5,7 +5,7 @@ namespace Config
 {
 	class NinePointCfg
 	{
-	private:
+	public:
 		// Measurement rectangle parameters
 		double MeasureLength1 = 100;
 		double MeasureLength2 = 50;
@@ -21,8 +21,12 @@ namespace Config
 		double distance = 0.007;
 		double scale = 0.5;
 
-	public:
+		int xdiantance = 400;
+		int ydistance = 100;
+
 		void saveInDir(const std::string& dirPath);
 		void loadInDir(const std::string& dirPath);
+	public:
+
 	};
 }

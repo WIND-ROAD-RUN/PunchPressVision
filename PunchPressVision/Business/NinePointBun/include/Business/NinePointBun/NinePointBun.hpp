@@ -3,8 +3,23 @@
 #include "global/GlobalInterface.hpp"
 #include "infrastructure/infrastructure.hpp"
 
+#include "halconcpp/HalconCpp.h"
+#include <vector>
+
 namespace bun
 {
+	struct Point2D
+	{
+		double x{ 0 };
+		double y{ 0 };
+	};
+
+	struct PointPair
+	{
+		Point2D pixPosition;
+		Point2D realPosition;
+	};
+
 	class NinePointBun
 		: public global::IBusiness
 	{
@@ -13,6 +28,13 @@ namespace bun
 
 		//TODO:这里定义九点标定的算法，包含输入类型的定义和返回结果的定义，下面是一个模板
 		void calculateNinePointConfig();
+
+		bool calcPixToWorldHomMat2D(const std::vector<Point2D>& pixPoints,
+			const std::vector<Point2D>& worldPoints,
+			Config::NinePointCfg& ninePointCfg);
+		bool pixToWorld(const HalconCpp::HTuple& homMat2D,
+			double pixX, double pixY,
+			double& outWorldX, double& outWorldY);
 
 	private:
 		inf::infrastructure& inf_;

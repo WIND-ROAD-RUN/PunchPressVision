@@ -57,7 +57,8 @@ namespace Config
 		void writeParamsSafe(const fs::path& filePath,
 			double measureLength1, double measureLength2,
 			double measureThreshold, double numMeasure,
-			int xNumber, int yNumber, double distanceVal, double scaleVal)
+			int xNumber, int yNumber, double distanceVal, double scaleVal,
+			int xDiantance, int yDistance)
 		{
 			fs::create_directories(filePath.parent_path());
 			fs::path tmp = filePath;
@@ -73,6 +74,8 @@ namespace Config
 			ofs << "ynumber=" << yNumber << '\n';
 			ofs << "distance=" << distanceVal << '\n';
 			ofs << "scale=" << scaleVal << '\n';
+			ofs << "xdiantance=" << xDiantance << '\n';
+			ofs << "ydistance=" << yDistance << '\n';
 			ofs.close();
 			replaceFile(tmp, filePath);
 		}
@@ -80,7 +83,8 @@ namespace Config
 		bool readParamsSafe(const fs::path& filePath,
 			double& measureLength1, double& measureLength2,
 			double& measureThreshold, double& numMeasure,
-			int& xNumber, int& yNumber, double& distanceVal, double& scaleVal)
+			int& xNumber, int& yNumber, double& distanceVal, double& scaleVal,
+			int& xDiantance, int& yDistance)
 		{
 			if (!fs::exists(filePath))
 				return false;
@@ -116,6 +120,10 @@ namespace Config
 						distanceVal = std::stod(value);
 					else if (key == "scale")
 						scaleVal = std::stod(value);
+					else if (key == "xdiantance")
+						xDiantance = std::stoi(value);
+					else if (key == "ydistance")
+						yDistance = std::stoi(value);
 				}
 				catch (...)
 				{
@@ -134,7 +142,8 @@ namespace Config
 			writeTupleSafe(dir / kHomMat2DFile, outHomMat2D);
 			writeParamsSafe(dir / kParamsFile,
 				MeasureLength1, MeasureLength2, MeasureThreshold, num_Measure,
-				xnumber, ynumber, distance, scale);
+				xnumber, ynumber, distance, scale,
+				xdiantance, ydistance);
 		}
 		catch (...)
 		{
@@ -155,10 +164,13 @@ namespace Config
 			ynumber = 7;
 			distance = 0.007;
 			scale = 0.5;
+			xdiantance = 400;
+			ydistance = 100;
 			readTupleSafe(dir / kHomMat2DFile, outHomMat2D);
 			readParamsSafe(dir / kParamsFile,
 				MeasureLength1, MeasureLength2, MeasureThreshold, num_Measure,
-				xnumber, ynumber, distance, scale);
+				xnumber, ynumber, distance, scale,
+				xdiantance, ydistance);
 		}
 		catch (...)
 		{
