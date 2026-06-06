@@ -1,7 +1,9 @@
 #pragma once
 
 #include <QDialog>
+#if 0 // --- 以下项目引用暂时注释 ---
 #include "ui_Dlg_OffSet.h"
+#endif
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Dlg_OffSetClass; };
@@ -14,6 +16,7 @@ class Dlg_OffSet : public QDialog
 public:
 	Dlg_OffSet(QWidget *parent = nullptr);
 	~Dlg_OffSet();
+#if 0 // --- 以下内容暂时注释 ---
 private:
 	void build_ui();
 	void build_connect();
@@ -49,8 +52,7 @@ private slots:
 	void btn_findNumberB_clicked();
 	void btn_RotateAngleB_clicked();
 	void ckb_usingB_checked(bool ischecked);
-
+#endif
 private:
 	Ui::Dlg_OffSetClass *ui;
 };
-

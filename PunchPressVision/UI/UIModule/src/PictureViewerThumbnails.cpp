@@ -1,3 +1,4 @@
+#if 0
 #include "PictureViewerThumbnails.h"
 
 #include "ui_PictureViewerThumbnails.h"
@@ -704,3 +705,5 @@ void PictureViewerThumbnails::iconReady(QListWidgetItem* item, const QIcon& icon
 {
 	item->setIcon(icon);
 }
+
+#endif

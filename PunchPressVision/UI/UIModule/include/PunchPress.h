@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QPoint>
 #include <atomic>
+#if 0 // --- 以下项目引用暂时注释 ---
 #include "PictureViewerThumbnails.h"
 #include "ImageEnlargedDisplay.h"
 #include "rqw_LabelClickable.h"
@@ -11,6 +12,7 @@
 #include "rqwu/rqwu_DlgModelManager.h"
 #include "WarnUtilty.hpp"
 #include "func/ProcessModule.hpp"
+#endif
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class PunchPressClass; };
@@ -22,6 +24,7 @@ class PunchPress : public QMainWindow
 public:
 	PunchPress(QWidget *parent = nullptr);
 	~PunchPress();
+#if 0 // --- 以下内容暂时注释 ---
 public:
 	void build_ui();
 	void build_connect();
@@ -133,12 +136,13 @@ protected:
 private slots:
 
 private:
-	Ui::PunchPressClass* ui;
 	int minimizeCount{ 3 };
 	bool _warnedNoCalibParam{ false };
 private:
-	PictureViewerThumbnails* _picturesViewer = nullptr;
 	rw::rqw::ClickableLabel* clickableTitle = nullptr;
 	PanZoomLabel* panZoomLabel = nullptr;
 	rw::rqwu::DlgModelManager* _dlgModelManager = nullptr;
+#endif
+private:
+	Ui::PunchPressClass* ui;
 };

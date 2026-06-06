@@ -2,6 +2,7 @@
 
 #include <QDialog>
 #include <QFutureWatcher>
+#if 0 // --- 以下项目引用暂时注释 ---
 #include <opencv2/core/mat.hpp>
 #include <rqwccore/rqwc_types.hpp>
 
@@ -15,6 +16,7 @@ namespace HalconCpp
 	class HTuple;
 	class HImage;
 }
+#endif
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Dlg_changeshapemodelClass; };
@@ -23,12 +25,13 @@ QT_END_NAMESPACE
 class Dlg_changeshapemodel : public QDialog
 {
 	Q_OBJECT
-private:
-	QFutureWatcher<std::pair<double, cv::Mat>> _matchWatcher;
-	bool _matchRunning = false;
 public:
 	Dlg_changeshapemodel(QWidget *parent = nullptr);
 	~Dlg_changeshapemodel();
+#if 0 // --- 以下内容暂时注释 ---
+private:
+	QFutureWatcher<std::pair<double, cv::Mat>> _matchWatcher;
+	bool _matchRunning = false;
 public:
 	void build_ui();
 	void setRoiEditingUiEnabled(bool enabled);
@@ -56,7 +59,6 @@ private:
 private:
 	PanZoomLabel* panZoomLabel = nullptr;
 
-	// 保存建模数据（模板/模板图/参数）
 	bool saveModelData();
 
 protected:
@@ -67,19 +69,16 @@ private:
 	ProcessParam _processParam;
 	ProcessModule::RoiPurpose _roiPurpose{ ProcessModule::RoiPurpose::None };
 
-	// PanZoomLabel 侧使用的 ROI/轮廓缓存（像素坐标）
 	QVector<QRectF> _paintCreateRois;
 	QVector<QRectF> _paintShieldRois;
 	QVector<QPainterPath> _findCreatePaths;
 private:
 	void readImage();
-	//清除绘制的要查找的区域，以及找到的xld轮廓
 	void paintCreateRegion();
 	void paintShieldRegion();
 	bool createShapeModelFromRois();
 	bool createShapeModel();
-
+#endif
 private:
 	Ui::Dlg_changeshapemodelClass *ui;
 };
-

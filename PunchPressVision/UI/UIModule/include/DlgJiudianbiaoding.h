@@ -8,16 +8,15 @@
 #include <atomic>
 #include <mutex>
 
+#include <QPoint>
+
+#if 0 // --- 以下项目引用暂时注释 ---
 #include <opencv2/core/mat.hpp>
-
 #include <rqwccore/rqwc_types.hpp>
-
 #include "JiudianParam.hpp"
 #include "ProcessModule.hpp"
 #include "ImageStitcchingParam.hpp"
 #include "ui_DlgJiudianbiaoding.h"
-
-#include <QPoint>
 
 namespace HalconCpp
 {
@@ -25,6 +24,7 @@ namespace HalconCpp
 	class HTuple;
 	class HObject;
 }
+#endif
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -40,6 +40,7 @@ class DlgJiudianbiaoding : public QDialog
 public:
 	DlgJiudianbiaoding(QWidget* parent = nullptr);
 	~DlgJiudianbiaoding();
+#if 0 // --- 以下内容暂时注释 ---
 private:
 	void build_ui();
 	void build_connect();
@@ -87,22 +88,20 @@ private slots:
 private:
 	enum class FindRectangleDisplay
 	{
-		SearchRectangleBox, // 只显示"查找矩形框"(测量框)
-		FoundRectangle      // 只显示"找到的矩形"(测量结果轮廓)
+		SearchRectangleBox,
+		FoundRectangle
 	};
 
-	// 矩形检测结果结构体
 	struct RectangleResult
 	{
-		double x{ 0.0 };  // 列坐标 (Col)
-		double y{ 0.0 };  // 行坐标 (Row)
-		HalconCpp::HObject* contour = nullptr;  // 轮廓对象（指针，需外部管理生命周期）
-		bool valid{ false };  // 是否有效
+		double x{ 0.0 };
+		double y{ 0.0 };
+		HalconCpp::HObject* contour = nullptr;
+		bool valid{ false };
 	};
 
 private:
 	void readImage();
-
 	void load_jiuDianParam();
 
 	struct HalconViewPart
@@ -135,15 +134,10 @@ private:
 	void setRoiEditingUiEnabled(bool enabled);
 	void paintCreateRegion();
 
-	// 查找矩形（支持多目标，最多3个）
 	bool findRectangle(const HalconCpp::HImage& image, QVector<RectangleResult>& results, FindRectangleDisplay display, bool showMessage = true, int maxCount = 3);
 
-	// 往ListView中添加内容（5列：index / pixX / pixY / realX / realY）
 	void addNewItemToListView(double pixX, double pixY, double realX, double realY, bool checked);
 	void clearJiudianImages();
-
-private:
-	Ui::DlgJiudianbiaodingClass* ui = nullptr;
 
 private:
 	QWidget* _halconHost = nullptr;
@@ -152,7 +146,6 @@ private:
 	HalconCpp::HTuple* _halconWindowHandle = nullptr;
 	HalconCpp::HImage* _halconLastImage = nullptr;
 
-	// genImageToWorldPlaneMap 执行期间：丢弃后续 onCameraDisplay
 	std::atomic_flag _genMapRunning = ATOMIC_FLAG_INIT;
 	QFutureWatcher<void> _cameraDisplayWatcher;
 
@@ -168,19 +161,20 @@ private:
 	bool lastIsCamera1SoftTrigger{ false };
 	bool lastIsCamera2SoftTrigger{ false };
 
-	// ========== 双相机拼接相关 ==========
-	std::mutex _stitchMutex;                              // 保护图像缓存
-	HalconCpp::HImage* _cam1Buffer = nullptr;            // 相机1图像缓存
-	HalconCpp::HImage* _cam2Buffer = nullptr;            // 相机2图像缓存
-	bool _cam1Ready = false;                             // 相机1图像是否就绪
-	bool _cam2Ready = false;                             // 相机2图像是否就绪
-	std::atomic_flag _stitchRunning = ATOMIC_FLAG_INIT;  // 拼接处理标志
-	
-	bool _isDualCameraMode = false;                      // 是否为双相机模式
-	ImageStitcchingParam _stitchParam;                   // 图像拼接参数
+	std::mutex _stitchMutex;
+	HalconCpp::HImage* _cam1Buffer = nullptr;
+	HalconCpp::HImage* _cam2Buffer = nullptr;
+	bool _cam1Ready = false;
+	bool _cam2Ready = false;
+	std::atomic_flag _stitchRunning = ATOMIC_FLAG_INIT;
 
-	// 双相机拼接处理函数
+	bool _isDualCameraMode = false;
+	ImageStitcchingParam _stitchParam;
+
 	void handleDualCameraStitch(const HalconCpp::HImage& src, size_t cameraIndex);
 	void processStitchedImage(HalconCpp::HImage img1, HalconCpp::HImage img2);
 	void handleSingleCamera(const HalconCpp::HImage& src);
+#endif
+private:
+	Ui::DlgJiudianbiaodingClass* ui = nullptr;
 };

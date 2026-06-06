@@ -1,9 +1,10 @@
 #pragma once
-#include "CalibParam.hpp"
+
 #include <QDialog>
 #include <QListView>
 #include <QSize>
-
+#if 0 // --- 以下项目引用暂时注释 ---
+#include "CalibParam.hpp"
 #include "func/ProcessModule.hpp"
 #include "ui_Dlg_jibianjiaozheng.h"
 #include <opencv2/opencv.hpp>
@@ -18,6 +19,7 @@ namespace HalconCpp
 	class HObject;
 	class HImage;
 }
+#endif
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Dlg_jibianjiaozhengClass; };
@@ -29,6 +31,7 @@ class Dlg_jibianjiaozheng : public QDialog
 public:
 	Dlg_jibianjiaozheng(QWidget* parent = nullptr);
 	~Dlg_jibianjiaozheng();
+#if 0 // --- 以下内容暂时注释 ---
 
 public:
 	void build_ui();
@@ -60,8 +63,6 @@ private slots:
 
 	void onCalibImageTableCellClicked(int row, int column);
 private:
-	Ui::Dlg_jibianjiaozhengClass* ui;
-
 	bool lastIsCamera1SoftTrigger{ false };
 	bool lastIsCamera2SoftTrigger{ false };
 private:
@@ -72,23 +73,18 @@ private:
 	QVector<HalconCpp::HObject*> CalibmarksXlds{ nullptr };
 	QVector<HalconCpp::HObject*> CalibmarksRegions{ nullptr };
 
-	// 叠加层显示样式（用于 redrawHalconView）
 	QString _marksXldColor{ "cyan" };
 	QString _marksRegionColor{ "red" };
 	QString _marksRegionDrawMode{ "margin" };
 	double _marksRegionAlpha{ 1.0 };
 
-
 	void clearCalibImages();
 	bool isok = false;
-	// 往ListView中添加内容
 	void addNewItemToListView(const QString& statusText, bool checked);
 	int listViewCount{ 0 };
 
-	// 清空当前显示的叠加（避免旧叠加跟随新画面）
 	void clearLastMarksOverlay();
 
-	// 拍照识别任务状态（避免重复点击/并发）
 	bool _captureDetectBusy{ false };
 	quint64 _captureDetectToken{ 0 };
 public:
@@ -96,7 +92,7 @@ public:
 	bool drawCalibMarks(const HalconCpp::HImage& src, bool& isOk, HalconCpp::HObject& outMarksXld, HalconCpp::HObject& outMarksRegion);
 	CalibParam calibrateFromImages(const QVector<HalconCpp::HImage*>& images, const std::string& descrPath, int referenceIndex);
 	bool blendYellowRegion(const HalconCpp::HImage& src,const HalconCpp::HObject& region,double alpha01,HalconCpp::HImage& out);
-	
+
 	HalconCpp::HImage* nowImage = nullptr;
 	CalibParam _calibParam;
 
@@ -105,7 +101,7 @@ public:
 public slots:
 	void onCameraDisplay(rw::rqwc::MatInfo matInfo, size_t index);
 private:
-	int _referenceIndex{ 0 }; // 参考位姿对应的图像索引（CalibImage)
+	int _referenceIndex{ 0 };
 private:
 	QWidget* _halconHost = nullptr;
 	QSize _labelImgDisplaySize;
@@ -120,4 +116,7 @@ private:
 	bool ensureHalconWindow();
 	void closeHalconWindow();
 	void redrawHalconView(bool clearWindow);
+#endif
+private:
+	Ui::Dlg_jibianjiaozhengClass* ui;
 };

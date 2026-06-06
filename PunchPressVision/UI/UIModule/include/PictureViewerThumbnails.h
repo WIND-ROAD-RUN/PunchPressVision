@@ -1,3 +1,4 @@
+#if 0
 #pragma once
 
 #include <QDir>
@@ -142,3 +143,4 @@ private slots:
 public slots:
 	void iconReady(QListWidgetItem* item, const QIcon& icon);
 };
+#endif

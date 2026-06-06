@@ -6,6 +6,7 @@
 #include <QSize>
 #include <atomic>
 #include <mutex>
+#if 0 // --- 以下项目引用暂时注释 ---
 #include <rqwccore/rqwc_types.hpp>
 
 #include "ProcessParam.hpp"
@@ -19,8 +20,8 @@ namespace HalconCpp
 	class HObject;
 }
 
-// 前向声明
 class ImageStitcchingParam;
+#endif
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Dlg_createshapemodelClass; };
@@ -32,32 +33,28 @@ class QEvent;
 class Dlg_createshapemodel : public QDialog
 {
 	Q_OBJECT
+public:
+	Dlg_createshapemodel(QWidget* parent = nullptr);
+	~Dlg_createshapemodel();
+#if 0 // --- 以下内容暂时注释 ---
 private:
-	// genImageToWorldPlaneMap 执行期间：丢弃后续 onCameraDisplay
 	std::atomic_flag _genMapRunning = ATOMIC_FLAG_INIT;
-
-	// 子线程任务 watcher（finished 信号在 UI 线程触发）
 	QFutureWatcher<void> _cameraDisplayWatcher;
 
-	// ========== 双相机拼接相关 ==========
-	std::mutex _stitchMutex;                              // 保护图像缓存
-	HalconCpp::HImage* _cam1Buffer = nullptr;            // 相机1图像缓存
-	HalconCpp::HImage* _cam2Buffer = nullptr;            // 相机2图像缓存
-	bool _cam1Ready = false;                             // 相机1图像是否就绪
-	bool _cam2Ready = false;                             // 相机2图像是否就绪
-	std::atomic_flag _stitchRunning = ATOMIC_FLAG_INIT;  // 拼接处理标志
-	
-	bool _isDualCameraMode = false;                      // 是否为双相机模式
-	ImageStitcchingParam _stitchParam;                   // 图像拼接参数
+	std::mutex _stitchMutex;
+	HalconCpp::HImage* _cam1Buffer = nullptr;
+	HalconCpp::HImage* _cam2Buffer = nullptr;
+	bool _cam1Ready = false;
+	bool _cam2Ready = false;
+	std::atomic_flag _stitchRunning = ATOMIC_FLAG_INIT;
 
-	// 双相机拼接处理函数
+	bool _isDualCameraMode = false;
+	ImageStitcchingParam _stitchParam;
+
 	void handleDualCameraStitch(const HalconCpp::HImage& src, size_t cameraIndex);
 	void processStitchedImage(HalconCpp::HImage img1, HalconCpp::HImage img2);
 	void handleSingleCamera(const HalconCpp::HImage& src);
 	void clearStitchBuffers();
-public:
-	Dlg_createshapemodel(QWidget* parent = nullptr);
-	~Dlg_createshapemodel();
 
 public:
 	void build_ui();
@@ -104,13 +101,9 @@ private:
 	bool _modelSaved{ false };
 	bool lastIsCamera1SoftTrigger{ false };
 	bool lastIsCamera2SoftTrigger{ false };
-public:
-	Ui::Dlg_createshapemodelClass* ui;
 
-private:
-	// Halcon 显示承载控件 + 窗口句柄 + 最近一次显示的图像
 	QWidget* _halconHost = nullptr;
-	QSize _labelImgDisplaySize; // 记录替换前 label_imgDisplay 的控件尺寸
+	QSize _labelImgDisplaySize;
 	HalconCpp::HTuple* _halconWindowHandle = nullptr;
 	HalconCpp::HImage* _halconLastImage = nullptr;
 	HalconCpp::HObject* _centerPointXldObj = nullptr;
@@ -142,7 +135,6 @@ private:
 
 private:
 	bool saveModelData();
-	// 重新按 UI 参数(通道/膨胀/均值)生成模板图并刷新显示
 	void refreshTemplateImage();
 protected:
 	void showEvent(QShowEvent*) override;
@@ -154,8 +146,6 @@ private:
 	QImage qimg;
 	ProcessParam _processParam;
 	ProcessModule::RoiPurpose _roiPurpose{ ProcessModule::RoiPurpose::None };
-
-	// 记录“最近一次绘制”的 ROI 类型（用于 btn_clearRegion2 撤销）
 	ProcessModule::RoiPurpose _lastPaintPurpose{ ProcessModule::RoiPurpose::None };
 
 private:
@@ -164,4 +154,7 @@ private:
 	void paintShieldRegion();
 	bool createShapeModelFromRois(ProcessParam& _processParam);
 	bool createShapeModel();
+#endif
+public:
+	Ui::Dlg_createshapemodelClass* ui;
 };
