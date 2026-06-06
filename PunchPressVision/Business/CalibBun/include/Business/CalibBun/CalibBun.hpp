@@ -4,6 +4,7 @@
 #include "infrastructure/infrastructure.hpp"
 
 #include "halconcpp/HalconCpp.h"
+#include <vector>
 
 namespace bun
 {
@@ -13,7 +14,12 @@ namespace bun
 	public:
 		explicit CalibBun(inf::infrastructure& inf);
 	public:
-		void calibCamera(const HalconCpp::HImage & himage);
+		void calibCamera(const std::vector<HalconCpp::HImage>& himages);
+		bool calibrateFromImages(const std::vector<HalconCpp::HImage>& himages,
+			double focalLengthMm,
+			double plateThicknessMm,
+			int referenceIndex = 0,
+			std::string* errorMsg = nullptr);
 		HalconCpp::HImage undistortImage(const HalconCpp::HImage& himage);
 	private:
 		inf::infrastructure& inf_;

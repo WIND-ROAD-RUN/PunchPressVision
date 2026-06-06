@@ -31,8 +31,8 @@ namespace bun
 		}
 
 		// 检查相机标定参数
-		if (cam1Calib.getCameraParameters().TupleLength() == 0 || cam1Calib.getCameraPose().TupleLength() == 0 ||
-		    cam2Calib.getCameraParameters().TupleLength() == 0 || cam2Calib.getCameraPose().TupleLength() == 0)
+		if (cam1Calib.cameraParameters.TupleLength() == 0 || cam1Calib.cameraPose.TupleLength() == 0 ||
+		    cam2Calib.cameraParameters.TupleLength() == 0 || cam2Calib.cameraPose.TupleLength() == 0)
 		{
 			if (errorMsg) *errorMsg = "相机标定参数不完整";
 			return false;
@@ -115,12 +115,12 @@ namespace bun
 		HalconCpp::HTuple hv_Focus1, hv_K11, hv_K21, hv_K31, hv_P11, hv_P21, hv_Sx1, hv_Sy1, hv_Cx1, hv_Cy1, hv_ImageWidth1, hv_ImageHeight1;
 		HalconCpp::HTuple hv_Focus2, hv_K12, hv_K22, hv_K32, hv_P12, hv_P22, hv_Sx2, hv_Sy2, hv_Cx2, hv_Cy2, hv_ImageWidth2, hv_ImageHeight2;
 
-		if (!parseCamParams(cam1Calib.getCameraParameters(), hv_Focus1, hv_K11, hv_K21, hv_K31, hv_P11, hv_P21, hv_Sx1, hv_Sy1, hv_Cx1, hv_Cy1, hv_ImageWidth1, hv_ImageHeight1))
+		if (!parseCamParams(cam1Calib.cameraParameters, hv_Focus1, hv_K11, hv_K21, hv_K31, hv_P11, hv_P21, hv_Sx1, hv_Sy1, hv_Cx1, hv_Cy1, hv_ImageWidth1, hv_ImageHeight1))
 		{
 			if (errorMsg) *errorMsg = "相机1参数格式不正确";
 			return false;
 		}
-		if (!parseCamParams(cam2Calib.getCameraParameters(), hv_Focus2, hv_K12, hv_K22, hv_K32, hv_P12, hv_P22, hv_Sx2, hv_Sy2, hv_Cx2, hv_Cy2, hv_ImageWidth2, hv_ImageHeight2))
+		if (!parseCamParams(cam2Calib.cameraParameters, hv_Focus2, hv_K12, hv_K22, hv_K32, hv_P12, hv_P22, hv_Sx2, hv_Sy2, hv_Cx2, hv_Cy2, hv_ImageWidth2, hv_ImageHeight2))
 		{
 			if (errorMsg) *errorMsg = "相机2参数格式不正确";
 			return false;
