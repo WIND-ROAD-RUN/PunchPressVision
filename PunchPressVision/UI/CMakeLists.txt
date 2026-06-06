@@ -8,6 +8,7 @@ add_executable(${PPV_TARGET_NAME} ${SRC_FILES} ${INCLUDE_FILES})
 target_include_directories(${PPV_TARGET_NAME}
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/UIModule/include
 )
 
 target_link_libraries(${PPV_TARGET_NAME}
