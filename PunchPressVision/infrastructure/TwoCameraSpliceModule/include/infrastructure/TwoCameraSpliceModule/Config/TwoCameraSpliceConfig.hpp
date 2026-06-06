@@ -5,7 +5,7 @@ namespace Config
 {
 	class TwoCameraSpliceCfg
 	{
-	private:
+	public:
 		// Input: calibration images from both cameras
 		HalconCpp::HObject camera1Piccture; // calibration image from camera 1
 		HalconCpp::HObject camera2Piccture; // calibration image from camera 2
@@ -28,7 +28,6 @@ namespace Config
 		int rectifiedWidth{ 0 };  // width after rectification
 		int rectifiedHeight{ 0 }; // height after rectification
 
-	public:
 		void saveInDir(const std::string& dirPath);
 		void loadInDir(const std::string& dirPath);
 	};
