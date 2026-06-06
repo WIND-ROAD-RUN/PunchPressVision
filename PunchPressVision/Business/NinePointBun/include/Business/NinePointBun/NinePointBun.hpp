@@ -32,6 +32,7 @@ namespace bun
 		bool calcPixToWorldHomMat2D(const std::vector<Point2D>& pixPoints,
 			const std::vector<Point2D>& worldPoints,
 			Config::NinePointCfg& ninePointCfg);
+		//调用这个函数把像素值转化为实际值
 		bool pixToWorld(const HalconCpp::HTuple& homMat2D,
 			double pixX, double pixY,
 			double& outWorldX, double& outWorldY);

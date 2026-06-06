@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <fstream>
 #include <json/json.h>
+
 namespace Config
 {
 	namespace
@@ -10,6 +11,17 @@ namespace Config
 		namespace fs = std::filesystem;
 
 		constexpr const char* kModelInfoFile = "model_info.json";
+		constexpr const char* kParamsFile = "model_params.txt";
+		constexpr const char* kTemplateImageFile = "template_image.bmp";
+		constexpr const char* kOriginalImageFile = "original_image.bmp";
+		constexpr const char* kModelFile = "model.shm";
+		constexpr const char* kMetrologyFile = "metrology.mmc";
+		constexpr const char* kPaintCreateRoiPrefix = "paint_create_roi_";
+		constexpr const char* kPaintShieldRoiPrefix = "paint_shield_roi_";
+		constexpr const char* kRoiExtension = ".hobj";
+		constexpr const char* kFindCreateXldFile = "find_create_xld.hobj";
+		constexpr const char* kFindCreateXldSecondaryFile = "find_create_xld_secondary.hobj";
+		constexpr const char* kImageFormat = "bmp";
 
 		void replaceFile(const fs::path& tmp, const fs::path& target)
 		{
@@ -56,14 +68,445 @@ namespace Config
 
 			replaceFile(tmp, filePath);
 		}
+
+		void writeImageSafe(const HalconCpp::HObject& image, const fs::path& filePath)
+		{
+			if (!image.IsInitialized())
+				return;
+			fs::create_directories(filePath.parent_path());
+			fs::path tmp = filePath;
+			tmp += ".tmp";
+			HalconCpp::HImage(image).WriteImage(kImageFormat, 0, tmp.string().c_str());
+			replaceFile(tmp, filePath);
+		}
+
+		bool readImageSafe(const fs::path& filePath, HalconCpp::HImage& image)
+		{
+			if (!fs::exists(filePath))
+				return false;
+			try
+			{
+				image.ReadImage(filePath.string().c_str());
+			}
+			catch (...)
+			{
+				return false;
+			}
+			return true;
+		}
+
+		void writeObjectSafe(const HalconCpp::HObject& obj, const fs::path& filePath)
+		{
+			if (!obj.IsInitialized())
+				return;
+			fs::create_directories(filePath.parent_path());
+			fs::path tmp = filePath;
+			tmp += ".tmp";
+			try { HalconCpp::WriteObject(obj, tmp.string().c_str()); }
+			catch (...) { return; }
+			replaceFile(tmp, filePath);
+		}
+
+		bool readObjectSafe(const fs::path& filePath, HalconCpp::HObject& obj)
+		{
+			if (!fs::exists(filePath))
+				return false;
+			try
+			{
+				HalconCpp::ReadObject(&obj, filePath.string().c_str());
+			}
+			catch (...)
+			{
+				return false;
+			}
+			return true;
+		}
+
+		void clearOldRoiFiles(const fs::path& dirPath, const std::string& prefix)
+		{
+			size_t index = 0;
+			while (true)
+			{
+				fs::path filePath = dirPath / (prefix + std::to_string(index) + kRoiExtension);
+				if (!fs::exists(filePath))
+					break;
+				try { fs::remove(filePath); }
+				catch (...) {}
+				++index;
+			}
+		}
+
+		void writeTupleSafe(const fs::path& filePath, const HalconCpp::HTuple& tuple)
+		{
+			fs::create_directories(filePath.parent_path());
+			fs::path tmp = filePath;
+			tmp += ".tmp";
+			HalconCpp::WriteTuple(tuple, tmp.string().c_str());
+			replaceFile(tmp, filePath);
+		}
+
+		bool readTupleSafe(const fs::path& filePath, HalconCpp::HTuple& tuple)
+		{
+			if (!fs::exists(filePath))
+				return false;
+			try
+			{
+				HalconCpp::ReadTuple(filePath.string().c_str(), &tuple);
+			}
+			catch (...)
+			{
+				return false;
+			}
+			return true;
+		}
+
+		void writeParamsSafe(const fs::path& filePath,
+			int singleChannelType,
+			double centerX, double centerY,
+			double findCenterX, double findCenterY,
+			double offsetX, double offsetY, double offsetAngle,
+			bool isSelectXLDToCreateModel,
+			double xldMinLength, double xldMin, double xldMax,
+			int findNumber, double rotateAngle,
+			bool enabled,
+			double createModelExposureTime, double createModelGain,
+			int createModelPreProcessType,
+			bool createModelUseOpening, int createModelOpeningRadius,
+			bool createModelUseClosing, int createModelClosingRadius,
+			bool createModelUseMean, int createModelMeanRadius,
+			int matchChannelType,
+			bool matchUseOpening, int matchOpeningRadius,
+			bool matchUseClosing, int matchClosingRadius,
+			bool matchUseMean, int matchMeanRadius,
+			int maxContrast, int minContrast,
+			const std::string& modelPath)
+		{
+			fs::create_directories(filePath.parent_path());
+			fs::path tmp = filePath;
+			tmp += ".tmp";
+			std::ofstream ofs(tmp);
+			if (!ofs)
+				return;
+			ofs << "SingleChannelType=" << singleChannelType << '\n';
+			ofs << "centerX=" << centerX << '\n';
+			ofs << "centerY=" << centerY << '\n';
+			ofs << "findCenterX=" << findCenterX << '\n';
+			ofs << "findCenterY=" << findCenterY << '\n';
+			ofs << "offsetX=" << offsetX << '\n';
+			ofs << "offsetY=" << offsetY << '\n';
+			ofs << "offsetAngle=" << offsetAngle << '\n';
+			ofs << "isSelectXLDToCreateModel=" << (isSelectXLDToCreateModel ? 1 : 0) << '\n';
+			ofs << "xld_Minlength=" << xldMinLength << '\n';
+			ofs << "xld_min=" << xldMin << '\n';
+			ofs << "xld_max=" << xldMax << '\n';
+			ofs << "findnumber=" << findNumber << '\n';
+			ofs << "rotateAngle=" << rotateAngle << '\n';
+			ofs << "enabled=" << (enabled ? 1 : 0) << '\n';
+			ofs << "createModelExposureTime=" << createModelExposureTime << '\n';
+			ofs << "createModelGain=" << createModelGain << '\n';
+			ofs << "createModelPreProcessType=" << createModelPreProcessType << '\n';
+			ofs << "createModelUseOpening=" << (createModelUseOpening ? 1 : 0) << '\n';
+			ofs << "createModelOpeningRadius=" << createModelOpeningRadius << '\n';
+			ofs << "createModelUseClosing=" << (createModelUseClosing ? 1 : 0) << '\n';
+			ofs << "createModelClosingRadius=" << createModelClosingRadius << '\n';
+			ofs << "createModelUseMean=" << (createModelUseMean ? 1 : 0) << '\n';
+			ofs << "createModelMeanRadius=" << createModelMeanRadius << '\n';
+			ofs << "matchChannelType=" << matchChannelType << '\n';
+			ofs << "matchUseOpening=" << (matchUseOpening ? 1 : 0) << '\n';
+			ofs << "matchOpeningRadius=" << matchOpeningRadius << '\n';
+			ofs << "matchUseClosing=" << (matchUseClosing ? 1 : 0) << '\n';
+			ofs << "matchClosingRadius=" << matchClosingRadius << '\n';
+			ofs << "matchUseMean=" << (matchUseMean ? 1 : 0) << '\n';
+			ofs << "matchMeanRadius=" << matchMeanRadius << '\n';
+			ofs << "maxContrast=" << maxContrast << '\n';
+			ofs << "minContrast=" << minContrast << '\n';
+			ofs << "modelPath=" << modelPath << '\n';
+			ofs.close();
+			replaceFile(tmp, filePath);
+		}
+
+		std::string trimCr(const std::string& s)
+		{
+			if (!s.empty() && s.back() == '\r')
+				return s.substr(0, s.size() - 1);
+			return s;
+		}
+
+		bool readParamsSafe(const fs::path& filePath,
+			int& singleChannelType,
+			double& centerX, double& centerY,
+			double& findCenterX, double& findCenterY,
+			double& offsetX, double& offsetY, double& offsetAngle,
+			bool& isSelectXLDToCreateModel,
+			double& xldMinLength, double& xldMin, double& xldMax,
+			int& findNumber, double& rotateAngle,
+			bool& enabled,
+			double& createModelExposureTime, double& createModelGain,
+			int& createModelPreProcessType,
+			bool& createModelUseOpening, int& createModelOpeningRadius,
+			bool& createModelUseClosing, int& createModelClosingRadius,
+			bool& createModelUseMean, int& createModelMeanRadius,
+			int& matchChannelType,
+			bool& matchUseOpening, int& matchOpeningRadius,
+			bool& matchUseClosing, int& matchClosingRadius,
+			bool& matchUseMean, int& matchMeanRadius,
+			int& maxContrast, int& minContrast,
+			std::string& modelPath)
+		{
+			if (!fs::exists(filePath))
+				return false;
+			std::ifstream ifs(filePath);
+			if (!ifs)
+				return false;
+			std::string line;
+			while (std::getline(ifs, line))
+			{
+				line = trimCr(line);
+				if (line.empty() || line.front() == '#')
+					continue;
+				const auto pos = line.find('=');
+				if (pos == std::string::npos)
+					continue;
+				const std::string key = line.substr(0, pos);
+				const std::string value = line.substr(pos + 1);
+				try
+				{
+					if (key == "SingleChannelType")
+						singleChannelType = std::stoi(value);
+					else if (key == "centerX")
+						centerX = std::stod(value);
+					else if (key == "centerY")
+						centerY = std::stod(value);
+					else if (key == "findCenterX")
+						findCenterX = std::stod(value);
+					else if (key == "findCenterY")
+						findCenterY = std::stod(value);
+					else if (key == "offsetX")
+						offsetX = std::stod(value);
+					else if (key == "offsetY")
+						offsetY = std::stod(value);
+					else if (key == "offsetAngle")
+						offsetAngle = std::stod(value);
+					else if (key == "isSelectXLDToCreateModel")
+						isSelectXLDToCreateModel = std::stoi(value) != 0;
+					else if (key == "xld_Minlength")
+						xldMinLength = std::stod(value);
+					else if (key == "xld_min")
+						xldMin = std::stod(value);
+					else if (key == "xld_max")
+						xldMax = std::stod(value);
+					else if (key == "findnumber")
+						findNumber = std::stoi(value);
+					else if (key == "rotateAngle")
+						rotateAngle = std::stod(value);
+					else if (key == "enabled")
+						enabled = std::stoi(value) != 0;
+					else if (key == "createModelExposureTime")
+						createModelExposureTime = std::stod(value);
+					else if (key == "createModelGain")
+						createModelGain = std::stod(value);
+					else if (key == "createModelPreProcessType")
+						createModelPreProcessType = std::stoi(value);
+					else if (key == "createModelUseOpening")
+						createModelUseOpening = std::stoi(value) != 0;
+					else if (key == "createModelOpeningRadius")
+						createModelOpeningRadius = std::stoi(value);
+					else if (key == "createModelUseClosing")
+						createModelUseClosing = std::stoi(value) != 0;
+					else if (key == "createModelClosingRadius")
+						createModelClosingRadius = std::stoi(value);
+					else if (key == "createModelUseMean")
+						createModelUseMean = std::stoi(value) != 0;
+					else if (key == "createModelMeanRadius")
+						createModelMeanRadius = std::stoi(value);
+					else if (key == "matchChannelType")
+						matchChannelType = std::stoi(value);
+					else if (key == "matchUseOpening")
+						matchUseOpening = std::stoi(value) != 0;
+					else if (key == "matchOpeningRadius")
+						matchOpeningRadius = std::stoi(value);
+					else if (key == "matchUseClosing")
+						matchUseClosing = std::stoi(value) != 0;
+					else if (key == "matchClosingRadius")
+						matchClosingRadius = std::stoi(value);
+					else if (key == "matchUseMean")
+						matchUseMean = std::stoi(value) != 0;
+					else if (key == "matchMeanRadius")
+						matchMeanRadius = std::stoi(value);
+					else if (key == "maxContrast")
+						maxContrast = std::stoi(value);
+					else if (key == "minContrast")
+						minContrast = std::stoi(value);
+					else if (key == "modelPath")
+						modelPath = value;
+				}
+				catch (...)
+				{
+					continue;
+				}
+			}
+			return true;
+		}
 	}
 
 	void ShapeModelData::loadInDir(const std::string& dir)
 	{
+		try
+		{
+			const fs::path dirPath(dir);
+
+			// 加载基本参数
+			readParamsSafe(dirPath / kParamsFile,
+				_SingleChannelType,
+				centerX, centerY,
+				findCenterX, findCenterY,
+				offsetX, offsetY, offsetAngle,
+				isSelectXLDToCreateModel,
+				xld_Minlength, xld_min, xld_max,
+				findnumber, rotateAngle,
+				enabled,
+				_createModelExposureTime, _createModelGain,
+				_createModelPreProcessType,
+				_createModelUseOpening, _createModelOpeningRadius,
+				_createModelUseClosing, _createModelClosingRadius,
+				_createModelUseMean, _createModelMeanRadius,
+				_matchChannelType,
+				_matchUseOpening, _matchOpeningRadius,
+				_matchUseClosing, _matchClosingRadius,
+				_matchUseMean, _matchMeanRadius,
+				maxContrast, minContrast,
+				modelPath);
+
+			// 加载图像
+			readImageSafe(dirPath / kTemplateImageFile, _templateMatImage);
+			readImageSafe(dirPath / kOriginalImageFile, _originalImage);
+
+			// 加载 ShapeModel
+			if (fs::exists(dirPath / kModelFile))
+			{
+				try { HalconCpp::ReadShapeModel((dirPath / kModelFile).string().c_str(), &hv_ModelID); }
+				catch (...) {}
+			}
+
+			// 加载 MetrologyModel
+			if (fs::exists(dirPath / kMetrologyFile))
+			{
+				try { HalconCpp::ReadMetrologyModel((dirPath / kMetrologyFile).string().c_str(), &hv_MetrologyHandle); }
+				catch (...) {}
+			}
+
+			// 加载绘制 ROI 列表（支持回撤的历史记录）
+			_paintCreateRoiList.clear();
+			for (size_t i = 0; ; ++i)
+			{
+				fs::path filePath = dirPath / (std::string(kPaintCreateRoiPrefix) + std::to_string(i) + kRoiExtension);
+				if (!fs::exists(filePath))
+					break;
+				HalconCpp::HObject obj;
+				if (readObjectSafe(filePath, obj))
+					_paintCreateRoiList.push_back(obj);
+			}
+
+			_paintShieldRoiList.clear();
+			for (size_t i = 0; ; ++i)
+			{
+				fs::path filePath = dirPath / (std::string(kPaintShieldRoiPrefix) + std::to_string(i) + kRoiExtension);
+				if (!fs::exists(filePath))
+					break;
+				HalconCpp::HObject obj;
+				if (readObjectSafe(filePath, obj))
+					_paintShieldRoiList.push_back(obj);
+			}
+
+			// 加载 XLD
+			readObjectSafe(dirPath / kFindCreateXldFile, _findCreateXldObj);
+			readObjectSafe(dirPath / kFindCreateXldSecondaryFile, _findCreateXldObj_Secondary);
+		}
+		catch (...)
+		{
+			// Ignore load errors; missing files keep the default values.
+		}
 	}
 
 	void ShapeModelData::saveInDir(const std::string& dir)
 	{
+		try
+		{
+			const fs::path dirPath(dir);
+
+			// 保存基本参数
+			writeParamsSafe(dirPath / kParamsFile,
+				_SingleChannelType,
+				centerX, centerY,
+				findCenterX, findCenterY,
+				offsetX, offsetY, offsetAngle,
+				isSelectXLDToCreateModel,
+				xld_Minlength, xld_min, xld_max,
+				findnumber, rotateAngle,
+				enabled,
+				_createModelExposureTime, _createModelGain,
+				_createModelPreProcessType,
+				_createModelUseOpening, _createModelOpeningRadius,
+				_createModelUseClosing, _createModelClosingRadius,
+				_createModelUseMean, _createModelMeanRadius,
+				_matchChannelType,
+				_matchUseOpening, _matchOpeningRadius,
+				_matchUseClosing, _matchClosingRadius,
+				_matchUseMean, _matchMeanRadius,
+				maxContrast, minContrast,
+				modelPath);
+
+			// 保存图像
+			if (_templateMatImage.IsInitialized())
+				writeImageSafe(_templateMatImage, dirPath / kTemplateImageFile);
+			if (_originalImage.IsInitialized())
+				writeImageSafe(_originalImage, dirPath / kOriginalImageFile);
+
+			// 保存 ShapeModel
+			if (hv_ModelID.TupleLength() > 0)
+			{
+				try { HalconCpp::WriteShapeModel(hv_ModelID, (dirPath / kModelFile).string().c_str()); }
+				catch (...) {}
+			}
+
+			// 保存 MetrologyModel
+			if (hv_MetrologyHandle.TupleLength() > 0)
+			{
+				try { HalconCpp::WriteMetrologyModel(hv_MetrologyHandle, (dirPath / kMetrologyFile).string().c_str()); }
+				catch (...) {}
+			}
+
+			// 保存绘制 ROI 列表（支持回撤）
+			clearOldRoiFiles(dirPath, kPaintCreateRoiPrefix);
+			for (size_t i = 0; i < _paintCreateRoiList.size(); ++i)
+			{
+				if (_paintCreateRoiList[i].IsInitialized())
+				{
+					auto fileName = std::string(kPaintCreateRoiPrefix) + std::to_string(i) + kRoiExtension;
+					writeObjectSafe(_paintCreateRoiList[i], dirPath / fileName);
+				}
+			}
+
+			clearOldRoiFiles(dirPath, kPaintShieldRoiPrefix);
+			for (size_t i = 0; i < _paintShieldRoiList.size(); ++i)
+			{
+				if (_paintShieldRoiList[i].IsInitialized())
+				{
+					auto fileName = std::string(kPaintShieldRoiPrefix) + std::to_string(i) + kRoiExtension;
+					writeObjectSafe(_paintShieldRoiList[i], dirPath / fileName);
+				}
+			}
+
+			// 保存 XLD
+			if (_findCreateXldObj.IsInitialized())
+				writeObjectSafe(_findCreateXldObj, dirPath / kFindCreateXldFile);
+			if (_findCreateXldObj_Secondary.IsInitialized())
+				writeObjectSafe(_findCreateXldObj_Secondary, dirPath / kFindCreateXldSecondaryFile);
+		}
+		catch (...)
+		{
+			// Ignore save errors to avoid crashing the application.
+		}
 	}
 
 	void ShapeModelInfo::loadInDir(const std::string& dir)
