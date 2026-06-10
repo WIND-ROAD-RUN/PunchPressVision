@@ -6,6 +6,8 @@
 #include "infrastructure/ConfigModule/ConfigModule.hpp"
 #include "infrastructure/NinePointModule/NinePointModule.hpp"
 #include "infrastructure/TwoCameraSpliceModule/TwoCameraSpliceModule.hpp"
+#include "infrastructure/ControlModule/ControlModule.hpp"
+#include "infrastructure/LightIOModule/LightIOModule.hpp"
 
 namespace inf
 {
@@ -24,5 +26,7 @@ namespace inf
 		std::unique_ptr<NinePointModule> nine_point_module_;
 		std::unique_ptr<CameraModule> camera_module_;
 		std::unique_ptr<ShapeModelManagerModule> shape_model_manager_module_;
+		std::unique_ptr<ControlModule> control_module_;
+		std::unique_ptr<LightIOModule> light_io_module_;
 	};
 }

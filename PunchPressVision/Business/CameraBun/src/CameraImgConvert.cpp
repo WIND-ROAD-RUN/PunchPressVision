@@ -59,5 +59,34 @@ namespace bun
 		throw std::runtime_error("Unsupported cv::Mat format for HImage conversion");
 	}
 
-	
+	HalconCpp::HImage CameraImgConvert::cvMatToHImageFast(const cv::Mat& mat)
+	{
+		// 零拷贝：直接包装 mat.data 指针。调用方须保证 mat 在 HImage 使用期间有效。
+		if (mat.empty())
+			return HalconCpp::HImage();
+
+		const int width = mat.cols;
+		const int height = mat.rows;
+
+		HalconCpp::HImage temp;
+		switch (mat.type())
+		{
+		case CV_8UC1:
+			HalconCpp::GenImage1(&temp, "byte", width, height, (Hlong)mat.data);
+			return temp;
+		case CV_16UC1:
+			HalconCpp::GenImage1(&temp, "uint2", width, height, (Hlong)mat.data);
+			return temp;
+		case CV_8UC3:
+			HalconCpp::GenImageInterleaved(&temp, (Hlong)mat.data, "bgr",
+				width, height, 0, "byte", width, height, 0, 0, -1, 0);
+			return temp;
+		case CV_8UC4:
+			HalconCpp::GenImageInterleaved(&temp, (Hlong)mat.data, "bgra",
+				width, height, 0, "byte", width, height, 0, 0, -1, 0);
+			return temp;
+		default:
+			throw std::runtime_error("Unsupported cv::Mat format for HImage conversion");
+		}
+	}
 }

@@ -2,9 +2,37 @@
 
 namespace global
 {
+	// 相机索引
 	enum class CameraIndex
 	{
-		Camera1,
-		Camera2
+		Camera1,    // 左相机 / 相机 A
+		Camera2     // 右相机 / 相机 B
+	};
+
+	// 运行模式
+	enum class RunMode
+	{
+		Idle,               // 空闲状态
+		Debug,              // 调试模式（FR-005 ~ FR-007）
+		Production,         // 工作模式（FR-008 ~ FR-010）
+		CalibDistortion,    // 畸变矫正模式（FR-011 ~ FR-014）
+		CalibNinePoint,     // 九点标定模式（FR-015 ~ FR-018）
+		Splice              // 双相机拼接模式（FR-019 ~ FR-020）
+	};
+
+	// 触发源
+	enum class TriggerSource
+	{
+		Software,   // 软触发
+		Line0,      // 硬件触发线 0（工作模式使用）
+		Line1,
+		Line2
+	};
+
+	// 光源状态
+	enum class LightState
+	{
+		Off,
+		On
 	};
 }

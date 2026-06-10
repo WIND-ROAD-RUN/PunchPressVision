@@ -16,13 +16,14 @@ target_link_libraries(${Bun_TARGET}
 		inf::infrastructure
 )
 
-target_link_libraries(${Bun_TARGET} 
+target_link_libraries(${Bun_TARGET}
 	PUBLIC
 		bun::CalibBun
 		bun::CameraBun
 		bun::NinePointBun
 		bun::ShapeModeManagerBun
 		bun::TwoCameraSpliceBun
+		bun::LightControlBun
 )
 
 set_target_properties(${Bun_TARGET} PROPERTIES

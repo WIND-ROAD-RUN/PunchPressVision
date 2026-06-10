@@ -46,7 +46,20 @@ namespace Config
 
 		double rotateAngle = 360.0;
 
-		
+		// 创建模板时选择的单通道类型（对应单通道下拉框索引）
+		int _SingleChannelType = 0;
+
+		// 是否使用 XLD 轮廓来创建模板
+		bool isSelectXLDToCreateModel = false;
+		// XLD 轮廓筛选：最小长度，对比度范围 [min, max]
+		double xld_Minlength = 0.0;
+		double xld_min = 0.0;
+		double xld_max = 0.0;
+
+		// 该模板是否启用
+		bool enabled = true;
+
+
 
 		// 创建模板时候的曝光，创建模板时候的增益，创建模板的时候选择的通道，创建模板时候是否开启开运算
 		// 创建模板时候开运算的半径，创建模板时候是否开启均值，创建模板时候均值的半径

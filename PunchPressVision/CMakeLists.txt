@@ -1,5 +1,5 @@
-add_subdirectory(UI)
+add_subdirectory(global)
 add_subdirectory(infrastructure)
 add_subdirectory(Business)
-add_subdirectory(global)
 add_subdirectory(app)
+add_subdirectory(UI)

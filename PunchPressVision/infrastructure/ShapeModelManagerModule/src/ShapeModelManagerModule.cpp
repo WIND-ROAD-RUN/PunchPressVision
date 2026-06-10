@@ -218,7 +218,9 @@ namespace inf
 
     void ShapeModelManagerModule::destroy()
     {
-        // TODO: 保存所有待持久化的数据
+        // 模型在 add/change 时即原子落盘，无需在此额外持久化。
+        // 仅释放内存索引（folder 内文件已是权威数据源）。
+        shape_model_infos_.clear();
     }
 
 }

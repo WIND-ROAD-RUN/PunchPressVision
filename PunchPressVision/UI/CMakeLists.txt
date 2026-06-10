@@ -1,6 +1,9 @@
 set(PPV_TARGET_NAME "PunchPressVision")
 
+# 旧 UIModule（重构前外壳）保留编译，但不链接进可执行文件
 add_subdirectory(UIModule)
+# 新 UI 模块（复用旧 .ui，接入 App 层）
+add_subdirectory(PunchPressUI)
 
 file(GLOB INCLUDE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h)
 file(GLOB SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
@@ -10,21 +13,12 @@ add_executable(${PPV_TARGET_NAME} ${SRC_FILES} ${INCLUDE_FILES})
 target_include_directories(${PPV_TARGET_NAME}
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
-        ${CMAKE_CURRENT_SOURCE_DIR}/UIModule/include
 )
 
 target_link_libraries(${PPV_TARGET_NAME}
     PRIVATE
-        UI::UIModule
-)
-
-target_link_libraries(${PPV_TARGET_NAME}
-    PRIVATE
+        UI::PunchPressUI
         Halcon
-)
-
-target_link_libraries(${PPV_TARGET_NAME}
-    PRIVATE
         Qt6::Core Qt6::Widgets
 )
 

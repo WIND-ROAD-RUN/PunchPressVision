@@ -11,10 +11,10 @@ namespace bun
 
 	void CalibBun::calibCamera(const std::vector<HalconCpp::HImage>& himages)
 	{
-		Config::CalibConfig calibConfig;
-		//TODO:实现通过himages标定相机畸变矫正结果
-
-		inf_.calib_config_module_->calibConfig = calibConfig;
+		// 便捷封装：使用默认焦距/板厚执行标定。结果由 calibrateFromImages
+		// 直接写入 inf_.calib_config_module_->calibConfig（不再用空配置覆盖）。
+		std::string err;
+		calibrateFromImages(himages, /*focalLengthMm*/ 8.0, /*plateThicknessMm*/ 0.0, /*referenceIndex*/ 0, &err);
 	}
 	
 	bool CalibBun::calibrateFromImages(const std::vector<HalconCpp::HImage>& himages,
@@ -270,11 +270,29 @@ namespace bun
 
 	HalconCpp::HImage CalibBun::undistortImage(const HalconCpp::HImage& himage)
 	{
-		HalconCpp::HImage result;
+		using namespace HalconCpp;
 		auto& cfg = inf_.calib_config_module_->calibConfig;
-		//TODO:实现通过cfg中的相机内参和外参对himage进行畸变矫正，并将结果保存在result中
 
-		return result;
+		// 未标定或输入无效时原样返回，确保流水线不中断
+		if (!himage.IsInitialized() || cfg.cameraParameters.Length() == 0)
+			return himage;
+
+		try
+		{
+			// 生成无畸变（理想）相机参数
+			HTuple camParRectified;
+			ChangeRadialDistortionCamPar("fixed", cfg.cameraParameters, 0, &camParRectified);
+
+			// 执行畸变矫正（Region 传空对象表示对整图处理）
+			HObject rectified;
+			ChangeRadialDistortionImage(himage, HObject(), &rectified,
+				cfg.cameraParameters, camParRectified);
+			return HImage(rectified);
+		}
+		catch (const HException&)
+		{
+			return himage;
+		}
 	}
 
 

@@ -1,5 +1,9 @@
 #include "Business/NinePointBun/NinePointBun.hpp"
 
+#include <chrono>
+
+#include "infrastructure/ControlModule/ControlModule.hpp"
+
 namespace bun
 {
 	NinePointBun::NinePointBun(inf::infrastructure& inf)
@@ -7,13 +11,17 @@ namespace bun
 	{
 	}
 
+	NinePointBun::~NinePointBun()
+	{
+		stopAutoCalibration();
+	}
+
 	void NinePointBun::calculateNinePointConfig()
 	{
-		Config::NinePointCfg ninePointCfg;
-
-		//TODO:
-
-		inf_.nine_point_module_->ninePointConfig = ninePointCfg;
+		// 触发自动化九点标定流程（PLC 协同），结果写入并持久化到 NinePointModule。
+		// 不再用空配置覆盖现有标定结果。
+		std::string err;
+		startAutoCalibration(&err);
 	}
 
 	bool NinePointBun::calcPixToWorldHomMat2D(const std::vector<Point2D>& pixPoints,
@@ -86,12 +94,127 @@ namespace bun
 		}
 	}
 
+	void NinePointBun::setMechanicalCoords(const std::vector<Point2D>& coords)
+	{
+		mechanicalCoords_ = coords;
+	}
+
+	bool NinePointBun::startAutoCalibration(std::string* errorMsg)
+	{
+		if (worker_.joinable())
+		{
+			if (errorMsg) *errorMsg = "九点标定已在进行中";
+			return false;
+		}
+		if (mechanicalCoords_.size() < 3)
+		{
+			if (errorMsg) *errorMsg = "九点机械坐标数量不足（至少 3 个）";
+			return false;
+		}
+		stopRequested_.store(false, std::memory_order_release);
+		worker_ = std::thread([this] { runAutoCalibration(); });
+		return true;
+	}
+
+	void NinePointBun::stopAutoCalibration()
+	{
+		stopRequested_.store(true, std::memory_order_release);
+		if (worker_.joinable())
+			worker_.join();
+	}
+
+	void NinePointBun::runAutoCalibration()
+	{
+		try
+		{
+			const int total = static_cast<int>(mechanicalCoords_.size());
+			std::vector<Point2D> pixPoints;
+			std::vector<Point2D> worldPoints;
+
+			auto* control = inf_.control_module_ ? inf_.control_module_.get() : nullptr;
+
+			for (int i = 0; i < total; ++i)
+			{
+				if (stopRequested_.load(std::memory_order_acquire))
+				{
+					emit calibrationFinished(false, QStringLiteral("九点标定已取消"));
+					return;
+				}
+
+				emit calibrationProgress(i + 1, total);
+
+				const Point2D mech = mechanicalCoords_[i];
+
+				// 1. 写入机械坐标到 PLC（40103 起，X/Y 交替）并写当前点位序号（40102）
+				if (control && control->isConnected())
+				{
+					// TODO(硬件): 确认浮点坐标的寄存器编排方式。
+					control->writeFloat(40103 + i * 2, static_cast<float>(mech.x));
+					control->writeFloat(40103 + i * 2 + 2, static_cast<float>(mech.y));
+					control->writeRegister(40102, static_cast<uint16_t>(i + 1));
+				}
+
+				// 2. 轮询到位确认（40101）
+				bool arrived = !control || !control->isConnected(); // 无硬件时直接放行（便于离线流程）
+				for (int retry = 0; retry < 300 && !arrived; ++retry)
+				{
+					if (stopRequested_.load(std::memory_order_acquire))
+					{
+						emit calibrationFinished(false, QStringLiteral("九点标定已取消"));
+						return;
+					}
+					uint16_t status = 0;
+					if (control && control->readRegister(40101, status) && status == 1)
+					{
+						arrived = true;
+						break;
+					}
+					std::this_thread::sleep_for(std::chrono::milliseconds(100));
+				}
+				if (!arrived)
+				{
+					emit calibrationFinished(false, QStringLiteral("PLC 到位超时"));
+					return;
+				}
+
+				// 3. 采集图像并检测标定标记得到像素坐标
+				// TODO(硬件): 采集单帧并用 Halcon 检测标记点像素坐标。
+				//   rw::rqwc::MatInfo frame;
+				//   inf_.camera_module_->captureSingleFrame(global::CameraIndex::Camera1, frame);
+				//   ...检测得到 pix...
+				Point2D pix{ 0.0, 0.0 };
+
+				pixPoints.push_back(pix);
+				worldPoints.push_back(mech);
+			}
+
+			// 4. 计算变换矩阵
+			Config::NinePointCfg cfg = inf_.nine_point_module_->ninePointConfig;
+			if (!calcPixToWorldHomMat2D(pixPoints, worldPoints, cfg))
+			{
+				emit calibrationFinished(false, QStringLiteral("变换矩阵计算失败"));
+				return;
+			}
+
+			// 5. 保存
+			inf_.nine_point_module_->ninePointConfig = cfg;
+			inf_.nine_point_module_->save();
+
+			emit calibrationFinished(true, QStringLiteral("九点标定完成"));
+		}
+		catch (...)
+		{
+			emit calibrationFinished(false, QStringLiteral("九点标定异常"));
+		}
+	}
+
 	void NinePointBun::build()
 	{
 	}
 
 	void NinePointBun::destroy()
 	{
+		stopAutoCalibration();
 	}
 
 	void NinePointBun::start()
@@ -100,5 +223,6 @@ namespace bun
 
 	void NinePointBun::stop()
 	{
+		stopAutoCalibration();
 	}
 }

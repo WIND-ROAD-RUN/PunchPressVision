@@ -10,12 +10,24 @@ namespace bun
 	void TwoCameraSpliceBun::calculateTwoCameraSpliceConfig(const HalconCpp::HImage& himage1,
 		const HalconCpp::HImage& himage2)
 	{
-		Config::TwoCameraSpliceCfg result;
-		//TODO: 补充双相机拼接的算法
+		// 复用已实现的 calibImage 计算拼接映射，结果写入拼接配置模块并持久化。
+		Config::TwoCameraSpliceCfg result = inf_.two_camera_splice_module_->twoCameraSpliceConfig;
 
+		// 双相机标定参数：当前以同一相机标定配置为基准（单相机标定数据）。
+		// TODO: 若两相机各自独立标定，应分别传入对应的 CalibConfig。
+		Config::CalibConfig calib = inf_.calib_config_module_->calibConfig;
 
+		std::string err;
+		const bool ok = calibImage(
+			static_cast<HalconCpp::HObject>(himage1),
+			static_cast<HalconCpp::HObject>(himage2),
+			calib, calib, result, &err);
 
-		inf_.two_camera_splice_module_->twoCameraSpliceConfig = result;
+		if (ok)
+		{
+			inf_.two_camera_splice_module_->twoCameraSpliceConfig = result;
+			inf_.two_camera_splice_module_->save();
+		}
 	}
 
 	bool TwoCameraSpliceBun::calibImage(HalconCpp::HObject image1, HalconCpp::HObject image2,
