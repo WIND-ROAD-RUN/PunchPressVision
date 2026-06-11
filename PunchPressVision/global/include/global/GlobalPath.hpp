@@ -4,7 +4,7 @@
 namespace global
 {
 	// 项目运行时数据根目录（配置/标定/模型/日志均位于其下）
-	inline std::string ProjectRootPath = "D:/zfkjData/PunchPressVision";
+	inline std::string ProjectRootPath = "D:/zfkjData/PunchPressVision/";
 
 	// 拼接子目录，保证使用统一的 '/' 分隔符
 	inline std::string joinPath(const std::string& base, const std::string& sub)

@@ -6,6 +6,6 @@ namespace inf
 {
 	inline struct 
 	{
-		std::string RootPath = global::ProjectRootPath + "TwoCameraSpliceModule/";
+		std::string RootPath = global::joinPath(global::ProjectRootPath, "TwoCameraSpliceModule");
 	}TwoCameraSpliceModulePath;
 }

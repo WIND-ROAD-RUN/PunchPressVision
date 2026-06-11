@@ -7,7 +7,7 @@ namespace inf
 	inline struct 
 	{
 	public:
-		std::string RootPath = global::ProjectRootPath + "/config";
+		std::string RootPath = global::joinPath(global::ProjectRootPath, "config");
 	public:
 		std::string baseCfgName = "baseCfg.xml";
 		std::string cameraCfgName = "cameraCfg.xml";

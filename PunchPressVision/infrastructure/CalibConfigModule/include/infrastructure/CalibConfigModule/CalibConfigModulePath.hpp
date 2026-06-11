@@ -6,6 +6,6 @@ namespace inf
 {
 	inline struct 
 	{
-		std::string RootPath = global::ProjectRootPath + "CalibConfigModule/";
+		std::string RootPath = global::joinPath(global::ProjectRootPath, "CalibConfigModule");
 	}CalibConfigModulePath;
 }
