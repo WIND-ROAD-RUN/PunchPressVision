@@ -28,6 +28,10 @@ namespace inf
 		void build() override;
 		void destroy() override;
 
+		// 启动/停止所有已连接相机的监控（与 build/destroy 分离，可独立控制）
+		void startMonitor();
+		void stopMonitor();
+
 		// 相机控制接口（FR-005 / FR-008 / FR-011）
 		bool setFreeRunMode(global::CameraIndex idx, double fps);
 		bool setTriggerMode(global::CameraIndex idx, global::TriggerSource source, double fps);

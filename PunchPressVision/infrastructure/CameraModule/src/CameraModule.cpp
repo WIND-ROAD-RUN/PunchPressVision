@@ -81,16 +81,30 @@ namespace inf
 			cam->setExposureTime(static_cast<rw::hoec::UInt>(exposure));
 			cam->setGain(static_cast<rw::hoec::UInt>(gain));
 			cam->setFrameRate(5.0f);
-
 			(void)cam->registerCallBackFunc();
-			(void)cam->startMonitor();
 
 			emit cameraConnectionStateChanged(idx, true, "ok");
 			cameras_[idx] = std::move(cam);
 		}
 	}
 
-	void CameraModule::destroy()
+	void CameraModule::startMonitor()
+	{
+		for (auto& [idx, cam] : cameras_)
+		{
+			if (!cam || !isConnected(idx))
+				continue;
+			try
+			{
+				(void)cam->startMonitor();
+			}
+			catch (...)
+			{
+			}
+		}
+	}
+
+	void CameraModule::stopMonitor()
 	{
 		for (auto& [idx, cam] : cameras_)
 		{
@@ -99,6 +113,22 @@ namespace inf
 			try
 			{
 				(void)cam->stopMonitor();
+			}
+			catch (...)
+			{
+			}
+		}
+	}
+
+	void CameraModule::destroy()
+	{
+		stopMonitor();
+		for (auto& [idx, cam] : cameras_)
+		{
+			if (!cam)
+				continue;
+			try
+			{
 				(void)cam->disconnectCamera();
 			}
 			catch (...)
