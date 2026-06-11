@@ -6,6 +6,7 @@
 #include "Config/VisionCfg.hpp"
 #include "infrastructure/ConfigModule/Config/cameraCfg.hpp"
 #include "infrastructure/ConfigModule/Config/baseCfg.hpp"
+#include "infrastructure/ConfigModule/Config/plcAddressCfg.hpp"
 
 namespace rw::oso
 {
@@ -25,6 +26,7 @@ namespace inf
 	public:
 		Config::BaseCfg baseCfg;
 		Config::cameraCfg cameraCfg;
+		Config::PlcAddressCfg plcAddressCfg;
 		Config::visionCfg visionCfg;
 	public:
 		void build() override;

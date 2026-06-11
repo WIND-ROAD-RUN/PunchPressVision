@@ -7,15 +7,6 @@
 
 namespace app
 {
-	namespace
-	{
-		// PLC 寄存器映射（LLD 附录）
-		constexpr int kRegOffsetX = 40001; // float
-		constexpr int kRegOffsetY = 40003; // float
-		constexpr int kRegAngle   = 40005; // float
-		constexpr int kRegValid   = 40007; // int
-	}
-
 	PunchPressApp::PunchPressApp(bun::Business& business, QObject* parent)
 		: QObject(parent)
 		, business_(business)
@@ -324,14 +315,15 @@ namespace app
 
 		emit positionResultReady(result);
 
-		// 写 PLC（若已连接）：X/Y 偏移、角度、有效标志（LLD 寄存器映射）
+		// 写 PLC（若已连接）：X/Y 偏移、角度、有效标志（寄存器地址来自 plcAddressCfg）
 		auto& inf = business_.infrastructure();
-		if (inf.control_module_ && inf.control_module_->isConnected())
+		if (inf.control_module_ && inf.control_module_->isConnected() && inf.config_module_)
 		{
-			inf.control_module_->writeFloat(kRegOffsetX, static_cast<float>(result.offsetX));
-			inf.control_module_->writeFloat(kRegOffsetY, static_cast<float>(result.offsetY));
-			inf.control_module_->writeFloat(kRegAngle, static_cast<float>(result.angle));
-			inf.control_module_->writeRegister(kRegValid, result.valid ? 1 : 0);
+			const auto& plc = inf.config_module_->plcAddressCfg;
+			inf.control_module_->writeFloat(plc.regOffsetX, static_cast<float>(result.offsetX));
+			inf.control_module_->writeFloat(plc.regOffsetY, static_cast<float>(result.offsetY));
+			inf.control_module_->writeFloat(plc.regAngle, static_cast<float>(result.angle));
+			inf.control_module_->writeRegister(plc.regValid, result.valid ? 1 : 0);
 		}
 	}
 }

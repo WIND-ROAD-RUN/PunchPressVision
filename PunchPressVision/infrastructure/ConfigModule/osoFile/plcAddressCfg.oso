@@ -1,0 +1,13 @@
+namespace Config{
+	class PlcAddressCfg
+	{
+	public:
+		regOffsetX : int : default = 40001;
+		regOffsetY : int : default = 40003;
+		regAngle : int : default = 40005;
+		regValid : int : default = 40007;
+		regNinePointArrived : int : default = 40101;
+		regNinePointIndex : int : default = 40102;
+		regNinePointCoordsStart : int : default = 40103;
+	};
+}

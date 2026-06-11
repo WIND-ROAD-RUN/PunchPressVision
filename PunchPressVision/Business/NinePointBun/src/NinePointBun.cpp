@@ -145,16 +145,17 @@ namespace bun
 
 				const Point2D mech = mechanicalCoords_[i];
 
-				// 1. 写入机械坐标到 PLC（40103 起，X/Y 交替）并写当前点位序号（40102）
-				if (control && control->isConnected())
+				// 1. 写入机械坐标到 PLC（X/Y 交替）并写当前点位序号
+				if (control && control->isConnected() && inf_.config_module_)
 				{
 					// TODO(硬件): 确认浮点坐标的寄存器编排方式。
-					control->writeFloat(40103 + i * 2, static_cast<float>(mech.x));
-					control->writeFloat(40103 + i * 2 + 2, static_cast<float>(mech.y));
-					control->writeRegister(40102, static_cast<uint16_t>(i + 1));
+					const auto& plc = inf_.config_module_->plcAddressCfg;
+					control->writeFloat(plc.regNinePointCoordsStart + i * 2, static_cast<float>(mech.x));
+					control->writeFloat(plc.regNinePointCoordsStart + i * 2 + 2, static_cast<float>(mech.y));
+					control->writeRegister(plc.regNinePointIndex, static_cast<uint16_t>(i + 1));
 				}
 
-				// 2. 轮询到位确认（40101）
+				// 2. 轮询到位确认
 				bool arrived = !control || !control->isConnected(); // 无硬件时直接放行（便于离线流程）
 				for (int retry = 0; retry < 300 && !arrived; ++retry)
 				{
@@ -164,7 +165,7 @@ namespace bun
 						return;
 					}
 					uint16_t status = 0;
-					if (control && control->readRegister(40101, status) && status == 1)
+					if (control && inf_.config_module_ && control->readRegister(inf_.config_module_->plcAddressCfg.regNinePointArrived, status) && status == 1)
 					{
 						arrived = true;
 						break;

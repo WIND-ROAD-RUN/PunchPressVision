@@ -18,14 +18,15 @@ namespace rw::hoep
 namespace inf
 {
 	// PLC 控制网关：封装 Modbus TCP 通信（rw::hoep::ModbusDevice）。
-	// 寄存器地址映射（LLD 附录）：
-	//   40001 float  X 偏移量
-	//   40003 float  Y 偏移量
-	//   40005 float  旋转角度 Angle
-	//   40007 int    定位结果有效标志
-	//   40101 int    九点标定到位确认（PLC→系统）
-	//   40102 int    九点标定当前点位序号
-	//   40103~ float  九点点位机械坐标
+	// 寄存器地址映射由 ConfigModule::plcAddressCfg 提供（oso 持久化），
+	// 默认值对应 LLD 附录：
+	//   regOffsetX          (40001) float  X 偏移量
+	//   regOffsetY          (40003) float  Y 偏移量
+	//   regAngle            (40005) float  旋转角度 Angle
+	//   regValid            (40007) int    定位结果有效标志
+	//   regNinePointArrived (40101) int    九点标定到位确认（PLC→系统）
+	//   regNinePointIndex   (40102) int    九点标定当前点位序号
+	//   regNinePointCoordsStart (40103~) float  九点点位机械坐标
 	class ControlModule
 		: public QObject, public global::IInfrastructure
 	{
