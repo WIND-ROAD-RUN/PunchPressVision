@@ -3,6 +3,9 @@
 #include <QObject>
 #include <QString>
 
+#include <memory>
+#include <unordered_map>
+
 #include <rwul/hoecm/hoec_m.hpp>
 
 #include "global/GlobalType.hpp"

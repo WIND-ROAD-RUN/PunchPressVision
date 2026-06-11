@@ -21,3 +21,5 @@ target_link_libraries(${Inf_TARGET} PRIVATE
     inf::CameraModule
 )
 
+add_windeployqt(${Inf_TARGET})
+
