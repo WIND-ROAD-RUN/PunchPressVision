@@ -1,6 +1,9 @@
 #pragma once
 
-#include <rwul/rqwcm/rqwc_m.hpp>
+#include <QObject>
+#include <QString>
+
+#include <rwul/hoecm/hoec_m.hpp>
 
 #include "global/GlobalType.hpp"
 #include "global/GlobalInterface.hpp"
@@ -14,7 +17,7 @@ namespace inf
 	{
 		Q_OBJECT
 	public:
-		std::unordered_map<global::CameraIndex, std::unique_ptr<rw::rqwc::MVSCameraPassive>> cameras_{};
+		std::unordered_map<global::CameraIndex, std::unique_ptr<rw::hoec::MVSCameraPassive>> cameras_{};
 		Config::cameraCfg cameraCfg;
 		// 相机 IP / PLC 等基础配置（由 ConfigModule 注入）
 		Config::BaseCfg baseCfg;
@@ -27,17 +30,17 @@ namespace inf
 		bool setTriggerMode(global::CameraIndex idx, global::TriggerSource source, double fps);
 		bool setExposure(global::CameraIndex idx, double microseconds);
 		bool setGain(global::CameraIndex idx, double value);
-		bool captureSingleFrame(global::CameraIndex idx, rw::rqwc::MatInfo& out);
+		bool captureSingleFrame(global::CameraIndex idx, rw::hoec::MatInfo& out);
 
 		// 查询连接状态
 		bool isConnected(global::CameraIndex idx) const;
 
 	private:
-		rw::rqwc::MVSCameraPassive* camera(global::CameraIndex idx) const;
+		rw::hoec::MVSCameraPassive* camera(global::CameraIndex idx) const;
 
 	signals:
 		//所有相机的回调函数都连接到这个槽函数上，区分相机通过cameraIndex参数，信号使用Qt::DirectConnection连接
-		void callBackFunc(rw::rqwc::MatInfo matInfo, global::CameraIndex cameraIndex);
+		void callBackFunc(rw::hoec::MatInfo matInfo, global::CameraIndex cameraIndex);
 		//相机连接状态改变的信号，connected表示连接状态，reason表示状态改变的原因
 		void cameraConnectionStateChanged(global::CameraIndex cameraIndex, bool connected, QString reason);
 	};

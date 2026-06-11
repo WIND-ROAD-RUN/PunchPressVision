@@ -23,8 +23,9 @@ target_include_directories(${Inf_TARGET}
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/private/include>
 )
 
-target_link_libraries(${Inf_TARGET} 
-	PUBLIC RWUL::rqwcm 
+target_link_libraries(${Inf_TARGET}
+	PUBLIC RWUL::hoecm
+	PUBLIC Qt6::Core
 	PUBLIC global::global inf::ConfigModule
 )
 

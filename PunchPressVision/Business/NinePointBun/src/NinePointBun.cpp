@@ -179,7 +179,7 @@ namespace bun
 
 				// 3. 采集图像并检测标定标记得到像素坐标
 				// TODO(硬件): 采集单帧并用 Halcon 检测标记点像素坐标。
-				//   rw::rqwc::MatInfo frame;
+				//   rw::hoec::MatInfo frame;
 				//   inf_.camera_module_->captureSingleFrame(global::CameraIndex::Camera1, frame);
 				//   ...检测得到 pix...
 				Point2D pix{ 0.0, 0.0 };

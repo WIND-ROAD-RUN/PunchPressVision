@@ -4,21 +4,21 @@ namespace inf
 {
 	namespace
 	{
-		// global::TriggerSource → rw::rqwc::TriggerSource(底层枚举为 Software/Line0/Line2/Counter0)
-		rw::rqwc::TriggerSource toRwTriggerSource(global::TriggerSource src)
+		// global::TriggerSource → rw::hoec::TriggerSource(底层枚举为 Software/Line0/Line2/Counter0)
+		rw::hoec::TriggerSource toRwTriggerSource(global::TriggerSource src)
 		{
 			switch (src)
 			{
-			case global::TriggerSource::Line0: return rw::rqwc::TriggerSource::Line0;
-			case global::TriggerSource::Line1: return rw::rqwc::TriggerSource::Line2; // 底层无 Line1，退化到 Line2
-			case global::TriggerSource::Line2: return rw::rqwc::TriggerSource::Line2;
+			case global::TriggerSource::Line0: return rw::hoec::TriggerSource::Line0;
+			case global::TriggerSource::Line1: return rw::hoec::TriggerSource::Line2; // 底层无 Line1，退化到 Line2
+			case global::TriggerSource::Line2: return rw::hoec::TriggerSource::Line2;
 			case global::TriggerSource::Software:
-			default: return rw::rqwc::TriggerSource::Software;
+			default: return rw::hoec::TriggerSource::Software;
 			}
 		}
 	}
 
-	rw::rqwc::MVSCameraPassive* CameraModule::camera(global::CameraIndex idx) const
+	rw::hoec::MVSCameraPassive* CameraModule::camera(global::CameraIndex idx) const
 	{
 		auto it = cameras_.find(idx);
 		return it == cameras_.end() ? nullptr : it->second.get();
@@ -40,17 +40,16 @@ namespace inf
 
 		for (const auto& init : inits)
 		{
-			auto cam = std::make_unique<rw::rqwc::MVSCameraPassive>();
+			auto cam = std::make_unique<rw::hoec::MVSCameraPassive>();
 			const global::CameraIndex idx = init.index;
 
 			// 回调：底层 MatInfo → Qt 信号（DirectConnection 由订阅方指定）
 			cam->setCallBackFuncPost(
-				[this, idx](rw::rqwc::MatInfo& matInfo)
+				[this, idx](rw::hoec::MatInfo& matInfo)
 				{
 					emit callBackFunc(matInfo, idx);
 				});
 
-			// TODO(硬件): 确认实际相机 IP；当前从 baseCfg 读取。
 			cam->setIP(init.ip);
 
 			bool connected = false;
@@ -74,13 +73,13 @@ namespace inf
 			}
 
 			// 默认自由运行模式，曝光/增益取自 cameraCfg
-			cam->setTriggerModeStatus(rw::rqwc::TriggerModeStatus::OFF);
+			cam->setTriggerModeStatus(rw::hoec::TriggerModeStatus::OFF);
 			const int exposure = (idx == global::CameraIndex::Camera1)
 				? cameraCfg.exposureTime1 : cameraCfg.exposureTime2;
 			const int gain = (idx == global::CameraIndex::Camera1)
 				? cameraCfg.gain1 : cameraCfg.gain2;
-			cam->setExposureTime(static_cast<rw::rqwc::UInt>(exposure));
-			cam->setGain(static_cast<rw::rqwc::UInt>(gain));
+			cam->setExposureTime(static_cast<rw::hoec::UInt>(exposure));
+			cam->setGain(static_cast<rw::hoec::UInt>(gain));
 			cam->setFrameRate(5.0f);
 
 			(void)cam->registerCallBackFunc();
@@ -114,7 +113,7 @@ namespace inf
 		auto* cam = camera(idx);
 		if (!cam)
 			return false;
-		if (!cam->setTriggerModeStatus(rw::rqwc::TriggerModeStatus::OFF))
+		if (!cam->setTriggerModeStatus(rw::hoec::TriggerModeStatus::OFF))
 			return false;
 		return cam->setFrameRate(static_cast<float>(fps));
 	}
@@ -124,7 +123,7 @@ namespace inf
 		auto* cam = camera(idx);
 		if (!cam)
 			return false;
-		if (!cam->setTriggerModeStatus(rw::rqwc::TriggerModeStatus::ON))
+		if (!cam->setTriggerModeStatus(rw::hoec::TriggerModeStatus::ON))
 			return false;
 		if (!cam->setTriggerSource(toRwTriggerSource(source)))
 			return false;
@@ -136,7 +135,7 @@ namespace inf
 		auto* cam = camera(idx);
 		if (!cam)
 			return false;
-		return cam->setExposureTime(static_cast<rw::rqwc::UInt>(microseconds));
+		return cam->setExposureTime(static_cast<rw::hoec::UInt>(microseconds));
 	}
 
 	bool CameraModule::setGain(global::CameraIndex idx, double value)
@@ -144,16 +143,16 @@ namespace inf
 		auto* cam = camera(idx);
 		if (!cam)
 			return false;
-		return cam->setGain(static_cast<rw::rqwc::UInt>(value));
+		return cam->setGain(static_cast<rw::hoec::UInt>(value));
 	}
 
-	bool CameraModule::captureSingleFrame(global::CameraIndex idx, rw::rqwc::MatInfo& out)
+	bool CameraModule::captureSingleFrame(global::CameraIndex idx, rw::hoec::MatInfo& out)
 	{
 		auto* cam = camera(idx);
 		if (!cam)
 			return false;
 		// 被动相机通过软触发取一帧；结果经回调返回，此处发起触发。
-		// TODO(硬件): 若需同步取帧，可改用 rw::rqwc::MVSCameraActive::captureImage。
+		// TODO(硬件): 若需同步取帧，可改用 rw::hoec::MVSCameraActive::captureImage。
 		(void)out;
 		try
 		{

@@ -30,7 +30,7 @@ namespace bun
 		void setSpliceEnabled(bool enabled);
 
 	public slots:
-		void callBackFunc(rw::rqwc::MatInfo matInfo, global::CameraIndex cameraIndex);
+		void callBackFunc(rw::hoec::MatInfo matInfo, global::CameraIndex cameraIndex);
 
 	signals:
 		void cameraConnectionStateChanged(global::CameraIndex cameraIndex, bool connected, QString reason);

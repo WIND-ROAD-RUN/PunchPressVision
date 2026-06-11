@@ -73,7 +73,7 @@ namespace bun
 		return image;
 	}
 
-	void CameraBun::callBackFunc(rw::rqwc::MatInfo matInfo, global::CameraIndex cameraIndex)
+	void CameraBun::callBackFunc(rw::hoec::MatInfo matInfo, global::CameraIndex cameraIndex)
 	{
 		try
 		{
