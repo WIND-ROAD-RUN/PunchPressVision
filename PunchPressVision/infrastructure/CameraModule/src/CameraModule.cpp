@@ -81,6 +81,7 @@ namespace inf
 			cam->setExposureTime(static_cast<rw::hoec::UInt>(exposure));
 			cam->setGain(static_cast<rw::hoec::UInt>(gain));
 			cam->setFrameRate(5.0f);
+			cam->setHeartbeatTime(5);
 			(void)cam->registerCallBackFunc();
 
 			emit cameraConnectionStateChanged(idx, true, "ok");

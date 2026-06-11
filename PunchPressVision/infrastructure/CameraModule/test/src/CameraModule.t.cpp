@@ -22,6 +22,8 @@ int main(int argc, char* argv[])
 		{
 			std::cout << "CameraIndex" << static_cast<int>(cameraIndex) << " MatInfo: " << matInfo.frameInfo.width << "x" << matInfo.frameInfo.height << std::endl;
 		});
+
+	cameraModule.startMonitor();
 	
 	return app.exec();
 }
