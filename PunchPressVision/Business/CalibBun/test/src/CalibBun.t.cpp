@@ -1,10 +1,32 @@
-#include "CalibBun.t.hpp"
+#include "CalibBunTestWindow.hpp"
 
-#include <QCoreApplication>
+#include <QApplication>
+#include <QMetaType>
+
+#include "halconcpp/HalconCpp.h"
+#include "global/GlobalType.hpp"
+#include "infrastructure/infrastructure.hpp"
+
+Q_DECLARE_METATYPE(global::CameraIndex)
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
+    QApplication app(argc, argv);
 
-    return app.exec();
+    // 自定义枚举/类需要注册，才能在跨线程信号中传递
+    qRegisterMetaType<HalconCpp::HImage>("HalconCpp::HImage");
+    qRegisterMetaType<global::CameraIndex>("global::CameraIndex");
+
+    inf::infrastructure inf;
+    inf.build();
+
+    CalibBunTestWindow wnd(inf);
+    wnd.setWindowTitle(QStringLiteral("CalibBun 畸变矫正测试窗口"));
+    wnd.resize(1024, 768);
+    wnd.show();
+
+    const int rc = app.exec();
+
+    inf.destroy();
+    return rc;
 }

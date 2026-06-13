@@ -12,13 +12,18 @@ list(APPEND SRC_LIST ${INCLUDE_LIST})
 
 add_executable(${Bun_TARGET} ${SRC_LIST})
 
-target_include_directories(${Bun_TARGET} 
-	PUBLIC 
+target_include_directories(${Bun_TARGET}
+	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+	PRIVATE
+		${CMAKE_SOURCE_DIR}/PunchPressVision/UI/PunchPressUI/include
 )
 
 target_link_libraries(${Bun_TARGET} PRIVATE
     bun::CalibBun
+    bun::CameraBun
+    Qt6::Core
+    Qt6::Widgets
 )
 
 add_windeployqt(${Bun_TARGET})
