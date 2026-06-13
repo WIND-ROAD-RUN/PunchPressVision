@@ -20,3 +20,5 @@ target_include_directories(${App_TARGET}
 target_link_libraries(${App_TARGET} PRIVATE
     app::PunchPressApp
 )
+
+add_windeployqt(${App_TARGET})
