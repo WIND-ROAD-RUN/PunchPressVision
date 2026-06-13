@@ -1,7 +1,7 @@
 set(PPV_TARGET_NAME "PunchPressVision")
 
 # 旧 UIModule（重构前外壳）保留编译，但不链接进可执行文件
-add_subdirectory(UIModule)
+#add_subdirectory(UIModule)
 # 新 UI 模块（复用旧 .ui，接入 App 层）
 add_subdirectory(PunchPressUI)
 
