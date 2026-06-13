@@ -21,3 +21,4 @@ target_link_libraries(${Bun_TARGET} PRIVATE
     bun::CalibBun
 )
 
+add_windeployqt(${Bun_TARGET})

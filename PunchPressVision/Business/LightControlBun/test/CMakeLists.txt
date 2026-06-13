@@ -20,3 +20,5 @@ target_include_directories(${Bun_TARGET}
 target_link_libraries(${Bun_TARGET} PRIVATE
     bun::LightControlBun
 )
+
+add_windeployqt(${Bun_TARGET})

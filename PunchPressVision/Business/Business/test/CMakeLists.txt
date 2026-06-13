@@ -21,3 +21,4 @@ target_link_libraries(${Bun_TARGET} PRIVATE
     bun::Business
 )
 
+add_windeployqt(${Bun_TARGET})
