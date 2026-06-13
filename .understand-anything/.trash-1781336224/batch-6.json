@@ -1,0 +1,767 @@
+{
+  "nodes": [
+    {
+      "id": "file:PunchPressVision/Business/CalibBun/test/include/CalibBun.t.hpp",
+      "type": "file",
+      "name": "CalibBun.t.hpp",
+      "filePath": "PunchPressVision/Business/CalibBun/test/include/CalibBun.t.hpp",
+      "summary": "CalibBun 测试头文件桩，当前为空，预留将来测试工具类或 fixture 声明。",
+      "tags": ["test", "stub", "header"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/Business/CalibBun/test/src/CalibBun.t.cpp",
+      "type": "file",
+      "name": "CalibBun.t.cpp",
+      "filePath": "PunchPressVision/Business/CalibBun/test/src/CalibBun.t.cpp",
+      "summary": "CalibBun 测试入口文件，当前仅为返回 0 的桩实现，待后续补充具体测试用例。",
+      "tags": ["test", "stub", "entry-point"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:PunchPressVision/Business/CameraBun/CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/Business/CameraBun/CMakeLists.txt",
+      "summary": "CameraBun 模块的 CMake 构建配置，将头文件和源文件编译为静态库 bun::CameraBun，并链接 inf::infrastructure 基础设施依赖。",
+      "tags": ["build-system", "configuration", "cmake", "static-library"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/Business/CameraBun/include/Business/CameraBun/CameraBun.hpp",
+      "type": "file",
+      "name": "CameraBun.hpp",
+      "filePath": "PunchPressVision/Business/CameraBun/include/Business/CameraBun/CameraBun.hpp",
+      "summary": "CameraBun 业务类头文件，继承 QObject 和 global::IBusiness，定义相机图像处理流水线（转换-畸变矫正-九点变换-双相机拼接）及信号接口。",
+      "tags": ["api-handler", "header", "qt-signals", "image-processing"],
+      "complexity": "moderate",
+      "languageNotes": "使用 Qt 信号槽机制（calbackFunc 为 slot，cameraConnectionStateChanged/callBackFunWithCalib 为 signal）实现异步图像处理通知。"
+    },
+    {
+      "id": "class:PunchPressVision/Business/CameraBun/include/Business/CameraBun/CameraBun.hpp:CameraBun",
+      "type": "class",
+      "name": "CameraBun",
+      "filePath": "PunchPressVision/Business/CameraBun/include/Business/CameraBun/CameraBun.hpp",
+      "lineRange": [17, 53],
+      "summary": "相机业务编排类，负责图像处理流水线：原始帧→格式转换→畸变矫正→九点变换→双相机拼接→信号发射，实现 global::IBusiness 生命周期接口。",
+      "tags": ["service", "image-pipeline", "qt-object", "camera"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/Business/CameraBun/include/Business/CameraBun/CameraImgConvert.hpp",
+      "type": "file",
+      "name": "CameraImgConvert.hpp",
+      "filePath": "PunchPressVision/Business/CameraBun/include/Business/CameraBun/CameraImgConvert.hpp",
+      "summary": "相机图像格式转换工具类头文件，提供 cv::Mat 到 Halcon HImage 的两种转换方法（标准版和快速版）。",
+      "tags": ["utility", "header", "image-conversion", "opencv", "halcon"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:PunchPressVision/Business/CameraBun/include/Business/CameraBun/CameraImgConvert.hpp:CameraImgConvert",
+      "type": "class",
+      "name": "CameraImgConvert",
+      "filePath": "PunchPressVision/Business/CameraBun/include/Business/CameraBun/CameraImgConvert.hpp",
+      "lineRange": [8, 14],
+      "summary": "OpenCV 与 Halcon 图像格式互转工具类，提供 cvMatToHImage 和 cvMatToHImageFast 两个静态转换方法。",
+      "tags": ["utility", "image-conversion", "opencv", "halcon"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/Business/CameraBun/src/CameraBun.cpp",
+      "type": "file",
+      "name": "CameraBun.cpp",
+      "filePath": "PunchPressVision/Business/CameraBun/src/CameraBun.cpp",
+      "summary": "CameraBun 业务类实现，完成相机回调连接、图像畸变矫正（Halcon ChangeRadialDistortion）、九点变换及双相机拼接缓存逻辑。",
+      "tags": ["implementation", "camera", "image-pipeline", "halcon", "qt"],
+      "complexity": "complex",
+      "languageNotes": "使用 QObject::connect 以 DirectConnection 绑定相机信号，callBackFunc 为核心回调处理流水线：cv::Mat→HImage→去畸变→九点变换→拼接。"
+    },
+    {
+      "id": "function:PunchPressVision/Business/CameraBun/src/CameraBun.cpp:build",
+      "type": "function",
+      "name": "build",
+      "filePath": "PunchPressVision/Business/CameraBun/src/CameraBun.cpp",
+      "lineRange": [12, 22],
+      "summary": "构建 CameraBun，通过 QObject::connect 将 CameraModule 的 callBackFunc 和 cameraConnectionStateChanged 信号连接到本类对应槽/信号。",
+      "tags": ["lifecycle", "qt-connect", "initialization"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/Business/CameraBun/src/CameraBun.cpp:applyUndistort",
+      "type": "function",
+      "name": "applyUndistort",
+      "filePath": "PunchPressVision/Business/CameraBun/src/CameraBun.cpp",
+      "lineRange": [43, 66],
+      "summary": "对 Halcon HImage 应用畸变矫正，从 ConfigModule 加载标定参数并调用 Halcon 的 ChangeRadialDistortionCamPar/ChangeRadialDistortionImage 算子。",
+      "tags": ["image-processing", "calibration", "halcon", "undistortion"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/Business/CameraBun/src/CameraBun.cpp:callBackFunc",
+      "type": "function",
+      "name": "callBackFunc",
+      "filePath": "PunchPressVision/Business/CameraBun/src/CameraBun.cpp",
+      "lineRange": [76, 130],
+      "summary": "相机帧回调核心函数（Qt slot），处理单帧图像流水线：cv::Mat→HImage 转换→去畸变→九点变换，并根据拼接使能状态缓存或直接发射校准后图像信号。",
+      "tags": ["callback", "slot", "image-pipeline", "stitching", "qt"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:PunchPressVision/Business/CameraBun/src/CameraImgConvert.cpp",
+      "type": "file",
+      "name": "CameraImgConvert.cpp",
+      "filePath": "PunchPressVision/Business/CameraBun/src/CameraImgConvert.cpp",
+      "summary": "CameraImgConvert 工具类实现，根据 cv::Mat 的通道数和数据类型，使用 Halcon GenImage1/GenImageInterleaved 算子实现 OpenCV 到 Halcon 图像格式转换。",
+      "tags": ["implementation", "utility", "image-conversion", "opencv", "halcon"],
+      "complexity": "moderate",
+      "languageNotes": "cvMatToHImage 处理灰度/三通道连续/非连续/16位等多种格式，cvMatToHImageFast 直接使用 GenImage 零拷贝，不处理差分格式。"
+    },
+    {
+      "id": "function:PunchPressVision/Business/CameraBun/src/CameraImgConvert.cpp:cvMatToHImage",
+      "type": "function",
+      "name": "cvMatToHImage",
+      "filePath": "PunchPressVision/Business/CameraBun/src/CameraImgConvert.cpp",
+      "lineRange": [8, 60],
+      "summary": "将 cv::Mat 转换为 Halcon HImage，完整处理灰度单通道（CV_8UC1/CV_16UC1）和三通道 BGR（CV_8UC3/CV_16UC3），含连续内存检查和 Clone 分支。",
+      "tags": ["image-conversion", "opencv", "halcon", "utility"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/Business/CameraBun/src/CameraImgConvert.cpp:cvMatToHImageFast",
+      "type": "function",
+      "name": "cvMatToHImageFast",
+      "filePath": "PunchPressVision/Business/CameraBun/src/CameraImgConvert.cpp",
+      "lineRange": [62, 91],
+      "summary": "快速版 cv::Mat 到 HImage 转换，通过 Halcon GenImage1/GenImageInterleaved 直接引用 cv::Mat 内存指针（零拷贝），仅支持标准格式。",
+      "tags": ["image-conversion", "opencv", "halcon", "zero-copy", "performance"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:PunchPressVision/Business/CameraBun/test/CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/Business/CameraBun/test/CMakeLists.txt",
+      "summary": "CameraBun 测试模块的 CMake 构建配置，定义 Test_bun_CameraBun 测试可执行目标。",
+      "tags": ["build-system", "configuration", "cmake", "test"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/Business/CameraBun/test/include/CameraBun.t.hpp",
+      "type": "file",
+      "name": "CameraBun.t.hpp",
+      "filePath": "PunchPressVision/Business/CameraBun/test/include/CameraBun.t.hpp",
+      "summary": "CameraBun 测试头文件桩，当前为空，预留将来测试 fixture 声明。",
+      "tags": ["test", "stub", "header"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/Business/CameraBun/test/src/CameraBun.t.cpp",
+      "type": "file",
+      "name": "CameraBun.t.cpp",
+      "filePath": "PunchPressVision/Business/CameraBun/test/src/CameraBun.t.cpp",
+      "summary": "CameraBun 测试入口文件，当前仅为返回 0 的桩实现，待后续补充具体的 CameraBun 单元测试用例。",
+      "tags": ["test", "stub", "entry-point"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:PunchPressVision/Business/CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/Business/CMakeLists.txt",
+      "summary": "Business 层顶层 CMake 构建配置，通过 add_subdirectory 聚合 CameraBun、CalibBun、NinePointBun、ShapeModeManagerBun、LightControlBun 等所有业务子模块。",
+      "tags": ["build-system", "configuration", "cmake", "aggregator"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:PunchPressVision/Business/LightControlBun/CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/Business/LightControlBun/CMakeLists.txt",
+      "summary": "LightControlBun 模块的 CMake 构建配置，将光源控制业务代码编译为静态库 bun::LightControlBun，链接 inf::infrastructure。",
+      "tags": ["build-system", "configuration", "cmake", "static-library"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/Business/LightControlBun/include/Business/LightControlBun/LightControlBun.hpp",
+      "type": "file",
+      "name": "LightControlBun.hpp",
+      "filePath": "PunchPressVision/Business/LightControlBun/include/Business/LightControlBun/LightControlBun.hpp",
+      "summary": "LightControlBun 业务类头文件，继承 QObject 和 global::IBusiness，提供上/下光源的开关控制和状态查询（FR-021/FR-022），通过信号通知光源状态变化。",
+      "tags": ["api-handler", "header", "qt-signals", "light-control"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:PunchPressVision/Business/LightControlBun/include/Business/LightControlBun/LightControlBun.hpp:LightControlBun",
+      "type": "class",
+      "name": "LightControlBun",
+      "filePath": "PunchPressVision/Business/LightControlBun/include/Business/LightControlBun/LightControlBun.hpp",
+      "lineRange": [12, 35],
+      "summary": "光源控制业务类，封装上/下光源的开关操作和状态查询，通过 Qt 信号（upperLightChanged/lowerLightChanged）广播状态变更。",
+      "tags": ["service", "light-control", "qt-object", "modbus"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/Business/LightControlBun/src/LightControlBun.cpp",
+      "type": "file",
+      "name": "LightControlBun.cpp",
+      "filePath": "PunchPressVision/Business/LightControlBun/src/LightControlBun.cpp",
+      "summary": "LightControlBun 业务类实现，通过 infrastructure 的 PlcModule 代理上/下光源的 Modbus 寄存器写入和状态查询，并在操作后发射对应变更信号。",
+      "tags": ["implementation", "light-control", "modbus", "qt-signals"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:PunchPressVision/Business/LightControlBun/test/CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/Business/LightControlBun/test/CMakeLists.txt",
+      "summary": "LightControlBun 测试模块的 CMake 构建配置，定义 Test_bun_LightControlBun 测试可执行目标。",
+      "tags": ["build-system", "configuration", "cmake", "test"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/Business/LightControlBun/test/include/LightControlBun.t.hpp",
+      "type": "file",
+      "name": "LightControlBun.t.hpp",
+      "filePath": "PunchPressVision/Business/LightControlBun/test/include/LightControlBun.t.hpp",
+      "summary": "LightControlBun 测试头文件桩，当前仅一行空文件，预留将来测试 fixture 声明。",
+      "tags": ["test", "stub", "header"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/Business/LightControlBun/test/src/LightControlBun.t.cpp",
+      "type": "file",
+      "name": "LightControlBun.t.cpp",
+      "filePath": "PunchPressVision/Business/LightControlBun/test/src/LightControlBun.t.cpp",
+      "summary": "LightControlBun 测试入口文件，当前仅为返回 0 的桩实现，待后续补充光源控制的单元测试用例。",
+      "tags": ["test", "stub", "entry-point"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:PunchPressVision/Business/NinePointBun/CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/Business/NinePointBun/CMakeLists.txt",
+      "summary": "NinePointBun 模块的 CMake 构建配置，将九点标定业务代码编译为静态库 bun::NinePointBun，链接 inf::infrastructure。",
+      "tags": ["build-system", "configuration", "cmake", "static-library"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/Business/NinePointBun/include/Business/NinePointBun/NinePointBun.hpp",
+      "type": "file",
+      "name": "NinePointBun.hpp",
+      "filePath": "PunchPressVision/Business/NinePointBun/include/Business/NinePointBun/NinePointBun.hpp",
+      "summary": "NinePointBun 业务类头文件，继承 QObject 和 global::IBusiness，定义九点标定的数据模型（Point2D/PointPair）、像素到世界坐标转换接口及自动化标定流程（FR-017）。",
+      "tags": ["api-handler", "header", "calibration", "qt-signals", "data-model"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:PunchPressVision/Business/NinePointBun/include/Business/NinePointBun/NinePointBun.hpp:NinePointBun",
+      "type": "class",
+      "name": "NinePointBun",
+      "filePath": "PunchPressVision/Business/NinePointBun/include/Business/NinePointBun/NinePointBun.hpp",
+      "lineRange": [29, 72],
+      "summary": "九点标定业务类，通过 Halcon 的 VectorToHomMat2d 计算像素到世界坐标的变换矩阵，支持手动/自动标定流程，自动流程在 worker 线程中与 PLC 协同完成。",
+      "tags": ["service", "calibration", "halcon", "automation", "qt-object"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp",
+      "type": "file",
+      "name": "NinePointBun.cpp",
+      "filePath": "PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp",
+      "summary": "NinePointBun 业务类实现，包含 Halcon 齐次变换矩阵计算、pixToWorld 坐标转换、以及通过 Modbus PLC 协同的九点自动标定线程流程。",
+      "tags": ["implementation", "calibration", "halcon", "plc", "threading"],
+      "complexity": "complex",
+      "languageNotes": "runAutoCalibration 在线程中通过 Modbus 读写寄存器与 PLC 交互，逐点采集像素和机械坐标后调用 calcPixToWorldHomMat2D 计算变换矩阵并持久化到 ConfigModule。"
+    },
+    {
+      "id": "function:PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp:calcPixToWorldHomMat2D",
+      "type": "function",
+      "name": "calcPixToWorldHomMat2D",
+      "filePath": "PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp",
+      "lineRange": [27, 60],
+      "summary": "根据像素坐标和世界坐标点对，使用 Halcon 的 VectorToHomMat2d 算子计算像素到世界的齐次变换矩阵（HomMat2D），并写入 NinePointCfg 配置。",
+      "tags": ["calibration", "halcon", "homography", "math"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp:pixToWorld",
+      "type": "function",
+      "name": "pixToWorld",
+      "filePath": "PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp",
+      "lineRange": [62, 95],
+      "summary": "利用 HomMat2D 变换矩阵将像素坐标 (pixX, pixY) 转换为世界坐标 (outWorldX, outWorldY)，通过 Halcon 的 AffineTransPoint2d 算子实现仿射变换。",
+      "tags": ["calibration", "halcon", "coordinate-transform", "math"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp:startAutoCalibration",
+      "type": "function",
+      "name": "startAutoCalibration",
+      "filePath": "PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp",
+      "lineRange": [102, 117],
+      "summary": "启动九点自动标定流程，验证机械坐标数量后创建 worker 线程执行 runAutoCalibration，通过 Qt 信号通知标定进度和结果。",
+      "tags": ["calibration", "automation", "threading", "plc"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp:runAutoCalibration",
+      "type": "function",
+      "name": "runAutoCalibration",
+      "filePath": "PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp",
+      "lineRange": [126, 210],
+      "summary": "九点自动标定核心线程函数，通过 Modbus 与 PLC 交互，逐点发送机械坐标、触发拍照、采集像素坐标，最终调用 calcPixToWorldHomMat2D 计算变换矩阵并持久化结果。",
+      "tags": ["calibration", "automation", "plc", "modbus", "threading"],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:PunchPressVision/Business/NinePointBun/test/CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/Business/NinePointBun/test/CMakeLists.txt",
+      "summary": "NinePointBun 测试模块的 CMake 构建配置，定义 Test_bun_NinePointBun 测试可执行目标。",
+      "tags": ["build-system", "configuration", "cmake", "test"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/Business/NinePointBun/test/include/NinePointBun.t.hpp",
+      "type": "file",
+      "name": "NinePointBun.t.hpp",
+      "filePath": "PunchPressVision/Business/NinePointBun/test/include/NinePointBun.t.hpp",
+      "summary": "NinePointBun 测试头文件桩，当前为空，预留将来测试 fixture 声明。",
+      "tags": ["test", "stub", "header"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/Business/NinePointBun/test/src/NinePointBun.t.cpp",
+      "type": "file",
+      "name": "NinePointBun.t.cpp",
+      "filePath": "PunchPressVision/Business/NinePointBun/test/src/NinePointBun.t.cpp",
+      "summary": "NinePointBun 测试入口文件，当前仅为返回 0 的桩实现，待后续补充九点标定的单元测试用例。",
+      "tags": ["test", "stub", "entry-point"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:PunchPressVision/Business/ShapeModeManagerBun/CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/Business/ShapeModeManagerBun/CMakeLists.txt",
+      "summary": "ShapeModeManagerBun 模块的 CMake 构建配置，将形状模板管理业务代码编译为静态库 bun::ShapeModeManagerBun，链接 inf::infrastructure。",
+      "tags": ["build-system", "configuration", "cmake", "static-library"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/Business/ShapeModeManagerBun/include/Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp",
+      "type": "file",
+      "name": "ShapeModeManagerBun.hpp",
+      "filePath": "PunchPressVision/Business/ShapeModeManagerBun/include/Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp",
+      "summary": "ShapeModeManagerBun 业务类头文件，定义形状模板的数据模型（CreateModelRequest/MatchResult）、CRUD 操作、模板匹配推理及模型加载管理接口（FR-024~FR-030）。",
+      "tags": ["api-handler", "header", "shape-matching", "halcon", "data-model"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:PunchPressVision/Business/ShapeModeManagerBun/include/Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp:ShapeModeManagerBun",
+      "type": "class",
+      "name": "ShapeModeManagerBun",
+      "filePath": "PunchPressVision/Business/ShapeModeManagerBun/include/Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp",
+      "lineRange": [52, 98],
+      "summary": "形状模板管理业务类，封装 Halcon 形状模板的创建/删除/重命名/加载/卸载 CRUD 及模板匹配推理（match），通过 shared_mutex 保护模型缓存，信号通知模板列表变更。",
+      "tags": ["service", "shape-matching", "halcon", "crud", "qt-object"],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:PunchPressVision/Business/CameraBun/include/Business/CameraBun/CameraBun.hpp",
+      "target": "class:PunchPressVision/Business/CameraBun/include/Business/CameraBun/CameraBun.hpp:CameraBun",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/Business/CameraBun/include/Business/CameraBun/CameraBun.hpp",
+      "target": "class:PunchPressVision/Business/CameraBun/include/Business/CameraBun/CameraBun.hpp:CameraBun",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/Business/CameraBun/include/Business/CameraBun/CameraImgConvert.hpp",
+      "target": "class:PunchPressVision/Business/CameraBun/include/Business/CameraBun/CameraImgConvert.hpp:CameraImgConvert",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/Business/CameraBun/include/Business/CameraBun/CameraImgConvert.hpp",
+      "target": "class:PunchPressVision/Business/CameraBun/include/Business/CameraBun/CameraImgConvert.hpp:CameraImgConvert",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/Business/CameraBun/src/CameraBun.cpp",
+      "target": "function:PunchPressVision/Business/CameraBun/src/CameraBun.cpp:build",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/Business/CameraBun/src/CameraBun.cpp",
+      "target": "function:PunchPressVision/Business/CameraBun/src/CameraBun.cpp:build",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/Business/CameraBun/src/CameraBun.cpp",
+      "target": "function:PunchPressVision/Business/CameraBun/src/CameraBun.cpp:applyUndistort",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/Business/CameraBun/src/CameraBun.cpp",
+      "target": "function:PunchPressVision/Business/CameraBun/src/CameraBun.cpp:applyUndistort",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/Business/CameraBun/src/CameraBun.cpp",
+      "target": "function:PunchPressVision/Business/CameraBun/src/CameraBun.cpp:callBackFunc",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/Business/CameraBun/src/CameraBun.cpp",
+      "target": "function:PunchPressVision/Business/CameraBun/src/CameraBun.cpp:callBackFunc",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/Business/CameraBun/src/CameraImgConvert.cpp",
+      "target": "function:PunchPressVision/Business/CameraBun/src/CameraImgConvert.cpp:cvMatToHImage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/Business/CameraBun/src/CameraImgConvert.cpp",
+      "target": "function:PunchPressVision/Business/CameraBun/src/CameraImgConvert.cpp:cvMatToHImage",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/Business/CameraBun/src/CameraImgConvert.cpp",
+      "target": "function:PunchPressVision/Business/CameraBun/src/CameraImgConvert.cpp:cvMatToHImageFast",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/Business/CameraBun/src/CameraImgConvert.cpp",
+      "target": "function:PunchPressVision/Business/CameraBun/src/CameraImgConvert.cpp:cvMatToHImageFast",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/Business/LightControlBun/include/Business/LightControlBun/LightControlBun.hpp",
+      "target": "class:PunchPressVision/Business/LightControlBun/include/Business/LightControlBun/LightControlBun.hpp:LightControlBun",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/Business/LightControlBun/include/Business/LightControlBun/LightControlBun.hpp",
+      "target": "class:PunchPressVision/Business/LightControlBun/include/Business/LightControlBun/LightControlBun.hpp:LightControlBun",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/Business/NinePointBun/include/Business/NinePointBun/NinePointBun.hpp",
+      "target": "class:PunchPressVision/Business/NinePointBun/include/Business/NinePointBun/NinePointBun.hpp:NinePointBun",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/Business/NinePointBun/include/Business/NinePointBun/NinePointBun.hpp",
+      "target": "class:PunchPressVision/Business/NinePointBun/include/Business/NinePointBun/NinePointBun.hpp:NinePointBun",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp",
+      "target": "function:PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp:calcPixToWorldHomMat2D",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp",
+      "target": "function:PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp:calcPixToWorldHomMat2D",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp",
+      "target": "function:PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp:pixToWorld",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp",
+      "target": "function:PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp:pixToWorld",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp",
+      "target": "function:PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp:startAutoCalibration",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp",
+      "target": "function:PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp:startAutoCalibration",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp",
+      "target": "function:PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp:runAutoCalibration",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp",
+      "target": "function:PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp:runAutoCalibration",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/Business/ShapeModeManagerBun/include/Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp",
+      "target": "class:PunchPressVision/Business/ShapeModeManagerBun/include/Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp:ShapeModeManagerBun",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/Business/ShapeModeManagerBun/include/Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp",
+      "target": "class:PunchPressVision/Business/ShapeModeManagerBun/include/Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp:ShapeModeManagerBun",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/Business/CameraBun/src/CameraBun.cpp:callBackFunc",
+      "target": "function:PunchPressVision/Business/CameraBun/src/CameraImgConvert.cpp:cvMatToHImage",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/Business/CameraBun/src/CameraBun.cpp:callBackFunc",
+      "target": "function:PunchPressVision/Business/CameraBun/src/CameraBun.cpp:applyUndistort",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp:startAutoCalibration",
+      "target": "function:PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp:runAutoCalibration",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp:runAutoCalibration",
+      "target": "function:PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp:calcPixToWorldHomMat2D",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "document:PunchPressVision/Business/CMakeLists.txt",
+      "target": "file:PunchPressVision/Business/CameraBun/include/Business/CameraBun/CameraBun.hpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/Business/CMakeLists.txt",
+      "target": "file:PunchPressVision/Business/LightControlBun/include/Business/LightControlBun/LightControlBun.hpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/Business/CMakeLists.txt",
+      "target": "file:PunchPressVision/Business/NinePointBun/include/Business/NinePointBun/NinePointBun.hpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/Business/CMakeLists.txt",
+      "target": "file:PunchPressVision/Business/ShapeModeManagerBun/include/Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/Business/CameraBun/CMakeLists.txt",
+      "target": "file:PunchPressVision/Business/CameraBun/include/Business/CameraBun/CameraBun.hpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/Business/CameraBun/CMakeLists.txt",
+      "target": "file:PunchPressVision/Business/CameraBun/include/Business/CameraBun/CameraImgConvert.hpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/Business/CameraBun/CMakeLists.txt",
+      "target": "file:PunchPressVision/Business/CameraBun/src/CameraBun.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/Business/CameraBun/CMakeLists.txt",
+      "target": "file:PunchPressVision/Business/CameraBun/src/CameraImgConvert.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/Business/CameraBun/test/CMakeLists.txt",
+      "target": "file:PunchPressVision/Business/CameraBun/test/include/CameraBun.t.hpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/Business/CameraBun/test/CMakeLists.txt",
+      "target": "file:PunchPressVision/Business/CameraBun/test/src/CameraBun.t.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/Business/LightControlBun/CMakeLists.txt",
+      "target": "file:PunchPressVision/Business/LightControlBun/include/Business/LightControlBun/LightControlBun.hpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/Business/LightControlBun/CMakeLists.txt",
+      "target": "file:PunchPressVision/Business/LightControlBun/src/LightControlBun.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/Business/LightControlBun/test/CMakeLists.txt",
+      "target": "file:PunchPressVision/Business/LightControlBun/test/include/LightControlBun.t.hpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/Business/LightControlBun/test/CMakeLists.txt",
+      "target": "file:PunchPressVision/Business/LightControlBun/test/src/LightControlBun.t.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/Business/NinePointBun/CMakeLists.txt",
+      "target": "file:PunchPressVision/Business/NinePointBun/include/Business/NinePointBun/NinePointBun.hpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/Business/NinePointBun/CMakeLists.txt",
+      "target": "file:PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/Business/NinePointBun/test/CMakeLists.txt",
+      "target": "file:PunchPressVision/Business/NinePointBun/test/include/NinePointBun.t.hpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/Business/NinePointBun/test/CMakeLists.txt",
+      "target": "file:PunchPressVision/Business/NinePointBun/test/src/NinePointBun.t.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/Business/ShapeModeManagerBun/CMakeLists.txt",
+      "target": "file:PunchPressVision/Business/ShapeModeManagerBun/include/Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/Business/CameraBun/include/Business/CameraBun/CameraBun.hpp",
+      "target": "file:PunchPressVision/Business/CameraBun/test/src/CameraBun.t.cpp",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:PunchPressVision/Business/LightControlBun/include/Business/LightControlBun/LightControlBun.hpp",
+      "target": "file:PunchPressVision/Business/LightControlBun/test/src/LightControlBun.t.cpp",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:PunchPressVision/Business/NinePointBun/include/Business/NinePointBun/NinePointBun.hpp",
+      "target": "file:PunchPressVision/Business/NinePointBun/test/src/NinePointBun.t.cpp",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:PunchPressVision/Business/CalibBun/include/Business/CalibBun/CalibBun.hpp",
+      "target": "file:PunchPressVision/Business/CalibBun/test/src/CalibBun.t.cpp",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:PunchPressVision/Business/CameraBun/src/CameraBun.cpp",
+      "target": "file:PunchPressVision/Business/CameraBun/include/Business/CameraBun/CameraImgConvert.hpp",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    }
+  ]
+}

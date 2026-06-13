@@ -1,0 +1,1508 @@
+{
+  "nodes": [
+    {
+      "id": "file:PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModule.cpp",
+      "type": "file",
+      "name": "CalibConfigModule.cpp",
+      "filePath": "PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModule.cpp",
+      "summary": "标定配置模块的 build/destroy/save 生命周期实现，桥接 CalibConfig 文件持久化函数到 IInfrastructure 接口。",
+      "tags": [
+        "infrastructure",
+        "config",
+        "lifecycle",
+        "calibration"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModule.cpp:build",
+      "type": "function",
+      "name": "build",
+      "filePath": "PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModule.cpp",
+      "lineRange": [
+        8,
+        11
+      ],
+      "summary": "初始化标定配置模块，从目录加载标定数据。",
+      "tags": [
+        "infrastructure",
+        "lifecycle",
+        "initialization"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModule.cpp:destroy",
+      "type": "function",
+      "name": "destroy",
+      "filePath": "PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModule.cpp",
+      "lineRange": [
+        13,
+        16
+      ],
+      "summary": "销毁标定配置模块，销毁前保存标定数据。",
+      "tags": [
+        "infrastructure",
+        "lifecycle",
+        "cleanup"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModule.cpp:save",
+      "type": "function",
+      "name": "save",
+      "filePath": "PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModule.cpp",
+      "lineRange": [
+        18,
+        21
+      ],
+      "summary": "将标定配置数据保存至指定目录。",
+      "tags": [
+        "infrastructure",
+        "persistence",
+        "save"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModulePath.cpp",
+      "type": "file",
+      "name": "CalibConfigModulePath.cpp",
+      "filePath": "PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModulePath.cpp",
+      "summary": "标定配置模块的文件路径定义，提供标定数据文件的标准路径常量。",
+      "tags": [
+        "config",
+        "path-definition",
+        "calibration"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModuleTypes.cpp",
+      "type": "file",
+      "name": "CalibConfigModuleTypes.cpp",
+      "filePath": "PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModuleTypes.cpp",
+      "summary": "标定配置模块的类型定义源文件，为标定相关结构提供符号导出。",
+      "tags": [
+        "type-definition",
+        "calibration"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp",
+      "type": "file",
+      "name": "CalibConfig.cpp",
+      "filePath": "PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp",
+      "summary": "标定配置文件的底层持久化实现，提供 Halcon Tuple 和曝光/增益设置的原子读写，保证写入过程文件安全。",
+      "tags": [
+        "persistence",
+        "halcon",
+        "file-io",
+        "calibration"
+      ],
+      "complexity": "complex",
+      "languageNotes": "使用原子写入模式（写入临时文件后重命名），确保标定数据在写入中断时不会损坏已有数据。"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp:replaceFile",
+      "type": "function",
+      "name": "replaceFile",
+      "filePath": "PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp",
+      "lineRange": [
+        24,
+        32
+      ],
+      "summary": "原子替换文件：先写入临时文件，成功后删除目标并重命名。",
+      "tags": [
+        "file-io",
+        "atomic-write",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp:readTupleSafe",
+      "type": "function",
+      "name": "readTupleSafe",
+      "filePath": "PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp",
+      "lineRange": [
+        43,
+        56
+      ],
+      "summary": "安全读取 Halcon Tuple 文件，检查文件存在性后读取。",
+      "tags": [
+        "halcon",
+        "file-io",
+        "deserialization"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp:writeSettingsSafe",
+      "type": "function",
+      "name": "writeSettingsSafe",
+      "filePath": "PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp",
+      "lineRange": [
+        58,
+        70
+      ],
+      "summary": "以原子方式写入曝光和增益设置到文本文件。",
+      "tags": [
+        "file-io",
+        "atomic-write",
+        "settings"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp:readSettingsSafe",
+      "type": "function",
+      "name": "readSettingsSafe",
+      "filePath": "PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp",
+      "lineRange": [
+        72,
+        103
+      ],
+      "summary": "安全解析曝光/增益设置文件，处理换行符并转换为数值。",
+      "tags": [
+        "file-io",
+        "parsing",
+        "settings"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp:saveInDir",
+      "type": "function",
+      "name": "saveInDir",
+      "filePath": "PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp",
+      "lineRange": [
+        106,
+        119
+      ],
+      "summary": "将标定 Tuple 和曝光/增益设置保存到指定目录。",
+      "tags": [
+        "persistence",
+        "calibration",
+        "save"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp:loadInDir",
+      "type": "function",
+      "name": "loadInDir",
+      "filePath": "PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp",
+      "lineRange": [
+        121,
+        136
+      ],
+      "summary": "从指定目录加载标定 Tuple 和曝光/增益设置。",
+      "tags": [
+        "persistence",
+        "calibration",
+        "load"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/CalibConfigModule/test/CMakeLists.txt",
+      "type": "file",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/infrastructure/CalibConfigModule/test/CMakeLists.txt",
+      "summary": "CalibConfigModule 测试的 CMake 构建配置，定义 Test_inf_CalibConfigModule 测试可执行目标。",
+      "tags": [
+        "build-system",
+        "test",
+        "cmake"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/CalibConfigModule/test/include/CalibConfigModule.t.hpp",
+      "type": "file",
+      "name": "CalibConfigModule.t.hpp",
+      "filePath": "PunchPressVision/infrastructure/CalibConfigModule/test/include/CalibConfigModule.t.hpp",
+      "summary": "CalibConfigModule 测试头文件，当前为空桩。",
+      "tags": [
+        "test",
+        "header",
+        "stub"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/CalibConfigModule/test/src/CalibConfigModule.t.cpp",
+      "type": "file",
+      "name": "CalibConfigModule.t.cpp",
+      "filePath": "PunchPressVision/infrastructure/CalibConfigModule/test/src/CalibConfigModule.t.cpp",
+      "summary": "CalibConfigModule 测试入口，验证标定数据的 loadInDir 和 saveInDir 基本流程。",
+      "tags": [
+        "test",
+        "calibration",
+        "entry-point"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/CalibConfigModule/test/src/CalibConfigModule.t.cpp:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "PunchPressVision/infrastructure/CalibConfigModule/test/src/CalibConfigModule.t.cpp",
+      "lineRange": [
+        5,
+        11
+      ],
+      "summary": "测试主函数：调用标定数据加载和保存函数进行基本验证。",
+      "tags": [
+        "test",
+        "entry-point"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/CameraModule/CMakeLists.txt",
+      "type": "file",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/infrastructure/CameraModule/CMakeLists.txt",
+      "summary": "CameraModule 的 CMake 构建配置，定义 inf::CameraModule 静态库目标，链接 Halcon、RWUL 和 OpenCV 依赖。",
+      "tags": [
+        "build-system",
+        "cmake",
+        "camera"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/CameraModule/include/infrastructure/CameraModule/CameraModule.hpp",
+      "type": "file",
+      "name": "CameraModule.hpp",
+      "filePath": "PunchPressVision/infrastructure/CameraModule/include/infrastructure/CameraModule/CameraModule.hpp",
+      "summary": "CameraModule 类声明，继承 IInfrastructure，封装 MVSCameraPassive 相机的生命周期、触发模式、曝光/增益设置和状态监控。",
+      "tags": [
+        "infrastructure",
+        "camera",
+        "hardware",
+        "header"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:PunchPressVision/infrastructure/CameraModule/include/infrastructure/CameraModule/CameraModule.hpp:CameraModule",
+      "type": "class",
+      "name": "CameraModule",
+      "filePath": "PunchPressVision/infrastructure/CameraModule/include/infrastructure/CameraModule/CameraModule.hpp",
+      "lineRange": [
+        18,
+        53
+      ],
+      "summary": "相机模块核心类，管理两个相机的连接、触发模式、曝光参数和单帧捕获，通过 Qt 信号报告连接状态变化。",
+      "tags": [
+        "camera",
+        "infrastructure",
+        "hardware-abstraction"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "使用 Qt::DirectConnection 发射 cameraConnectionStateChanged 信号，支持自由运行和触发两种模式。"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/CameraModule/include/infrastructure/CameraModule/CameraModuleTypes.hpp",
+      "type": "file",
+      "name": "CameraModuleTypes.hpp",
+      "filePath": "PunchPressVision/infrastructure/CameraModule/include/infrastructure/CameraModule/CameraModuleTypes.hpp",
+      "summary": "CameraModule 相关类型定义头文件，声明相机索引、触发源等枚举和结构体。",
+      "tags": [
+        "type-definition",
+        "camera",
+        "header"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp",
+      "type": "file",
+      "name": "CameraModule.cpp",
+      "filePath": "PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp",
+      "summary": "CameraModule 的完整实现，包含双相机连接管理、心跳监控、触发模式切换、曝光/增益设置、软件触发单帧捕获和连接状态检测。",
+      "tags": [
+        "infrastructure",
+        "camera",
+        "hardware",
+        "implementation"
+      ],
+      "complexity": "complex",
+      "languageNotes": "使用 RWUL 的 MVSCameraPassive 作为相机驱动，通过 QMetaObject::invokeMethod 实现线程安全的跨线程信号发射。"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp:toRwTriggerSource",
+      "type": "function",
+      "name": "toRwTriggerSource",
+      "filePath": "PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp",
+      "lineRange": [
+        8,
+        18
+      ],
+      "summary": "将内部触发源枚举转换为 RWUL 框架的 rw::hoec::TriggerSourceEnum。",
+      "tags": [
+        "camera",
+        "adapter",
+        "enum-conversion"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp:build",
+      "type": "function",
+      "name": "build",
+      "filePath": "PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp",
+      "lineRange": [
+        27,
+        90
+      ],
+      "summary": "构建相机系统：创建相机实例、设置回调、连接相机并配置触发模式、曝光、增益和帧率。",
+      "tags": [
+        "camera",
+        "lifecycle",
+        "initialization"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp:startMonitor",
+      "type": "function",
+      "name": "startMonitor",
+      "filePath": "PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp",
+      "lineRange": [
+        92,
+        106
+      ],
+      "summary": "启动相机心跳监控，通过 QMetaObject::invokeMethod 安全跨线程调用。",
+      "tags": [
+        "camera",
+        "monitoring",
+        "heartbeat"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp:stopMonitor",
+      "type": "function",
+      "name": "stopMonitor",
+      "filePath": "PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp",
+      "lineRange": [
+        108,
+        122
+      ],
+      "summary": "停止相机心跳监控，安全取消待处理的监控调用。",
+      "tags": [
+        "camera",
+        "monitoring",
+        "heartbeat"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp:destroy",
+      "type": "function",
+      "name": "destroy",
+      "filePath": "PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp",
+      "lineRange": [
+        124,
+        140
+      ],
+      "summary": "销毁相机资源：停止监控、断开连接并清空相机智能指针。",
+      "tags": [
+        "camera",
+        "lifecycle",
+        "cleanup"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp:setTriggerMode",
+      "type": "function",
+      "name": "setTriggerMode",
+      "filePath": "PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp",
+      "lineRange": [
+        152,
+        162
+      ],
+      "summary": "设置指定相机为触发模式，配置触发源和帧率。",
+      "tags": [
+        "camera",
+        "trigger",
+        "configuration"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp:captureSingleFrame",
+      "type": "function",
+      "name": "captureSingleFrame",
+      "filePath": "PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp",
+      "lineRange": [
+        180,
+        196
+      ],
+      "summary": "执行软件触发捕获单帧图像，返回捕获成功状态。",
+      "tags": [
+        "camera",
+        "capture",
+        "trigger"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp:isConnected",
+      "type": "function",
+      "name": "isConnected",
+      "filePath": "PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp",
+      "lineRange": [
+        198,
+        214
+      ],
+      "summary": "检测指定相机是否处于连接状态。",
+      "tags": [
+        "camera",
+        "status",
+        "query"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/CameraModule/src/CameraModuleTypes.cpp",
+      "type": "file",
+      "name": "CameraModuleTypes.cpp",
+      "filePath": "PunchPressVision/infrastructure/CameraModule/src/CameraModuleTypes.cpp",
+      "summary": "CameraModule 类型定义的符号导出源文件。",
+      "tags": [
+        "type-definition",
+        "camera",
+        "stub"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/CameraModule/test/CMakeLists.txt",
+      "type": "file",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/infrastructure/CameraModule/test/CMakeLists.txt",
+      "summary": "CameraModule 测试的 CMake 构建配置，定义 Test_inf_CameraModule 测试可执行目标并链接 Qt、Halcon 和 RWUL 依赖。",
+      "tags": [
+        "build-system",
+        "test",
+        "cmake"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/CameraModule/test/include/CameraModule.t.hpp",
+      "type": "file",
+      "name": "CameraModule.t.hpp",
+      "filePath": "PunchPressVision/infrastructure/CameraModule/test/include/CameraModule.t.hpp",
+      "summary": "CameraModule 测试头文件，当前为空桩。",
+      "tags": [
+        "test",
+        "header",
+        "stub"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/CameraModule/test/src/CameraModule.t.cpp",
+      "type": "file",
+      "name": "CameraModule.t.cpp",
+      "filePath": "PunchPressVision/infrastructure/CameraModule/test/src/CameraModule.t.cpp",
+      "summary": "CameraModule 交互式测试程序，创建 QApplication 和 CameraModule 实例，启动监控并进入 Qt 事件循环。",
+      "tags": [
+        "test",
+        "camera",
+        "qt",
+        "integration-test"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/CameraModule/test/src/CameraModule.t.cpp:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "PunchPressVision/infrastructure/CameraModule/test/src/CameraModule.t.cpp",
+      "lineRange": [
+        8,
+        29
+      ],
+      "summary": "测试入口：构建 CameraModule、连接状态信号、启动监控并运行 Qt 事件循环。",
+      "tags": [
+        "test",
+        "entry-point",
+        "qt"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/CMakeLists.txt",
+      "type": "file",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/infrastructure/CMakeLists.txt",
+      "summary": "infrastructure 层的聚合 CMake 配置，通过 add_subdirectory 引入 CameraModule、ConfigModule 和 CalibConfigModule 等子模块。",
+      "tags": [
+        "build-system",
+        "cmake",
+        "aggregator"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/ConfigModule/CMakeLists.txt",
+      "type": "file",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/infrastructure/ConfigModule/CMakeLists.txt",
+      "summary": "ConfigModule 的 CMake 构建配置，定义 inf::ConfigModule 静态库目标，处理 OSO 文件序列化代码生成并链接 RWUL 依赖。",
+      "tags": [
+        "build-system",
+        "cmake",
+        "config",
+        "oso"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/baseCfg.hpp",
+      "type": "file",
+      "name": "baseCfg.hpp",
+      "filePath": "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/baseCfg.hpp",
+      "summary": "基础配置结构体 BaseCfg 定义，包含相机和 PLC 的 IP/端口，支持从 OSO ObjectStore 反序列化和序列化。",
+      "tags": [
+        "data-model",
+        "config",
+        "oso",
+        "serialization",
+        "header"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "通过 operator rw::oso::ObjectStoreAssembly() 实现到 OSO 存储格式的隐式转换，支持读写对称的序列化机制。"
+    },
+    {
+      "id": "class:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/baseCfg.hpp:BaseCfg",
+      "type": "class",
+      "name": "BaseCfg",
+      "filePath": "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/baseCfg.hpp",
+      "lineRange": [
+        7,
+        26
+      ],
+      "summary": "基础配置类，持有 cameraIp1、cameraIp2、plcIp 和 plcPort 四个网络配置字段，支持 OSO 序列化/反序列化。",
+      "tags": [
+        "data-model",
+        "config",
+        "oso"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/baseCfg.hpp:BaseCfg.fromAssembly",
+      "type": "function",
+      "name": "BaseCfg.fromAssembly",
+      "filePath": "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/baseCfg.hpp",
+      "lineRange": [
+        28,
+        55
+      ],
+      "summary": "从 OSO ObjectStoreAssembly 构造 BaseCfg：逐个读取 cameraIp1、cameraIp2、plcIp、plcPort 字段。",
+      "tags": [
+        "deserialization",
+        "oso",
+        "constructor"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/baseCfg.hpp:BaseCfg.toAssembly",
+      "type": "function",
+      "name": "BaseCfg.toAssembly",
+      "filePath": "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/baseCfg.hpp",
+      "lineRange": [
+        76,
+        97
+      ],
+      "summary": "将 BaseCfg 字段序列化为 OSO ObjectStoreAssembly 格式。",
+      "tags": [
+        "serialization",
+        "oso",
+        "conversion"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/cameraCfg.hpp",
+      "type": "file",
+      "name": "cameraCfg.hpp",
+      "filePath": "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/cameraCfg.hpp",
+      "summary": "相机参数配置结构体 cameraCfg 定义，存储双相机的曝光时间和增益值，支持 OSO 持久化。",
+      "tags": [
+        "data-model",
+        "config",
+        "camera",
+        "oso",
+        "header"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/cameraCfg.hpp:cameraCfg",
+      "type": "class",
+      "name": "cameraCfg",
+      "filePath": "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/cameraCfg.hpp",
+      "lineRange": [
+        7,
+        26
+      ],
+      "summary": "相机配置类，持有 exposureTime1/2 和 gain1/2 四个整数字段，支持 OSO 序列化。",
+      "tags": [
+        "data-model",
+        "config",
+        "camera"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/cameraCfg.hpp:cameraCfg.fromAssembly",
+      "type": "function",
+      "name": "cameraCfg.fromAssembly",
+      "filePath": "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/cameraCfg.hpp",
+      "lineRange": [
+        28,
+        55
+      ],
+      "summary": "从 OSO ObjectStoreAssembly 构造 cameraCfg，读取曝光时间和增益整数值。",
+      "tags": [
+        "deserialization",
+        "oso",
+        "constructor"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/cameraCfg.hpp:cameraCfg.toAssembly",
+      "type": "function",
+      "name": "cameraCfg.toAssembly",
+      "filePath": "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/cameraCfg.hpp",
+      "lineRange": [
+        76,
+        97
+      ],
+      "summary": "将 cameraCfg 字段序列化为 OSO ObjectStoreAssembly 格式。",
+      "tags": [
+        "serialization",
+        "oso",
+        "conversion"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/plcAddressCfg.hpp",
+      "type": "file",
+      "name": "plcAddressCfg.hpp",
+      "filePath": "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/plcAddressCfg.hpp",
+      "summary": "PLC 地址配置结构体 PlcAddressCfg 定义，存储对位偏移、角度、九点标定状态等 PLC 寄存器地址映射，支持 OSO 序列化。",
+      "tags": [
+        "data-model",
+        "config",
+        "plc",
+        "oso",
+        "header"
+      ],
+      "complexity": "complex",
+      "languageNotes": "包含 7 个寄存器地址字段，涵盖对位控制（regOffsetX/Y、regAngle、regValid）和九点标定（regNinePointArrived/Index/CoordsStart）两类 PLC 通信参数。"
+    },
+    {
+      "id": "class:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/plcAddressCfg.hpp:PlcAddressCfg",
+      "type": "class",
+      "name": "PlcAddressCfg",
+      "filePath": "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/plcAddressCfg.hpp",
+      "lineRange": [
+        7,
+        29
+      ],
+      "summary": "PLC 地址配置类，持有 7 个 Modbus 寄存器地址字段，用于对位控制和九点标定的 PLC 通信。",
+      "tags": [
+        "data-model",
+        "config",
+        "plc",
+        "modbus"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/plcAddressCfg.hpp:PlcAddressCfg.fromAssembly",
+      "type": "function",
+      "name": "PlcAddressCfg.fromAssembly",
+      "filePath": "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/plcAddressCfg.hpp",
+      "lineRange": [
+        31,
+        73
+      ],
+      "summary": "从 OSO ObjectStoreAssembly 构造 PlcAddressCfg，按序读取 7 个寄存器地址值。",
+      "tags": [
+        "deserialization",
+        "oso",
+        "constructor"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/plcAddressCfg.hpp:PlcAddressCfg.toAssembly",
+      "type": "function",
+      "name": "PlcAddressCfg.toAssembly",
+      "filePath": "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/plcAddressCfg.hpp",
+      "lineRange": [
+        100,
+        133
+      ],
+      "summary": "将 PlcAddressCfg 的 7 个寄存器地址序列化为 OSO ObjectStoreAssembly 格式。",
+      "tags": [
+        "serialization",
+        "oso",
+        "conversion"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/VisionCfg.hpp",
+      "type": "file",
+      "name": "VisionCfg.hpp",
+      "filePath": "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/VisionCfg.hpp",
+      "summary": "视觉检测配置结构体 visionCfg 定义，包含过滤区域参数，支持文本格式的保存和加载。",
+      "tags": [
+        "data-model",
+        "config",
+        "vision",
+        "header"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/VisionCfg.hpp:visionCfg",
+      "type": "class",
+      "name": "visionCfg",
+      "filePath": "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/VisionCfg.hpp",
+      "lineRange": [
+        11,
+        75
+      ],
+      "summary": "视觉配置类，管理图像过滤区域（filterRegion），提供基于文本文件的 save/load 持久化方法。",
+      "tags": [
+        "data-model",
+        "config",
+        "vision"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/VisionCfg.hpp:visionCfg.save",
+      "type": "function",
+      "name": "visionCfg.save",
+      "filePath": "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/VisionCfg.hpp",
+      "lineRange": [
+        17,
+        38
+      ],
+      "summary": "将视觉过滤区域配置以文本格式原子写入文件。",
+      "tags": [
+        "persistence",
+        "save",
+        "file-io"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/VisionCfg.hpp:visionCfg.load",
+      "type": "function",
+      "name": "visionCfg.load",
+      "filePath": "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/VisionCfg.hpp",
+      "lineRange": [
+        40,
+        74
+      ],
+      "summary": "从文本文件解析视觉过滤区域配置，支持换行符处理。",
+      "tags": [
+        "persistence",
+        "load",
+        "parsing"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/ConfigModule.hpp",
+      "type": "file",
+      "name": "ConfigModule.hpp",
+      "filePath": "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/ConfigModule.hpp",
+      "summary": "ConfigModule 类声明，继承 IInfrastructure，管理 OSO StorageContext 并提供对各配置子对象（BaseCfg、cameraCfg、plcAddressCfg、visionCfg）的类型化访问。",
+      "tags": [
+        "infrastructure",
+        "config",
+        "oso",
+        "header"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "使用类型别名 StorageContext 引入 rw::oso::StorageContext，通过 build/destroy/save 生命周期管理 OSO 持久化存储。"
+    },
+    {
+      "id": "class:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/ConfigModule.hpp:ConfigModule",
+      "type": "class",
+      "name": "ConfigModule",
+      "filePath": "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/ConfigModule.hpp",
+      "lineRange": [
+        18,
+        35
+      ],
+      "summary": "配置模块核心类，持有 baseCfg、cameraCfg、plcAddressCfg、visionCfg 四个配置对象，负责统一的配置加载、保存和生命周期管理。",
+      "tags": [
+        "infrastructure",
+        "config",
+        "oso",
+        "lifecycle"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/ConfigModulePath.hpp",
+      "type": "file",
+      "name": "ConfigModulePath.hpp",
+      "filePath": "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/ConfigModulePath.hpp",
+      "summary": "ConfigModule 的文件路径常量定义，声明配置数据文件的标准化存储路径。",
+      "tags": [
+        "config",
+        "path-definition",
+        "header"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/ConfigModuleTypes.hpp",
+      "type": "file",
+      "name": "ConfigModuleTypes.hpp",
+      "filePath": "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/ConfigModuleTypes.hpp",
+      "summary": "ConfigModule 的类型定义头文件，声明配置模块所用的枚举和结构体类型。",
+      "tags": [
+        "type-definition",
+        "config",
+        "header"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/ConfigModule/osoFile/baseCfg.oso",
+      "type": "file",
+      "name": "baseCfg.oso",
+      "filePath": "PunchPressVision/infrastructure/ConfigModule/osoFile/baseCfg.oso",
+      "summary": "BaseCfg 的 OSO 模式定义文件，声明 cameraIp1、cameraIp2、plcIp、plcPort 四个持久化字段，由 CMake 的 oso_wrap_oso() 生成 C++ 头文件。",
+      "tags": [
+        "schema-definition",
+        "oso",
+        "config",
+        "serialization"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModule.cpp:build",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModule.cpp:build",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModule.cpp:destroy",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModule.cpp:destroy",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModule.cpp:save",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModule.cpp:save",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp:replaceFile",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp:replaceFile",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp:readTupleSafe",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp:readTupleSafe",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp:writeSettingsSafe",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp:writeSettingsSafe",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp:readSettingsSafe",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp:readSettingsSafe",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp:saveInDir",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp:saveInDir",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp:loadInDir",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp:loadInDir",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CalibConfigModule/test/CMakeLists.txt",
+      "target": "file:PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModule.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CalibConfigModule/test/src/CalibConfigModule.t.cpp",
+      "target": "function:PunchPressVision/infrastructure/CalibConfigModule/test/src/CalibConfigModule.t.cpp:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CalibConfigModule/test/src/CalibConfigModule.t.cpp",
+      "target": "function:PunchPressVision/infrastructure/CalibConfigModule/test/src/CalibConfigModule.t.cpp:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModule.cpp",
+      "target": "file:PunchPressVision/infrastructure/CalibConfigModule/test/src/CalibConfigModule.t.cpp",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/CalibConfigModule/test/src/CalibConfigModule.t.cpp:main",
+      "target": "function:PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp:loadInDir",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/CalibConfigModule/test/src/CalibConfigModule.t.cpp:main",
+      "target": "function:PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp:saveInDir",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CameraModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CameraModule/include/infrastructure/CameraModule/CameraModule.hpp",
+      "target": "class:PunchPressVision/infrastructure/CameraModule/include/infrastructure/CameraModule/CameraModule.hpp:CameraModule",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CameraModule/include/infrastructure/CameraModule/CameraModule.hpp",
+      "target": "class:PunchPressVision/infrastructure/CameraModule/include/infrastructure/CameraModule/CameraModule.hpp:CameraModule",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp:toRwTriggerSource",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp:toRwTriggerSource",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp:build",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp:build",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp:startMonitor",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp:startMonitor",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp:stopMonitor",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp:stopMonitor",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp:destroy",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp:destroy",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp:setTriggerMode",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp:setTriggerMode",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp:captureSingleFrame",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp:captureSingleFrame",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp:isConnected",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp:isConnected",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CameraModule/test/CMakeLists.txt",
+      "target": "file:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CameraModule/test/src/CameraModule.t.cpp",
+      "target": "function:PunchPressVision/infrastructure/CameraModule/test/src/CameraModule.t.cpp:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CameraModule/test/src/CameraModule.t.cpp",
+      "target": "function:PunchPressVision/infrastructure/CameraModule/test/src/CameraModule.t.cpp:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp",
+      "target": "file:PunchPressVision/infrastructure/CameraModule/test/src/CameraModule.t.cpp",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/CameraModule/test/src/CameraModule.t.cpp:main",
+      "target": "function:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp:build",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/CameraModule/test/src/CameraModule.t.cpp:main",
+      "target": "function:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp:startMonitor",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/ConfigModule.hpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/baseCfg.hpp",
+      "target": "class:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/baseCfg.hpp:BaseCfg",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/baseCfg.hpp",
+      "target": "class:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/baseCfg.hpp:BaseCfg",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/baseCfg.hpp",
+      "target": "function:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/baseCfg.hpp:BaseCfg.fromAssembly",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/baseCfg.hpp",
+      "target": "function:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/baseCfg.hpp:BaseCfg.fromAssembly",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/baseCfg.hpp",
+      "target": "function:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/baseCfg.hpp:BaseCfg.toAssembly",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/baseCfg.hpp",
+      "target": "function:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/baseCfg.hpp:BaseCfg.toAssembly",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/cameraCfg.hpp",
+      "target": "class:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/cameraCfg.hpp:cameraCfg",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/cameraCfg.hpp",
+      "target": "class:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/cameraCfg.hpp:cameraCfg",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/cameraCfg.hpp",
+      "target": "function:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/cameraCfg.hpp:cameraCfg.fromAssembly",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/cameraCfg.hpp",
+      "target": "function:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/cameraCfg.hpp:cameraCfg.fromAssembly",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/cameraCfg.hpp",
+      "target": "function:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/cameraCfg.hpp:cameraCfg.toAssembly",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/cameraCfg.hpp",
+      "target": "function:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/cameraCfg.hpp:cameraCfg.toAssembly",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/plcAddressCfg.hpp",
+      "target": "class:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/plcAddressCfg.hpp:PlcAddressCfg",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/plcAddressCfg.hpp",
+      "target": "class:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/plcAddressCfg.hpp:PlcAddressCfg",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/plcAddressCfg.hpp",
+      "target": "function:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/plcAddressCfg.hpp:PlcAddressCfg.fromAssembly",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/plcAddressCfg.hpp",
+      "target": "function:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/plcAddressCfg.hpp:PlcAddressCfg.fromAssembly",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/plcAddressCfg.hpp",
+      "target": "function:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/plcAddressCfg.hpp:PlcAddressCfg.toAssembly",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/plcAddressCfg.hpp",
+      "target": "function:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/plcAddressCfg.hpp:PlcAddressCfg.toAssembly",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/VisionCfg.hpp",
+      "target": "class:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/VisionCfg.hpp:visionCfg",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/VisionCfg.hpp",
+      "target": "class:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/VisionCfg.hpp:visionCfg",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/VisionCfg.hpp",
+      "target": "function:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/VisionCfg.hpp:visionCfg.save",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/VisionCfg.hpp",
+      "target": "function:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/VisionCfg.hpp:visionCfg.save",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/VisionCfg.hpp",
+      "target": "function:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/VisionCfg.hpp:visionCfg.load",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/VisionCfg.hpp",
+      "target": "function:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/VisionCfg.hpp:visionCfg.load",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/ConfigModule.hpp",
+      "target": "class:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/ConfigModule.hpp:ConfigModule",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/ConfigModule.hpp",
+      "target": "class:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/ConfigModule.hpp:ConfigModule",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/osoFile/baseCfg.oso",
+      "target": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/baseCfg.hpp",
+      "type": "defines_schema",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/ConfigModule.hpp",
+      "target": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/VisionCfg.hpp",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModule.cpp:build",
+      "target": "function:PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp:loadInDir",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModule.cpp:save",
+      "target": "function:PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp:saveInDir",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CMakeLists.txt",
+      "target": "file:PunchPressVision/infrastructure/CameraModule/CMakeLists.txt",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CMakeLists.txt",
+      "target": "file:PunchPressVision/infrastructure/ConfigModule/CMakeLists.txt",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CameraModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/infrastructure/CameraModule/include/infrastructure/CameraModule/CameraModule.hpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/ConfigModule.hpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/infrastructure/ConfigModule/osoFile/baseCfg.oso",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    }
+  ]
+}

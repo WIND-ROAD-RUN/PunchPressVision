@@ -1,0 +1,4549 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 25,
+  "filesSkipped": [],
+  "results": [
+    {
+      "path": "PunchPressVision/UI/UIModule/include/PunchPress.h",
+      "language": "c",
+      "fileCategory": "code",
+      "totalLines": 148,
+      "nonEmptyLines": 122,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/qrc/Dlg_createshapemodel.qrc",
+      "language": "qrc",
+      "fileCategory": "code",
+      "totalLines": 4,
+      "nonEmptyLines": 4,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/qrc/PunchPress.qrc",
+      "language": "qrc",
+      "fileCategory": "code",
+      "totalLines": 5,
+      "nonEmptyLines": 5,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/src/Dlg_changeshapemodel.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 65,
+      "nonEmptyLines": 58,
+      "functions": [
+        {
+          "name": "Dlg_changeshapemodel",
+          "startLine": 35,
+          "endLine": 45,
+          "params": [
+            "parent"
+          ]
+        },
+        {
+          "name": "~Dlg_changeshapemodel",
+          "startLine": 47,
+          "endLine": 50,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "Dlg_changeshapemodel",
+          "line": 35,
+          "isDefault": false
+        },
+        {
+          "name": "~Dlg_changeshapemodel",
+          "line": 47,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "Dlg_changeshapemodel",
+          "callee": "setupUi",
+          "lineNumber": 39
+        },
+        {
+          "caller": "Dlg_changeshapemodel",
+          "callee": "build_ui",
+          "lineNumber": 41
+        },
+        {
+          "caller": "Dlg_changeshapemodel",
+          "callee": "build_connect",
+          "lineNumber": 42
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 2,
+        "functionCount": 2,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/src/Dlg_createshapemodel.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 100,
+      "nonEmptyLines": 88,
+      "functions": [
+        {
+          "name": "Dlg_createshapemodel",
+          "startLine": 52,
+          "endLine": 62,
+          "params": [
+            "parent"
+          ]
+        },
+        {
+          "name": "~Dlg_createshapemodel",
+          "startLine": 64,
+          "endLine": 74,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "Dlg_createshapemodel",
+          "line": 52,
+          "isDefault": false
+        },
+        {
+          "name": "~Dlg_createshapemodel",
+          "line": 64,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "Dlg_createshapemodel",
+          "callee": "setupUi",
+          "lineNumber": 56
+        },
+        {
+          "caller": "Dlg_createshapemodel",
+          "callee": "build_ui",
+          "lineNumber": 58
+        },
+        {
+          "caller": "Dlg_createshapemodel",
+          "callee": "build_connect",
+          "lineNumber": 59
+        },
+        {
+          "caller": "~Dlg_createshapemodel",
+          "callee": "closeHalconWindow",
+          "lineNumber": 67
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 2,
+        "functionCount": 2,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/src/Dlg_ImageStitching.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 76,
+      "nonEmptyLines": 66,
+      "functions": [
+        {
+          "name": "Dlg_ImageStitching",
+          "startLine": 42,
+          "endLine": 51,
+          "params": [
+            "parent"
+          ]
+        },
+        {
+          "name": "~Dlg_ImageStitching",
+          "startLine": 53,
+          "endLine": 61,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "Dlg_ImageStitching",
+          "line": 42,
+          "isDefault": false
+        },
+        {
+          "name": "~Dlg_ImageStitching",
+          "line": 53,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "Dlg_ImageStitching",
+          "callee": "setupUi",
+          "lineNumber": 46
+        },
+        {
+          "caller": "Dlg_ImageStitching",
+          "callee": "build_ui",
+          "lineNumber": 48
+        },
+        {
+          "caller": "Dlg_ImageStitching",
+          "callee": "build_connect",
+          "lineNumber": 49
+        },
+        {
+          "caller": "~Dlg_ImageStitching",
+          "callee": "closeAllHalconWindows",
+          "lineNumber": 56
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 2,
+        "functionCount": 2,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/src/Dlg_jibianjiaozheng.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 72,
+      "nonEmptyLines": 66,
+      "functions": [
+        {
+          "name": "Dlg_jibianjiaozheng",
+          "startLine": 33,
+          "endLine": 43,
+          "params": [
+            "parent"
+          ]
+        },
+        {
+          "name": "~Dlg_jibianjiaozheng",
+          "startLine": 45,
+          "endLine": 54,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "Dlg_jibianjiaozheng",
+          "line": 33,
+          "isDefault": false
+        },
+        {
+          "name": "~Dlg_jibianjiaozheng",
+          "line": 45,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "Dlg_jibianjiaozheng",
+          "callee": "setupUi",
+          "lineNumber": 37
+        },
+        {
+          "caller": "Dlg_jibianjiaozheng",
+          "callee": "clear",
+          "lineNumber": 39
+        },
+        {
+          "caller": "Dlg_jibianjiaozheng",
+          "callee": "build_ui",
+          "lineNumber": 40
+        },
+        {
+          "caller": "Dlg_jibianjiaozheng",
+          "callee": "build_connect",
+          "lineNumber": 41
+        },
+        {
+          "caller": "~Dlg_jibianjiaozheng",
+          "callee": "closeHalconWindow",
+          "lineNumber": 48
+        },
+        {
+          "caller": "~Dlg_jibianjiaozheng",
+          "callee": "clearCalibImages",
+          "lineNumber": 49
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 2,
+        "functionCount": 2,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/src/Dlg_OffSet.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 36,
+      "nonEmptyLines": 33,
+      "functions": [
+        {
+          "name": "Dlg_OffSet",
+          "startLine": 9,
+          "endLine": 18,
+          "params": [
+            "parent"
+          ]
+        },
+        {
+          "name": "~Dlg_OffSet",
+          "startLine": 20,
+          "endLine": 23,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "Dlg_OffSet",
+          "line": 9,
+          "isDefault": false
+        },
+        {
+          "name": "~Dlg_OffSet",
+          "line": 20,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "Dlg_OffSet",
+          "callee": "setupUi",
+          "lineNumber": 13
+        },
+        {
+          "caller": "Dlg_OffSet",
+          "callee": "build_ui",
+          "lineNumber": 15
+        },
+        {
+          "caller": "Dlg_OffSet",
+          "callee": "build_connect",
+          "lineNumber": 16
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 2,
+        "functionCount": 2,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/src/DlgCloseForm.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 118,
+      "nonEmptyLines": 103,
+      "functions": [
+        {
+          "name": "DlgCloseForm",
+          "startLine": 16,
+          "endLine": 22,
+          "params": [
+            "parent"
+          ]
+        },
+        {
+          "name": "~DlgCloseForm",
+          "startLine": 24,
+          "endLine": 27,
+          "params": []
+        },
+        {
+          "name": "build_connect",
+          "startLine": 29,
+          "endLine": 35,
+          "params": []
+        },
+        {
+          "name": "setLabelShowMessage",
+          "startLine": 37,
+          "endLine": 42,
+          "params": [
+            "message"
+          ]
+        },
+        {
+          "name": "btn_close_clicked",
+          "startLine": 44,
+          "endLine": 47,
+          "params": []
+        },
+        {
+          "name": "btn_restart_clicked",
+          "startLine": 49,
+          "endLine": 79,
+          "params": []
+        },
+        {
+          "name": "btn_yes_clicked",
+          "startLine": 81,
+          "endLine": 112,
+          "params": []
+        },
+        {
+          "name": "btn_no_clicked",
+          "startLine": 114,
+          "endLine": 117,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "DlgCloseForm",
+          "line": 16,
+          "isDefault": false
+        },
+        {
+          "name": "~DlgCloseForm",
+          "line": 24,
+          "isDefault": false
+        },
+        {
+          "name": "build_connect",
+          "line": 29,
+          "isDefault": false
+        },
+        {
+          "name": "setLabelShowMessage",
+          "line": 37,
+          "isDefault": false
+        },
+        {
+          "name": "btn_close_clicked",
+          "line": 44,
+          "isDefault": false
+        },
+        {
+          "name": "btn_restart_clicked",
+          "line": 49,
+          "isDefault": false
+        },
+        {
+          "name": "btn_yes_clicked",
+          "line": 81,
+          "isDefault": false
+        },
+        {
+          "name": "btn_no_clicked",
+          "line": 114,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "DlgCloseForm",
+          "callee": "setupUi",
+          "lineNumber": 20
+        },
+        {
+          "caller": "DlgCloseForm",
+          "callee": "build_connect",
+          "lineNumber": 21
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 31
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 32
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 33
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 34
+        },
+        {
+          "caller": "setLabelShowMessage",
+          "callee": "setText",
+          "lineNumber": 40
+        },
+        {
+          "caller": "btn_close_clicked",
+          "callee": "close",
+          "lineNumber": 46
+        },
+        {
+          "caller": "btn_restart_clicked",
+          "callee": "OpenProcessToken",
+          "lineNumber": 53
+        },
+        {
+          "caller": "btn_restart_clicked",
+          "callee": "GetCurrentProcess",
+          "lineNumber": 53
+        },
+        {
+          "caller": "btn_restart_clicked",
+          "callee": "LookupPrivilegeValue",
+          "lineNumber": 55
+        },
+        {
+          "caller": "btn_restart_clicked",
+          "callee": "AdjustTokenPrivileges",
+          "lineNumber": 58
+        },
+        {
+          "caller": "btn_restart_clicked",
+          "callee": "CloseHandle",
+          "lineNumber": 60
+        },
+        {
+          "caller": "btn_restart_clicked",
+          "callee": "ExitWindowsEx",
+          "lineNumber": 63
+        },
+        {
+          "caller": "btn_restart_clicked",
+          "callee": "QProcess::startDetached",
+          "lineNumber": 66
+        },
+        {
+          "caller": "btn_restart_clicked",
+          "callee": "QProcess::startDetached",
+          "lineNumber": 69
+        },
+        {
+          "caller": "btn_restart_clicked",
+          "callee": "QProcess::startDetached",
+          "lineNumber": 70
+        },
+        {
+          "caller": "btn_restart_clicked",
+          "callee": "QProcess::startDetached",
+          "lineNumber": 71
+        },
+        {
+          "caller": "btn_restart_clicked",
+          "callee": "quit",
+          "lineNumber": 78
+        },
+        {
+          "caller": "btn_yes_clicked",
+          "callee": "OpenProcessToken",
+          "lineNumber": 86
+        },
+        {
+          "caller": "btn_yes_clicked",
+          "callee": "GetCurrentProcess",
+          "lineNumber": 86
+        },
+        {
+          "caller": "btn_yes_clicked",
+          "callee": "LookupPrivilegeValue",
+          "lineNumber": 88
+        },
+        {
+          "caller": "btn_yes_clicked",
+          "callee": "AdjustTokenPrivileges",
+          "lineNumber": 91
+        },
+        {
+          "caller": "btn_yes_clicked",
+          "callee": "CloseHandle",
+          "lineNumber": 93
+        },
+        {
+          "caller": "btn_yes_clicked",
+          "callee": "ExitWindowsEx",
+          "lineNumber": 97
+        },
+        {
+          "caller": "btn_yes_clicked",
+          "callee": "QProcess::startDetached",
+          "lineNumber": 100
+        },
+        {
+          "caller": "btn_yes_clicked",
+          "callee": "QProcess::startDetached",
+          "lineNumber": 104
+        },
+        {
+          "caller": "btn_yes_clicked",
+          "callee": "QProcess::startDetached",
+          "lineNumber": 105
+        },
+        {
+          "caller": "btn_yes_clicked",
+          "callee": "QProcess::startDetached",
+          "lineNumber": 106
+        },
+        {
+          "caller": "btn_yes_clicked",
+          "callee": "quit",
+          "lineNumber": 111
+        },
+        {
+          "caller": "btn_no_clicked",
+          "callee": "quit",
+          "lineNumber": 116
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 8,
+        "functionCount": 8,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/src/DlgJiudianbiaoding.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 120,
+      "nonEmptyLines": 106,
+      "functions": [
+        {
+          "name": "DlgJiudianbiaoding",
+          "startLine": 42,
+          "endLine": 51,
+          "params": [
+            "parent"
+          ]
+        },
+        {
+          "name": "~DlgJiudianbiaoding",
+          "startLine": 53,
+          "endLine": 64,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "DlgJiudianbiaoding",
+          "line": 42,
+          "isDefault": false
+        },
+        {
+          "name": "~DlgJiudianbiaoding",
+          "line": 53,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "DlgJiudianbiaoding",
+          "callee": "setupUi",
+          "lineNumber": 46
+        },
+        {
+          "caller": "DlgJiudianbiaoding",
+          "callee": "build_ui",
+          "lineNumber": 48
+        },
+        {
+          "caller": "DlgJiudianbiaoding",
+          "callee": "build_connect",
+          "lineNumber": 49
+        },
+        {
+          "caller": "~DlgJiudianbiaoding",
+          "callee": "closeHalconWindow",
+          "lineNumber": 56
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 2,
+        "functionCount": 2,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/src/DraggableListWidget.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 1,
+      "nonEmptyLines": 1,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/src/ImageEnlargedDisplay.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 171,
+      "nonEmptyLines": 148,
+      "functions": [
+        {
+          "name": "ImageEnlargedDisplay",
+          "startLine": 4,
+          "endLine": 12,
+          "params": [
+            "parent"
+          ]
+        },
+        {
+          "name": "~ImageEnlargedDisplay",
+          "startLine": 14,
+          "endLine": 17,
+          "params": []
+        },
+        {
+          "name": "build_ui",
+          "startLine": 19,
+          "endLine": 22,
+          "params": []
+        },
+        {
+          "name": "build_connect",
+          "startLine": 24,
+          "endLine": 32,
+          "params": []
+        },
+        {
+          "name": "initWorkStationTitleMap",
+          "startLine": 34,
+          "endLine": 37,
+          "params": [
+            "map"
+          ]
+        },
+        {
+          "name": "initWorkStationTitleMap",
+          "startLine": 39,
+          "endLine": 45,
+          "params": [
+            "map"
+          ]
+        },
+        {
+          "name": "initWorkStationImageMap",
+          "startLine": 47,
+          "endLine": 50,
+          "params": [
+            "map"
+          ]
+        },
+        {
+          "name": "initWorkStationImageMap",
+          "startLine": 52,
+          "endLine": 58,
+          "params": [
+            "map"
+          ]
+        },
+        {
+          "name": "setNum",
+          "startLine": 60,
+          "endLine": 66,
+          "params": [
+            "number"
+          ]
+        },
+        {
+          "name": "setMonitorValue",
+          "startLine": 68,
+          "endLine": 75,
+          "params": [
+            "isShow"
+          ]
+        },
+        {
+          "name": "setMonitorDisImgIndex",
+          "startLine": 77,
+          "endLine": 84,
+          "params": [
+            "index"
+          ]
+        },
+        {
+          "name": "setGboxTitle",
+          "startLine": 86,
+          "endLine": 89,
+          "params": [
+            "title"
+          ]
+        },
+        {
+          "name": "showEvent",
+          "startLine": 91,
+          "endLine": 97,
+          "params": [
+            "event"
+          ]
+        },
+        {
+          "name": "setShowImg",
+          "startLine": 99,
+          "endLine": 102,
+          "params": [
+            "image"
+          ]
+        },
+        {
+          "name": "clearImgDis",
+          "startLine": 104,
+          "endLine": 108,
+          "params": []
+        },
+        {
+          "name": "updateTitle",
+          "startLine": 110,
+          "endLine": 116,
+          "params": [
+            "index"
+          ]
+        },
+        {
+          "name": "updateImage",
+          "startLine": 118,
+          "endLine": 124,
+          "params": [
+            "index"
+          ]
+        },
+        {
+          "name": "pbtn_exit_clicked",
+          "startLine": 126,
+          "endLine": 133,
+          "params": []
+        },
+        {
+          "name": "pbtn_nextWork_clicked",
+          "startLine": 135,
+          "endLine": 147,
+          "params": []
+        },
+        {
+          "name": "pbtn_preWork_clicked",
+          "startLine": 149,
+          "endLine": 161,
+          "params": []
+        },
+        {
+          "name": "closeEvent",
+          "startLine": 163,
+          "endLine": 170,
+          "params": [
+            "close_event"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "ImageEnlargedDisplay",
+          "line": 4,
+          "isDefault": false
+        },
+        {
+          "name": "~ImageEnlargedDisplay",
+          "line": 14,
+          "isDefault": false
+        },
+        {
+          "name": "build_ui",
+          "line": 19,
+          "isDefault": false
+        },
+        {
+          "name": "build_connect",
+          "line": 24,
+          "isDefault": false
+        },
+        {
+          "name": "initWorkStationTitleMap",
+          "line": 34,
+          "isDefault": false
+        },
+        {
+          "name": "initWorkStationTitleMap",
+          "line": 39,
+          "isDefault": false
+        },
+        {
+          "name": "initWorkStationImageMap",
+          "line": 47,
+          "isDefault": false
+        },
+        {
+          "name": "initWorkStationImageMap",
+          "line": 52,
+          "isDefault": false
+        },
+        {
+          "name": "setNum",
+          "line": 60,
+          "isDefault": false
+        },
+        {
+          "name": "setMonitorValue",
+          "line": 68,
+          "isDefault": false
+        },
+        {
+          "name": "setMonitorDisImgIndex",
+          "line": 77,
+          "isDefault": false
+        },
+        {
+          "name": "setGboxTitle",
+          "line": 86,
+          "isDefault": false
+        },
+        {
+          "name": "showEvent",
+          "line": 91,
+          "isDefault": false
+        },
+        {
+          "name": "setShowImg",
+          "line": 99,
+          "isDefault": false
+        },
+        {
+          "name": "clearImgDis",
+          "line": 104,
+          "isDefault": false
+        },
+        {
+          "name": "updateTitle",
+          "line": 110,
+          "isDefault": false
+        },
+        {
+          "name": "updateImage",
+          "line": 118,
+          "isDefault": false
+        },
+        {
+          "name": "pbtn_exit_clicked",
+          "line": 126,
+          "isDefault": false
+        },
+        {
+          "name": "pbtn_nextWork_clicked",
+          "line": 135,
+          "isDefault": false
+        },
+        {
+          "name": "pbtn_preWork_clicked",
+          "line": 149,
+          "isDefault": false
+        },
+        {
+          "name": "closeEvent",
+          "line": 163,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "ImageEnlargedDisplay",
+          "callee": "setupUi",
+          "lineNumber": 8
+        },
+        {
+          "caller": "ImageEnlargedDisplay",
+          "callee": "build_ui",
+          "lineNumber": 10
+        },
+        {
+          "caller": "ImageEnlargedDisplay",
+          "callee": "build_connect",
+          "lineNumber": 11
+        },
+        {
+          "caller": "build_ui",
+          "callee": "setWindowFlags",
+          "lineNumber": 21
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 26
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 28
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 30
+        },
+        {
+          "caller": "initWorkStationTitleMap",
+          "callee": "clear",
+          "lineNumber": 41
+        },
+        {
+          "caller": "initWorkStationTitleMap",
+          "callee": "constBegin",
+          "lineNumber": 42
+        },
+        {
+          "caller": "initWorkStationTitleMap",
+          "callee": "constEnd",
+          "lineNumber": 42
+        },
+        {
+          "caller": "initWorkStationTitleMap",
+          "callee": "key",
+          "lineNumber": 43
+        },
+        {
+          "caller": "initWorkStationTitleMap",
+          "callee": "value",
+          "lineNumber": 43
+        },
+        {
+          "caller": "initWorkStationImageMap",
+          "callee": "clear",
+          "lineNumber": 54
+        },
+        {
+          "caller": "initWorkStationImageMap",
+          "callee": "constBegin",
+          "lineNumber": 55
+        },
+        {
+          "caller": "initWorkStationImageMap",
+          "callee": "constEnd",
+          "lineNumber": 55
+        },
+        {
+          "caller": "initWorkStationImageMap",
+          "callee": "key",
+          "lineNumber": 56
+        },
+        {
+          "caller": "initWorkStationImageMap",
+          "callee": "value",
+          "lineNumber": 56
+        },
+        {
+          "caller": "setGboxTitle",
+          "callee": "setTitle",
+          "lineNumber": 88
+        },
+        {
+          "caller": "setShowImg",
+          "callee": "setPixmap",
+          "lineNumber": 101
+        },
+        {
+          "caller": "setShowImg",
+          "callee": "scaled",
+          "lineNumber": 101
+        },
+        {
+          "caller": "setShowImg",
+          "callee": "size",
+          "lineNumber": 101
+        },
+        {
+          "caller": "clearImgDis",
+          "callee": "clear",
+          "lineNumber": 106
+        },
+        {
+          "caller": "clearImgDis",
+          "callee": "setPixmap",
+          "lineNumber": 107
+        },
+        {
+          "caller": "clearImgDis",
+          "callee": "QPixmap",
+          "lineNumber": 107
+        },
+        {
+          "caller": "updateTitle",
+          "callee": "find",
+          "lineNumber": 112
+        },
+        {
+          "caller": "updateTitle",
+          "callee": "end",
+          "lineNumber": 113
+        },
+        {
+          "caller": "updateTitle",
+          "callee": "setGboxTitle",
+          "lineNumber": 114
+        },
+        {
+          "caller": "updateImage",
+          "callee": "find",
+          "lineNumber": 120
+        },
+        {
+          "caller": "updateImage",
+          "callee": "end",
+          "lineNumber": 121
+        },
+        {
+          "caller": "updateImage",
+          "callee": "setShowImg",
+          "lineNumber": 122
+        },
+        {
+          "caller": "pbtn_exit_clicked",
+          "callee": "close",
+          "lineNumber": 132
+        },
+        {
+          "caller": "pbtn_nextWork_clicked",
+          "callee": "updateTitle",
+          "lineNumber": 144
+        },
+        {
+          "caller": "pbtn_nextWork_clicked",
+          "callee": "updateImage",
+          "lineNumber": 145
+        },
+        {
+          "caller": "pbtn_preWork_clicked",
+          "callee": "updateTitle",
+          "lineNumber": 158
+        },
+        {
+          "caller": "pbtn_preWork_clicked",
+          "callee": "updateImage",
+          "lineNumber": 159
+        },
+        {
+          "caller": "closeEvent",
+          "callee": "QDialog::closeEvent",
+          "lineNumber": 169
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 21,
+        "functionCount": 21,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/src/LoadingDialog.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 26,
+      "nonEmptyLines": 20,
+      "functions": [
+        {
+          "name": "LoadingDialog",
+          "startLine": 7,
+          "endLine": 21,
+          "params": [
+            "parent"
+          ]
+        },
+        {
+          "name": "updateMessage",
+          "startLine": 23,
+          "endLine": 26,
+          "params": [
+            "message"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "LoadingDialog",
+          "line": 7,
+          "isDefault": false
+        },
+        {
+          "name": "updateMessage",
+          "line": 23,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "LoadingDialog",
+          "callee": "setWindowTitle",
+          "lineNumber": 9
+        },
+        {
+          "caller": "LoadingDialog",
+          "callee": "setWindowFlags",
+          "lineNumber": 10
+        },
+        {
+          "caller": "LoadingDialog",
+          "callee": "windowFlags",
+          "lineNumber": 10
+        },
+        {
+          "caller": "LoadingDialog",
+          "callee": "setModal",
+          "lineNumber": 11
+        },
+        {
+          "caller": "LoadingDialog",
+          "callee": "setRange",
+          "lineNumber": 16
+        },
+        {
+          "caller": "LoadingDialog",
+          "callee": "addWidget",
+          "lineNumber": 18
+        },
+        {
+          "caller": "LoadingDialog",
+          "callee": "addWidget",
+          "lineNumber": 19
+        },
+        {
+          "caller": "LoadingDialog",
+          "callee": "setLayout",
+          "lineNumber": 20
+        },
+        {
+          "caller": "updateMessage",
+          "callee": "setText",
+          "lineNumber": 25
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 2,
+        "functionCount": 2,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/src/PictureViewerThumbnails.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 709,
+      "nonEmptyLines": 603,
+      "callGraph": [
+        {
+          "caller": "~ThumbnailLoaderThread",
+          "callee": "stop",
+          "lineNumber": 30
+        },
+        {
+          "caller": "~ThumbnailLoaderThread",
+          "callee": "wait",
+          "lineNumber": 31
+        },
+        {
+          "caller": "run",
+          "callee": "isEmpty",
+          "lineNumber": 46
+        },
+        {
+          "caller": "run",
+          "callee": "dequeue",
+          "lineNumber": 48
+        },
+        {
+          "caller": "run",
+          "callee": "toString",
+          "lineNumber": 51
+        },
+        {
+          "caller": "run",
+          "callee": "data",
+          "lineNumber": 51
+        },
+        {
+          "caller": "run",
+          "callee": "setAutoTransform",
+          "lineNumber": 55
+        },
+        {
+          "caller": "run",
+          "callee": "read",
+          "lineNumber": 57
+        },
+        {
+          "caller": "run",
+          "callee": "isNull",
+          "lineNumber": 61
+        },
+        {
+          "caller": "run",
+          "callee": "scaled",
+          "lineNumber": 62
+        },
+        {
+          "caller": "run",
+          "callee": "QPixmap",
+          "lineNumber": 63
+        },
+        {
+          "caller": "run",
+          "callee": "fill",
+          "lineNumber": 64
+        },
+        {
+          "caller": "run",
+          "callee": "width",
+          "lineNumber": 66
+        },
+        {
+          "caller": "run",
+          "callee": "width",
+          "lineNumber": 66
+        },
+        {
+          "caller": "run",
+          "callee": "height",
+          "lineNumber": 67
+        },
+        {
+          "caller": "run",
+          "callee": "height",
+          "lineNumber": 67
+        },
+        {
+          "caller": "run",
+          "callee": "drawImage",
+          "lineNumber": 68
+        },
+        {
+          "caller": "run",
+          "callee": "end",
+          "lineNumber": 69
+        },
+        {
+          "caller": "run",
+          "callee": "isNull",
+          "lineNumber": 73
+        },
+        {
+          "caller": "run",
+          "callee": "set",
+          "lineNumber": 74
+        },
+        {
+          "caller": "run",
+          "callee": "QIcon",
+          "lineNumber": 75
+        },
+        {
+          "caller": "startAsyncLoadQueue",
+          "callee": "get",
+          "lineNumber": 87
+        },
+        {
+          "caller": "startAsyncLoadQueue",
+          "callee": "connect",
+          "lineNumber": 91
+        },
+        {
+          "caller": "startAsyncLoadQueue",
+          "callee": "start",
+          "lineNumber": 93
+        },
+        {
+          "caller": "stopAsyncLoadQueue",
+          "callee": "stop",
+          "lineNumber": 99
+        },
+        {
+          "caller": "stopAsyncLoadQueue",
+          "callee": "wait",
+          "lineNumber": 100
+        },
+        {
+          "caller": "stopAsyncLoadQueue",
+          "callee": "disconnect",
+          "lineNumber": 101
+        },
+        {
+          "caller": "PictureViewerThumbnails",
+          "callee": "setupUi",
+          "lineNumber": 116
+        },
+        {
+          "caller": "PictureViewerThumbnails",
+          "callee": "build_ui",
+          "lineNumber": 118
+        },
+        {
+          "caller": "PictureViewerThumbnails",
+          "callee": "build_connect",
+          "lineNumber": 119
+        },
+        {
+          "caller": "~PictureViewerThumbnails",
+          "callee": "stopAsyncLoadQueue",
+          "lineNumber": 125
+        },
+        {
+          "caller": "setThumbnailCacheCapacity",
+          "callee": "resizeCapacity",
+          "lineNumber": 132
+        },
+        {
+          "caller": "setSize",
+          "callee": "setIconSize",
+          "lineNumber": 143
+        },
+        {
+          "caller": "setSize",
+          "callee": "width",
+          "lineNumber": 145
+        },
+        {
+          "caller": "setSize",
+          "callee": "height",
+          "lineNumber": 145
+        },
+        {
+          "caller": "setSize",
+          "callee": "count",
+          "lineNumber": 146
+        },
+        {
+          "caller": "setSize",
+          "callee": "item",
+          "lineNumber": 147
+        },
+        {
+          "caller": "setSize",
+          "callee": "setSizeHint",
+          "lineNumber": 148
+        },
+        {
+          "caller": "setSize",
+          "callee": "loadThumbnail",
+          "lineNumber": 149
+        },
+        {
+          "caller": "setSize",
+          "callee": "toString",
+          "lineNumber": 149
+        },
+        {
+          "caller": "setSize",
+          "callee": "data",
+          "lineNumber": 149
+        },
+        {
+          "caller": "showEvent",
+          "callee": "updateMessage",
+          "lineNumber": 166
+        },
+        {
+          "caller": "showEvent",
+          "callee": "show",
+          "lineNumber": 167
+        },
+        {
+          "caller": "showEvent",
+          "callee": "updateCategoryList",
+          "lineNumber": 168
+        },
+        {
+          "caller": "showEvent",
+          "callee": "QtConcurrent::run",
+          "lineNumber": 172
+        },
+        {
+          "caller": "showEvent",
+          "callee": "preloadAllCategoryImages",
+          "lineNumber": 173
+        },
+        {
+          "caller": "showEvent",
+          "callee": "QMetaObject::invokeMethod",
+          "lineNumber": 174
+        },
+        {
+          "caller": "showEvent",
+          "callee": "loadImageList",
+          "lineNumber": 175
+        },
+        {
+          "caller": "showEvent",
+          "callee": "close",
+          "lineNumber": 176
+        },
+        {
+          "caller": "showEvent",
+          "callee": "QMainWindow::showEvent",
+          "lineNumber": 180
+        },
+        {
+          "caller": "build_ui",
+          "callee": "addWidget",
+          "lineNumber": 187
+        },
+        {
+          "caller": "build_ui",
+          "callee": "setLayout",
+          "lineNumber": 188
+        },
+        {
+          "caller": "build_ui",
+          "callee": "setViewMode",
+          "lineNumber": 190
+        },
+        {
+          "caller": "build_ui",
+          "callee": "setResizeMode",
+          "lineNumber": 191
+        },
+        {
+          "caller": "build_ui",
+          "callee": "setIconSize",
+          "lineNumber": 192
+        },
+        {
+          "caller": "build_ui",
+          "callee": "setMovement",
+          "lineNumber": 193
+        },
+        {
+          "caller": "build_ui",
+          "callee": "setSelectionMode",
+          "lineNumber": 194
+        },
+        {
+          "caller": "build_ui",
+          "callee": "setSpacing",
+          "lineNumber": 195
+        },
+        {
+          "caller": "build_ui",
+          "callee": "setWindowFlags",
+          "lineNumber": 200
+        },
+        {
+          "caller": "build_ui",
+          "callee": "setModel",
+          "lineNumber": 201
+        },
+        {
+          "caller": "build_ui",
+          "callee": "std::make_unique<rw::dsl::CacheFIFO<QString, QPixmap>>",
+          "lineNumber": 203
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 208
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 211
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 213
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 215
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 217
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 219
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 221
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 223
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 226
+        },
+        {
+          "caller": "build_connect",
+          "callee": "selectionModel",
+          "lineNumber": 226
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 229
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 232
+        },
+        {
+          "caller": "loadImageList",
+          "callee": "stopAsyncLoadQueue",
+          "lineNumber": 238
+        },
+        {
+          "caller": "loadImageList",
+          "callee": "QCoreApplication::processEvents",
+          "lineNumber": 242
+        },
+        {
+          "caller": "loadImageList",
+          "callee": "clear",
+          "lineNumber": 243
+        },
+        {
+          "caller": "loadImageList",
+          "callee": "clear",
+          "lineNumber": 244
+        },
+        {
+          "caller": "loadImageList",
+          "callee": "clear",
+          "lineNumber": 245
+        },
+        {
+          "caller": "loadImageList",
+          "callee": "currentIndex",
+          "lineNumber": 249
+        },
+        {
+          "caller": "loadImageList",
+          "callee": "isValid",
+          "lineNumber": 251
+        },
+        {
+          "caller": "loadImageList",
+          "callee": "data",
+          "lineNumber": 252
+        },
+        {
+          "caller": "loadImageList",
+          "callee": "isValid",
+          "lineNumber": 253
+        },
+        {
+          "caller": "loadImageList",
+          "callee": "toString",
+          "lineNumber": 254
+        },
+        {
+          "caller": "loadImageList",
+          "callee": "value",
+          "lineNumber": 259
+        },
+        {
+          "caller": "loadImageList",
+          "callee": "setText",
+          "lineNumber": 270
+        },
+        {
+          "caller": "loadImageList",
+          "callee": "fileName",
+          "lineNumber": 270
+        },
+        {
+          "caller": "loadImageList",
+          "callee": "setData",
+          "lineNumber": 271
+        },
+        {
+          "caller": "loadImageList",
+          "callee": "setSizeHint",
+          "lineNumber": 272
+        },
+        {
+          "caller": "loadImageList",
+          "callee": "QSize",
+          "lineNumber": 272
+        },
+        {
+          "caller": "loadImageList",
+          "callee": "width",
+          "lineNumber": 272
+        },
+        {
+          "caller": "loadImageList",
+          "callee": "height",
+          "lineNumber": 272
+        },
+        {
+          "caller": "loadImageList",
+          "callee": "get",
+          "lineNumber": 273
+        },
+        {
+          "caller": "loadImageList",
+          "callee": "has_value",
+          "lineNumber": 274
+        },
+        {
+          "caller": "loadImageList",
+          "callee": "setIcon",
+          "lineNumber": 275
+        },
+        {
+          "caller": "loadImageList",
+          "callee": "QIcon",
+          "lineNumber": 275
+        },
+        {
+          "caller": "loadImageList",
+          "callee": "value",
+          "lineNumber": 275
+        },
+        {
+          "caller": "loadImageList",
+          "callee": "setIcon",
+          "lineNumber": 278
+        },
+        {
+          "caller": "loadImageList",
+          "callee": "QIcon",
+          "lineNumber": 278
+        },
+        {
+          "caller": "loadImageList",
+          "callee": "append",
+          "lineNumber": 281
+        },
+        {
+          "caller": "loadImageList",
+          "callee": "addItem",
+          "lineNumber": 285
+        },
+        {
+          "caller": "loadImageList",
+          "callee": "startAsyncLoadQueue",
+          "lineNumber": 288
+        },
+        {
+          "caller": "loadThumbnail",
+          "callee": "get",
+          "lineNumber": 293
+        },
+        {
+          "caller": "loadThumbnail",
+          "callee": "has_value",
+          "lineNumber": 294
+        },
+        {
+          "caller": "loadThumbnail",
+          "callee": "setIcon",
+          "lineNumber": 296
+        },
+        {
+          "caller": "loadThumbnail",
+          "callee": "QIcon",
+          "lineNumber": 296
+        },
+        {
+          "caller": "loadThumbnail",
+          "callee": "value",
+          "lineNumber": 296
+        },
+        {
+          "caller": "loadThumbnail",
+          "callee": "append",
+          "lineNumber": 301
+        },
+        {
+          "caller": "updateCategoryList",
+          "callee": "clear",
+          "lineNumber": 308
+        },
+        {
+          "caller": "updateCategoryList",
+          "callee": "isEmpty",
+          "lineNumber": 310
+        },
+        {
+          "caller": "updateCategoryList",
+          "callee": "qDebug",
+          "lineNumber": 311
+        },
+        {
+          "caller": "updateCategoryList",
+          "callee": "exists",
+          "lineNumber": 316
+        },
+        {
+          "caller": "updateCategoryList",
+          "callee": "qDebug",
+          "lineNumber": 317
+        },
+        {
+          "caller": "updateCategoryList",
+          "callee": "setHorizontalHeaderLabels",
+          "lineNumber": 321
+        },
+        {
+          "caller": "updateCategoryList",
+          "callee": "entryList",
+          "lineNumber": 324
+        },
+        {
+          "caller": "updateCategoryList",
+          "callee": "isEmpty",
+          "lineNumber": 325
+        },
+        {
+          "caller": "updateCategoryList",
+          "callee": "dirName",
+          "lineNumber": 327
+        },
+        {
+          "caller": "updateCategoryList",
+          "callee": "setData",
+          "lineNumber": 328
+        },
+        {
+          "caller": "updateCategoryList",
+          "callee": "absolutePath",
+          "lineNumber": 328
+        },
+        {
+          "caller": "updateCategoryList",
+          "callee": "appendRow",
+          "lineNumber": 329
+        },
+        {
+          "caller": "updateCategoryList",
+          "callee": "filePath",
+          "lineNumber": 333
+        },
+        {
+          "caller": "updateCategoryList",
+          "callee": "setData",
+          "lineNumber": 337
+        },
+        {
+          "caller": "updateCategoryList",
+          "callee": "addSubFolders",
+          "lineNumber": 341
+        },
+        {
+          "caller": "updateCategoryList",
+          "callee": "appendRow",
+          "lineNumber": 343
+        },
+        {
+          "caller": "updateCategoryList",
+          "callee": "expandAll",
+          "lineNumber": 349
+        },
+        {
+          "caller": "updateCategoryList",
+          "callee": "findFirstDeepestIndex",
+          "lineNumber": 352
+        },
+        {
+          "caller": "updateCategoryList",
+          "callee": "isValid",
+          "lineNumber": 353
+        },
+        {
+          "caller": "updateCategoryList",
+          "callee": "setCurrentIndex",
+          "lineNumber": 354
+        },
+        {
+          "caller": "addSubFolders",
+          "callee": "entryList",
+          "lineNumber": 361
+        },
+        {
+          "caller": "addSubFolders",
+          "callee": "filePath",
+          "lineNumber": 363
+        },
+        {
+          "caller": "addSubFolders",
+          "callee": "setData",
+          "lineNumber": 367
+        },
+        {
+          "caller": "addSubFolders",
+          "callee": "addSubFolders",
+          "lineNumber": 371
+        },
+        {
+          "caller": "addSubFolders",
+          "callee": "appendRow",
+          "lineNumber": 373
+        },
+        {
+          "caller": "findFirstDeepestIndex",
+          "callee": "rowCount",
+          "lineNumber": 379
+        },
+        {
+          "caller": "findFirstDeepestIndex",
+          "callee": "QModelIndex",
+          "lineNumber": 380
+        },
+        {
+          "caller": "findFirstDeepestIndex",
+          "callee": "invisibleRootItem",
+          "lineNumber": 383
+        },
+        {
+          "caller": "findFirstDeepestIndex",
+          "callee": "findDeepestChild",
+          "lineNumber": 384
+        },
+        {
+          "caller": "findDeepestChild",
+          "callee": "rowCount",
+          "lineNumber": 389
+        },
+        {
+          "caller": "findDeepestChild",
+          "callee": "index",
+          "lineNumber": 390
+        },
+        {
+          "caller": "findDeepestChild",
+          "callee": "QModelIndex",
+          "lineNumber": 390
+        },
+        {
+          "caller": "findDeepestChild",
+          "callee": "child",
+          "lineNumber": 394
+        },
+        {
+          "caller": "findDeepestChild",
+          "callee": "findDeepestChild",
+          "lineNumber": 395
+        },
+        {
+          "caller": "preloadAllCategoryImages",
+          "callee": "QImageReader::supportedImageFormats",
+          "lineNumber": 401
+        },
+        {
+          "caller": "preloadAllCategoryImages",
+          "callee": "entryInfoList",
+          "lineNumber": 405
+        },
+        {
+          "caller": "preloadAllCategoryImages",
+          "callee": "absoluteFilePath",
+          "lineNumber": 408
+        },
+        {
+          "caller": "preloadAllCategoryImages",
+          "callee": "insert",
+          "lineNumber": 410
+        },
+        {
+          "caller": "preloadAllCategoryImages",
+          "callee": "absolutePath",
+          "lineNumber": 410
+        },
+        {
+          "caller": "preloadAllCategoryImages",
+          "callee": "entryList",
+          "lineNumber": 413
+        },
+        {
+          "caller": "preloadAllCategoryImages",
+          "callee": "filePath",
+          "lineNumber": 415
+        },
+        {
+          "caller": "preloadAllCategoryImages",
+          "callee": "preloadAllCategoryImages",
+          "lineNumber": 416
+        },
+        {
+          "caller": "onThumbnailSelected",
+          "callee": "currentItem",
+          "lineNumber": 422
+        },
+        {
+          "caller": "onThumbnailSelected",
+          "callee": "toString",
+          "lineNumber": 424
+        },
+        {
+          "caller": "onThumbnailSelected",
+          "callee": "data",
+          "lineNumber": 424
+        },
+        {
+          "caller": "onThumbnailSelected",
+          "callee": "showMessage",
+          "lineNumber": 425
+        },
+        {
+          "caller": "pbtn_exit_clicked",
+          "callee": "stopAsyncLoadQueue",
+          "lineNumber": 431
+        },
+        {
+          "caller": "pbtn_exit_clicked",
+          "callee": "close",
+          "lineNumber": 432
+        },
+        {
+          "caller": "pbtn_deleteTotal_clicked",
+          "callee": "stopAsyncLoadQueue",
+          "lineNumber": 438
+        },
+        {
+          "caller": "pbtn_deleteTotal_clicked",
+          "callee": "QMessageBox::question",
+          "lineNumber": 440
+        },
+        {
+          "caller": "pbtn_deleteTotal_clicked",
+          "callee": "currentIndex",
+          "lineNumber": 448
+        },
+        {
+          "caller": "pbtn_deleteTotal_clicked",
+          "callee": "isValid",
+          "lineNumber": 450
+        },
+        {
+          "caller": "pbtn_deleteTotal_clicked",
+          "callee": "data",
+          "lineNumber": 451
+        },
+        {
+          "caller": "pbtn_deleteTotal_clicked",
+          "callee": "isValid",
+          "lineNumber": 452
+        },
+        {
+          "caller": "pbtn_deleteTotal_clicked",
+          "callee": "toString",
+          "lineNumber": 453
+        },
+        {
+          "caller": "pbtn_deleteTotal_clicked",
+          "callee": "exists",
+          "lineNumber": 459
+        },
+        {
+          "caller": "pbtn_deleteTotal_clicked",
+          "callee": "qDebug",
+          "lineNumber": 460
+        },
+        {
+          "caller": "pbtn_deleteTotal_clicked",
+          "callee": "entryList",
+          "lineNumber": 467
+        },
+        {
+          "caller": "pbtn_deleteTotal_clicked",
+          "callee": "filePath",
+          "lineNumber": 469
+        },
+        {
+          "caller": "pbtn_deleteTotal_clicked",
+          "callee": "QFile::remove",
+          "lineNumber": 470
+        },
+        {
+          "caller": "pbtn_deleteTotal_clicked",
+          "callee": "qDebug",
+          "lineNumber": 471
+        },
+        {
+          "caller": "pbtn_deleteTotal_clicked",
+          "callee": "qDebug",
+          "lineNumber": 474
+        },
+        {
+          "caller": "pbtn_deleteTotal_clicked",
+          "callee": "entryList",
+          "lineNumber": 480
+        },
+        {
+          "caller": "pbtn_deleteTotal_clicked",
+          "callee": "filePath",
+          "lineNumber": 482
+        },
+        {
+          "caller": "pbtn_deleteTotal_clicked",
+          "callee": "removeRecursively",
+          "lineNumber": 483
+        },
+        {
+          "caller": "pbtn_deleteTotal_clicked",
+          "callee": "qDebug",
+          "lineNumber": 484
+        },
+        {
+          "caller": "pbtn_deleteTotal_clicked",
+          "callee": "path",
+          "lineNumber": 484
+        },
+        {
+          "caller": "pbtn_deleteTotal_clicked",
+          "callee": "qDebug",
+          "lineNumber": 487
+        },
+        {
+          "caller": "pbtn_deleteTotal_clicked",
+          "callee": "path",
+          "lineNumber": 487
+        },
+        {
+          "caller": "pbtn_deleteTotal_clicked",
+          "callee": "begin",
+          "lineNumber": 492
+        },
+        {
+          "caller": "pbtn_deleteTotal_clicked",
+          "callee": "end",
+          "lineNumber": 493
+        },
+        {
+          "caller": "pbtn_deleteTotal_clicked",
+          "callee": "key",
+          "lineNumber": 494
+        },
+        {
+          "caller": "pbtn_deleteTotal_clicked",
+          "callee": "startsWith",
+          "lineNumber": 495
+        },
+        {
+          "caller": "pbtn_deleteTotal_clicked",
+          "callee": "erase",
+          "lineNumber": 496
+        },
+        {
+          "caller": "pbtn_deleteTotal_clicked",
+          "callee": "size",
+          "lineNumber": 506
+        },
+        {
+          "caller": "pbtn_deleteTotal_clicked",
+          "callee": "startsWith",
+          "lineNumber": 508
+        },
+        {
+          "caller": "pbtn_deleteTotal_clicked",
+          "callee": "toString",
+          "lineNumber": 508
+        },
+        {
+          "caller": "pbtn_deleteTotal_clicked",
+          "callee": "data",
+          "lineNumber": 508
+        },
+        {
+          "caller": "pbtn_deleteTotal_clicked",
+          "callee": "removeAt",
+          "lineNumber": 509
+        },
+        {
+          "caller": "pbtn_deleteTotal_clicked",
+          "callee": "loadImageList",
+          "lineNumber": 515
+        },
+        {
+          "caller": "pbtn_delete_clicked",
+          "callee": "stopAsyncLoadQueue",
+          "lineNumber": 520
+        },
+        {
+          "caller": "pbtn_delete_clicked",
+          "callee": "currentItem",
+          "lineNumber": 523
+        },
+        {
+          "caller": "pbtn_delete_clicked",
+          "callee": "startAsyncLoadQueue",
+          "lineNumber": 525
+        },
+        {
+          "caller": "pbtn_delete_clicked",
+          "callee": "toString",
+          "lineNumber": 529
+        },
+        {
+          "caller": "pbtn_delete_clicked",
+          "callee": "data",
+          "lineNumber": 529
+        },
+        {
+          "caller": "pbtn_delete_clicked",
+          "callee": "QFile::remove",
+          "lineNumber": 532
+        },
+        {
+          "caller": "pbtn_delete_clicked",
+          "callee": "removeAll",
+          "lineNumber": 535
+        },
+        {
+          "caller": "pbtn_delete_clicked",
+          "callee": "begin",
+          "lineNumber": 538
+        },
+        {
+          "caller": "pbtn_delete_clicked",
+          "callee": "end",
+          "lineNumber": 538
+        },
+        {
+          "caller": "pbtn_delete_clicked",
+          "callee": "removeAll",
+          "lineNumber": 539
+        },
+        {
+          "caller": "pbtn_delete_clicked",
+          "callee": "value",
+          "lineNumber": 539
+        },
+        {
+          "caller": "pbtn_delete_clicked",
+          "callee": "size",
+          "lineNumber": 545
+        },
+        {
+          "caller": "pbtn_delete_clicked",
+          "callee": "toString",
+          "lineNumber": 547
+        },
+        {
+          "caller": "pbtn_delete_clicked",
+          "callee": "data",
+          "lineNumber": 547
+        },
+        {
+          "caller": "pbtn_delete_clicked",
+          "callee": "removeAt",
+          "lineNumber": 548
+        },
+        {
+          "caller": "pbtn_delete_clicked",
+          "callee": "takeItem",
+          "lineNumber": 554
+        },
+        {
+          "caller": "pbtn_delete_clicked",
+          "callee": "row",
+          "lineNumber": 554
+        },
+        {
+          "caller": "pbtn_delete_clicked",
+          "callee": "startAsyncLoadQueue",
+          "lineNumber": 556
+        },
+        {
+          "caller": "pbtn_prePicture_clicked",
+          "callee": "count",
+          "lineNumber": 561
+        },
+        {
+          "caller": "pbtn_prePicture_clicked",
+          "callee": "currentRow",
+          "lineNumber": 564
+        },
+        {
+          "caller": "pbtn_prePicture_clicked",
+          "callee": "setCurrentRow",
+          "lineNumber": 567
+        },
+        {
+          "caller": "pbtn_prePicture_clicked",
+          "callee": "setCurrentRow",
+          "lineNumber": 571
+        },
+        {
+          "caller": "pbtn_nextPicture_clicked",
+          "callee": "count",
+          "lineNumber": 578
+        },
+        {
+          "caller": "pbtn_nextPicture_clicked",
+          "callee": "currentRow",
+          "lineNumber": 581
+        },
+        {
+          "caller": "pbtn_nextPicture_clicked",
+          "callee": "setCurrentRow",
+          "lineNumber": 584
+        },
+        {
+          "caller": "pbtn_nextPicture_clicked",
+          "callee": "setCurrentRow",
+          "lineNumber": 588
+        },
+        {
+          "caller": "pbtn_bigger_clicked",
+          "callee": "width",
+          "lineNumber": 595
+        },
+        {
+          "caller": "pbtn_bigger_clicked",
+          "callee": "height",
+          "lineNumber": 595
+        },
+        {
+          "caller": "pbtn_bigger_clicked",
+          "callee": "width",
+          "lineNumber": 596
+        },
+        {
+          "caller": "pbtn_bigger_clicked",
+          "callee": "width",
+          "lineNumber": 596
+        },
+        {
+          "caller": "pbtn_bigger_clicked",
+          "callee": "height",
+          "lineNumber": 598
+        },
+        {
+          "caller": "pbtn_bigger_clicked",
+          "callee": "height",
+          "lineNumber": 598
+        },
+        {
+          "caller": "pbtn_bigger_clicked",
+          "callee": "width",
+          "lineNumber": 604
+        },
+        {
+          "caller": "pbtn_bigger_clicked",
+          "callee": "width",
+          "lineNumber": 604
+        },
+        {
+          "caller": "pbtn_bigger_clicked",
+          "callee": "height",
+          "lineNumber": 606
+        },
+        {
+          "caller": "pbtn_bigger_clicked",
+          "callee": "height",
+          "lineNumber": 606
+        },
+        {
+          "caller": "pbtn_bigger_clicked",
+          "callee": "setSize",
+          "lineNumber": 612
+        },
+        {
+          "caller": "pbtn_smaller_clicked",
+          "callee": "width",
+          "lineNumber": 617
+        },
+        {
+          "caller": "pbtn_smaller_clicked",
+          "callee": "height",
+          "lineNumber": 617
+        },
+        {
+          "caller": "pbtn_smaller_clicked",
+          "callee": "width",
+          "lineNumber": 618
+        },
+        {
+          "caller": "pbtn_smaller_clicked",
+          "callee": "width",
+          "lineNumber": 618
+        },
+        {
+          "caller": "pbtn_smaller_clicked",
+          "callee": "height",
+          "lineNumber": 620
+        },
+        {
+          "caller": "pbtn_smaller_clicked",
+          "callee": "height",
+          "lineNumber": 620
+        },
+        {
+          "caller": "pbtn_smaller_clicked",
+          "callee": "width",
+          "lineNumber": 626
+        },
+        {
+          "caller": "pbtn_smaller_clicked",
+          "callee": "width",
+          "lineNumber": 626
+        },
+        {
+          "caller": "pbtn_smaller_clicked",
+          "callee": "height",
+          "lineNumber": 628
+        },
+        {
+          "caller": "pbtn_smaller_clicked",
+          "callee": "height",
+          "lineNumber": 628
+        },
+        {
+          "caller": "pbtn_smaller_clicked",
+          "callee": "setSize",
+          "lineNumber": 634
+        },
+        {
+          "caller": "updateImagesPaths",
+          "callee": "stopAsyncLoadQueue",
+          "lineNumber": 639
+        },
+        {
+          "caller": "updateImagesPaths",
+          "callee": "QFile::remove",
+          "lineNumber": 646
+        },
+        {
+          "caller": "updateImagesPaths",
+          "callee": "removeAll",
+          "lineNumber": 649
+        },
+        {
+          "caller": "updateImagesPaths",
+          "callee": "begin",
+          "lineNumber": 652
+        },
+        {
+          "caller": "updateImagesPaths",
+          "callee": "end",
+          "lineNumber": 652
+        },
+        {
+          "caller": "updateImagesPaths",
+          "callee": "removeAll",
+          "lineNumber": 653
+        },
+        {
+          "caller": "updateImagesPaths",
+          "callee": "value",
+          "lineNumber": 653
+        },
+        {
+          "caller": "updateImagesPaths",
+          "callee": "size",
+          "lineNumber": 659
+        },
+        {
+          "caller": "updateImagesPaths",
+          "callee": "toString",
+          "lineNumber": 661
+        },
+        {
+          "caller": "updateImagesPaths",
+          "callee": "data",
+          "lineNumber": 661
+        },
+        {
+          "caller": "updateImagesPaths",
+          "callee": "removeAt",
+          "lineNumber": 662
+        },
+        {
+          "caller": "updateImagesPaths",
+          "callee": "count",
+          "lineNumber": 668
+        },
+        {
+          "caller": "updateImagesPaths",
+          "callee": "item",
+          "lineNumber": 669
+        },
+        {
+          "caller": "updateImagesPaths",
+          "callee": "toString",
+          "lineNumber": 670
+        },
+        {
+          "caller": "updateImagesPaths",
+          "callee": "data",
+          "lineNumber": 670
+        },
+        {
+          "caller": "updateImagesPaths",
+          "callee": "takeItem",
+          "lineNumber": 671
+        },
+        {
+          "caller": "updateImagesPaths",
+          "callee": "startAsyncLoadQueue",
+          "lineNumber": 676
+        },
+        {
+          "caller": "onThumbnailDoubleClicked",
+          "callee": "toString",
+          "lineNumber": 682
+        },
+        {
+          "caller": "onThumbnailDoubleClicked",
+          "callee": "data",
+          "lineNumber": 682
+        },
+        {
+          "caller": "onThumbnailDoubleClicked",
+          "callee": "setPositive",
+          "lineNumber": 683
+        },
+        {
+          "caller": "onThumbnailDoubleClicked",
+          "callee": "setImgPath",
+          "lineNumber": 684
+        },
+        {
+          "caller": "onThumbnailDoubleClicked",
+          "callee": "show",
+          "lineNumber": 685
+        },
+        {
+          "caller": "treeView_categoryTree_changed",
+          "callee": "Q_UNUSED",
+          "lineNumber": 690
+        },
+        {
+          "caller": "treeView_categoryTree_changed",
+          "callee": "loadImageList",
+          "lineNumber": 697
+        },
+        {
+          "caller": "treeView_categoryTree_changed",
+          "callee": "count",
+          "lineNumber": 699
+        },
+        {
+          "caller": "treeView_categoryTree_changed",
+          "callee": "setCurrentRow",
+          "lineNumber": 700
+        },
+        {
+          "caller": "iconReady",
+          "callee": "setIcon",
+          "lineNumber": 706
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/src/PictureViewerUtilty.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 203,
+      "nonEmptyLines": 171,
+      "functions": [
+        {
+          "name": "PictureViewerUtilty",
+          "startLine": 10,
+          "endLine": 18,
+          "params": [
+            "parent"
+          ]
+        },
+        {
+          "name": "~PictureViewerUtilty",
+          "startLine": 20,
+          "endLine": 23,
+          "params": []
+        },
+        {
+          "name": "build_ui",
+          "startLine": 25,
+          "endLine": 27,
+          "params": []
+        },
+        {
+          "name": "build_connect",
+          "startLine": 29,
+          "endLine": 39,
+          "params": []
+        },
+        {
+          "name": "showEvent",
+          "startLine": 41,
+          "endLine": 63,
+          "params": [
+            "event"
+          ]
+        },
+        {
+          "name": "setImgPath",
+          "startLine": 65,
+          "endLine": 68,
+          "params": [
+            "imgPath"
+          ]
+        },
+        {
+          "name": "setAllImgPath",
+          "startLine": 70,
+          "endLine": 93,
+          "params": [
+            "imgParentPath",
+            "isPositive"
+          ]
+        },
+        {
+          "name": "setPositive",
+          "startLine": 95,
+          "endLine": 98,
+          "params": []
+        },
+        {
+          "name": "getCurrentImageIndex",
+          "startLine": 100,
+          "endLine": 104,
+          "params": []
+        },
+        {
+          "name": "pbtn_exit_clicked",
+          "startLine": 106,
+          "endLine": 110,
+          "params": []
+        },
+        {
+          "name": "pbtn_previousImage_clicked",
+          "startLine": 112,
+          "endLine": 133,
+          "params": []
+        },
+        {
+          "name": "pbtn_nextImage_clicked",
+          "startLine": 135,
+          "endLine": 161,
+          "params": []
+        },
+        {
+          "name": "pbtn_delete_clicked",
+          "startLine": 163,
+          "endLine": 203,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "PictureViewerUtilty",
+          "line": 10,
+          "isDefault": false
+        },
+        {
+          "name": "~PictureViewerUtilty",
+          "line": 20,
+          "isDefault": false
+        },
+        {
+          "name": "build_ui",
+          "line": 25,
+          "isDefault": false
+        },
+        {
+          "name": "build_connect",
+          "line": 29,
+          "isDefault": false
+        },
+        {
+          "name": "showEvent",
+          "line": 41,
+          "isDefault": false
+        },
+        {
+          "name": "setImgPath",
+          "line": 65,
+          "isDefault": false
+        },
+        {
+          "name": "setAllImgPath",
+          "line": 70,
+          "isDefault": false
+        },
+        {
+          "name": "setPositive",
+          "line": 95,
+          "isDefault": false
+        },
+        {
+          "name": "getCurrentImageIndex",
+          "line": 100,
+          "isDefault": false
+        },
+        {
+          "name": "pbtn_exit_clicked",
+          "line": 106,
+          "isDefault": false
+        },
+        {
+          "name": "pbtn_previousImage_clicked",
+          "line": 112,
+          "isDefault": false
+        },
+        {
+          "name": "pbtn_nextImage_clicked",
+          "line": 135,
+          "isDefault": false
+        },
+        {
+          "name": "pbtn_delete_clicked",
+          "line": 163,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "PictureViewerUtilty",
+          "callee": "setupUi",
+          "lineNumber": 14
+        },
+        {
+          "caller": "PictureViewerUtilty",
+          "callee": "build_ui",
+          "lineNumber": 16
+        },
+        {
+          "caller": "PictureViewerUtilty",
+          "callee": "build_connect",
+          "lineNumber": 17
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 31
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 33
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 35
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 37
+        },
+        {
+          "caller": "showEvent",
+          "callee": "absolutePath",
+          "lineNumber": 44
+        },
+        {
+          "caller": "showEvent",
+          "callee": "dir",
+          "lineNumber": 44
+        },
+        {
+          "caller": "showEvent",
+          "callee": "setAllImgPath",
+          "lineNumber": 47
+        },
+        {
+          "caller": "showEvent",
+          "callee": "getCurrentImageIndex",
+          "lineNumber": 50
+        },
+        {
+          "caller": "showEvent",
+          "callee": "QMainWindow::showEvent",
+          "lineNumber": 52
+        },
+        {
+          "caller": "showEvent",
+          "callee": "isEmpty",
+          "lineNumber": 53
+        },
+        {
+          "caller": "showEvent",
+          "callee": "isNull",
+          "lineNumber": 55
+        },
+        {
+          "caller": "showEvent",
+          "callee": "setPixmap",
+          "lineNumber": 56
+        },
+        {
+          "caller": "showEvent",
+          "callee": "scaled",
+          "lineNumber": 56
+        },
+        {
+          "caller": "showEvent",
+          "callee": "size",
+          "lineNumber": 56
+        },
+        {
+          "caller": "showEvent",
+          "callee": "clear",
+          "lineNumber": 59
+        },
+        {
+          "caller": "showEvent",
+          "callee": "setText",
+          "lineNumber": 60
+        },
+        {
+          "caller": "setAllImgPath",
+          "callee": "entryList",
+          "lineNumber": 81
+        },
+        {
+          "caller": "setAllImgPath",
+          "callee": "entryList",
+          "lineNumber": 86
+        },
+        {
+          "caller": "setAllImgPath",
+          "callee": "std::reverse",
+          "lineNumber": 87
+        },
+        {
+          "caller": "setAllImgPath",
+          "callee": "begin",
+          "lineNumber": 87
+        },
+        {
+          "caller": "setAllImgPath",
+          "callee": "end",
+          "lineNumber": 87
+        },
+        {
+          "caller": "setAllImgPath",
+          "callee": "append",
+          "lineNumber": 91
+        },
+        {
+          "caller": "setAllImgPath",
+          "callee": "absoluteFilePath",
+          "lineNumber": 91
+        },
+        {
+          "caller": "getCurrentImageIndex",
+          "callee": "indexOf",
+          "lineNumber": 102
+        },
+        {
+          "caller": "pbtn_exit_clicked",
+          "callee": "close",
+          "lineNumber": 109
+        },
+        {
+          "caller": "pbtn_previousImage_clicked",
+          "callee": "isEmpty",
+          "lineNumber": 114
+        },
+        {
+          "caller": "pbtn_previousImage_clicked",
+          "callee": "QMessageBox::information",
+          "lineNumber": 116
+        },
+        {
+          "caller": "pbtn_previousImage_clicked",
+          "callee": "isNull",
+          "lineNumber": 125
+        },
+        {
+          "caller": "pbtn_previousImage_clicked",
+          "callee": "setPixmap",
+          "lineNumber": 126
+        },
+        {
+          "caller": "pbtn_previousImage_clicked",
+          "callee": "scaled",
+          "lineNumber": 126
+        },
+        {
+          "caller": "pbtn_previousImage_clicked",
+          "callee": "size",
+          "lineNumber": 126
+        },
+        {
+          "caller": "pbtn_previousImage_clicked",
+          "callee": "clear",
+          "lineNumber": 129
+        },
+        {
+          "caller": "pbtn_previousImage_clicked",
+          "callee": "setText",
+          "lineNumber": 130
+        },
+        {
+          "caller": "pbtn_nextImage_clicked",
+          "callee": "isEmpty",
+          "lineNumber": 137
+        },
+        {
+          "caller": "pbtn_nextImage_clicked",
+          "callee": "size",
+          "lineNumber": 140
+        },
+        {
+          "caller": "pbtn_nextImage_clicked",
+          "callee": "QMessageBox::information",
+          "lineNumber": 142
+        },
+        {
+          "caller": "pbtn_nextImage_clicked",
+          "callee": "isNull",
+          "lineNumber": 153
+        },
+        {
+          "caller": "pbtn_nextImage_clicked",
+          "callee": "setPixmap",
+          "lineNumber": 154
+        },
+        {
+          "caller": "pbtn_nextImage_clicked",
+          "callee": "scaled",
+          "lineNumber": 154
+        },
+        {
+          "caller": "pbtn_nextImage_clicked",
+          "callee": "size",
+          "lineNumber": 154
+        },
+        {
+          "caller": "pbtn_nextImage_clicked",
+          "callee": "clear",
+          "lineNumber": 157
+        },
+        {
+          "caller": "pbtn_nextImage_clicked",
+          "callee": "setText",
+          "lineNumber": 158
+        },
+        {
+          "caller": "pbtn_delete_clicked",
+          "callee": "isEmpty",
+          "lineNumber": 165
+        },
+        {
+          "caller": "pbtn_delete_clicked",
+          "callee": "size",
+          "lineNumber": 165
+        },
+        {
+          "caller": "pbtn_delete_clicked",
+          "callee": "QFile::remove",
+          "lineNumber": 171
+        },
+        {
+          "caller": "pbtn_delete_clicked",
+          "callee": "append",
+          "lineNumber": 173
+        },
+        {
+          "caller": "pbtn_delete_clicked",
+          "callee": "removeAt",
+          "lineNumber": 175
+        },
+        {
+          "caller": "pbtn_delete_clicked",
+          "callee": "isEmpty",
+          "lineNumber": 177
+        },
+        {
+          "caller": "pbtn_delete_clicked",
+          "callee": "clear",
+          "lineNumber": 178
+        },
+        {
+          "caller": "pbtn_delete_clicked",
+          "callee": "clear",
+          "lineNumber": 180
+        },
+        {
+          "caller": "pbtn_delete_clicked",
+          "callee": "setText",
+          "lineNumber": 181
+        },
+        {
+          "caller": "pbtn_delete_clicked",
+          "callee": "size",
+          "lineNumber": 187
+        },
+        {
+          "caller": "pbtn_delete_clicked",
+          "callee": "size",
+          "lineNumber": 188
+        },
+        {
+          "caller": "pbtn_delete_clicked",
+          "callee": "isNull",
+          "lineNumber": 194
+        },
+        {
+          "caller": "pbtn_delete_clicked",
+          "callee": "setPixmap",
+          "lineNumber": 195
+        },
+        {
+          "caller": "pbtn_delete_clicked",
+          "callee": "scaled",
+          "lineNumber": 195
+        },
+        {
+          "caller": "pbtn_delete_clicked",
+          "callee": "size",
+          "lineNumber": 195
+        },
+        {
+          "caller": "pbtn_delete_clicked",
+          "callee": "clear",
+          "lineNumber": 198
+        },
+        {
+          "caller": "pbtn_delete_clicked",
+          "callee": "setText",
+          "lineNumber": 199
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 13,
+        "functionCount": 13,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/src/PunchPress.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 250,
+      "nonEmptyLines": 214,
+      "functions": [
+        {
+          "name": "PunchPress",
+          "startLine": 49,
+          "endLine": 57,
+          "params": [
+            "parent"
+          ]
+        },
+        {
+          "name": "~PunchPress",
+          "startLine": 59,
+          "endLine": 67,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "PunchPress",
+          "line": 49,
+          "isDefault": false
+        },
+        {
+          "name": "~PunchPress",
+          "line": 59,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "PunchPress",
+          "callee": "setupUi",
+          "lineNumber": 53
+        },
+        {
+          "caller": "PunchPress",
+          "callee": "initializeComponents",
+          "lineNumber": 55
+        },
+        {
+          "caller": "~PunchPress",
+          "callee": "destroyComponents",
+          "lineNumber": 62
+        },
+        {
+          "caller": "~PunchPress",
+          "callee": "stop",
+          "lineNumber": 63
+        },
+        {
+          "caller": "~PunchPress",
+          "callee": "Modules::getInstance",
+          "lineNumber": 63
+        },
+        {
+          "caller": "~PunchPress",
+          "callee": "destroy",
+          "lineNumber": 64
+        },
+        {
+          "caller": "~PunchPress",
+          "callee": "Modules::getInstance",
+          "lineNumber": 64
+        },
+        {
+          "caller": "showEvent",
+          "callee": "QMainWindow::showEvent",
+          "lineNumber": 73
+        },
+        {
+          "caller": "showEvent",
+          "callee": "QTimer::singleShot",
+          "lineNumber": 75
+        },
+        {
+          "caller": "showEvent",
+          "callee": "size",
+          "lineNumber": 78
+        },
+        {
+          "caller": "showEvent",
+          "callee": "ensureHalconWindow",
+          "lineNumber": 79
+        },
+        {
+          "caller": "showEvent",
+          "callee": "devicePixelRatioF",
+          "lineNumber": 83
+        },
+        {
+          "caller": "showEvent",
+          "callee": "HalconCpp::SetWindowExtents",
+          "lineNumber": 84
+        },
+        {
+          "caller": "showEvent",
+          "callee": "static_cast<int>",
+          "lineNumber": 85
+        },
+        {
+          "caller": "showEvent",
+          "callee": "std::lround",
+          "lineNumber": 85
+        },
+        {
+          "caller": "showEvent",
+          "callee": "width",
+          "lineNumber": 85
+        },
+        {
+          "caller": "showEvent",
+          "callee": "width",
+          "lineNumber": 85
+        },
+        {
+          "caller": "showEvent",
+          "callee": "static_cast<int>",
+          "lineNumber": 86
+        },
+        {
+          "caller": "showEvent",
+          "callee": "std::lround",
+          "lineNumber": 86
+        },
+        {
+          "caller": "showEvent",
+          "callee": "height",
+          "lineNumber": 86
+        },
+        {
+          "caller": "showEvent",
+          "callee": "height",
+          "lineNumber": 86
+        },
+        {
+          "caller": "showEvent",
+          "callee": "redrawHalconView",
+          "lineNumber": 92
+        },
+        {
+          "caller": "build_ui",
+          "callee": "setAutoExclusive",
+          "lineNumber": 98
+        },
+        {
+          "caller": "build_ui",
+          "callee": "setAutoExclusive",
+          "lineNumber": 99
+        },
+        {
+          "caller": "build_ui",
+          "callee": "build_HalconDisplay",
+          "lineNumber": 100
+        },
+        {
+          "caller": "build_ui",
+          "callee": "build_PunchPressData",
+          "lineNumber": 101
+        },
+        {
+          "caller": "build_HalconDisplay",
+          "callee": "size",
+          "lineNumber": 107
+        },
+        {
+          "caller": "build_HalconDisplay",
+          "callee": "QSize",
+          "lineNumber": 107
+        },
+        {
+          "caller": "build_HalconDisplay",
+          "callee": "parentWidget",
+          "lineNumber": 111
+        },
+        {
+          "caller": "build_HalconDisplay",
+          "callee": "setObjectName",
+          "lineNumber": 112
+        },
+        {
+          "caller": "build_HalconDisplay",
+          "callee": "objectName",
+          "lineNumber": 112
+        },
+        {
+          "caller": "build_HalconDisplay",
+          "callee": "setStyleSheet",
+          "lineNumber": 113
+        },
+        {
+          "caller": "build_HalconDisplay",
+          "callee": "styleSheet",
+          "lineNumber": 113
+        },
+        {
+          "caller": "build_HalconDisplay",
+          "callee": "setSizePolicy",
+          "lineNumber": 114
+        },
+        {
+          "caller": "build_HalconDisplay",
+          "callee": "sizePolicy",
+          "lineNumber": 114
+        },
+        {
+          "caller": "build_HalconDisplay",
+          "callee": "setMinimumSize",
+          "lineNumber": 115
+        },
+        {
+          "caller": "build_HalconDisplay",
+          "callee": "minimumSize",
+          "lineNumber": 115
+        },
+        {
+          "caller": "build_HalconDisplay",
+          "callee": "setMaximumSize",
+          "lineNumber": 116
+        },
+        {
+          "caller": "build_HalconDisplay",
+          "callee": "maximumSize",
+          "lineNumber": 116
+        },
+        {
+          "caller": "build_HalconDisplay",
+          "callee": "setSizePolicy",
+          "lineNumber": 117
+        },
+        {
+          "caller": "build_HalconDisplay",
+          "callee": "setAttribute",
+          "lineNumber": 118
+        },
+        {
+          "caller": "build_HalconDisplay",
+          "callee": "setAttribute",
+          "lineNumber": 119
+        },
+        {
+          "caller": "build_HalconDisplay",
+          "callee": "setFocusPolicy",
+          "lineNumber": 121
+        },
+        {
+          "caller": "build_HalconDisplay",
+          "callee": "installEventFilter",
+          "lineNumber": 122
+        },
+        {
+          "caller": "build_HalconDisplay",
+          "callee": "parentWidget",
+          "lineNumber": 124
+        },
+        {
+          "caller": "build_HalconDisplay",
+          "callee": "layout",
+          "lineNumber": 124
+        },
+        {
+          "caller": "build_HalconDisplay",
+          "callee": "parentWidget",
+          "lineNumber": 124
+        },
+        {
+          "caller": "build_HalconDisplay",
+          "callee": "replaceWidget",
+          "lineNumber": 126
+        },
+        {
+          "caller": "build_HalconDisplay",
+          "callee": "setGeometry",
+          "lineNumber": 130
+        },
+        {
+          "caller": "build_HalconDisplay",
+          "callee": "geometry",
+          "lineNumber": 130
+        },
+        {
+          "caller": "build_HalconDisplay",
+          "callee": "show",
+          "lineNumber": 133
+        },
+        {
+          "caller": "build_HalconDisplay",
+          "callee": "hide",
+          "lineNumber": 134
+        },
+        {
+          "caller": "build_HalconDisplay",
+          "callee": "deleteLater",
+          "lineNumber": 135
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 140
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 141
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 142
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 143
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 145
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 146
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 147
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 148
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 150
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 151
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 153
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 154
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 155
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 156
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 157
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 158
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 160
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 161
+        },
+        {
+          "caller": "build_connect",
+          "callee": "QObject::connect",
+          "lineNumber": 163
+        },
+        {
+          "caller": "build_connect",
+          "callee": "QObject::connect",
+          "lineNumber": 165
+        },
+        {
+          "caller": "build_PunchPressData",
+          "callee": "Modules::getInstance",
+          "lineNumber": 170
+        },
+        {
+          "caller": "build_PunchPressData",
+          "callee": "setChecked",
+          "lineNumber": 172
+        },
+        {
+          "caller": "build_PunchPressData",
+          "callee": "setChecked",
+          "lineNumber": 173
+        },
+        {
+          "caller": "build_PunchPressData",
+          "callee": "setChecked",
+          "lineNumber": 174
+        },
+        {
+          "caller": "build_PunchPressData",
+          "callee": "setChecked",
+          "lineNumber": 175
+        },
+        {
+          "caller": "build_PunchPressData",
+          "callee": "setCurrentIndex",
+          "lineNumber": 176
+        },
+        {
+          "caller": "build_PunchPressData",
+          "callee": "setText",
+          "lineNumber": 177
+        },
+        {
+          "caller": "build_PunchPressData",
+          "callee": "QString::number",
+          "lineNumber": 177
+        },
+        {
+          "caller": "build_PunchPressData",
+          "callee": "setText",
+          "lineNumber": 178
+        },
+        {
+          "caller": "build_PunchPressData",
+          "callee": "QString::number",
+          "lineNumber": 178
+        },
+        {
+          "caller": "build_PunchPressData",
+          "callee": "setText",
+          "lineNumber": 179
+        },
+        {
+          "caller": "build_PunchPressData",
+          "callee": "QString::number",
+          "lineNumber": 179
+        },
+        {
+          "caller": "build_PunchPressData",
+          "callee": "setText",
+          "lineNumber": 180
+        },
+        {
+          "caller": "build_PunchPressData",
+          "callee": "QString::number",
+          "lineNumber": 180
+        },
+        {
+          "caller": "build_PunchPressData",
+          "callee": "ini_clickableTitle",
+          "lineNumber": 182
+        },
+        {
+          "caller": "build_PunchPressData",
+          "callee": "rbtn_removeFunc_checked",
+          "lineNumber": 183
+        },
+        {
+          "caller": "build_PunchPressData",
+          "callee": "setChecked",
+          "lineNumber": 185
+        },
+        {
+          "caller": "ini_clickableTitle",
+          "callee": "layout",
+          "lineNumber": 191
+        },
+        {
+          "caller": "ini_clickableTitle",
+          "callee": "replaceWidget",
+          "lineNumber": 192
+        },
+        {
+          "caller": "ini_clickableTitle",
+          "callee": "setText",
+          "lineNumber": 194
+        },
+        {
+          "caller": "ini_clickableTitle",
+          "callee": "setStyleSheet",
+          "lineNumber": 195
+        },
+        {
+          "caller": "initializeComponents",
+          "callee": "build_ui",
+          "lineNumber": 200
+        },
+        {
+          "caller": "initializeComponents",
+          "callee": "build_DlgModelManager",
+          "lineNumber": 201
+        },
+        {
+          "caller": "initializeComponents",
+          "callee": "getCameraStateAndUpdateUi",
+          "lineNumber": 202
+        },
+        {
+          "caller": "initializeComponents",
+          "callee": "isConnected",
+          "lineNumber": 203
+        },
+        {
+          "caller": "initializeComponents",
+          "callee": "Modules::getInstance",
+          "lineNumber": 203
+        },
+        {
+          "caller": "initializeComponents",
+          "callee": "updateCameraLabelState",
+          "lineNumber": 204
+        },
+        {
+          "caller": "initializeComponents",
+          "callee": "loadCompanyTXT",
+          "lineNumber": 205
+        },
+        {
+          "caller": "initializeComponents",
+          "callee": "build_connect",
+          "lineNumber": 206
+        },
+        {
+          "caller": "destroyComponents",
+          "callee": "closeHalconWindow",
+          "lineNumber": 211
+        },
+        {
+          "caller": "destroyComponents",
+          "callee": "destroy_DlgModelManager",
+          "lineNumber": 212
+        },
+        {
+          "caller": "getCameraStateAndUpdateUi",
+          "callee": "Modules::getInstance",
+          "lineNumber": 217
+        },
+        {
+          "caller": "getCameraStateAndUpdateUi",
+          "callee": "getBuildResults",
+          "lineNumber": 218
+        },
+        {
+          "caller": "getCameraStateAndUpdateUi",
+          "callee": "updateCameraLabelState",
+          "lineNumber": 219
+        },
+        {
+          "caller": "getCameraStateAndUpdateUi",
+          "callee": "updateCameraLabelState",
+          "lineNumber": 220
+        },
+        {
+          "caller": "getCameraStateAndUpdateUi",
+          "callee": "static_cast<int>",
+          "lineNumber": 224
+        },
+        {
+          "caller": "getCameraStateAndUpdateUi",
+          "callee": "updateCameraLabelState",
+          "lineNumber": 225
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 2,
+        "functionCount": 2,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/src/rqw_LabelClickable.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 15,
+      "nonEmptyLines": 14,
+      "functions": [
+        {
+          "name": "mousePressEvent",
+          "startLine": 7,
+          "endLine": 13,
+          "params": [
+            "event"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "mousePressEvent",
+          "line": 7,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "mousePressEvent",
+          "callee": "button",
+          "lineNumber": 9
+        },
+        {
+          "caller": "mousePressEvent",
+          "callee": "QLabel::mousePressEvent",
+          "lineNumber": 12
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/src/rqw_LabelWarning.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 221,
+      "nonEmptyLines": 185,
+      "functions": [
+        {
+          "name": "build_ui",
+          "startLine": 7,
+          "endLine": 12,
+          "params": []
+        },
+        {
+          "name": "build_connect",
+          "startLine": 14,
+          "endLine": 21,
+          "params": []
+        },
+        {
+          "name": "LabelWarning",
+          "startLine": 23,
+          "endLine": 34,
+          "params": [
+            "parent"
+          ]
+        },
+        {
+          "name": "addWarning",
+          "startLine": 36,
+          "endLine": 55,
+          "params": [
+            "message",
+            "redDuration"
+          ]
+        },
+        {
+          "name": "addWarning",
+          "startLine": 57,
+          "endLine": 87,
+          "params": [
+            "message",
+            "updateTimestampIfSame",
+            "redDuration",
+            "time"
+          ]
+        },
+        {
+          "name": "setMaxHistorySize",
+          "startLine": 89,
+          "endLine": 96,
+          "params": [
+            "maxSize"
+          ]
+        },
+        {
+          "name": "getHistory",
+          "startLine": 98,
+          "endLine": 101,
+          "params": []
+        },
+        {
+          "name": "setWarningColor",
+          "startLine": 103,
+          "endLine": 106,
+          "params": [
+            "color"
+          ]
+        },
+        {
+          "name": "setTimeoutColor",
+          "startLine": 108,
+          "endLine": 111,
+          "params": [
+            "color"
+          ]
+        },
+        {
+          "name": "setGrayDuration",
+          "startLine": 113,
+          "endLine": 116,
+          "params": [
+            "duration"
+          ]
+        },
+        {
+          "name": "onTimeoutToGray",
+          "startLine": 118,
+          "endLine": 128,
+          "params": []
+        },
+        {
+          "name": "onTimeoutToBlack",
+          "startLine": 130,
+          "endLine": 138,
+          "params": []
+        },
+        {
+          "name": "labelClicked",
+          "startLine": 140,
+          "endLine": 145,
+          "params": []
+        },
+        {
+          "name": "clearWarningHistory",
+          "startLine": 147,
+          "endLine": 150,
+          "params": []
+        },
+        {
+          "name": "pushWarningList",
+          "startLine": 153,
+          "endLine": 159,
+          "params": [
+            "info"
+          ]
+        },
+        {
+          "name": "popWarningListThreadSafe",
+          "startLine": 161,
+          "endLine": 169,
+          "params": []
+        },
+        {
+          "name": "topWarningListThreadSafe",
+          "startLine": 171,
+          "endLine": 178,
+          "params": []
+        },
+        {
+          "name": "isEmptyWarningListThreadSafe",
+          "startLine": 180,
+          "endLine": 183,
+          "params": []
+        },
+        {
+          "name": "getWarningListThreadSafe",
+          "startLine": 185,
+          "endLine": 188,
+          "params": []
+        },
+        {
+          "name": "clearWarningListThreadSafe",
+          "startLine": 190,
+          "endLine": 193,
+          "params": []
+        },
+        {
+          "name": "pushHistory",
+          "startLine": 196,
+          "endLine": 202,
+          "params": [
+            "info"
+          ]
+        },
+        {
+          "name": "updateLastHistoryTimestamp",
+          "startLine": 204,
+          "endLine": 209,
+          "params": []
+        },
+        {
+          "name": "getHistoryThreadSafe",
+          "startLine": 211,
+          "endLine": 214,
+          "params": []
+        },
+        {
+          "name": "clearHistoryThreadSafe",
+          "startLine": 216,
+          "endLine": 219,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "build_ui",
+          "line": 7,
+          "isDefault": false
+        },
+        {
+          "name": "build_connect",
+          "line": 14,
+          "isDefault": false
+        },
+        {
+          "name": "LabelWarning",
+          "line": 23,
+          "isDefault": false
+        },
+        {
+          "name": "addWarning",
+          "line": 36,
+          "isDefault": false
+        },
+        {
+          "name": "addWarning",
+          "line": 57,
+          "isDefault": false
+        },
+        {
+          "name": "setMaxHistorySize",
+          "line": 89,
+          "isDefault": false
+        },
+        {
+          "name": "getHistory",
+          "line": 98,
+          "isDefault": false
+        },
+        {
+          "name": "setWarningColor",
+          "line": 103,
+          "isDefault": false
+        },
+        {
+          "name": "setTimeoutColor",
+          "line": 108,
+          "isDefault": false
+        },
+        {
+          "name": "setGrayDuration",
+          "line": 113,
+          "isDefault": false
+        },
+        {
+          "name": "onTimeoutToGray",
+          "line": 118,
+          "isDefault": false
+        },
+        {
+          "name": "onTimeoutToBlack",
+          "line": 130,
+          "isDefault": false
+        },
+        {
+          "name": "labelClicked",
+          "line": 140,
+          "isDefault": false
+        },
+        {
+          "name": "clearWarningHistory",
+          "line": 147,
+          "isDefault": false
+        },
+        {
+          "name": "pushWarningList",
+          "line": 153,
+          "isDefault": false
+        },
+        {
+          "name": "popWarningListThreadSafe",
+          "line": 161,
+          "isDefault": false
+        },
+        {
+          "name": "topWarningListThreadSafe",
+          "line": 171,
+          "isDefault": false
+        },
+        {
+          "name": "isEmptyWarningListThreadSafe",
+          "line": 180,
+          "isDefault": false
+        },
+        {
+          "name": "getWarningListThreadSafe",
+          "line": 185,
+          "isDefault": false
+        },
+        {
+          "name": "clearWarningListThreadSafe",
+          "line": 190,
+          "isDefault": false
+        },
+        {
+          "name": "pushHistory",
+          "line": 196,
+          "isDefault": false
+        },
+        {
+          "name": "updateLastHistoryTimestamp",
+          "line": 204,
+          "isDefault": false
+        },
+        {
+          "name": "getHistoryThreadSafe",
+          "line": 211,
+          "isDefault": false
+        },
+        {
+          "name": "clearHistoryThreadSafe",
+          "line": 216,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "build_ui",
+          "callee": "setStyleSheet",
+          "lineNumber": 10
+        },
+        {
+          "caller": "build_ui",
+          "callee": "arg",
+          "lineNumber": 10
+        },
+        {
+          "caller": "build_ui",
+          "callee": "QString",
+          "lineNumber": 10
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 17
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 18
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 19
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 20
+        },
+        {
+          "caller": "LabelWarning",
+          "callee": "build_ui",
+          "lineNumber": 32
+        },
+        {
+          "caller": "LabelWarning",
+          "callee": "build_connect",
+          "lineNumber": 33
+        },
+        {
+          "caller": "addWarning",
+          "callee": "pushHistory",
+          "lineNumber": 39
+        },
+        {
+          "caller": "addWarning",
+          "callee": "setText",
+          "lineNumber": 43
+        },
+        {
+          "caller": "addWarning",
+          "callee": "setStyleSheet",
+          "lineNumber": 46
+        },
+        {
+          "caller": "addWarning",
+          "callee": "arg",
+          "lineNumber": 46
+        },
+        {
+          "caller": "addWarning",
+          "callee": "QString",
+          "lineNumber": 46
+        },
+        {
+          "caller": "addWarning",
+          "callee": "start",
+          "lineNumber": 49
+        },
+        {
+          "caller": "addWarning",
+          "callee": "stop",
+          "lineNumber": 52
+        },
+        {
+          "caller": "addWarning",
+          "callee": "pushWarningList",
+          "lineNumber": 54
+        },
+        {
+          "caller": "addWarning",
+          "callee": "empty",
+          "lineNumber": 59
+        },
+        {
+          "caller": "addWarning",
+          "callee": "QDateTime::currentDateTime",
+          "lineNumber": 61
+        },
+        {
+          "caller": "addWarning",
+          "callee": "rbegin",
+          "lineNumber": 62
+        },
+        {
+          "caller": "addWarning",
+          "callee": "rend",
+          "lineNumber": 62
+        },
+        {
+          "caller": "addWarning",
+          "callee": "msecsTo",
+          "lineNumber": 64
+        },
+        {
+          "caller": "addWarning",
+          "callee": "setText",
+          "lineNumber": 70
+        },
+        {
+          "caller": "addWarning",
+          "callee": "start",
+          "lineNumber": 73
+        },
+        {
+          "caller": "addWarning",
+          "callee": "stop",
+          "lineNumber": 75
+        },
+        {
+          "caller": "addWarning",
+          "callee": "addWarning",
+          "lineNumber": 86
+        },
+        {
+          "caller": "setMaxHistorySize",
+          "callee": "size",
+          "lineNumber": 93
+        },
+        {
+          "caller": "setMaxHistorySize",
+          "callee": "pop_front",
+          "lineNumber": 94
+        },
+        {
+          "caller": "onTimeoutToGray",
+          "callee": "stop",
+          "lineNumber": 121
+        },
+        {
+          "caller": "onTimeoutToGray",
+          "callee": "setStyleSheet",
+          "lineNumber": 124
+        },
+        {
+          "caller": "onTimeoutToGray",
+          "callee": "arg",
+          "lineNumber": 124
+        },
+        {
+          "caller": "onTimeoutToGray",
+          "callee": "QString",
+          "lineNumber": 124
+        },
+        {
+          "caller": "onTimeoutToGray",
+          "callee": "start",
+          "lineNumber": 127
+        },
+        {
+          "caller": "onTimeoutToBlack",
+          "callee": "stop",
+          "lineNumber": 133
+        },
+        {
+          "caller": "onTimeoutToBlack",
+          "callee": "setText",
+          "lineNumber": 136
+        },
+        {
+          "caller": "onTimeoutToBlack",
+          "callee": "setStyleSheet",
+          "lineNumber": 137
+        },
+        {
+          "caller": "labelClicked",
+          "callee": "setWarningHistory",
+          "lineNumber": 142
+        },
+        {
+          "caller": "labelClicked",
+          "callee": "setWindowFlags",
+          "lineNumber": 143
+        },
+        {
+          "caller": "labelClicked",
+          "callee": "show",
+          "lineNumber": 144
+        },
+        {
+          "caller": "clearWarningHistory",
+          "callee": "clear",
+          "lineNumber": 149
+        },
+        {
+          "caller": "pushWarningList",
+          "callee": "push_back",
+          "lineNumber": 155
+        },
+        {
+          "caller": "pushWarningList",
+          "callee": "size",
+          "lineNumber": 156
+        },
+        {
+          "caller": "pushWarningList",
+          "callee": "pop_front",
+          "lineNumber": 157
+        },
+        {
+          "caller": "popWarningListThreadSafe",
+          "callee": "empty",
+          "lineNumber": 163
+        },
+        {
+          "caller": "popWarningListThreadSafe",
+          "callee": "front",
+          "lineNumber": 164
+        },
+        {
+          "caller": "popWarningListThreadSafe",
+          "callee": "pop_front",
+          "lineNumber": 165
+        },
+        {
+          "caller": "popWarningListThreadSafe",
+          "callee": "WarningInfo",
+          "lineNumber": 168
+        },
+        {
+          "caller": "topWarningListThreadSafe",
+          "callee": "empty",
+          "lineNumber": 174
+        },
+        {
+          "caller": "topWarningListThreadSafe",
+          "callee": "front",
+          "lineNumber": 175
+        },
+        {
+          "caller": "topWarningListThreadSafe",
+          "callee": "WarningInfo",
+          "lineNumber": 177
+        },
+        {
+          "caller": "isEmptyWarningListThreadSafe",
+          "callee": "empty",
+          "lineNumber": 182
+        },
+        {
+          "caller": "clearWarningListThreadSafe",
+          "callee": "clear",
+          "lineNumber": 192
+        },
+        {
+          "caller": "pushHistory",
+          "callee": "push_back",
+          "lineNumber": 198
+        },
+        {
+          "caller": "pushHistory",
+          "callee": "size",
+          "lineNumber": 199
+        },
+        {
+          "caller": "pushHistory",
+          "callee": "pop_front",
+          "lineNumber": 200
+        },
+        {
+          "caller": "updateLastHistoryTimestamp",
+          "callee": "empty",
+          "lineNumber": 206
+        },
+        {
+          "caller": "updateLastHistoryTimestamp",
+          "callee": "back",
+          "lineNumber": 207
+        },
+        {
+          "caller": "updateLastHistoryTimestamp",
+          "callee": "QDateTime::currentDateTime",
+          "lineNumber": 207
+        },
+        {
+          "caller": "clearHistoryThreadSafe",
+          "callee": "clear",
+          "lineNumber": 218
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 24,
+        "functionCount": 24,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/src/WarningInfoList.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 56,
+      "nonEmptyLines": 45,
+      "functions": [
+        {
+          "name": "WarningInfoList",
+          "startLine": 4,
+          "endLine": 11,
+          "params": [
+            "parent"
+          ]
+        },
+        {
+          "name": "~WarningInfoList",
+          "startLine": 13,
+          "endLine": 16,
+          "params": []
+        },
+        {
+          "name": "build_ui",
+          "startLine": 18,
+          "endLine": 31,
+          "params": []
+        },
+        {
+          "name": "build_connect",
+          "startLine": 33,
+          "endLine": 37,
+          "params": []
+        },
+        {
+          "name": "setWarningHistory",
+          "startLine": 39,
+          "endLine": 49,
+          "params": [
+            "history"
+          ]
+        },
+        {
+          "name": "onClearWarnings",
+          "startLine": 51,
+          "endLine": 56,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "WarningInfoList",
+          "line": 4,
+          "isDefault": false
+        },
+        {
+          "name": "~WarningInfoList",
+          "line": 13,
+          "isDefault": false
+        },
+        {
+          "name": "build_ui",
+          "line": 18,
+          "isDefault": false
+        },
+        {
+          "name": "build_connect",
+          "line": 33,
+          "isDefault": false
+        },
+        {
+          "name": "setWarningHistory",
+          "line": 39,
+          "isDefault": false
+        },
+        {
+          "name": "onClearWarnings",
+          "line": 51,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "WarningInfoList",
+          "callee": "setupUi",
+          "lineNumber": 7
+        },
+        {
+          "caller": "WarningInfoList",
+          "callee": "build_ui",
+          "lineNumber": 9
+        },
+        {
+          "caller": "WarningInfoList",
+          "callee": "build_connect",
+          "lineNumber": 10
+        },
+        {
+          "caller": "build_ui",
+          "callee": "setModel",
+          "lineNumber": 20
+        },
+        {
+          "caller": "build_ui",
+          "callee": "setColumnCount",
+          "lineNumber": 22
+        },
+        {
+          "caller": "build_ui",
+          "callee": "setHeaderData",
+          "lineNumber": 23
+        },
+        {
+          "caller": "build_ui",
+          "callee": "setHeaderData",
+          "lineNumber": 24
+        },
+        {
+          "caller": "build_ui",
+          "callee": "setSelectionBehavior",
+          "lineNumber": 26
+        },
+        {
+          "caller": "build_ui",
+          "callee": "setEditTriggers",
+          "lineNumber": 27
+        },
+        {
+          "caller": "build_ui",
+          "callee": "setStretchLastSection",
+          "lineNumber": 28
+        },
+        {
+          "caller": "build_ui",
+          "callee": "horizontalHeader",
+          "lineNumber": 28
+        },
+        {
+          "caller": "build_ui",
+          "callee": "setSectionResizeMode",
+          "lineNumber": 29
+        },
+        {
+          "caller": "build_ui",
+          "callee": "horizontalHeader",
+          "lineNumber": 29
+        },
+        {
+          "caller": "build_ui",
+          "callee": "resizeSection",
+          "lineNumber": 30
+        },
+        {
+          "caller": "build_ui",
+          "callee": "horizontalHeader",
+          "lineNumber": 30
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 35
+        },
+        {
+          "caller": "build_connect",
+          "callee": "connect",
+          "lineNumber": 36
+        },
+        {
+          "caller": "setWarningHistory",
+          "callee": "removeRows",
+          "lineNumber": 41
+        },
+        {
+          "caller": "setWarningHistory",
+          "callee": "rowCount",
+          "lineNumber": 41
+        },
+        {
+          "caller": "setWarningHistory",
+          "callee": "append",
+          "lineNumber": 45
+        },
+        {
+          "caller": "setWarningHistory",
+          "callee": "toString",
+          "lineNumber": 45
+        },
+        {
+          "caller": "setWarningHistory",
+          "callee": "append",
+          "lineNumber": 46
+        },
+        {
+          "caller": "setWarningHistory",
+          "callee": "appendRow",
+          "lineNumber": 47
+        },
+        {
+          "caller": "onClearWarnings",
+          "callee": "removeRows",
+          "lineNumber": 53
+        },
+        {
+          "caller": "onClearWarnings",
+          "callee": "rowCount",
+          "lineNumber": 53
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 6,
+        "functionCount": 6,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/src/WarnUtilty.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 8,
+      "nonEmptyLines": 7,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/ui/Dlg_changeshapemodel.ui",
+      "language": "ui",
+      "fileCategory": "code",
+      "totalLines": 695,
+      "nonEmptyLines": 671,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/ui/Dlg_createshapemodel.ui",
+      "language": "ui",
+      "fileCategory": "code",
+      "totalLines": 1760,
+      "nonEmptyLines": 1653,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/ui/Dlg_ImageStitching.ui",
+      "language": "ui",
+      "fileCategory": "code",
+      "totalLines": 1294,
+      "nonEmptyLines": 1251,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/ui/Dlg_jibianjiaozheng.ui",
+      "language": "ui",
+      "fileCategory": "code",
+      "totalLines": 1703,
+      "nonEmptyLines": 1640,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/ui/Dlg_OffSet.ui",
+      "language": "ui",
+      "fileCategory": "code",
+      "totalLines": 1284,
+      "nonEmptyLines": 1216,
+      "metrics": {}
+    }
+  ]
+}

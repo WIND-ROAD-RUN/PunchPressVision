@@ -1,0 +1,836 @@
+{
+  "nodes": [
+    {
+      "id": "file:PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp",
+      "type": "file",
+      "name": "ShapeModeManagerBun.cpp",
+      "filePath": "PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp",
+      "summary": "形状模板管理器业务实现，提供形状模板的创建、删除、重命名、加载、卸载和匹配功能，封装 Halcon ShapeModel 的完整生命周期管理。",
+      "tags": ["business-logic", "shape-model", "halcon", "template-matching", "service"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp:createModel",
+      "type": "function",
+      "name": "createModel",
+      "filePath": "PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp",
+      "lineRange": [10, 88],
+      "summary": "根据图像区域创建形状模板模型，包括 ROI 裁剪、域缩减及模型参数设置，并持久化保存到数据存储。",
+      "tags": ["template-creation", "halcon", "shape-model"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp:deleteModel",
+      "type": "function",
+      "name": "deleteModel",
+      "filePath": "PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp",
+      "lineRange": [90, 111],
+      "summary": "根据 ID 删除指定的形状模板模型，包含模型文件清理和内存释放。",
+      "tags": ["template-management", "cleanup", "shape-model"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp:renameModel",
+      "type": "function",
+      "name": "renameModel",
+      "filePath": "PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp",
+      "lineRange": [113, 132],
+      "summary": "重命名指定 ID 的形状模板模型，更新模型名称并同步持久化。",
+      "tags": ["template-management", "rename", "shape-model"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp:loadModel",
+      "type": "function",
+      "name": "loadModel",
+      "filePath": "PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp",
+      "lineRange": [134, 174],
+      "summary": "加载指定 ID 的形状模板模型到内存，从持久化存储中读取模型文件并激活为当前模型。",
+      "tags": ["template-loading", "halcon", "shape-model"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp:match",
+      "type": "function",
+      "name": "match",
+      "filePath": "PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp",
+      "lineRange": [196, 242],
+      "summary": "在当前加载的模型中执行形状模板匹配，在输入图像中查找目标，返回匹配结果包括位置、角度和得分。",
+      "tags": ["template-matching", "halcon", "vision", "search"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp:searchModels",
+      "type": "function",
+      "name": "searchModels",
+      "filePath": "PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp",
+      "lineRange": [249, 259],
+      "summary": "通过关键字搜索匹配的形状模板模型列表，支持模型检索和过滤。",
+      "tags": ["template-search", "filtering", "shape-model"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:PunchPressVision/Business/ShapeModeManagerBun/test/CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/Business/ShapeModeManagerBun/test/CMakeLists.txt",
+      "summary": "ShapeModeManagerBun 模块测试项目的 CMake 构建配置，生成 Test_bun_ShapeModeManagerBun 可执行文件并链接 bun::ShapeModeManagerBun 库。",
+      "tags": ["build-system", "test", "cmake"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/Business/ShapeModeManagerBun/test/include/ShapeModeManagerBun.t.hpp",
+      "type": "file",
+      "name": "ShapeModeManagerBun.t.hpp",
+      "filePath": "PunchPressVision/Business/ShapeModeManagerBun/test/include/ShapeModeManagerBun.t.hpp",
+      "summary": "ShapeModeManagerBun 模块测试头文件，当前为空桩文件（仅含 pragma once 指令）。",
+      "tags": ["test", "stub", "header"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/Business/ShapeModeManagerBun/test/src/ShapeModeManagerBun.t.cpp",
+      "type": "file",
+      "name": "ShapeModeManagerBun.t.cpp",
+      "filePath": "PunchPressVision/Business/ShapeModeManagerBun/test/src/ShapeModeManagerBun.t.cpp",
+      "summary": "ShapeModeManagerBun 模块测试入口，当前为空桩实现（仅包含返回 0 的 main 函数，测试用例尚未添加）。",
+      "tags": ["test", "stub", "entry-point"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:PunchPressVision/Business/TwoCameraSpliceBun/CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/Business/TwoCameraSpliceBun/CMakeLists.txt",
+      "summary": "TwoCameraSpliceBun 模块的 CMake 构建配置，构建 bun::TwoCameraSpliceBun 静态库，链接 inf::infrastructure 并包含 test 子目录。",
+      "tags": ["build-system", "cmake", "static-library"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/Business/TwoCameraSpliceBun/include/Business/TwoCameraSpliceBun/TwoCameraSpliceBun.hpp",
+      "type": "file",
+      "name": "TwoCameraSpliceBun.hpp",
+      "filePath": "PunchPressVision/Business/TwoCameraSpliceBun/include/Business/TwoCameraSpliceBun/TwoCameraSpliceBun.hpp",
+      "summary": "双相机拼接业务模块头文件，声明 TwoCameraSpliceBun 类，继承 global::IBusiness，提供双相机标定、图像校正和拼接的核心接口。",
+      "tags": ["api-handler", "header", "camera-splice", "calibration"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:PunchPressVision/Business/TwoCameraSpliceBun/include/Business/TwoCameraSpliceBun/TwoCameraSpliceBun.hpp:TwoCameraSpliceBun",
+      "type": "class",
+      "name": "TwoCameraSpliceBun",
+      "filePath": "PunchPressVision/Business/TwoCameraSpliceBun/include/Business/TwoCameraSpliceBun/TwoCameraSpliceBun.hpp",
+      "lineRange": [11, 32],
+      "summary": "双相机拼接业务类，封装双相机标定参数计算、图像校正和拼接逻辑，持有 inf::infrastructure 引用以访问底层模块。",
+      "tags": ["business-logic", "camera-splice", "calibration", "image-stitching"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/Business/TwoCameraSpliceBun/src/TwoCameraSpliceBun.cpp",
+      "type": "file",
+      "name": "TwoCameraSpliceBun.cpp",
+      "filePath": "PunchPressVision/Business/TwoCameraSpliceBun/src/TwoCameraSpliceBun.cpp",
+      "summary": "双相机拼接业务实现，核心包含标定参数计算、图像畸变校正与坐标映射、以及双相机拼接图像的生成逻辑，大量使用 Halcon 标定与几何变换 API。",
+      "tags": ["business-logic", "camera-splice", "halcon", "calibration", "image-stitching"],
+      "complexity": "complex",
+      "languageNotes": "大量使用 Halcon 标定 API（CreateCalibData、FindCalibObject、GenImageToWorldPlaneMap）和齐次变换矩阵进行图像到世界平面的坐标映射。"
+    },
+    {
+      "id": "function:PunchPressVision/Business/TwoCameraSpliceBun/src/TwoCameraSpliceBun.cpp:calculateTwoCameraSpliceConfig",
+      "type": "function",
+      "name": "calculateTwoCameraSpliceConfig",
+      "filePath": "PunchPressVision/Business/TwoCameraSpliceBun/src/TwoCameraSpliceBun.cpp",
+      "lineRange": [10, 31],
+      "summary": "计算双相机拼接配置参数，对输入的两幅图像执行标定流程，生成并保存拼接变换参数。",
+      "tags": ["calibration", "camera-splice", "configuration"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/Business/TwoCameraSpliceBun/src/TwoCameraSpliceBun.cpp:calibImage",
+      "type": "function",
+      "name": "calibImage",
+      "filePath": "PunchPressVision/Business/TwoCameraSpliceBun/src/TwoCameraSpliceBun.cpp",
+      "lineRange": [33, 265],
+      "summary": "执行双相机图像标定的核心函数，包括标定板检测、相机内外参数解析、世界平面映射计算和拼接变换矩阵的求解，是拼接流程中逻辑最复杂的部分。",
+      "tags": ["calibration", "halcon", "coordinate-transform", "vision"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:PunchPressVision/Business/TwoCameraSpliceBun/src/TwoCameraSpliceBun.cpp:pinjieImage",
+      "type": "function",
+      "name": "pinjieImage",
+      "filePath": "PunchPressVision/Business/TwoCameraSpliceBun/src/TwoCameraSpliceBun.cpp",
+      "lineRange": [267, 297],
+      "summary": "执行双相机图像拼接，使用标定参数对两幅图像进行映射变换和拼接，生成最终的拼接图像。",
+      "tags": ["image-stitching", "halcon", "vision", "coordinate-transform"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:PunchPressVision/Business/TwoCameraSpliceBun/test/CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/Business/TwoCameraSpliceBun/test/CMakeLists.txt",
+      "summary": "TwoCameraSpliceBun 模块测试项目的 CMake 构建配置，生成 Test_bun_TwoCameraSpliceBun 可执行文件，当前链接 bun::CameraBun（可能存在配置错误）。",
+      "tags": ["build-system", "test", "cmake"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/Business/TwoCameraSpliceBun/test/include/TwoCameraSpliceBun.t.hpp",
+      "type": "file",
+      "name": "TwoCameraSpliceBun.t.hpp",
+      "filePath": "PunchPressVision/Business/TwoCameraSpliceBun/test/include/TwoCameraSpliceBun.t.hpp",
+      "summary": "TwoCameraSpliceBun 模块测试头文件，当前为空桩文件（仅含 pragma once 指令）。",
+      "tags": ["test", "stub", "header"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/Business/TwoCameraSpliceBun/test/src/TwoCameraSpliceBun.t.cpp",
+      "type": "file",
+      "name": "TwoCameraSpliceBun.t.cpp",
+      "filePath": "PunchPressVision/Business/TwoCameraSpliceBun/test/src/TwoCameraSpliceBun.t.cpp",
+      "summary": "TwoCameraSpliceBun 模块测试入口，当前为空桩实现（仅包含返回 0 的 main 函数，测试用例尚未添加）。",
+      "tags": ["test", "stub", "entry-point"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:PunchPressVision/CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/CMakeLists.txt",
+      "summary": "项目根级 CMake 构建入口，通过 add_subdirectory 按序引入 global、infrastructure、Business、app 和 UI 五个子目录层。",
+      "tags": ["build-system", "entry-point", "cmake"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:PunchPressVision/global/CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/global/CMakeLists.txt",
+      "summary": "global 层的 CMake 构建配置，将 include/ 和 src/ 下所有头文件和源文件编译为 global::global 静态库，提供共享类型和接口定义。",
+      "tags": ["build-system", "cmake", "static-library"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/global/include/global/GlobalInterface.hpp",
+      "type": "file",
+      "name": "GlobalInterface.hpp",
+      "filePath": "PunchPressVision/global/include/global/GlobalInterface.hpp",
+      "summary": "定义 global 层的核心抽象接口，声明 IInfrastructure（build/destroy）和 IBusiness（build/destroy/start/stop）纯虚基类，作为所有基础设施和业务模块的统一契约。",
+      "tags": ["interface", "type-definition", "architecture", "contract"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:PunchPressVision/global/include/global/GlobalInterface.hpp:IInfrastructure",
+      "type": "class",
+      "name": "IInfrastructure",
+      "filePath": "PunchPressVision/global/include/global/GlobalInterface.hpp",
+      "lineRange": [5, 11],
+      "summary": "基础设施层抽象接口，定义 build() 和 destroy() 纯虚方法，所有基础设施模块统一继承此基类。",
+      "tags": ["interface", "architecture", "base-class"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:PunchPressVision/global/include/global/GlobalInterface.hpp:IBusiness",
+      "type": "class",
+      "name": "IBusiness",
+      "filePath": "PunchPressVision/global/include/global/GlobalInterface.hpp",
+      "lineRange": [13, 21],
+      "summary": "业务层抽象接口，定义 build()、destroy()、start() 和 stop() 纯虚方法，所有业务模块统一继承此基类。",
+      "tags": ["interface", "architecture", "base-class"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/global/include/global/GlobalPath.hpp",
+      "type": "file",
+      "name": "GlobalPath.hpp",
+      "filePath": "PunchPressVision/global/include/global/GlobalPath.hpp",
+      "summary": "定义项目运行时数据路径管理，包含根路径常量 ProjectRootPath、路径拼接工具 joinPath，以及 config/model/calib/log 四个子目录路径的内联函数。",
+      "tags": ["utility", "path-management", "configuration"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/global/include/global/GlobalReadiness.hpp",
+      "type": "file",
+      "name": "GlobalReadiness.hpp",
+      "filePath": "PunchPressVision/global/include/global/GlobalReadiness.hpp",
+      "summary": "定义系统就绪性检查数据结构，包含 CalibReadiness（标定就绪标志）和 ProductionReadiness（生产就绪标志），通过 allReady() 方法聚合判断各子系统准备状态。",
+      "tags": ["type-definition", "readiness", "state-management"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:PunchPressVision/global/include/global/GlobalReadiness.hpp:CalibReadiness",
+      "type": "class",
+      "name": "CalibReadiness",
+      "filePath": "PunchPressVision/global/include/global/GlobalReadiness.hpp",
+      "lineRange": [6, 16],
+      "summary": "标定就绪性数据结构，追踪畸变矫正、九点标定和双相机拼接三种标定参数的准备状态，通过 allReady() 聚合判断。",
+      "tags": ["data-model", "readiness", "calibration"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:PunchPressVision/global/include/global/GlobalReadiness.hpp:ProductionReadiness",
+      "type": "class",
+      "name": "ProductionReadiness",
+      "filePath": "PunchPressVision/global/include/global/GlobalReadiness.hpp",
+      "lineRange": [19, 29],
+      "summary": "生产就绪性数据结构，聚合标定就绪性、模型加载状态和 PLC 连接状态，通过 allReady() 判断是否可以进入生产模式。",
+      "tags": ["data-model", "readiness", "production"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/global/include/global/GlobalResult.hpp",
+      "type": "file",
+      "name": "GlobalResult.hpp",
+      "filePath": "PunchPressVision/global/include/global/GlobalResult.hpp",
+      "summary": "定义视觉定位结果数据结构 PositionResult，包含 X/Y 轴偏移量、旋转角度、匹配得分和有效标志，用于模板匹配结果的统一传递。",
+      "tags": ["type-definition", "data-model", "vision-result"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:PunchPressVision/global/include/global/GlobalResult.hpp:PositionResult",
+      "type": "class",
+      "name": "PositionResult",
+      "filePath": "PunchPressVision/global/include/global/GlobalResult.hpp",
+      "lineRange": [6, 13],
+      "summary": "视觉定位结果结构体，以世界坐标偏移量（mm）、旋转角度、匹配得分和有效性标志描述模板匹配的最终结果。",
+      "tags": ["data-model", "vision-result", "positioning"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/global/include/global/GlobalType.hpp",
+      "type": "file",
+      "name": "GlobalType.hpp",
+      "filePath": "PunchPressVision/global/include/global/GlobalType.hpp",
+      "summary": "定义项目全局枚举类型，包括 CameraIndex（相机索引）、RunMode（运行模式：空闲/调试/生产/标定）、TriggerSource（触发源）和 LightState（光源状态）。",
+      "tags": ["type-definition", "enum", "configuration"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/global/src/GlobalInterface.cpp",
+      "type": "file",
+      "name": "GlobalInterface.cpp",
+      "filePath": "PunchPressVision/global/src/GlobalInterface.cpp",
+      "summary": "GlobalInterface 模块的源文件，当前为空实现（仅存在空白命名空间，纯虚接口无需在此实现）。",
+      "tags": ["stub", "source-file"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/global/src/GlobalPath.cpp",
+      "type": "file",
+      "name": "GlobalPath.cpp",
+      "filePath": "PunchPressVision/global/src/GlobalPath.cpp",
+      "summary": "GlobalPath 模块的源文件，当前为空实现（路径常量与工具函数已在头文件中以内联方式定义）。",
+      "tags": ["stub", "source-file"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/global/src/GlobalType.cpp",
+      "type": "file",
+      "name": "GlobalType.cpp",
+      "filePath": "PunchPressVision/global/src/GlobalType.cpp",
+      "summary": "GlobalType 模块的源文件，当前为空实现（枚举类型仅需头文件声明，无额外实现逻辑）。",
+      "tags": ["stub", "source-file"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:PunchPressVision/infrastructure/CalibConfigModule/CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/infrastructure/CalibConfigModule/CMakeLists.txt",
+      "summary": "CalibConfigModule 基础设施模块的 CMake 构建配置，构建 inf::CalibConfigModule 静态库，链接 global::global 和 Halcon 库。",
+      "tags": ["build-system", "cmake", "static-library"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/CalibConfigModule.hpp",
+      "type": "file",
+      "name": "CalibConfigModule.hpp",
+      "filePath": "PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/CalibConfigModule.hpp",
+      "summary": "标定配置模块头文件，声明 CalibConfigModule 类，继承 global::IInfrastructure，管理标定配置数据的构建、销毁和持久化保存。",
+      "tags": ["api-handler", "header", "calibration", "configuration"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/CalibConfigModule.hpp:CalibConfigModule",
+      "type": "class",
+      "name": "CalibConfigModule",
+      "filePath": "PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/CalibConfigModule.hpp",
+      "lineRange": [8, 17],
+      "summary": "标定配置管理类，继承 IInfrastructure 接口，持有 CalibConfig 配置对象并提供 build/destroy/save 生命周期方法。",
+      "tags": ["infrastructure", "calibration", "configuration", "service"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/CalibConfigModulePath.hpp",
+      "type": "file",
+      "name": "CalibConfigModulePath.hpp",
+      "filePath": "PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/CalibConfigModulePath.hpp",
+      "summary": "定义 CalibConfigModule 的文件系统路径常量，基于 global::ProjectRootPath 拼接 CalibConfigModule 子目录路径。",
+      "tags": ["path-management", "configuration", "utility"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/CalibConfigModuleTypes.hpp",
+      "type": "file",
+      "name": "CalibConfigModuleTypes.hpp",
+      "filePath": "PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/CalibConfigModuleTypes.hpp",
+      "summary": "CalibConfigModule 的类型定义头文件，当前为空（命名空间已预留，类型定义尚未添加）。",
+      "tags": ["stub", "type-definition", "header"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/Config/CalibConfig.hpp",
+      "type": "file",
+      "name": "CalibConfig.hpp",
+      "filePath": "PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/Config/CalibConfig.hpp",
+      "summary": "标定配置数据结构头文件，定义 CalibConfig 类，封装 Halcon 相机内外参数、标定板描述路径、曝光/增益设置及标定误差等配置数据。",
+      "tags": ["data-model", "configuration", "halcon", "calibration"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/Config/CalibConfig.hpp:CalibConfig",
+      "type": "class",
+      "name": "CalibConfig",
+      "filePath": "PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/Config/CalibConfig.hpp",
+      "lineRange": [7, 30],
+      "summary": "标定配置数据类，封装相机内参（cameraParameters）、外参（cameraPose）、标定板描述、曝光增益以及从文件目录加载/保存配置的序列化方法。",
+      "tags": ["data-model", "configuration", "halcon", "calibration", "serialization"],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp",
+      "target": "function:PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp:createModel",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp",
+      "target": "function:PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp:deleteModel",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp",
+      "target": "function:PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp:renameModel",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp",
+      "target": "function:PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp:loadModel",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp",
+      "target": "function:PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp:match",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp",
+      "target": "function:PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp:searchModels",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp",
+      "target": "function:PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp:createModel",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp",
+      "target": "function:PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp:deleteModel",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp",
+      "target": "function:PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp:renameModel",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp",
+      "target": "function:PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp:loadModel",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp",
+      "target": "function:PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp:match",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp",
+      "target": "function:PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp:searchModels",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "document:PunchPressVision/Business/ShapeModeManagerBun/test/CMakeLists.txt",
+      "target": "file:PunchPressVision/Business/ShapeModeManagerBun/test/include/ShapeModeManagerBun.t.hpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/Business/ShapeModeManagerBun/test/CMakeLists.txt",
+      "target": "file:PunchPressVision/Business/ShapeModeManagerBun/test/src/ShapeModeManagerBun.t.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp",
+      "target": "file:PunchPressVision/Business/ShapeModeManagerBun/test/src/ShapeModeManagerBun.t.cpp",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:PunchPressVision/Business/TwoCameraSpliceBun/include/Business/TwoCameraSpliceBun/TwoCameraSpliceBun.hpp",
+      "target": "class:PunchPressVision/Business/TwoCameraSpliceBun/include/Business/TwoCameraSpliceBun/TwoCameraSpliceBun.hpp:TwoCameraSpliceBun",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/Business/TwoCameraSpliceBun/include/Business/TwoCameraSpliceBun/TwoCameraSpliceBun.hpp",
+      "target": "class:PunchPressVision/Business/TwoCameraSpliceBun/include/Business/TwoCameraSpliceBun/TwoCameraSpliceBun.hpp:TwoCameraSpliceBun",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/Business/TwoCameraSpliceBun/src/TwoCameraSpliceBun.cpp",
+      "target": "function:PunchPressVision/Business/TwoCameraSpliceBun/src/TwoCameraSpliceBun.cpp:calculateTwoCameraSpliceConfig",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/Business/TwoCameraSpliceBun/src/TwoCameraSpliceBun.cpp",
+      "target": "function:PunchPressVision/Business/TwoCameraSpliceBun/src/TwoCameraSpliceBun.cpp:calibImage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/Business/TwoCameraSpliceBun/src/TwoCameraSpliceBun.cpp",
+      "target": "function:PunchPressVision/Business/TwoCameraSpliceBun/src/TwoCameraSpliceBun.cpp:pinjieImage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/Business/TwoCameraSpliceBun/src/TwoCameraSpliceBun.cpp",
+      "target": "function:PunchPressVision/Business/TwoCameraSpliceBun/src/TwoCameraSpliceBun.cpp:calculateTwoCameraSpliceConfig",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/Business/TwoCameraSpliceBun/src/TwoCameraSpliceBun.cpp",
+      "target": "function:PunchPressVision/Business/TwoCameraSpliceBun/src/TwoCameraSpliceBun.cpp:calibImage",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/Business/TwoCameraSpliceBun/src/TwoCameraSpliceBun.cpp",
+      "target": "function:PunchPressVision/Business/TwoCameraSpliceBun/src/TwoCameraSpliceBun.cpp:pinjieImage",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "class:PunchPressVision/Business/TwoCameraSpliceBun/include/Business/TwoCameraSpliceBun/TwoCameraSpliceBun.hpp:TwoCameraSpliceBun",
+      "target": "class:PunchPressVision/global/include/global/GlobalInterface.hpp:IBusiness",
+      "type": "inherits",
+      "direction": "forward",
+      "weight": 0.9
+    },
+    {
+      "source": "file:PunchPressVision/Business/TwoCameraSpliceBun/include/Business/TwoCameraSpliceBun/TwoCameraSpliceBun.hpp",
+      "target": "file:PunchPressVision/global/include/global/GlobalInterface.hpp",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/Business/TwoCameraSpliceBun/include/Business/TwoCameraSpliceBun/TwoCameraSpliceBun.hpp",
+      "target": "file:PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/Config/CalibConfig.hpp",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/Business/TwoCameraSpliceBun/CMakeLists.txt",
+      "target": "file:PunchPressVision/Business/TwoCameraSpliceBun/include/Business/TwoCameraSpliceBun/TwoCameraSpliceBun.hpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/Business/TwoCameraSpliceBun/CMakeLists.txt",
+      "target": "file:PunchPressVision/Business/TwoCameraSpliceBun/src/TwoCameraSpliceBun.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/Business/TwoCameraSpliceBun/test/CMakeLists.txt",
+      "target": "file:PunchPressVision/Business/TwoCameraSpliceBun/test/include/TwoCameraSpliceBun.t.hpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/Business/TwoCameraSpliceBun/test/CMakeLists.txt",
+      "target": "file:PunchPressVision/Business/TwoCameraSpliceBun/test/src/TwoCameraSpliceBun.t.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/Business/TwoCameraSpliceBun/src/TwoCameraSpliceBun.cpp",
+      "target": "file:PunchPressVision/Business/TwoCameraSpliceBun/test/src/TwoCameraSpliceBun.t.cpp",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:PunchPressVision/CMakeLists.txt",
+      "target": "document:PunchPressVision/global/CMakeLists.txt",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/global/CMakeLists.txt",
+      "target": "file:PunchPressVision/global/include/global/GlobalInterface.hpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/global/CMakeLists.txt",
+      "target": "file:PunchPressVision/global/include/global/GlobalPath.hpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/global/CMakeLists.txt",
+      "target": "file:PunchPressVision/global/include/global/GlobalReadiness.hpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/global/CMakeLists.txt",
+      "target": "file:PunchPressVision/global/include/global/GlobalResult.hpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/global/CMakeLists.txt",
+      "target": "file:PunchPressVision/global/include/global/GlobalType.hpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/global/CMakeLists.txt",
+      "target": "file:PunchPressVision/global/src/GlobalInterface.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/global/CMakeLists.txt",
+      "target": "file:PunchPressVision/global/src/GlobalPath.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/global/CMakeLists.txt",
+      "target": "file:PunchPressVision/global/src/GlobalType.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/global/include/global/GlobalInterface.hpp",
+      "target": "class:PunchPressVision/global/include/global/GlobalInterface.hpp:IInfrastructure",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/global/include/global/GlobalInterface.hpp",
+      "target": "class:PunchPressVision/global/include/global/GlobalInterface.hpp:IBusiness",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/global/include/global/GlobalInterface.hpp",
+      "target": "class:PunchPressVision/global/include/global/GlobalInterface.hpp:IInfrastructure",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/global/include/global/GlobalInterface.hpp",
+      "target": "class:PunchPressVision/global/include/global/GlobalInterface.hpp:IBusiness",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/global/include/global/GlobalReadiness.hpp",
+      "target": "class:PunchPressVision/global/include/global/GlobalReadiness.hpp:CalibReadiness",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/global/include/global/GlobalReadiness.hpp",
+      "target": "class:PunchPressVision/global/include/global/GlobalReadiness.hpp:ProductionReadiness",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/global/include/global/GlobalReadiness.hpp",
+      "target": "class:PunchPressVision/global/include/global/GlobalReadiness.hpp:CalibReadiness",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/global/include/global/GlobalReadiness.hpp",
+      "target": "class:PunchPressVision/global/include/global/GlobalReadiness.hpp:ProductionReadiness",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/global/include/global/GlobalResult.hpp",
+      "target": "class:PunchPressVision/global/include/global/GlobalResult.hpp:PositionResult",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/global/include/global/GlobalResult.hpp",
+      "target": "class:PunchPressVision/global/include/global/GlobalResult.hpp:PositionResult",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/CalibConfigModule.hpp",
+      "target": "class:PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/CalibConfigModule.hpp:CalibConfigModule",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/CalibConfigModule.hpp",
+      "target": "class:PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/CalibConfigModule.hpp:CalibConfigModule",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "class:PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/CalibConfigModule.hpp:CalibConfigModule",
+      "target": "class:PunchPressVision/global/include/global/GlobalInterface.hpp:IInfrastructure",
+      "type": "inherits",
+      "direction": "forward",
+      "weight": 0.9
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/CalibConfigModule.hpp",
+      "target": "file:PunchPressVision/global/include/global/GlobalInterface.hpp",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/CalibConfigModule.hpp",
+      "target": "file:PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/Config/CalibConfig.hpp",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/CalibConfigModulePath.hpp",
+      "target": "file:PunchPressVision/global/include/global/GlobalPath.hpp",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/infrastructure/CalibConfigModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/CalibConfigModule.hpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/infrastructure/CalibConfigModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/CalibConfigModulePath.hpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/infrastructure/CalibConfigModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/CalibConfigModuleTypes.hpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/infrastructure/CalibConfigModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/Config/CalibConfig.hpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/Config/CalibConfig.hpp",
+      "target": "class:PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/Config/CalibConfig.hpp:CalibConfig",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/Config/CalibConfig.hpp",
+      "target": "class:PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/Config/CalibConfig.hpp:CalibConfig",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "fixedSectionOk": true,
+  "nodesRecovered": 0,
+  "edgesRestored": 0,
+  "crossBatchEdgesAdded": 0,
+  "typesRemapped": 0,
+  "complexityRemapped": 0,
+  "notes": [
+    "Fixed section clean: 42 duplicate node IDs (8.2% of input) removed — well within normal range. 22 tested_by edges dropped per merge logic. No systemic prefix pattern suggests well-normalized LLM output across batches.",
+    "Could not fix: no items outstanding — no missing IDs, no unknown complexity values, no dangling edges. All 469 nodes have complete required fields.",
+    "Node types present: file (199), function (163), class (52), document (38), config (17). 'document' type covers CMakeLists.txt, CLAUDE.md, and build config files — a valid extension type, not unknown. 'config' type covers JSON/configuration files. No type remapping needed.",
+    "Cross-batch import edge verification: all 5 import map edges (from 4 non-empty entries out of 268 scanned) are already present in the assembled graph with correct source, target, weight=0.7, and direction=forward. Zero edges needed adding.",
+    "Minor inconsistency noted: 5 CMakeLists.txt nodes typed as 'file' instead of 'document' (majority are 'document'). Both types are valid; this is a cosmetic LLM classification variance, not a correctness issue.",
+    "4 disconnected config nodes (temp analyzer input files) have flawed paths (missing directory separators) and zero edges — harmless noise, no impact on graph traversal.",
+    "Edge count delta (752 input -> 683 output, net -69): 22 tested_by drops + ~47 edge deduplications from source/target normalization after node merging. Expected behavior."
+  ]
+}

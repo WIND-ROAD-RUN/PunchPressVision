@@ -1,0 +1,123 @@
+{
+  "nodes": [
+    {
+      "id": "document:CLAUDE.md",
+      "type": "document",
+      "name": "CLAUDE.md",
+      "filePath": "CLAUDE.md",
+      "summary": "PunchPressVision 项目的 AI 编码助手指导文档，涵盖项目概述、构建系统（CMake+vcpkg+Ninja）、四层架构（UI/Business/infrastructure/global）、模块规范、配置系统（OSO）、相机与视觉流程、主要依赖及开发注意事项。",
+      "tags": ["documentation", "architecture", "build-system", "coding-guide", "project-overview"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "CMakeLists.txt",
+      "summary": "项目根 CMake 构建入口文件，定义项目名称、C++17 标准、vcpkg 清单集成及子目录（global/infrastructure/Business/UI/App）的构建顺序。",
+      "tags": ["build-system", "cmake", "entry-point", "project-configuration"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:CMakePresets.json",
+      "type": "config",
+      "name": "CMakePresets.json",
+      "filePath": "CMakePresets.json",
+      "summary": "CMake 预设配置文件，定义 user-ninja-debug 配置预设（含 Ninja 生成器、MSVC 工具链、SDK 缓存变量）及对应的构建与测试预设，支持通过 CMakeUserPresets.json 覆盖本地路径。",
+      "tags": ["configuration", "cmake", "build-system", "presets"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:D:WorkplacerepPunchPressVision.understand-anythingtmpua-file-analyzer-input-1.json",
+      "type": "config",
+      "name": "ua-file-analyzer-input-1.json",
+      "filePath": "D:WorkplacerepPunchPressVision.understand-anythingtmpua-file-analyzer-input-1.json",
+      "summary": "Understand-Anything 管道的临时批处理输入文件，包含第 1 批次四个 UI 头文件的分析配置及导入映射数据。",
+      "tags": ["configuration", "pipeline-artifact", "temporary"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:D:WorkplacerepPunchPressVision.understand-anythingtmpua-file-analyzer-input-2.json",
+      "type": "config",
+      "name": "ua-file-analyzer-input-2.json",
+      "filePath": "D:WorkplacerepPunchPressVision.understand-anythingtmpua-file-analyzer-input-2.json",
+      "summary": "Understand-Anything 管道的临时批处理输入文件，包含第 2 批次五个项目根文件（CLAUDE.md、CMakeLists.txt、CMakePresets.json、vcpkg-configuration.json、vcpkg.json）的分析配置及导入映射数据。",
+      "tags": ["configuration", "pipeline-artifact", "temporary"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:D:WorkplacerepPunchPressVision.understand-anythingtmpua-file-analyzer-input-6.json",
+      "type": "config",
+      "name": "ua-file-analyzer-input-6.json",
+      "filePath": "D:WorkplacerepPunchPressVision.understand-anythingtmpua-file-analyzer-input-6.json",
+      "summary": "Understand-Anything 管道的临时批处理输入文件，包含第 6 批次 25 个基础设施层源文件（CalibConfigModule、CameraModule、ConfigModule）的分析配置及导入映射数据。",
+      "tags": ["configuration", "pipeline-artifact", "temporary"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:D:WorkplacerepPunchPressVision.understand-anythingtmpua-file-analyzer-input-7.json",
+      "type": "config",
+      "name": "ua-file-analyzer-input-7.json",
+      "filePath": "D:WorkplacerepPunchPressVision.understand-anythingtmpua-file-analyzer-input-7.json",
+      "summary": "Understand-Anything 管道的临时批处理输入文件，包含第 7 批次 25 个基础设施层源文件（ConfigModule、ControlModule、infrastructure 聚合模块、LightIOModule）的分析配置及导入映射数据。",
+      "tags": ["configuration", "pipeline-artifact", "temporary"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:vcpkg-configuration.json",
+      "type": "config",
+      "name": "vcpkg-configuration.json",
+      "filePath": "vcpkg-configuration.json",
+      "summary": "vcpkg 注册表配置文件，声明默认注册表为 Microsoft 官方 vcpkg 注册表（https://github.com/microsoft/vcpkg），用于解析 vcpkg.json 清单中声明的所有依赖包。",
+      "tags": ["configuration", "vcpkg", "package-management", "build-system"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:vcpkg.json",
+      "type": "config",
+      "name": "vcpkg.json",
+      "filePath": "vcpkg.json",
+      "summary": "vcpkg 清单文件，声明项目名称为 punchpressvision、版本 0.1.0，列出 22 个 C++ 依赖包（Qt6、OpenCV、Halcon、jsoncpp、sqlite3、gtest、spdlog、libmodbus、libzip 等）及 36 个版本覆盖项，管理所有第三方库的版本与平台约束。",
+      "tags": ["configuration", "vcpkg", "package-management", "dependencies", "build-system"],
+      "complexity": "moderate",
+      "languageNotes": "使用 vcpkg 清单模式（manifest mode）声明依赖，含 overrides 数组精确控制依赖版本，platform 字段限定 Windows x64 平台。"
+    }
+  ],
+  "edges": [
+    {
+      "source": "document:CLAUDE.md",
+      "target": "document:CMakeLists.txt",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:CLAUDE.md",
+      "target": "config:vcpkg.json",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:CMakePresets.json",
+      "target": "document:CMakeLists.txt",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:vcpkg.json",
+      "target": "document:CMakeLists.txt",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:vcpkg-configuration.json",
+      "target": "config:vcpkg.json",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    }
+  ]
+}

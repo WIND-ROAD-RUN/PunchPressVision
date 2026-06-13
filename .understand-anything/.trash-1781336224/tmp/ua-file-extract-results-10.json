@@ -1,0 +1,2985 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 25,
+  "filesSkipped": [],
+  "results": [
+    {
+      "path": "PunchPressVision/infrastructure/LightIOModule/test/src/LightIOModule.t.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 6,
+      "nonEmptyLines": 5,
+      "functions": [
+        {
+          "name": "main",
+          "startLine": 3,
+          "endLine": 6,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "main",
+          "line": 3,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/infrastructure/NinePointModule/CMakeLists.txt",
+      "language": "txt",
+      "fileCategory": "docs",
+      "totalLines": 33,
+      "nonEmptyLines": 26,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/Config/NinePointConfig.hpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 32,
+      "nonEmptyLines": 27,
+      "classes": [
+        {
+          "name": "NinePointCfg",
+          "startLine": 6,
+          "endLine": 31,
+          "methods": [
+            "saveInDir",
+            "loadInDir"
+          ],
+          "properties": [
+            "MeasureLength1",
+            "MeasureLength2",
+            "MeasureThreshold",
+            "num_Measure",
+            "outHomMat2D",
+            "xnumber",
+            "ynumber",
+            "distance",
+            "scale",
+            "xdiantance",
+            "ydistance"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "saveInDir",
+          "line": 27,
+          "isDefault": false
+        },
+        {
+          "name": "loadInDir",
+          "line": 28,
+          "isDefault": false
+        },
+        {
+          "name": "NinePointCfg",
+          "line": 6,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 3,
+        "functionCount": 0,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/NinePointModule.hpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 18,
+      "nonEmptyLines": 16,
+      "classes": [
+        {
+          "name": "NinePointModule",
+          "startLine": 8,
+          "endLine": 17,
+          "methods": [
+            "build",
+            "destroy",
+            "save"
+          ],
+          "properties": [
+            "ninePointConfig"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "build",
+          "line": 14,
+          "isDefault": false
+        },
+        {
+          "name": "destroy",
+          "line": 15,
+          "isDefault": false
+        },
+        {
+          "name": "save",
+          "line": 16,
+          "isDefault": false
+        },
+        {
+          "name": "NinePointModule",
+          "line": 8,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 4,
+        "functionCount": 0,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/NinePointModulePath.hpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 11,
+      "nonEmptyLines": 9,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/NinePointModuleTypes.hpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 6,
+      "nonEmptyLines": 4,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 180,
+      "nonEmptyLines": 169,
+      "functions": [
+        {
+          "name": "trimCr",
+          "startLine": 16,
+          "endLine": 21,
+          "params": [
+            "s"
+          ]
+        },
+        {
+          "name": "replaceFile",
+          "startLine": 23,
+          "endLine": 31,
+          "params": [
+            "tmp",
+            "target"
+          ]
+        },
+        {
+          "name": "writeTupleSafe",
+          "startLine": 33,
+          "endLine": 40,
+          "params": [
+            "filePath",
+            "tuple"
+          ]
+        },
+        {
+          "name": "readTupleSafe",
+          "startLine": 42,
+          "endLine": 55,
+          "params": [
+            "filePath",
+            "tuple"
+          ]
+        },
+        {
+          "name": "writeParamsSafe",
+          "startLine": 57,
+          "endLine": 81,
+          "params": [
+            "filePath",
+            "measureLength1",
+            "measureLength2",
+            "measureThreshold",
+            "numMeasure",
+            "xNumber",
+            "yNumber",
+            "distanceVal",
+            "scaleVal",
+            "xDiantance",
+            "yDistance"
+          ]
+        },
+        {
+          "name": "readParamsSafe",
+          "startLine": 83,
+          "endLine": 134,
+          "params": [
+            "filePath",
+            "measureLength1",
+            "measureLength2",
+            "measureThreshold",
+            "numMeasure",
+            "xNumber",
+            "yNumber",
+            "distanceVal",
+            "scaleVal",
+            "xDiantance",
+            "yDistance"
+          ]
+        },
+        {
+          "name": "saveInDir",
+          "startLine": 137,
+          "endLine": 152,
+          "params": [
+            "dirPath"
+          ]
+        },
+        {
+          "name": "loadInDir",
+          "startLine": 154,
+          "endLine": 179,
+          "params": [
+            "dirPath"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "trimCr",
+          "line": 16,
+          "isDefault": false
+        },
+        {
+          "name": "replaceFile",
+          "line": 23,
+          "isDefault": false
+        },
+        {
+          "name": "writeTupleSafe",
+          "line": 33,
+          "isDefault": false
+        },
+        {
+          "name": "readTupleSafe",
+          "line": 42,
+          "isDefault": false
+        },
+        {
+          "name": "writeParamsSafe",
+          "line": 57,
+          "isDefault": false
+        },
+        {
+          "name": "readParamsSafe",
+          "line": 83,
+          "isDefault": false
+        },
+        {
+          "name": "saveInDir",
+          "line": 137,
+          "isDefault": false
+        },
+        {
+          "name": "loadInDir",
+          "line": 154,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "trimCr",
+          "callee": "empty",
+          "lineNumber": 18
+        },
+        {
+          "caller": "trimCr",
+          "callee": "back",
+          "lineNumber": 18
+        },
+        {
+          "caller": "trimCr",
+          "callee": "substr",
+          "lineNumber": 19
+        },
+        {
+          "caller": "trimCr",
+          "callee": "size",
+          "lineNumber": 19
+        },
+        {
+          "caller": "replaceFile",
+          "callee": "fs::exists",
+          "lineNumber": 25
+        },
+        {
+          "caller": "replaceFile",
+          "callee": "fs::remove",
+          "lineNumber": 27
+        },
+        {
+          "caller": "replaceFile",
+          "callee": "fs::rename",
+          "lineNumber": 30
+        },
+        {
+          "caller": "writeTupleSafe",
+          "callee": "fs::create_directories",
+          "lineNumber": 35
+        },
+        {
+          "caller": "writeTupleSafe",
+          "callee": "parent_path",
+          "lineNumber": 35
+        },
+        {
+          "caller": "writeTupleSafe",
+          "callee": "HalconCpp::WriteTuple",
+          "lineNumber": 38
+        },
+        {
+          "caller": "writeTupleSafe",
+          "callee": "c_str",
+          "lineNumber": 38
+        },
+        {
+          "caller": "writeTupleSafe",
+          "callee": "string",
+          "lineNumber": 38
+        },
+        {
+          "caller": "writeTupleSafe",
+          "callee": "replaceFile",
+          "lineNumber": 39
+        },
+        {
+          "caller": "readTupleSafe",
+          "callee": "fs::exists",
+          "lineNumber": 44
+        },
+        {
+          "caller": "readTupleSafe",
+          "callee": "HalconCpp::ReadTuple",
+          "lineNumber": 48
+        },
+        {
+          "caller": "readTupleSafe",
+          "callee": "c_str",
+          "lineNumber": 48
+        },
+        {
+          "caller": "readTupleSafe",
+          "callee": "string",
+          "lineNumber": 48
+        },
+        {
+          "caller": "writeParamsSafe",
+          "callee": "fs::create_directories",
+          "lineNumber": 63
+        },
+        {
+          "caller": "writeParamsSafe",
+          "callee": "parent_path",
+          "lineNumber": 63
+        },
+        {
+          "caller": "writeParamsSafe",
+          "callee": "close",
+          "lineNumber": 79
+        },
+        {
+          "caller": "writeParamsSafe",
+          "callee": "replaceFile",
+          "lineNumber": 80
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "fs::exists",
+          "lineNumber": 89
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::getline",
+          "lineNumber": 95
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "trimCr",
+          "lineNumber": 97
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "empty",
+          "lineNumber": 98
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "front",
+          "lineNumber": 98
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "find",
+          "lineNumber": 100
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "substr",
+          "lineNumber": 103
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "substr",
+          "lineNumber": 104
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stod",
+          "lineNumber": 108
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stod",
+          "lineNumber": 110
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stod",
+          "lineNumber": 112
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stod",
+          "lineNumber": 114
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stoi",
+          "lineNumber": 116
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stoi",
+          "lineNumber": 118
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stod",
+          "lineNumber": 120
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stod",
+          "lineNumber": 122
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stoi",
+          "lineNumber": 124
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stoi",
+          "lineNumber": 126
+        },
+        {
+          "caller": "saveInDir",
+          "callee": "writeTupleSafe",
+          "lineNumber": 142
+        },
+        {
+          "caller": "saveInDir",
+          "callee": "writeParamsSafe",
+          "lineNumber": 143
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "readTupleSafe",
+          "lineNumber": 169
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "readParamsSafe",
+          "lineNumber": 170
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 8,
+        "functionCount": 8,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/infrastructure/NinePointModule/src/NinePointModule.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 21,
+      "nonEmptyLines": 17,
+      "functions": [
+        {
+          "name": "build",
+          "startLine": 7,
+          "endLine": 10,
+          "params": []
+        },
+        {
+          "name": "destroy",
+          "startLine": 12,
+          "endLine": 15,
+          "params": []
+        },
+        {
+          "name": "save",
+          "startLine": 17,
+          "endLine": 20,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "build",
+          "line": 7,
+          "isDefault": false
+        },
+        {
+          "name": "destroy",
+          "line": 12,
+          "isDefault": false
+        },
+        {
+          "name": "save",
+          "line": 17,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "build",
+          "callee": "loadInDir",
+          "lineNumber": 9
+        },
+        {
+          "caller": "destroy",
+          "callee": "save",
+          "lineNumber": 14
+        },
+        {
+          "caller": "save",
+          "callee": "saveInDir",
+          "lineNumber": 19
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 3,
+        "functionCount": 3,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/infrastructure/NinePointModule/src/NinePointModulePath.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 1,
+      "nonEmptyLines": 1,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/infrastructure/NinePointModule/src/NinePointModuleTypes.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 6,
+      "nonEmptyLines": 4,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/infrastructure/NinePointModule/test/CMakeLists.txt",
+      "language": "txt",
+      "fileCategory": "docs",
+      "totalLines": 23,
+      "nonEmptyLines": 17,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/infrastructure/NinePointModule/test/include/NinePointModule.t.hpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 2,
+      "nonEmptyLines": 1,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/infrastructure/NinePointModule/test/src/NinePointModule.t.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 7,
+      "nonEmptyLines": 5,
+      "functions": [
+        {
+          "name": "main",
+          "startLine": 3,
+          "endLine": 7,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "main",
+          "line": 3,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/infrastructure/ShapeModelManagerModule/CMakeLists.txt",
+      "language": "txt",
+      "fileCategory": "docs",
+      "totalLines": 35,
+      "nonEmptyLines": 28,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/Config/ShapeModelItem.hpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 137,
+      "nonEmptyLines": 110,
+      "functions": [
+        {
+          "name": "getId",
+          "startLine": 114,
+          "endLine": 114,
+          "params": []
+        },
+        {
+          "name": "getCreateTime",
+          "startLine": 115,
+          "endLine": 115,
+          "params": []
+        },
+        {
+          "name": "getUpdateTime",
+          "startLine": 116,
+          "endLine": 116,
+          "params": []
+        },
+        {
+          "name": "getFolderPath",
+          "startLine": 117,
+          "endLine": 117,
+          "params": []
+        },
+        {
+          "name": "setId",
+          "startLine": 118,
+          "endLine": 118,
+          "params": [
+            "id"
+          ]
+        },
+        {
+          "name": "setCreateTime",
+          "startLine": 119,
+          "endLine": 119,
+          "params": [
+            "createTime"
+          ]
+        },
+        {
+          "name": "setUpdateTime",
+          "startLine": 120,
+          "endLine": 120,
+          "params": [
+            "updateTime"
+          ]
+        },
+        {
+          "name": "setFolderPath",
+          "startLine": 121,
+          "endLine": 121,
+          "params": [
+            "folderPath"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "ShapeModelData",
+          "startLine": 9,
+          "endLine": 97,
+          "methods": [
+            "loadInDir",
+            "saveInDir"
+          ],
+          "properties": [
+            "_templateMatImage",
+            "_originalImage",
+            "hv_ModelID",
+            "hv_MetrologyHandle",
+            "_paintCreateRoiList",
+            "_paintShieldRoiList",
+            "_findCreateXldObj",
+            "_findCreateXldObj_Secondary",
+            "centerX",
+            "centerY",
+            "findCenterX",
+            "findCenterY",
+            "offsetX",
+            "offsetY",
+            "offsetAngle",
+            "findnumber",
+            "rotateAngle",
+            "_SingleChannelType",
+            "isSelectXLDToCreateModel",
+            "xld_Minlength",
+            "xld_min",
+            "xld_max",
+            "enabled",
+            "_createModelExposureTime",
+            "_createModelGain",
+            "_createModelPreProcessType",
+            "_createModelUseOpening",
+            "_createModelOpeningRadius",
+            "_createModelUseClosing",
+            "_createModelClosingRadius",
+            "_createModelUseMean",
+            "_createModelMeanRadius",
+            "_matchChannelType",
+            "_matchUseOpening",
+            "_matchOpeningRadius",
+            "_matchUseClosing",
+            "_matchClosingRadius",
+            "_matchUseMean",
+            "_matchMeanRadius",
+            "maxContrast",
+            "minContrast",
+            "modelPath"
+          ]
+        },
+        {
+          "name": "ShapeModelInfo",
+          "startLine": 99,
+          "endLine": 125,
+          "methods": [
+            "getId",
+            "getCreateTime",
+            "getUpdateTime",
+            "getFolderPath",
+            "setId",
+            "setCreateTime",
+            "setUpdateTime",
+            "setFolderPath",
+            "loadInDir",
+            "saveInDir"
+          ],
+          "properties": [
+            "base_info",
+            "id_",
+            "create_time_",
+            "update_time_",
+            "folder_path_"
+          ]
+        },
+        {
+          "name": "ShapeModelItem",
+          "startLine": 127,
+          "endLine": 136,
+          "methods": [
+            "loadInDir",
+            "saveInDir"
+          ],
+          "properties": [
+            "info",
+            "data"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "loadInDir",
+          "line": 95,
+          "isDefault": false
+        },
+        {
+          "name": "saveInDir",
+          "line": 96,
+          "isDefault": false
+        },
+        {
+          "name": "ShapeModelData",
+          "line": 9,
+          "isDefault": false
+        },
+        {
+          "name": "getId",
+          "line": 114,
+          "isDefault": false
+        },
+        {
+          "name": "getCreateTime",
+          "line": 115,
+          "isDefault": false
+        },
+        {
+          "name": "getUpdateTime",
+          "line": 116,
+          "isDefault": false
+        },
+        {
+          "name": "getFolderPath",
+          "line": 117,
+          "isDefault": false
+        },
+        {
+          "name": "setId",
+          "line": 118,
+          "isDefault": false
+        },
+        {
+          "name": "setCreateTime",
+          "line": 119,
+          "isDefault": false
+        },
+        {
+          "name": "setUpdateTime",
+          "line": 120,
+          "isDefault": false
+        },
+        {
+          "name": "setFolderPath",
+          "line": 121,
+          "isDefault": false
+        },
+        {
+          "name": "loadInDir",
+          "line": 123,
+          "isDefault": false
+        },
+        {
+          "name": "saveInDir",
+          "line": 124,
+          "isDefault": false
+        },
+        {
+          "name": "ShapeModelInfo",
+          "line": 99,
+          "isDefault": false
+        },
+        {
+          "name": "loadInDir",
+          "line": 134,
+          "isDefault": false
+        },
+        {
+          "name": "saveInDir",
+          "line": 135,
+          "isDefault": false
+        },
+        {
+          "name": "ShapeModelItem",
+          "line": 127,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 17,
+        "functionCount": 8,
+        "classCount": 3
+      }
+    },
+    {
+      "path": "PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/ShapeModelManagerModule.hpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 38,
+      "nonEmptyLines": 35,
+      "classes": [
+        {
+          "name": "ShapeModelManagerModule",
+          "startLine": 13,
+          "endLine": 37,
+          "methods": [
+            "readAllShapeModelInfos",
+            "addShapeModelItem",
+            "deleteShapeModelItem",
+            "getShapeModelItem",
+            "changeShapeModelItem",
+            "changeShapeModelItem",
+            "changeShapeModelItem",
+            "getCurrentTime_yyMMddHHmmsszzz",
+            "build",
+            "destroy"
+          ],
+          "properties": [
+            "shape_model_infos_"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "readAllShapeModelInfos",
+          "line": 24,
+          "isDefault": false
+        },
+        {
+          "name": "addShapeModelItem",
+          "line": 26,
+          "isDefault": false
+        },
+        {
+          "name": "deleteShapeModelItem",
+          "line": 27,
+          "isDefault": false
+        },
+        {
+          "name": "getShapeModelItem",
+          "line": 28,
+          "isDefault": false
+        },
+        {
+          "name": "changeShapeModelItem",
+          "line": 29,
+          "isDefault": false
+        },
+        {
+          "name": "changeShapeModelItem",
+          "line": 30,
+          "isDefault": false
+        },
+        {
+          "name": "changeShapeModelItem",
+          "line": 31,
+          "isDefault": false
+        },
+        {
+          "name": "getCurrentTime_yyMMddHHmmsszzz",
+          "line": 33,
+          "isDefault": false
+        },
+        {
+          "name": "build",
+          "line": 35,
+          "isDefault": false
+        },
+        {
+          "name": "destroy",
+          "line": 36,
+          "isDefault": false
+        },
+        {
+          "name": "ShapeModelManagerModule",
+          "line": 13,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 11,
+        "functionCount": 0,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/ShapeModelManagerModulePath.hpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 13,
+      "nonEmptyLines": 11,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/ShapeModelManagerModuleTypes.hpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 12,
+      "nonEmptyLines": 8,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 567,
+      "nonEmptyLines": 523,
+      "functions": [
+        {
+          "name": "replaceFile",
+          "startLine": 26,
+          "endLine": 34,
+          "params": [
+            "tmp",
+            "target"
+          ]
+        },
+        {
+          "name": "readJsonSafe",
+          "startLine": 36,
+          "endLine": 50,
+          "params": [
+            "filePath",
+            "root"
+          ]
+        },
+        {
+          "name": "writeJsonSafe",
+          "startLine": 52,
+          "endLine": 70,
+          "params": [
+            "filePath",
+            "root"
+          ]
+        },
+        {
+          "name": "writeImageSafe",
+          "startLine": 72,
+          "endLine": 81,
+          "params": [
+            "image",
+            "filePath"
+          ]
+        },
+        {
+          "name": "readImageSafe",
+          "startLine": 83,
+          "endLine": 96,
+          "params": [
+            "filePath",
+            "image"
+          ]
+        },
+        {
+          "name": "writeObjectSafe",
+          "startLine": 98,
+          "endLine": 108,
+          "params": [
+            "obj",
+            "filePath"
+          ]
+        },
+        {
+          "name": "readObjectSafe",
+          "startLine": 110,
+          "endLine": 123,
+          "params": [
+            "filePath",
+            "obj"
+          ]
+        },
+        {
+          "name": "clearOldRoiFiles",
+          "startLine": 125,
+          "endLine": 137,
+          "params": [
+            "dirPath",
+            "prefix"
+          ]
+        },
+        {
+          "name": "writeTupleSafe",
+          "startLine": 139,
+          "endLine": 146,
+          "params": [
+            "filePath",
+            "tuple"
+          ]
+        },
+        {
+          "name": "readTupleSafe",
+          "startLine": 148,
+          "endLine": 161,
+          "params": [
+            "filePath",
+            "tuple"
+          ]
+        },
+        {
+          "name": "writeParamsSafe",
+          "startLine": 163,
+          "endLine": 226,
+          "params": [
+            "filePath",
+            "singleChannelType",
+            "centerX",
+            "centerY",
+            "findCenterX",
+            "findCenterY",
+            "offsetX",
+            "offsetY",
+            "offsetAngle",
+            "isSelectXLDToCreateModel",
+            "xldMinLength",
+            "xldMin",
+            "xldMax",
+            "findNumber",
+            "rotateAngle",
+            "enabled",
+            "createModelExposureTime",
+            "createModelGain",
+            "createModelPreProcessType",
+            "createModelUseOpening",
+            "createModelOpeningRadius",
+            "createModelUseClosing",
+            "createModelClosingRadius",
+            "createModelUseMean",
+            "createModelMeanRadius",
+            "matchChannelType",
+            "matchUseOpening",
+            "matchOpeningRadius",
+            "matchUseClosing",
+            "matchClosingRadius",
+            "matchUseMean",
+            "matchMeanRadius",
+            "maxContrast",
+            "minContrast",
+            "modelPath"
+          ]
+        },
+        {
+          "name": "trimCr",
+          "startLine": 228,
+          "endLine": 233,
+          "params": [
+            "s"
+          ]
+        },
+        {
+          "name": "readParamsSafe",
+          "startLine": 235,
+          "endLine": 349,
+          "params": [
+            "filePath",
+            "singleChannelType",
+            "centerX",
+            "centerY",
+            "findCenterX",
+            "findCenterY",
+            "offsetX",
+            "offsetY",
+            "offsetAngle",
+            "isSelectXLDToCreateModel",
+            "xldMinLength",
+            "xldMin",
+            "xldMax",
+            "findNumber",
+            "rotateAngle",
+            "enabled",
+            "createModelExposureTime",
+            "createModelGain",
+            "createModelPreProcessType",
+            "createModelUseOpening",
+            "createModelOpeningRadius",
+            "createModelUseClosing",
+            "createModelClosingRadius",
+            "createModelUseMean",
+            "createModelMeanRadius",
+            "matchChannelType",
+            "matchUseOpening",
+            "matchOpeningRadius",
+            "matchUseClosing",
+            "matchClosingRadius",
+            "matchUseMean",
+            "matchMeanRadius",
+            "maxContrast",
+            "minContrast",
+            "modelPath"
+          ]
+        },
+        {
+          "name": "loadInDir",
+          "startLine": 352,
+          "endLine": 429,
+          "params": [
+            "dir"
+          ]
+        },
+        {
+          "name": "saveInDir",
+          "startLine": 431,
+          "endLine": 510,
+          "params": [
+            "dir"
+          ]
+        },
+        {
+          "name": "loadInDir",
+          "startLine": 512,
+          "endLine": 533,
+          "params": [
+            "dir"
+          ]
+        },
+        {
+          "name": "saveInDir",
+          "startLine": 535,
+          "endLine": 554,
+          "params": [
+            "dir"
+          ]
+        },
+        {
+          "name": "loadInDir",
+          "startLine": 556,
+          "endLine": 560,
+          "params": [
+            "dir"
+          ]
+        },
+        {
+          "name": "saveInDir",
+          "startLine": 562,
+          "endLine": 566,
+          "params": [
+            "dir"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "replaceFile",
+          "line": 26,
+          "isDefault": false
+        },
+        {
+          "name": "readJsonSafe",
+          "line": 36,
+          "isDefault": false
+        },
+        {
+          "name": "writeJsonSafe",
+          "line": 52,
+          "isDefault": false
+        },
+        {
+          "name": "writeImageSafe",
+          "line": 72,
+          "isDefault": false
+        },
+        {
+          "name": "readImageSafe",
+          "line": 83,
+          "isDefault": false
+        },
+        {
+          "name": "writeObjectSafe",
+          "line": 98,
+          "isDefault": false
+        },
+        {
+          "name": "readObjectSafe",
+          "line": 110,
+          "isDefault": false
+        },
+        {
+          "name": "clearOldRoiFiles",
+          "line": 125,
+          "isDefault": false
+        },
+        {
+          "name": "writeTupleSafe",
+          "line": 139,
+          "isDefault": false
+        },
+        {
+          "name": "readTupleSafe",
+          "line": 148,
+          "isDefault": false
+        },
+        {
+          "name": "writeParamsSafe",
+          "line": 163,
+          "isDefault": false
+        },
+        {
+          "name": "trimCr",
+          "line": 228,
+          "isDefault": false
+        },
+        {
+          "name": "readParamsSafe",
+          "line": 235,
+          "isDefault": false
+        },
+        {
+          "name": "loadInDir",
+          "line": 352,
+          "isDefault": false
+        },
+        {
+          "name": "saveInDir",
+          "line": 431,
+          "isDefault": false
+        },
+        {
+          "name": "loadInDir",
+          "line": 512,
+          "isDefault": false
+        },
+        {
+          "name": "saveInDir",
+          "line": 535,
+          "isDefault": false
+        },
+        {
+          "name": "loadInDir",
+          "line": 556,
+          "isDefault": false
+        },
+        {
+          "name": "saveInDir",
+          "line": 562,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "replaceFile",
+          "callee": "fs::exists",
+          "lineNumber": 28
+        },
+        {
+          "caller": "replaceFile",
+          "callee": "fs::remove",
+          "lineNumber": 30
+        },
+        {
+          "caller": "replaceFile",
+          "callee": "fs::rename",
+          "lineNumber": 33
+        },
+        {
+          "caller": "readJsonSafe",
+          "callee": "fs::exists",
+          "lineNumber": 38
+        },
+        {
+          "caller": "readJsonSafe",
+          "callee": "Json::parseFromStream",
+          "lineNumber": 47
+        },
+        {
+          "caller": "writeJsonSafe",
+          "callee": "fs::create_directories",
+          "lineNumber": 54
+        },
+        {
+          "caller": "writeJsonSafe",
+          "callee": "parent_path",
+          "lineNumber": 54
+        },
+        {
+          "caller": "writeJsonSafe",
+          "callee": "newStreamWriter",
+          "lineNumber": 64
+        },
+        {
+          "caller": "writeJsonSafe",
+          "callee": "write",
+          "lineNumber": 65
+        },
+        {
+          "caller": "writeJsonSafe",
+          "callee": "close",
+          "lineNumber": 67
+        },
+        {
+          "caller": "writeJsonSafe",
+          "callee": "replaceFile",
+          "lineNumber": 69
+        },
+        {
+          "caller": "writeImageSafe",
+          "callee": "IsInitialized",
+          "lineNumber": 74
+        },
+        {
+          "caller": "writeImageSafe",
+          "callee": "fs::create_directories",
+          "lineNumber": 76
+        },
+        {
+          "caller": "writeImageSafe",
+          "callee": "parent_path",
+          "lineNumber": 76
+        },
+        {
+          "caller": "writeImageSafe",
+          "callee": "WriteImage",
+          "lineNumber": 79
+        },
+        {
+          "caller": "writeImageSafe",
+          "callee": "HalconCpp::HImage",
+          "lineNumber": 79
+        },
+        {
+          "caller": "writeImageSafe",
+          "callee": "c_str",
+          "lineNumber": 79
+        },
+        {
+          "caller": "writeImageSafe",
+          "callee": "string",
+          "lineNumber": 79
+        },
+        {
+          "caller": "writeImageSafe",
+          "callee": "replaceFile",
+          "lineNumber": 80
+        },
+        {
+          "caller": "readImageSafe",
+          "callee": "fs::exists",
+          "lineNumber": 85
+        },
+        {
+          "caller": "readImageSafe",
+          "callee": "ReadImage",
+          "lineNumber": 89
+        },
+        {
+          "caller": "readImageSafe",
+          "callee": "c_str",
+          "lineNumber": 89
+        },
+        {
+          "caller": "readImageSafe",
+          "callee": "string",
+          "lineNumber": 89
+        },
+        {
+          "caller": "writeObjectSafe",
+          "callee": "IsInitialized",
+          "lineNumber": 100
+        },
+        {
+          "caller": "writeObjectSafe",
+          "callee": "fs::create_directories",
+          "lineNumber": 102
+        },
+        {
+          "caller": "writeObjectSafe",
+          "callee": "parent_path",
+          "lineNumber": 102
+        },
+        {
+          "caller": "writeObjectSafe",
+          "callee": "HalconCpp::WriteObject",
+          "lineNumber": 105
+        },
+        {
+          "caller": "writeObjectSafe",
+          "callee": "c_str",
+          "lineNumber": 105
+        },
+        {
+          "caller": "writeObjectSafe",
+          "callee": "string",
+          "lineNumber": 105
+        },
+        {
+          "caller": "writeObjectSafe",
+          "callee": "replaceFile",
+          "lineNumber": 107
+        },
+        {
+          "caller": "readObjectSafe",
+          "callee": "fs::exists",
+          "lineNumber": 112
+        },
+        {
+          "caller": "readObjectSafe",
+          "callee": "HalconCpp::ReadObject",
+          "lineNumber": 116
+        },
+        {
+          "caller": "readObjectSafe",
+          "callee": "c_str",
+          "lineNumber": 116
+        },
+        {
+          "caller": "readObjectSafe",
+          "callee": "string",
+          "lineNumber": 116
+        },
+        {
+          "caller": "clearOldRoiFiles",
+          "callee": "std::to_string",
+          "lineNumber": 130
+        },
+        {
+          "caller": "clearOldRoiFiles",
+          "callee": "fs::exists",
+          "lineNumber": 131
+        },
+        {
+          "caller": "clearOldRoiFiles",
+          "callee": "fs::remove",
+          "lineNumber": 133
+        },
+        {
+          "caller": "writeTupleSafe",
+          "callee": "fs::create_directories",
+          "lineNumber": 141
+        },
+        {
+          "caller": "writeTupleSafe",
+          "callee": "parent_path",
+          "lineNumber": 141
+        },
+        {
+          "caller": "writeTupleSafe",
+          "callee": "HalconCpp::WriteTuple",
+          "lineNumber": 144
+        },
+        {
+          "caller": "writeTupleSafe",
+          "callee": "c_str",
+          "lineNumber": 144
+        },
+        {
+          "caller": "writeTupleSafe",
+          "callee": "string",
+          "lineNumber": 144
+        },
+        {
+          "caller": "writeTupleSafe",
+          "callee": "replaceFile",
+          "lineNumber": 145
+        },
+        {
+          "caller": "readTupleSafe",
+          "callee": "fs::exists",
+          "lineNumber": 150
+        },
+        {
+          "caller": "readTupleSafe",
+          "callee": "HalconCpp::ReadTuple",
+          "lineNumber": 154
+        },
+        {
+          "caller": "readTupleSafe",
+          "callee": "c_str",
+          "lineNumber": 154
+        },
+        {
+          "caller": "readTupleSafe",
+          "callee": "string",
+          "lineNumber": 154
+        },
+        {
+          "caller": "writeParamsSafe",
+          "callee": "fs::create_directories",
+          "lineNumber": 184
+        },
+        {
+          "caller": "writeParamsSafe",
+          "callee": "parent_path",
+          "lineNumber": 184
+        },
+        {
+          "caller": "writeParamsSafe",
+          "callee": "close",
+          "lineNumber": 224
+        },
+        {
+          "caller": "writeParamsSafe",
+          "callee": "replaceFile",
+          "lineNumber": 225
+        },
+        {
+          "caller": "trimCr",
+          "callee": "empty",
+          "lineNumber": 230
+        },
+        {
+          "caller": "trimCr",
+          "callee": "back",
+          "lineNumber": 230
+        },
+        {
+          "caller": "trimCr",
+          "callee": "substr",
+          "lineNumber": 231
+        },
+        {
+          "caller": "trimCr",
+          "callee": "size",
+          "lineNumber": 231
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "fs::exists",
+          "lineNumber": 256
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::getline",
+          "lineNumber": 262
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "trimCr",
+          "lineNumber": 264
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "empty",
+          "lineNumber": 265
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "front",
+          "lineNumber": 265
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "find",
+          "lineNumber": 267
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "substr",
+          "lineNumber": 270
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "substr",
+          "lineNumber": 271
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stoi",
+          "lineNumber": 275
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stod",
+          "lineNumber": 277
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stod",
+          "lineNumber": 279
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stod",
+          "lineNumber": 281
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stod",
+          "lineNumber": 283
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stod",
+          "lineNumber": 285
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stod",
+          "lineNumber": 287
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stod",
+          "lineNumber": 289
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stoi",
+          "lineNumber": 291
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stod",
+          "lineNumber": 293
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stod",
+          "lineNumber": 295
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stod",
+          "lineNumber": 297
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stoi",
+          "lineNumber": 299
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stod",
+          "lineNumber": 301
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stoi",
+          "lineNumber": 303
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stod",
+          "lineNumber": 305
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stod",
+          "lineNumber": 307
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stoi",
+          "lineNumber": 309
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stoi",
+          "lineNumber": 311
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stoi",
+          "lineNumber": 313
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stoi",
+          "lineNumber": 315
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stoi",
+          "lineNumber": 317
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stoi",
+          "lineNumber": 319
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stoi",
+          "lineNumber": 321
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stoi",
+          "lineNumber": 323
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stoi",
+          "lineNumber": 325
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stoi",
+          "lineNumber": 327
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stoi",
+          "lineNumber": 329
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stoi",
+          "lineNumber": 331
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stoi",
+          "lineNumber": 333
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stoi",
+          "lineNumber": 335
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stoi",
+          "lineNumber": 337
+        },
+        {
+          "caller": "readParamsSafe",
+          "callee": "std::stoi",
+          "lineNumber": 339
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "readParamsSafe",
+          "lineNumber": 359
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "readImageSafe",
+          "lineNumber": 381
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "readImageSafe",
+          "lineNumber": 382
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "fs::exists",
+          "lineNumber": 385
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "HalconCpp::ReadShapeModel",
+          "lineNumber": 387
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "c_str",
+          "lineNumber": 387
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "string",
+          "lineNumber": 387
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "fs::exists",
+          "lineNumber": 392
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "HalconCpp::ReadMetrologyModel",
+          "lineNumber": 394
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "c_str",
+          "lineNumber": 394
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "string",
+          "lineNumber": 394
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "clear",
+          "lineNumber": 399
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "std::string",
+          "lineNumber": 402
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "std::to_string",
+          "lineNumber": 402
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "fs::exists",
+          "lineNumber": 403
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "readObjectSafe",
+          "lineNumber": 406
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "push_back",
+          "lineNumber": 407
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "clear",
+          "lineNumber": 410
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "std::string",
+          "lineNumber": 413
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "std::to_string",
+          "lineNumber": 413
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "fs::exists",
+          "lineNumber": 414
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "readObjectSafe",
+          "lineNumber": 417
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "push_back",
+          "lineNumber": 418
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "readObjectSafe",
+          "lineNumber": 422
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "readObjectSafe",
+          "lineNumber": 423
+        },
+        {
+          "caller": "saveInDir",
+          "callee": "writeParamsSafe",
+          "lineNumber": 438
+        },
+        {
+          "caller": "saveInDir",
+          "callee": "IsInitialized",
+          "lineNumber": 460
+        },
+        {
+          "caller": "saveInDir",
+          "callee": "writeImageSafe",
+          "lineNumber": 461
+        },
+        {
+          "caller": "saveInDir",
+          "callee": "IsInitialized",
+          "lineNumber": 462
+        },
+        {
+          "caller": "saveInDir",
+          "callee": "writeImageSafe",
+          "lineNumber": 463
+        },
+        {
+          "caller": "saveInDir",
+          "callee": "TupleLength",
+          "lineNumber": 466
+        },
+        {
+          "caller": "saveInDir",
+          "callee": "HalconCpp::WriteShapeModel",
+          "lineNumber": 468
+        },
+        {
+          "caller": "saveInDir",
+          "callee": "c_str",
+          "lineNumber": 468
+        },
+        {
+          "caller": "saveInDir",
+          "callee": "string",
+          "lineNumber": 468
+        },
+        {
+          "caller": "saveInDir",
+          "callee": "TupleLength",
+          "lineNumber": 473
+        },
+        {
+          "caller": "saveInDir",
+          "callee": "HalconCpp::WriteMetrologyModel",
+          "lineNumber": 475
+        },
+        {
+          "caller": "saveInDir",
+          "callee": "c_str",
+          "lineNumber": 475
+        },
+        {
+          "caller": "saveInDir",
+          "callee": "string",
+          "lineNumber": 475
+        },
+        {
+          "caller": "saveInDir",
+          "callee": "clearOldRoiFiles",
+          "lineNumber": 480
+        },
+        {
+          "caller": "saveInDir",
+          "callee": "size",
+          "lineNumber": 481
+        },
+        {
+          "caller": "saveInDir",
+          "callee": "IsInitialized",
+          "lineNumber": 483
+        },
+        {
+          "caller": "saveInDir",
+          "callee": "std::string",
+          "lineNumber": 485
+        },
+        {
+          "caller": "saveInDir",
+          "callee": "std::to_string",
+          "lineNumber": 485
+        },
+        {
+          "caller": "saveInDir",
+          "callee": "writeObjectSafe",
+          "lineNumber": 486
+        },
+        {
+          "caller": "saveInDir",
+          "callee": "clearOldRoiFiles",
+          "lineNumber": 490
+        },
+        {
+          "caller": "saveInDir",
+          "callee": "size",
+          "lineNumber": 491
+        },
+        {
+          "caller": "saveInDir",
+          "callee": "IsInitialized",
+          "lineNumber": 493
+        },
+        {
+          "caller": "saveInDir",
+          "callee": "std::string",
+          "lineNumber": 495
+        },
+        {
+          "caller": "saveInDir",
+          "callee": "std::to_string",
+          "lineNumber": 495
+        },
+        {
+          "caller": "saveInDir",
+          "callee": "writeObjectSafe",
+          "lineNumber": 496
+        },
+        {
+          "caller": "saveInDir",
+          "callee": "IsInitialized",
+          "lineNumber": 501
+        },
+        {
+          "caller": "saveInDir",
+          "callee": "writeObjectSafe",
+          "lineNumber": 502
+        },
+        {
+          "caller": "saveInDir",
+          "callee": "IsInitialized",
+          "lineNumber": 503
+        },
+        {
+          "caller": "saveInDir",
+          "callee": "writeObjectSafe",
+          "lineNumber": 504
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "string",
+          "lineNumber": 517
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "readJsonSafe",
+          "lineNumber": 520
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "asString",
+          "lineNumber": 523
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "get",
+          "lineNumber": 523
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "asString",
+          "lineNumber": 524
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "get",
+          "lineNumber": 524
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "asString",
+          "lineNumber": 525
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "get",
+          "lineNumber": 525
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "asString",
+          "lineNumber": 526
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "get",
+          "lineNumber": 526
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "asString",
+          "lineNumber": 527
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "get",
+          "lineNumber": 527
+        },
+        {
+          "caller": "saveInDir",
+          "callee": "empty",
+          "lineNumber": 546
+        },
+        {
+          "caller": "saveInDir",
+          "callee": "string",
+          "lineNumber": 546
+        },
+        {
+          "caller": "saveInDir",
+          "callee": "writeJsonSafe",
+          "lineNumber": 548
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "loadInDir",
+          "lineNumber": 558
+        },
+        {
+          "caller": "loadInDir",
+          "callee": "loadInDir",
+          "lineNumber": 559
+        },
+        {
+          "caller": "saveInDir",
+          "callee": "saveInDir",
+          "lineNumber": 564
+        },
+        {
+          "caller": "saveInDir",
+          "callee": "saveInDir",
+          "lineNumber": 565
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 19,
+        "functionCount": 19,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 226,
+      "nonEmptyLines": 187,
+      "functions": [
+        {
+          "name": "ShapeModelManagerModule",
+          "startLine": 16,
+          "endLine": 18,
+          "params": []
+        },
+        {
+          "name": "~ShapeModelManagerModule",
+          "startLine": 20,
+          "endLine": 23,
+          "params": []
+        },
+        {
+          "name": "readAllShapeModelInfos",
+          "startLine": 25,
+          "endLine": 49,
+          "params": []
+        },
+        {
+          "name": "addShapeModelItem",
+          "startLine": 51,
+          "endLine": 69,
+          "params": [
+            "data",
+            "baseInfo"
+          ]
+        },
+        {
+          "name": "deleteShapeModelItem",
+          "startLine": 71,
+          "endLine": 98,
+          "params": [
+            "id"
+          ]
+        },
+        {
+          "name": "getShapeModelItem",
+          "startLine": 100,
+          "endLine": 115,
+          "params": [
+            "id"
+          ]
+        },
+        {
+          "name": "changeShapeModelItem",
+          "startLine": 117,
+          "endLine": 144,
+          "params": [
+            "id",
+            "data"
+          ]
+        },
+        {
+          "name": "changeShapeModelItem",
+          "startLine": 146,
+          "endLine": 175,
+          "params": [
+            "id",
+            "baseInfo"
+          ]
+        },
+        {
+          "name": "changeShapeModelItem",
+          "startLine": 177,
+          "endLine": 207,
+          "params": [
+            "id",
+            "data",
+            "baseInfo"
+          ]
+        },
+        {
+          "name": "getCurrentTime_yyMMddHHmmsszzz",
+          "startLine": 209,
+          "endLine": 212,
+          "params": []
+        },
+        {
+          "name": "build",
+          "startLine": 214,
+          "endLine": 217,
+          "params": []
+        },
+        {
+          "name": "destroy",
+          "startLine": 219,
+          "endLine": 224,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "ShapeModelManagerModule",
+          "line": 16,
+          "isDefault": false
+        },
+        {
+          "name": "~ShapeModelManagerModule",
+          "line": 20,
+          "isDefault": false
+        },
+        {
+          "name": "readAllShapeModelInfos",
+          "line": 25,
+          "isDefault": false
+        },
+        {
+          "name": "addShapeModelItem",
+          "line": 51,
+          "isDefault": false
+        },
+        {
+          "name": "deleteShapeModelItem",
+          "line": 71,
+          "isDefault": false
+        },
+        {
+          "name": "getShapeModelItem",
+          "line": 100,
+          "isDefault": false
+        },
+        {
+          "name": "changeShapeModelItem",
+          "line": 117,
+          "isDefault": false
+        },
+        {
+          "name": "changeShapeModelItem",
+          "line": 146,
+          "isDefault": false
+        },
+        {
+          "name": "changeShapeModelItem",
+          "line": 177,
+          "isDefault": false
+        },
+        {
+          "name": "getCurrentTime_yyMMddHHmmsszzz",
+          "line": 209,
+          "isDefault": false
+        },
+        {
+          "name": "build",
+          "line": 214,
+          "isDefault": false
+        },
+        {
+          "name": "destroy",
+          "line": 219,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "~ShapeModelManagerModule",
+          "callee": "destroy",
+          "lineNumber": 22
+        },
+        {
+          "caller": "readAllShapeModelInfos",
+          "callee": "clear",
+          "lineNumber": 27
+        },
+        {
+          "caller": "readAllShapeModelInfos",
+          "callee": "fs::exists",
+          "lineNumber": 32
+        },
+        {
+          "caller": "readAllShapeModelInfos",
+          "callee": "fs::is_directory",
+          "lineNumber": 32
+        },
+        {
+          "caller": "readAllShapeModelInfos",
+          "callee": "fs::directory_iterator",
+          "lineNumber": 35
+        },
+        {
+          "caller": "readAllShapeModelInfos",
+          "callee": "is_directory",
+          "lineNumber": 37
+        },
+        {
+          "caller": "readAllShapeModelInfos",
+          "callee": "loadInDir",
+          "lineNumber": 41
+        },
+        {
+          "caller": "readAllShapeModelInfos",
+          "callee": "string",
+          "lineNumber": 41
+        },
+        {
+          "caller": "readAllShapeModelInfos",
+          "callee": "path",
+          "lineNumber": 41
+        },
+        {
+          "caller": "readAllShapeModelInfos",
+          "callee": "push_back",
+          "lineNumber": 42
+        },
+        {
+          "caller": "readAllShapeModelInfos",
+          "callee": "std::move",
+          "lineNumber": 42
+        },
+        {
+          "caller": "addShapeModelItem",
+          "callee": "getCurrentTime_yyMMddHHmmsszzz",
+          "lineNumber": 54
+        },
+        {
+          "caller": "addShapeModelItem",
+          "callee": "setCreateTime",
+          "lineNumber": 55
+        },
+        {
+          "caller": "addShapeModelItem",
+          "callee": "setUpdateTime",
+          "lineNumber": 56
+        },
+        {
+          "caller": "addShapeModelItem",
+          "callee": "setFolderPath",
+          "lineNumber": 57
+        },
+        {
+          "caller": "addShapeModelItem",
+          "callee": "setId",
+          "lineNumber": 58
+        },
+        {
+          "caller": "addShapeModelItem",
+          "callee": "toStdString",
+          "lineNumber": 58
+        },
+        {
+          "caller": "addShapeModelItem",
+          "callee": "toString",
+          "lineNumber": 58
+        },
+        {
+          "caller": "addShapeModelItem",
+          "callee": "QUuid::createUuid",
+          "lineNumber": 58
+        },
+        {
+          "caller": "addShapeModelItem",
+          "callee": "std::move",
+          "lineNumber": 59
+        },
+        {
+          "caller": "addShapeModelItem",
+          "callee": "saveInDir",
+          "lineNumber": 65
+        },
+        {
+          "caller": "addShapeModelItem",
+          "callee": "getFolderPath",
+          "lineNumber": 65
+        },
+        {
+          "caller": "addShapeModelItem",
+          "callee": "push_back",
+          "lineNumber": 66
+        },
+        {
+          "caller": "deleteShapeModelItem",
+          "callee": "std::find_if",
+          "lineNumber": 77
+        },
+        {
+          "caller": "deleteShapeModelItem",
+          "callee": "begin",
+          "lineNumber": 77
+        },
+        {
+          "caller": "deleteShapeModelItem",
+          "callee": "end",
+          "lineNumber": 77
+        },
+        {
+          "caller": "deleteShapeModelItem",
+          "callee": "getId",
+          "lineNumber": 80
+        },
+        {
+          "caller": "deleteShapeModelItem",
+          "callee": "end",
+          "lineNumber": 83
+        },
+        {
+          "caller": "deleteShapeModelItem",
+          "callee": "getFolderPath",
+          "lineNumber": 86
+        },
+        {
+          "caller": "deleteShapeModelItem",
+          "callee": "empty",
+          "lineNumber": 87
+        },
+        {
+          "caller": "deleteShapeModelItem",
+          "callee": "fs::exists",
+          "lineNumber": 87
+        },
+        {
+          "caller": "deleteShapeModelItem",
+          "callee": "fs::remove_all",
+          "lineNumber": 89
+        },
+        {
+          "caller": "deleteShapeModelItem",
+          "callee": "erase",
+          "lineNumber": 92
+        },
+        {
+          "caller": "getShapeModelItem",
+          "callee": "std::find_if",
+          "lineNumber": 104
+        },
+        {
+          "caller": "getShapeModelItem",
+          "callee": "begin",
+          "lineNumber": 104
+        },
+        {
+          "caller": "getShapeModelItem",
+          "callee": "end",
+          "lineNumber": 104
+        },
+        {
+          "caller": "getShapeModelItem",
+          "callee": "getId",
+          "lineNumber": 107
+        },
+        {
+          "caller": "getShapeModelItem",
+          "callee": "end",
+          "lineNumber": 110
+        },
+        {
+          "caller": "getShapeModelItem",
+          "callee": "loadInDir",
+          "lineNumber": 113
+        },
+        {
+          "caller": "getShapeModelItem",
+          "callee": "getFolderPath",
+          "lineNumber": 113
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "std::find_if",
+          "lineNumber": 121
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "begin",
+          "lineNumber": 121
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "end",
+          "lineNumber": 121
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "getId",
+          "lineNumber": 124
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "end",
+          "lineNumber": 127
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "loadInDir",
+          "lineNumber": 131
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "getFolderPath",
+          "lineNumber": 131
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "setUpdateTime",
+          "lineNumber": 133
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "getCurrentTime_yyMMddHHmmsszzz",
+          "lineNumber": 133
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "saveInDir",
+          "lineNumber": 135
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "getFolderPath",
+          "lineNumber": 135
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "setUpdateTime",
+          "lineNumber": 138
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "getUpdateTime",
+          "lineNumber": 138
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "std::find_if",
+          "lineNumber": 151
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "begin",
+          "lineNumber": 151
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "end",
+          "lineNumber": 151
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "getId",
+          "lineNumber": 154
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "end",
+          "lineNumber": 157
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "loadInDir",
+          "lineNumber": 161
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "getFolderPath",
+          "lineNumber": 161
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "setUpdateTime",
+          "lineNumber": 163
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "getCurrentTime_yyMMddHHmmsszzz",
+          "lineNumber": 163
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "saveInDir",
+          "lineNumber": 165
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "getFolderPath",
+          "lineNumber": 165
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "setUpdateTime",
+          "lineNumber": 169
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "getUpdateTime",
+          "lineNumber": 169
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "std::find_if",
+          "lineNumber": 182
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "begin",
+          "lineNumber": 182
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "end",
+          "lineNumber": 182
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "getId",
+          "lineNumber": 185
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "end",
+          "lineNumber": 188
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "loadInDir",
+          "lineNumber": 192
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "getFolderPath",
+          "lineNumber": 192
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "setUpdateTime",
+          "lineNumber": 195
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "getCurrentTime_yyMMddHHmmsszzz",
+          "lineNumber": 195
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "saveInDir",
+          "lineNumber": 197
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "getFolderPath",
+          "lineNumber": 197
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "setUpdateTime",
+          "lineNumber": 201
+        },
+        {
+          "caller": "changeShapeModelItem",
+          "callee": "getUpdateTime",
+          "lineNumber": 201
+        },
+        {
+          "caller": "getCurrentTime_yyMMddHHmmsszzz",
+          "callee": "toStdString",
+          "lineNumber": 211
+        },
+        {
+          "caller": "getCurrentTime_yyMMddHHmmsszzz",
+          "callee": "toString",
+          "lineNumber": 211
+        },
+        {
+          "caller": "getCurrentTime_yyMMddHHmmsszzz",
+          "callee": "QDateTime::currentDateTime",
+          "lineNumber": 211
+        },
+        {
+          "caller": "build",
+          "callee": "readAllShapeModelInfos",
+          "lineNumber": 216
+        },
+        {
+          "caller": "destroy",
+          "callee": "clear",
+          "lineNumber": 223
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 12,
+        "functionCount": 12,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModulePath.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 6,
+      "nonEmptyLines": 4,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModuleTypes.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 6,
+      "nonEmptyLines": 4,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/infrastructure/ShapeModelManagerModule/test/CMakeLists.txt",
+      "language": "txt",
+      "fileCategory": "docs",
+      "totalLines": 25,
+      "nonEmptyLines": 18,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/infrastructure/ShapeModelManagerModule/test/include/ShapeModelManagerModule.t.hpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 12,
+      "nonEmptyLines": 10,
+      "classes": [
+        {
+          "name": "ShapeModelManagerModuleTest",
+          "startLine": 7,
+          "endLine": 11,
+          "methods": [
+            "runBasicTest"
+          ],
+          "properties": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "runBasicTest",
+          "line": 10,
+          "isDefault": false
+        },
+        {
+          "name": "ShapeModelManagerModuleTest",
+          "line": 7,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 2,
+        "functionCount": 0,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "PunchPressVision/infrastructure/ShapeModelManagerModule/test/src/ShapeModelManagerModule.t.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 34,
+      "nonEmptyLines": 26,
+      "functions": [
+        {
+          "name": "runBasicTest",
+          "startLine": 10,
+          "endLine": 27,
+          "params": []
+        },
+        {
+          "name": "main",
+          "startLine": 30,
+          "endLine": 34,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "runBasicTest",
+          "line": 10,
+          "isDefault": false
+        },
+        {
+          "name": "main",
+          "line": 30,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "runBasicTest",
+          "callee": "build",
+          "lineNumber": 13
+        },
+        {
+          "caller": "runBasicTest",
+          "callee": "addShapeModelItem",
+          "lineNumber": 18
+        },
+        {
+          "caller": "runBasicTest",
+          "callee": "std::this_thread::sleep_for",
+          "lineNumber": 19
+        },
+        {
+          "caller": "runBasicTest",
+          "callee": "std::chrono::seconds",
+          "lineNumber": 19
+        },
+        {
+          "caller": "runBasicTest",
+          "callee": "addShapeModelItem",
+          "lineNumber": 22
+        },
+        {
+          "caller": "runBasicTest",
+          "callee": "deleteShapeModelItem",
+          "lineNumber": 24
+        },
+        {
+          "caller": "runBasicTest",
+          "callee": "getId",
+          "lineNumber": 24
+        },
+        {
+          "caller": "runBasicTest",
+          "callee": "destroy",
+          "lineNumber": 26
+        },
+        {
+          "caller": "main",
+          "callee": "test::ShapeModelManagerModuleTest::runBasicTest",
+          "lineNumber": 32
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 2,
+        "functionCount": 2,
+        "classCount": 0
+      }
+    }
+  ]
+}

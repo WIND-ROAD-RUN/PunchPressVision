@@ -1,0 +1,79 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 9,
+  "filesSkipped": [],
+  "results": [
+    {
+      "path": "PunchPressVision/UI/UIModule/ui/DlgCloseForm.ui",
+      "language": "ui",
+      "fileCategory": "markup",
+      "totalLines": 295,
+      "nonEmptyLines": 286,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/ui/DlgJiudianbiaoding.ui",
+      "language": "ui",
+      "fileCategory": "markup",
+      "totalLines": 1129,
+      "nonEmptyLines": 1074,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/ui/LoadingDialog.ui",
+      "language": "ui",
+      "fileCategory": "markup",
+      "totalLines": 22,
+      "nonEmptyLines": 22,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/ui/PicturesViewer.ui",
+      "language": "ui",
+      "fileCategory": "markup",
+      "totalLines": 592,
+      "nonEmptyLines": 542,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/ui/PictureViewerThumbnails.ui",
+      "language": "ui",
+      "fileCategory": "markup",
+      "totalLines": 454,
+      "nonEmptyLines": 420,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/ui/PictureViewerUtilty.ui",
+      "language": "ui",
+      "fileCategory": "markup",
+      "totalLines": 224,
+      "nonEmptyLines": 214,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/ui/PunchPress.ui",
+      "language": "ui",
+      "fileCategory": "markup",
+      "totalLines": 1411,
+      "nonEmptyLines": 1348,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/ui/rqw_ImageEnlargedDisplay.ui",
+      "language": "ui",
+      "fileCategory": "markup",
+      "totalLines": 187,
+      "nonEmptyLines": 179,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/ui/WarningInfoList.ui",
+      "language": "ui",
+      "fileCategory": "markup",
+      "totalLines": 244,
+      "nonEmptyLines": 222,
+      "metrics": {}
+    }
+  ]
+}

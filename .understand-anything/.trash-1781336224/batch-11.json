@@ -1,0 +1,1127 @@
+{
+  "nodes": [
+    {
+      "id": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/infrastructure/TwoCameraSpliceModule/CMakeLists.txt",
+      "summary": "TwoCameraSpliceModule 基础设施模块的 CMake 构建配置，定义静态库目标 inf::TwoCameraSpliceModule，链接 global 和 Halcon 依赖，并包含测试子目录。",
+      "tags": ["build-system", "configuration", "infrastructure"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/Config/TwoCameraSpliceConfig.hpp",
+      "type": "file",
+      "name": "TwoCameraSpliceConfig.hpp",
+      "filePath": "PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/Config/TwoCameraSpliceConfig.hpp",
+      "summary": "双相机拼接配置结构体 TwoCameraSpliceCfg 的头文件，定义标定图像、标定板参数、像素当量、拼接映射图及矫正尺寸等属性，并提供 saveInDir/loadInDir 持久化接口。",
+      "tags": ["data-model", "config", "serialization", "calibration"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/TwoCameraSpliceModule.hpp",
+      "type": "file",
+      "name": "TwoCameraSpliceModule.hpp",
+      "filePath": "PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/TwoCameraSpliceModule.hpp",
+      "summary": "双相机拼接模块 TwoCameraSpliceModule 的头文件，继承 global::IInfrastructure 接口，持有 TwoCameraSpliceCfg 配置实例，实现 build/destroy/save 生命周期管理。",
+      "tags": ["infrastructure", "api-handler", "calibration"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/TwoCameraSpliceModulePath.hpp",
+      "type": "file",
+      "name": "TwoCameraSpliceModulePath.hpp",
+      "filePath": "PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/TwoCameraSpliceModulePath.hpp",
+      "summary": "双相机拼接模块的路径常量定义，通过内联结构体 TwoCameraSpliceModulePath 提供模块根目录路径。",
+      "tags": ["config", "utility"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/TwoCameraSpliceModuleTypes.hpp",
+      "type": "file",
+      "name": "TwoCameraSpliceModuleTypes.hpp",
+      "filePath": "PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/TwoCameraSpliceModuleTypes.hpp",
+      "summary": "双相机拼接模块的类型定义头文件，当前为空命名空间预留，用于后续扩展模块专有类型。",
+      "tags": ["type-definition", "stub"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp",
+      "type": "file",
+      "name": "TwoCameraSpliceConfig.cpp",
+      "filePath": "PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp",
+      "summary": "TwoCameraSpliceCfg 配置类的实现文件，包含图像安全读写、参数文件解析/写入、文件原子替换等 8 个工具函数，用于双相机拼接标定数据的持久化。",
+      "tags": ["serialization", "persistence", "utility", "calibration"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModule.cpp",
+      "type": "file",
+      "name": "TwoCameraSpliceModule.cpp",
+      "filePath": "PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModule.cpp",
+      "summary": "TwoCameraSpliceModule 的实现文件，build 时从磁盘加载配置到 twoCameraSpliceConfig，destroy 时自动保存，save 方法显式持久化当前配置。",
+      "tags": ["infrastructure", "lifecycle"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModulePath.cpp",
+      "type": "file",
+      "name": "TwoCameraSpliceModulePath.cpp",
+      "filePath": "PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModulePath.cpp",
+      "summary": "TwoCameraSpliceModulePath 路径常量的实现文件，当前为空命名空间实现，路径定义位于对应的头文件中。",
+      "tags": ["stub", "config"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModuleTypes.cpp",
+      "type": "file",
+      "name": "TwoCameraSpliceModuleTypes.cpp",
+      "filePath": "PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModuleTypes.cpp",
+      "summary": "TwoCameraSpliceModuleTypes 类型定义的实现文件，当前为空命名空间实现，为模块专有类型预留扩展点。",
+      "tags": ["stub", "type-definition"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/test/CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/infrastructure/TwoCameraSpliceModule/test/CMakeLists.txt",
+      "summary": "TwoCameraSpliceModule 测试的 CMake 构建配置，生成 Test_inf_TwoCameraSpliceModule 可执行文件，链接被测模块 inf::TwoCameraSpliceModule。",
+      "tags": ["build-system", "configuration", "test"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/test/include/TwoCameraSpliceModule.t.hpp",
+      "type": "file",
+      "name": "TwoCameraSpliceModule.t.hpp",
+      "filePath": "PunchPressVision/infrastructure/TwoCameraSpliceModule/test/include/TwoCameraSpliceModule.t.hpp",
+      "summary": "TwoCameraSpliceModule 测试的头文件，当前仅包含 pragma once 指令，为空桩文件。",
+      "tags": ["test", "stub"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/test/src/TwoCameraSpliceModule.t.cpp",
+      "type": "file",
+      "name": "TwoCameraSpliceModule.t.cpp",
+      "filePath": "PunchPressVision/infrastructure/TwoCameraSpliceModule/test/src/TwoCameraSpliceModule.t.cpp",
+      "summary": "TwoCameraSpliceModule 的测试入口文件，当前仅包含空的 main 函数，为后续测试用例预留桩位。",
+      "tags": ["test", "stub", "entry-point"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/UI/CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/UI/CMakeLists.txt",
+      "summary": "UI 层的顶层 CMake 构建配置，添加 PunchPressUI 子目录并定义 PunchPressVision 可执行目标，链接 UI::PunchPressUI、Halcon 和 Qt6，构建后自动复制 Halcon DLL 并执行 windeployqt。",
+      "tags": ["build-system", "configuration", "entry-point"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/UI/PunchPressUI/CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/UI/PunchPressUI/CMakeLists.txt",
+      "summary": "PunchPressUI 静态库的 CMake 构建配置，收集 .cpp/.h/.ui/.qrc 文件，使用 qt_wrap_ui 编译 .ui 文件，链接 PunchPressApp、Halcon、Qt6 和 RWUL::rqwu 依赖。",
+      "tags": ["build-system", "configuration", "ui"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/UI/PunchPressUI/include/UI/DistortionCalibDialog.h",
+      "type": "file",
+      "name": "DistortionCalibDialog.h",
+      "filePath": "PunchPressVision/UI/PunchPressUI/include/UI/DistortionCalibDialog.h",
+      "summary": "畸变标定对话框 DistortionCalibDialog 的头文件，继承 QDialog，包含 HalconView 图像预览、图像捕获列表管理及标定执行的槽函数声明。",
+      "tags": ["ui", "dialog", "calibration", "api-handler"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/UI/PunchPressUI/include/UI/HalconView.h",
+      "type": "file",
+      "name": "HalconView.h",
+      "filePath": "PunchPressVision/UI/PunchPressUI/include/UI/HalconView.h",
+      "summary": "HalconView 图形显示封装类的头文件，将 Qt widget 与 Halcon 图像窗口桥接，提供 ensure/display/resizeToHost/close 等内联方法实现图像渲染和窗口管理。",
+      "tags": ["ui", "component", "graphics", "wrapper"],
+      "complexity": "moderate",
+      "languageNotes": "所有方法均为内联实现，直接调用 HalconCpp API（OpenWindow、SetPart、DispObj 等），避免额外的 .cpp 文件依赖。"
+    },
+    {
+      "id": "file:PunchPressVision/UI/PunchPressUI/include/UI/ModelEditorDialog.h",
+      "type": "file",
+      "name": "ModelEditorDialog.h",
+      "filePath": "PunchPressVision/UI/PunchPressUI/include/UI/ModelEditorDialog.h",
+      "summary": "模型编辑器对话框 ModelEditorDialog 的头文件，继承 QDialog，提供 ROI 矩形选取、模型创建触发及图像预览功能。",
+      "tags": ["ui", "dialog", "editor"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/UI/PunchPressUI/include/UI/ModelManagerDialog.h",
+      "type": "file",
+      "name": "ModelManagerDialog.h",
+      "filePath": "PunchPressVision/UI/PunchPressUI/include/UI/ModelManagerDialog.h",
+      "summary": "模型管理器对话框 ModelManagerDialog 的头文件，继承 QDialog，提供搜索过滤、排序、重命名、加载和删除模型的完整管理界面，使用 QTableWidget 展示模型列表。",
+      "tags": ["ui", "dialog", "manager"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/UI/PunchPressUI/include/UI/NinePointCalibDialog.h",
+      "type": "file",
+      "name": "NinePointCalibDialog.h",
+      "filePath": "PunchPressVision/UI/PunchPressUI/include/UI/NinePointCalibDialog.h",
+      "summary": "九点标定对话框 NinePointCalibDialog 的头文件，继承 QDialog，管理标定流程的启动、进度回调和完成通知。",
+      "tags": ["ui", "dialog", "calibration"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/UI/PunchPressUI/include/UI/PunchPress.h",
+      "type": "file",
+      "name": "PunchPress.h",
+      "filePath": "PunchPressVision/UI/PunchPressUI/include/UI/PunchPress.h",
+      "summary": "主窗口 PunchPress 的头文件，继承 QMainWindow，通过 app::PunchPressApp 注入实现 UI 与业务层解耦，管理 Halcon 图像显示、模式切换、光源控制、标定/模型对话框及相机状态信号响应。",
+      "tags": ["entry-point", "ui", "main-window"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/UI/PunchPressUI/include/UI/SpliceDialog.h",
+      "type": "file",
+      "name": "SpliceDialog.h",
+      "filePath": "PunchPressVision/UI/PunchPressUI/include/UI/SpliceDialog.h",
+      "summary": "图像拼接对话框 SpliceDialog 的头文件，继承 QDialog，使用两个 HalconView 分别显示相机1和相机2的帧画面，并触发拼接操作。",
+      "tags": ["ui", "dialog", "image-processing"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/UI/PunchPressUI/qrc/PunchPress.qrc",
+      "type": "file",
+      "name": "PunchPress.qrc",
+      "filePath": "PunchPressVision/UI/PunchPressUI/qrc/PunchPress.qrc",
+      "summary": "Qt 资源文件，注册 icons/close.png 图标资源，供 UI 对话框使用。",
+      "tags": ["resource", "ui", "assets"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/UI/PunchPressUI/src/DistortionCalibDialog.cpp",
+      "type": "file",
+      "name": "DistortionCalibDialog.cpp",
+      "filePath": "PunchPressVision/UI/PunchPressUI/src/DistortionCalibDialog.cpp",
+      "summary": "DistortionCalibDialog 的实现文件，包含构造函数中 HalconView 初始化、Qt 信号槽绑定，以及 onCalibrate 槽函数中调用 business 层 calibrateFromImages 执行畸变标定的完整流程。",
+      "tags": ["ui", "dialog", "calibration"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/UI/PunchPressUI/src/ModelEditorDialog.cpp",
+      "type": "file",
+      "name": "ModelEditorDialog.cpp",
+      "filePath": "PunchPressVision/UI/PunchPressUI/src/ModelEditorDialog.cpp",
+      "summary": "ModelEditorDialog 的实现文件，包含图像预览显示、信号槽绑定，以及 doCreateModel 槽函数中调用 business 层 createModel 创建匹配模型的流程。",
+      "tags": ["ui", "dialog", "editor"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/UI/PunchPressUI/src/ModelManagerDialog.cpp",
+      "type": "file",
+      "name": "ModelManagerDialog.cpp",
+      "filePath": "PunchPressVision/UI/PunchPressUI/src/ModelManagerDialog.cpp",
+      "summary": "ModelManagerDialog 的实现文件，包含纯代码构建 UI 布局（QTableWidget、搜索框、排序下拉、操作按钮）、模型列表刷新（搜索过滤+排序）、加载/重命名/删除模型的完整业务交互。",
+      "tags": ["ui", "dialog", "manager"],
+      "complexity": "complex"
+    },
+
+    {
+      "id": "class:PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/Config/TwoCameraSpliceConfig.hpp:TwoCameraSpliceCfg",
+      "type": "class",
+      "name": "TwoCameraSpliceCfg",
+      "filePath": "PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/Config/TwoCameraSpliceConfig.hpp",
+      "lineRange": [6, 33],
+      "summary": "双相机拼接标定的配置数据结构，持有两路相机标定图像、标定板参数（高度差、重叠率、边界百分比、板间距）、像素当量及拼接映射输出图像，支持按目录持久化。",
+      "tags": ["data-model", "config", "calibration", "serialization"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/TwoCameraSpliceModule.hpp:TwoCameraSpliceModule",
+      "type": "class",
+      "name": "TwoCameraSpliceModule",
+      "filePath": "PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/TwoCameraSpliceModule.hpp",
+      "lineRange": [8, 17],
+      "summary": "双相机拼接基础设施模块，继承 global::IInfrastructure 接口，在 build 时加载拼接配置，destroy 时自动保存，提供 save 方法用于显式持久化。",
+      "tags": ["infrastructure", "lifecycle"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:PunchPressVision/UI/PunchPressUI/include/UI/DistortionCalibDialog.h:DistortionCalibDialog",
+      "type": "class",
+      "name": "DistortionCalibDialog",
+      "filePath": "PunchPressVision/UI/PunchPressUI/include/UI/DistortionCalibDialog.h",
+      "lineRange": [19, 41],
+      "summary": "畸变标定对话框，通过 HalconView 实时预览相机帧，支持多图像捕获管理，调用 business 层 calibrateFromImages 执行 Halcon 畸变标定流程。",
+      "tags": ["ui", "dialog", "calibration"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:PunchPressVision/UI/PunchPressUI/include/UI/HalconView.h:HalconView",
+      "type": "class",
+      "name": "HalconView",
+      "filePath": "PunchPressVision/UI/PunchPressUI/include/UI/HalconView.h",
+      "lineRange": [11, 85],
+      "summary": "Halcon 图像显示视图封装，将 Qt widget 宿主与 Halcon HWindow 绑定，提供图像显示、自适应缩放和窗口生命周期管理，所有方法均为内联实现直接调用 HalconCpp API。",
+      "tags": ["ui", "component", "graphics", "wrapper"],
+      "complexity": "moderate",
+      "languageNotes": "全内联实现的设计避免了额外编译单元，ensure 方法使用 winId() 将 Qt widget 原生句柄桥接到 Halcon OpenWindow。"
+    },
+    {
+      "id": "class:PunchPressVision/UI/PunchPressUI/include/UI/ModelEditorDialog.h:ModelEditorDialog",
+      "type": "class",
+      "name": "ModelEditorDialog",
+      "filePath": "PunchPressVision/UI/PunchPressUI/include/UI/ModelEditorDialog.h",
+      "lineRange": [18, 38],
+      "summary": "匹配模型编辑器对话框，支持在实时图像上通过 ROI 矩形选取目标区域，调用 business 层 createModel 生成 Halcon 形状匹配模型。",
+      "tags": ["ui", "dialog", "editor"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:PunchPressVision/UI/PunchPressUI/include/UI/ModelManagerDialog.h:ModelManagerDialog",
+      "type": "class",
+      "name": "ModelManagerDialog",
+      "filePath": "PunchPressVision/UI/PunchPressUI/include/UI/ModelManagerDialog.h",
+      "lineRange": [17, 43],
+      "summary": "模型管理器对话框，提供模型列表的搜索过滤、按名称/时间排序，以及选中模型的重命名、加载、删除等管理操作。",
+      "tags": ["ui", "dialog", "manager"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:PunchPressVision/UI/PunchPressUI/include/UI/NinePointCalibDialog.h:NinePointCalibDialog",
+      "type": "class",
+      "name": "NinePointCalibDialog",
+      "filePath": "PunchPressVision/UI/PunchPressUI/include/UI/NinePointCalibDialog.h",
+      "lineRange": [18, 38],
+      "summary": "九点标定对话框，管理像素坐标到世界坐标转换的标定流程，包含标定启动、进度回调和完成通知的完整交互。",
+      "tags": ["ui", "dialog", "calibration"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:PunchPressVision/UI/PunchPressUI/include/UI/PunchPress.h:PunchPress",
+      "type": "class",
+      "name": "PunchPress",
+      "filePath": "PunchPressVision/UI/PunchPressUI/include/UI/PunchPress.h",
+      "lineRange": [21, 71],
+      "summary": "应用主窗口，承载调试/生产模式切换、光源控制、各类标定与模型对话框的入口调度，通过 app::PunchPressApp 注入实现 UI 与业务/基础设施层的完全解耦。",
+      "tags": ["entry-point", "ui", "main-window", "controller"],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:PunchPressVision/UI/PunchPressUI/include/UI/SpliceDialog.h:SpliceDialog",
+      "type": "class",
+      "name": "SpliceDialog",
+      "filePath": "PunchPressVision/UI/PunchPressUI/include/UI/SpliceDialog.h",
+      "lineRange": [18, 38],
+      "summary": "双相机图像拼接对话框，使用两个独立的 HalconView 分别展示相机1和相机2的实时帧，提供拼接操作触发入口。",
+      "tags": ["ui", "dialog", "image-processing", "splicing"],
+      "complexity": "moderate"
+    },
+
+    {
+      "id": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:trimCr",
+      "type": "function",
+      "name": "trimCr",
+      "filePath": "PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp",
+      "lineRange": [17, 22],
+      "summary": "去除字符串末尾的回车符（\\r），用于参数文件读取时的行清理。",
+      "tags": ["utility", "string-processing"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:replaceFile",
+      "type": "function",
+      "name": "replaceFile",
+      "filePath": "PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp",
+      "lineRange": [24, 32],
+      "summary": "原子替换文件：先写临时文件，若目标已存在则删除后重命名，确保写入过程中数据不丢失。",
+      "tags": ["utility", "file-io", "atomic"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:writeImageSafe",
+      "type": "function",
+      "name": "writeImageSafe",
+      "filePath": "PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp",
+      "lineRange": [34, 51],
+      "summary": "安全写入 Halcon 图像到文件：自动创建父目录、通过临时文件原子替换、若图像未初始化则跳过。",
+      "tags": ["utility", "file-io", "serialization"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:readImageSafe",
+      "type": "function",
+      "name": "readImageSafe",
+      "filePath": "PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp",
+      "lineRange": [53, 68],
+      "summary": "安全从文件读取 Halcon 图像：若文件不存在则跳过并清空目标图像。",
+      "tags": ["utility", "file-io", "serialization"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:writeParamsSafe",
+      "type": "function",
+      "name": "writeParamsSafe",
+      "filePath": "PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp",
+      "lineRange": [70, 93],
+      "summary": "安全写入标定参数到文本文件：自动创建父目录、逐行写入 caltabPath、diffHeight、overlap、border、distance、pixToWorld、rectWidth、rectHeight 等参数。",
+      "tags": ["utility", "file-io", "serialization", "calibration"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:readParamsSafe",
+      "type": "function",
+      "name": "readParamsSafe",
+      "filePath": "PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp",
+      "lineRange": [95, 143],
+      "summary": "安全从文本文件读取标定参数：跳过注释行（#开头），按 key:value 格式解析各标定参数并转换数值类型（stod/stoi），调用 trimCr 清理行尾。",
+      "tags": ["utility", "file-io", "serialization", "calibration"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:saveInDir",
+      "type": "function",
+      "name": "saveInDir",
+      "filePath": "PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp",
+      "lineRange": [146, 163],
+      "summary": "将双相机拼接配置整体保存到指定目录：分别保存 camera1/camera2 标定图像和标定参数文件。",
+      "tags": ["serialization", "persistence", "calibration"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:loadInDir",
+      "type": "function",
+      "name": "loadInDir",
+      "filePath": "PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp",
+      "lineRange": [165, 190],
+      "summary": "从指定目录整体加载双相机拼接配置：先清空现有数据，分别读取 camera1/camera2 标定图像和标定参数文件，失败则回退并清空。",
+      "tags": ["serialization", "persistence", "calibration"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModule.cpp:build",
+      "type": "function",
+      "name": "build",
+      "filePath": "PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModule.cpp",
+      "lineRange": [7, 10],
+      "summary": "模块初始化：从 TwoCameraSpliceModulePath.RootPath 目录加载拼接配置数据到 twoCameraSpliceConfig。",
+      "tags": ["lifecycle", "infrastructure", "initialization"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModule.cpp:destroy",
+      "type": "function",
+      "name": "destroy",
+      "filePath": "PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModule.cpp",
+      "lineRange": [12, 15],
+      "summary": "模块销毁：调用 save 方法将当前配置持久化到磁盘后清理资源。",
+      "tags": ["lifecycle", "infrastructure"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModule.cpp:save",
+      "type": "function",
+      "name": "save",
+      "filePath": "PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModule.cpp",
+      "lineRange": [17, 20],
+      "summary": "显式持久化：将 twoCameraSpliceConfig 保存到模块根路径目录。",
+      "tags": ["serialization", "persistence", "infrastructure"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/UI/PunchPressUI/src/DistortionCalibDialog.cpp:DistortionCalibDialog",
+      "type": "function",
+      "name": "DistortionCalibDialog",
+      "filePath": "PunchPressVision/UI/PunchPressUI/src/DistortionCalibDialog.cpp",
+      "lineRange": [17, 25],
+      "summary": "构造函数：通过 setupUi 加载 UI 布局，调用 buildConnections 绑定信号槽，初始化 HalconView 图形显示。",
+      "tags": ["ui", "constructor", "initialization"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/UI/PunchPressUI/src/DistortionCalibDialog.cpp:buildConnections",
+      "type": "function",
+      "name": "buildConnections",
+      "filePath": "PunchPressVision/UI/PunchPressUI/src/DistortionCalibDialog.cpp",
+      "lineRange": [32, 44],
+      "summary": "绑定 UI 控件信号到槽函数：捕获/删除/全部删除/标定按钮的 click 信号连接到对应槽，App 层 frameReady 信号连接到 onFrameReady。",
+      "tags": ["ui", "signal-slot", "initialization"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/UI/PunchPressUI/src/DistortionCalibDialog.cpp:onCalibrate",
+      "type": "function",
+      "name": "onCalibrate",
+      "filePath": "PunchPressVision/UI/PunchPressUI/src/DistortionCalibDialog.cpp",
+      "lineRange": [73, 107],
+      "summary": "执行畸变标定：检查图像数量、调用 business 层 calibrateFromImages、成功后将结果保存到 infrastructure 层，通过 MessageBox 通知结果。",
+      "tags": ["ui", "calibration", "api-handler"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/UI/PunchPressUI/src/ModelEditorDialog.cpp:doCreateModel",
+      "type": "function",
+      "name": "doCreateModel",
+      "filePath": "PunchPressVision/UI/PunchPressUI/src/ModelEditorDialog.cpp",
+      "lineRange": [48, 73],
+      "summary": "执行模型创建：获取上下光源状态和 ROI 区域，调用 business 层 createModel 生成 Halcon 形状匹配模型，通过 MessageBox 报告成功或失败。",
+      "tags": ["ui", "model-creation", "api-handler"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/UI/PunchPressUI/src/ModelManagerDialog.cpp:buildUi",
+      "type": "function",
+      "name": "buildUi",
+      "filePath": "PunchPressVision/UI/PunchPressUI/src/ModelManagerDialog.cpp",
+      "lineRange": [38, 77],
+      "summary": "纯代码构建模型管理器 UI 布局：创建搜索框、排序下拉菜单、模型表格（三列：名称/创建时间/ID）及重命名/加载/删除操作按钮，绑定信号槽。",
+      "tags": ["ui", "layout", "initialization"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/UI/PunchPressUI/src/ModelManagerDialog.cpp:refreshModelList",
+      "type": "function",
+      "name": "refreshModelList",
+      "filePath": "PunchPressVision/UI/PunchPressUI/src/ModelManagerDialog.cpp",
+      "lineRange": [79, 110],
+      "summary": "刷新模型列表：从 business 层获取模型数据，按搜索文本过滤、按排序条件（名称或创建时间正/倒序）排列，更新 QTableWidget 显示。",
+      "tags": ["ui", "data-binding", "filtering"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/UI/PunchPressUI/src/ModelManagerDialog.cpp:onLoadModel",
+      "type": "function",
+      "name": "onLoadModel",
+      "filePath": "PunchPressVision/UI/PunchPressUI/src/ModelManagerDialog.cpp",
+      "lineRange": [130, 140],
+      "summary": "加载选中模型：获取选中行模型 ID，调用 business 层 loadModel 加载模型到当前匹配引擎。",
+      "tags": ["ui", "api-handler"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/UI/PunchPressUI/src/ModelManagerDialog.cpp:onRenameModel",
+      "type": "function",
+      "name": "onRenameModel",
+      "filePath": "PunchPressVision/UI/PunchPressUI/src/ModelManagerDialog.cpp",
+      "lineRange": [142, 157],
+      "summary": "重命名选中模型：弹出 QInputDialog 获取新名称，调用 business 层 renameModel 执行重命名后刷新列表。",
+      "tags": ["ui", "api-handler"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/UI/PunchPressUI/src/ModelManagerDialog.cpp:onDeleteModel",
+      "type": "function",
+      "name": "onDeleteModel",
+      "filePath": "PunchPressVision/UI/PunchPressUI/src/ModelManagerDialog.cpp",
+      "lineRange": [159, 173],
+      "summary": "删除选中模型：弹出确认对话框，确认后调用 business 层 deleteModel 删除模型并刷新列表。",
+      "tags": ["ui", "api-handler"],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/TwoCameraSpliceModule.hpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/Config/TwoCameraSpliceConfig.hpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModule.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/test/CMakeLists.txt",
+      "target": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/test/src/TwoCameraSpliceModule.t.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/test/CMakeLists.txt",
+      "target": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/TwoCameraSpliceModule.hpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/UI/CMakeLists.txt",
+      "target": "file:PunchPressVision/UI/PunchPressUI/CMakeLists.txt",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/UI/CMakeLists.txt",
+      "target": "file:PunchPressVision/UI/PunchPressUI/include/UI/PunchPress.h",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/CMakeLists.txt",
+      "target": "file:PunchPressVision/UI/PunchPressUI/include/UI/PunchPress.h",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/CMakeLists.txt",
+      "target": "file:PunchPressVision/UI/PunchPressUI/src/DistortionCalibDialog.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/CMakeLists.txt",
+      "target": "file:PunchPressVision/UI/PunchPressUI/src/ModelEditorDialog.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/CMakeLists.txt",
+      "target": "file:PunchPressVision/UI/PunchPressUI/src/ModelManagerDialog.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/CMakeLists.txt",
+      "target": "file:PunchPressVision/UI/PunchPressUI/qrc/PunchPress.qrc",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/Config/TwoCameraSpliceConfig.hpp",
+      "target": "class:PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/Config/TwoCameraSpliceConfig.hpp:TwoCameraSpliceCfg",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/TwoCameraSpliceModule.hpp",
+      "target": "class:PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/TwoCameraSpliceModule.hpp:TwoCameraSpliceModule",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/include/UI/DistortionCalibDialog.h",
+      "target": "class:PunchPressVision/UI/PunchPressUI/include/UI/DistortionCalibDialog.h:DistortionCalibDialog",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/include/UI/HalconView.h",
+      "target": "class:PunchPressVision/UI/PunchPressUI/include/UI/HalconView.h:HalconView",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/include/UI/ModelEditorDialog.h",
+      "target": "class:PunchPressVision/UI/PunchPressUI/include/UI/ModelEditorDialog.h:ModelEditorDialog",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/include/UI/ModelManagerDialog.h",
+      "target": "class:PunchPressVision/UI/PunchPressUI/include/UI/ModelManagerDialog.h:ModelManagerDialog",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/include/UI/NinePointCalibDialog.h",
+      "target": "class:PunchPressVision/UI/PunchPressUI/include/UI/NinePointCalibDialog.h:NinePointCalibDialog",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/include/UI/PunchPress.h",
+      "target": "class:PunchPressVision/UI/PunchPressUI/include/UI/PunchPress.h:PunchPress",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/include/UI/SpliceDialog.h",
+      "target": "class:PunchPressVision/UI/PunchPressUI/include/UI/SpliceDialog.h:SpliceDialog",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:trimCr",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:replaceFile",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:writeImageSafe",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:readImageSafe",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:writeParamsSafe",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:readParamsSafe",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:saveInDir",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:loadInDir",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModule.cpp:build",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModule.cpp:destroy",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModule.cpp:save",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/src/DistortionCalibDialog.cpp",
+      "target": "function:PunchPressVision/UI/PunchPressUI/src/DistortionCalibDialog.cpp:DistortionCalibDialog",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/src/DistortionCalibDialog.cpp",
+      "target": "function:PunchPressVision/UI/PunchPressUI/src/DistortionCalibDialog.cpp:buildConnections",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/src/DistortionCalibDialog.cpp",
+      "target": "function:PunchPressVision/UI/PunchPressUI/src/DistortionCalibDialog.cpp:onCalibrate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/src/ModelEditorDialog.cpp",
+      "target": "function:PunchPressVision/UI/PunchPressUI/src/ModelEditorDialog.cpp:doCreateModel",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/src/ModelManagerDialog.cpp",
+      "target": "function:PunchPressVision/UI/PunchPressUI/src/ModelManagerDialog.cpp:buildUi",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/src/ModelManagerDialog.cpp",
+      "target": "function:PunchPressVision/UI/PunchPressUI/src/ModelManagerDialog.cpp:refreshModelList",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/src/ModelManagerDialog.cpp",
+      "target": "function:PunchPressVision/UI/PunchPressUI/src/ModelManagerDialog.cpp:onLoadModel",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/src/ModelManagerDialog.cpp",
+      "target": "function:PunchPressVision/UI/PunchPressUI/src/ModelManagerDialog.cpp:onRenameModel",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/src/ModelManagerDialog.cpp",
+      "target": "function:PunchPressVision/UI/PunchPressUI/src/ModelManagerDialog.cpp:onDeleteModel",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/Config/TwoCameraSpliceConfig.hpp",
+      "target": "class:PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/Config/TwoCameraSpliceConfig.hpp:TwoCameraSpliceCfg",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/TwoCameraSpliceModule.hpp",
+      "target": "class:PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/TwoCameraSpliceModule.hpp:TwoCameraSpliceModule",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/include/UI/DistortionCalibDialog.h",
+      "target": "class:PunchPressVision/UI/PunchPressUI/include/UI/DistortionCalibDialog.h:DistortionCalibDialog",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/include/UI/HalconView.h",
+      "target": "class:PunchPressVision/UI/PunchPressUI/include/UI/HalconView.h:HalconView",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/include/UI/ModelEditorDialog.h",
+      "target": "class:PunchPressVision/UI/PunchPressUI/include/UI/ModelEditorDialog.h:ModelEditorDialog",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/include/UI/ModelManagerDialog.h",
+      "target": "class:PunchPressVision/UI/PunchPressUI/include/UI/ModelManagerDialog.h:ModelManagerDialog",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/include/UI/NinePointCalibDialog.h",
+      "target": "class:PunchPressVision/UI/PunchPressUI/include/UI/NinePointCalibDialog.h:NinePointCalibDialog",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/include/UI/PunchPress.h",
+      "target": "class:PunchPressVision/UI/PunchPressUI/include/UI/PunchPress.h:PunchPress",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/include/UI/SpliceDialog.h",
+      "target": "class:PunchPressVision/UI/PunchPressUI/include/UI/SpliceDialog.h:SpliceDialog",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:trimCr",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:replaceFile",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:writeImageSafe",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:readImageSafe",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:writeParamsSafe",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:readParamsSafe",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:saveInDir",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:loadInDir",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModule.cpp:build",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModule.cpp:destroy",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModule.cpp:save",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+
+    {
+      "source": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModule.cpp:build",
+      "target": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:loadInDir",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModule.cpp:destroy",
+      "target": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModule.cpp:save",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModule.cpp:save",
+      "target": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:saveInDir",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:saveInDir",
+      "target": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:writeImageSafe",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:saveInDir",
+      "target": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:writeParamsSafe",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:loadInDir",
+      "target": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:readImageSafe",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:loadInDir",
+      "target": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:readParamsSafe",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:writeImageSafe",
+      "target": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:replaceFile",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:writeParamsSafe",
+      "target": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:replaceFile",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:readParamsSafe",
+      "target": "function:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp:trimCr",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+
+    {
+      "source": "function:PunchPressVision/UI/PunchPressUI/src/DistortionCalibDialog.cpp:DistortionCalibDialog",
+      "target": "function:PunchPressVision/UI/PunchPressUI/src/DistortionCalibDialog.cpp:buildConnections",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModule.cpp",
+      "target": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/TwoCameraSpliceModule.hpp",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp",
+      "target": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/Config/TwoCameraSpliceConfig.hpp",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModulePath.cpp",
+      "target": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/TwoCameraSpliceModulePath.hpp",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModuleTypes.cpp",
+      "target": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/TwoCameraSpliceModuleTypes.hpp",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/src/DistortionCalibDialog.cpp",
+      "target": "file:PunchPressVision/UI/PunchPressUI/include/UI/DistortionCalibDialog.h",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/src/ModelEditorDialog.cpp",
+      "target": "file:PunchPressVision/UI/PunchPressUI/include/UI/ModelEditorDialog.h",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/src/ModelManagerDialog.cpp",
+      "target": "file:PunchPressVision/UI/PunchPressUI/include/UI/ModelManagerDialog.h",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/TwoCameraSpliceModule.hpp",
+      "target": "class:PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/Config/TwoCameraSpliceConfig.hpp:TwoCameraSpliceCfg",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/qrc/PunchPress.qrc",
+      "target": "file:PunchPressVision/UI/PunchPressUI/include/UI/PunchPress.h",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/test/src/TwoCameraSpliceModule.t.cpp",
+      "target": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/TwoCameraSpliceModule.hpp",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/test/src/TwoCameraSpliceModule.t.cpp",
+      "target": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/Config/TwoCameraSpliceConfig.hpp",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/test/src/TwoCameraSpliceModule.t.cpp",
+      "target": "file:PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModule.cpp",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    }
+  ]
+}

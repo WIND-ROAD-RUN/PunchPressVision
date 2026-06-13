@@ -1,0 +1,817 @@
+{
+  "nodes": [
+    {
+      "id": "config:.claude/settings.json",
+      "type": "config",
+      "name": "settings.json",
+      "filePath": ".claude/settings.json",
+      "summary": "Claude Code 插件配置，启用了 andrej-karpathy-skills 插件。",
+      "tags": ["configuration", "claude", "editor-config"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:.understand-anything/.understandignore",
+      "type": "file",
+      "name": ".understandignore",
+      "filePath": ".understand-anything/.understandignore",
+      "summary": "understand-anything 分析忽略规则文件，定义排除在代码分析之外的文件和目录模式（语法类似 .gitignore），目前所有规则均被注释。",
+      "tags": ["configuration", "ignore-patterns", "analysis-config"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.understand-anything/config.json",
+      "type": "config",
+      "name": "config.json",
+      "filePath": ".understand-anything/config.json",
+      "summary": "understand-anything 全局配置，指定输出语言为中文（zh）。",
+      "tags": ["configuration", "analysis-config", "localization"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:cmake/AddThirdSDKTargets.cmake",
+      "type": "file",
+      "name": "AddThirdSDKTargets.cmake",
+      "filePath": "cmake/AddThirdSDKTargets.cmake",
+      "summary": "CMake 模块，为 MVTec Halcon SDK 创建 IMPORTED INTERFACE 库目标（Halcon），自动发现 DLL 文件并设置头文件与库搜索路径。",
+      "tags": ["build-system", "cmake-module", "halcon", "sdk-integration"],
+      "complexity": "moderate",
+      "languageNotes": "使用 IMPORTED INTERFACE 目标模式，将第三方 SDK 封装为可链接的 CMake 目标，实现依赖隔离。"
+    },
+    {
+      "id": "file:cmake/CMakeCacheIni.cmake",
+      "type": "file",
+      "name": "CMakeCacheIni.cmake",
+      "filePath": "cmake/CMakeCacheIni.cmake",
+      "summary": "CMake 缓存变量初始化模块，声明 QT_DIR、RWUL_DIR、HALCON_DIR 三个外部 SDK 路径变量（默认占位值为 D:），并将它们追加到 CMAKE_PREFIX_PATH。",
+      "tags": ["build-system", "cmake-module", "configuration", "sdk-path"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:cmake/func.cmake",
+      "type": "file",
+      "name": "func.cmake",
+      "filePath": "cmake/func.cmake",
+      "summary": "CMake 工具函数模块，定义 add_windeployqt 函数，在目标构建后自动运行 windeployqt 打包 Qt 运行时依赖。",
+      "tags": ["build-system", "cmake-module", "qt-deployment", "utility"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:Folder.DotSettings",
+      "type": "file",
+      "name": "Folder.DotSettings",
+      "filePath": "Folder.DotSettings",
+      "summary": "JetBrains ReSharper C++ 团队共享设置，包含 C++ 命名规则缩写配置（RT、IO）和用户自定义词典（bbox、yolov 等视觉领域术语）。",
+      "tags": ["configuration", "ide-settings", "resharper", "naming-convention"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:Folder.DotSettings.user",
+      "type": "file",
+      "name": "Folder.DotSettings.user",
+      "filePath": "Folder.DotSettings.user",
+      "summary": "JetBrains ReSharper C++ 用户个人设置文件（与团队共享的 .DotSettings 分离）。",
+      "tags": ["configuration", "ide-settings", "resharper", "user-preferences"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:PunchPressVision/app/CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/app/CMakeLists.txt",
+      "summary": "App 层根 CMake 构建文件，目前仅为占位（仅包含 add_subdirectory(UIModule) 一行），实际可执行目标在 UI 层定义。",
+      "tags": ["build-system", "cmake", "stub"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:PunchPressVision/App/PunchPressApp/CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/App/PunchPressApp/CMakeLists.txt",
+      "summary": "PunchPressApp 静态库的 CMake 构建定义，链接 bun::Business 和 Qt6::Core，设置 DEBUG_POSTFIX 为 d，并添加 test 子目录。",
+      "tags": ["build-system", "cmake", "static-library", "app-layer"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/App/PunchPressApp/include/app/PunchPressApp.hpp",
+      "type": "file",
+      "name": "PunchPressApp.hpp",
+      "filePath": "PunchPressVision/App/PunchPressApp/include/app/PunchPressApp.hpp",
+      "summary": "App 层聚合根头文件，定义 PunchPressApp 类（继承 QObject），作为模式状态机提供启动检查、就绪性查询、相机配置代理和生产帧处理编排，通过信号向 UI 层暴露状态变化。",
+      "tags": ["entry-point", "app-layer", "state-machine", "qt-signals", "header"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp",
+      "type": "file",
+      "name": "PunchPressApp.cpp",
+      "filePath": "PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp",
+      "summary": "PunchPressApp 核心实现，包含应用生命周期管理（build/destroy/start/stop）、启动安全检查（单实例检测、MVS 进程冲突检测、配置完整性校验）、运行模式切换（Debug/Production/Calibration）及生产帧处理（模板匹配+PLC 位置写入）。",
+      "tags": ["entry-point", "app-layer", "lifecycle", "startup-check", "mode-switching"],
+      "complexity": "complex",
+      "languageNotes": "使用 Qt::DirectConnection 实现低延迟信号槽连接，采用原子变量管理模式状态以保证线程安全，通过 QProcess 检测海康 MVS 驱动进程冲突。"
+    },
+    {
+      "id": "document:PunchPressVision/App/PunchPressApp/test/CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/App/PunchPressApp/test/CMakeLists.txt",
+      "summary": "PunchPressApp 测试可执行文件的 CMake 构建定义，链接 app::PunchPressApp 并在构建后运行 windeployqt。",
+      "tags": ["build-system", "cmake", "test", "executable"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/App/PunchPressApp/test/include/PunchPressApp.t.hpp",
+      "type": "file",
+      "name": "PunchPressApp.t.hpp",
+      "filePath": "PunchPressVision/App/PunchPressApp/test/include/PunchPressApp.t.hpp",
+      "summary": "PunchPressApp 测试头文件占位符，当前为空（仅 1 行）。",
+      "tags": ["test", "header", "stub"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/App/PunchPressApp/test/src/PunchPressApp.t.cpp",
+      "type": "file",
+      "name": "PunchPressApp.t.cpp",
+      "filePath": "PunchPressVision/App/PunchPressApp/test/src/PunchPressApp.t.cpp",
+      "summary": "PunchPressApp 集成测试入口，创建 QCoreApplication、构建基础设施和业务层、启动 PunchPressApp，进入 Qt 事件循环。",
+      "tags": ["test", "integration-test", "entry-point"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:PunchPressVision/Business/Business/CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/Business/Business/CMakeLists.txt",
+      "summary": "Business 聚合静态库的 CMake 构建定义，公开链接 inf::infrastructure 及所有子业务模块（CalibBun、CameraBun、NinePointBun、ShapeModeManagerBun、TwoCameraSpliceBun、LightControlBun），并添加 test 子目录。",
+      "tags": ["build-system", "cmake", "static-library", "business-layer", "aggregate"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/Business/Business/include/Business/Business.hpp",
+      "type": "file",
+      "name": "Business.hpp",
+      "filePath": "PunchPressVision/Business/Business/include/Business/Business.hpp",
+      "summary": "Business 聚合层头文件，定义 Business 类，持有 6 个子业务模块（CameraBun、CalibBun、NinePointBun、ShapeModeManagerBun、TwoCameraSpliceBun、LightControlBun）的 unique_ptr，并提供统一的生命周期管理接口（build/destroy/start/stop）。",
+      "tags": ["business-layer", "aggregate", "lifecycle", "dependency-injection", "header"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/Business/Business/src/Business.cpp",
+      "type": "file",
+      "name": "Business.cpp",
+      "filePath": "PunchPressVision/Business/Business/src/Business.cpp",
+      "summary": "Business 聚合层实现，在 build() 中按序构造并初始化 6 个子业务模块（依赖注入 inf::infrastructure 引用），在 destroy()/stop() 中按逆序销毁/停止，实现生命周期编排。",
+      "tags": ["business-layer", "aggregate", "lifecycle", "dependency-injection"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:PunchPressVision/Business/Business/test/CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/Business/Business/test/CMakeLists.txt",
+      "summary": "Business 聚合层测试可执行文件的 CMake 构建定义。",
+      "tags": ["build-system", "cmake", "test"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/Business/Business/test/include/CalibBun.t.hpp",
+      "type": "file",
+      "name": "CalibBun.t.hpp",
+      "filePath": "PunchPressVision/Business/Business/test/include/CalibBun.t.hpp",
+      "summary": "CalibBun 测试头文件占位符，当前为空（仅 2 行）。",
+      "tags": ["test", "header", "stub"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/Business/Business/test/src/CalibBun.t.cpp",
+      "type": "file",
+      "name": "CalibBun.t.cpp",
+      "filePath": "PunchPressVision/Business/Business/test/src/CalibBun.t.cpp",
+      "summary": "CalibBun 测试入口占位符，当前仅返回 0（空桩测试）。",
+      "tags": ["test", "stub"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:PunchPressVision/Business/CalibBun/CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/Business/CalibBun/CMakeLists.txt",
+      "summary": "CalibBun 静态库的 CMake 构建定义，公开链接 inf::infrastructure，并添加 test 子目录。",
+      "tags": ["build-system", "cmake", "static-library", "calibration"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/Business/CalibBun/include/Business/CalibBun/CalibBun.hpp",
+      "type": "file",
+      "name": "CalibBun.hpp",
+      "filePath": "PunchPressVision/Business/CalibBun/include/Business/CalibBun/CalibBun.hpp",
+      "summary": "标定业务模块头文件，定义 CalibBun 类（继承 global::IBusiness），封装 Halcon 相机标定 API，提供 calibCamera、calibrateFromImages、drawCalibMarks、undistortImage 等标定与畸变校正方法。",
+      "tags": ["business-layer", "calibration", "halcon", "image-processing", "header"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/Business/CalibBun/src/CalibBun.cpp",
+      "type": "file",
+      "name": "CalibBun.cpp",
+      "filePath": "PunchPressVision/Business/CalibBun/src/CalibBun.cpp",
+      "summary": "标定业务模块核心实现，封装 Halcon 标定流程：calibrateFromImages 执行完整标定流水线（创建标定数据、设置相机参数、查找标定板、执行标定算法并写入配置），drawCalibMarks 绘制标定标记点，undistortImage 对图像进行径向畸变校正。",
+      "tags": ["business-layer", "calibration", "halcon", "image-processing", "distortion-correction"],
+      "complexity": "complex",
+      "languageNotes": "使用 Halcon C++ API（HalconCpp 命名空间）进行相机标定；calibrateFromImages 实现完整错误处理流程（空图像检验→标定板文件检验→创建 CalibData→逐图像查找标定对象→执行 CalibrateCameras）；undistortImage 使用 ChangeRadialDistortionCamPar 进行自适应径向畸变校正。"
+    },
+    {
+      "id": "document:PunchPressVision/Business/CalibBun/test/CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/Business/CalibBun/test/CMakeLists.txt",
+      "summary": "CalibBun 测试可执行文件的 CMake 构建定义，链接 bun::CalibBun。",
+      "tags": ["build-system", "cmake", "test"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:PunchPressVision/App/PunchPressApp/include/app/PunchPressApp.hpp:PunchPressApp",
+      "type": "class",
+      "name": "PunchPressApp",
+      "filePath": "PunchPressVision/App/PunchPressApp/include/app/PunchPressApp.hpp",
+      "lineRange": [21, 75],
+      "summary": "App 层聚合根类（继承 QObject），作为应用模式状态机，负责启动安全检查、运行模式切换（Idle/Debug/Production/Calibration）、相机配置代理、生产帧处理编排，通过 Qt 信号与 UI 层通信。",
+      "tags": ["entry-point", "state-machine", "qt-signals", "lifecycle", "dependency-injection"],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:PunchPressVision/Business/Business/include/Business/Business.hpp:Business",
+      "type": "class",
+      "name": "Business",
+      "filePath": "PunchPressVision/Business/Business/include/Business/Business.hpp",
+      "lineRange": [13, 36],
+      "summary": "业务聚合根类，持有 6 个子业务模块（CameraBun、CalibBun、NinePointBun、ShapeModeManagerBun、TwoCameraSpliceBun、LightControlBun）的 unique_ptr，提供统一的 build/destroy/start/stop 生命周期编排接口，通过依赖注入持有 infra 引用。",
+      "tags": ["aggregate", "lifecycle", "dependency-injection", "business-layer"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:PunchPressVision/Business/CalibBun/include/Business/CalibBun/CalibBun.hpp:CalibBun",
+      "type": "class",
+      "name": "CalibBun",
+      "filePath": "PunchPressVision/Business/CalibBun/include/Business/CalibBun/CalibBun.hpp",
+      "lineRange": [11, 37],
+      "summary": "标定业务类（继承 global::IBusiness），封装 Halcon 相机标定全流程：从多张标定板图像中标定相机内外参（calibrateFromImages）、绘制标定标记点（drawCalibMarks）、对图像进行径向畸变校正（undistortImage）。",
+      "tags": ["calibration", "halcon", "image-processing", "camera"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp:build",
+      "type": "function",
+      "name": "build",
+      "filePath": "PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp",
+      "lineRange": [21, 31],
+      "summary": "建立 App 层信号连接，将 CameraBun 的帧回调（callBackFunWithCalib）和连接状态变化信号桥接到 App 层槽函数，使用 Qt::DirectConnection 保证低延迟。",
+      "tags": ["lifecycle", "signal-connection", "camera"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp:start",
+      "type": "function",
+      "name": "start",
+      "filePath": "PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp",
+      "lineRange": [39, 49],
+      "summary": "启动 App 运行时：通过 ControlModule 连接 PLC（IP/端口来自 baseCfg），连接失败时仅告警不中断。",
+      "tags": ["lifecycle", "plc-connection", "startup"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp:performStartupCheck",
+      "type": "function",
+      "name": "performStartupCheck",
+      "filePath": "PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp",
+      "lineRange": [64, 105],
+      "summary": "执行完整的启动安全检查流程：单实例检测→MVS 进程冲突检测→配置完整性校验→标定就绪性检查，每一步失败时返回详细错误信息。",
+      "tags": ["startup-check", "validation", "safety"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp:switchToMode",
+      "type": "function",
+      "name": "switchToMode",
+      "filePath": "PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp",
+      "lineRange": [199, 259],
+      "summary": "运行模式切换核心函数：验证目标模式的就绪性条件→存储当前模式→根据目标模式（Debug/Production/Calibration）配置相机（自由运行/触发模式/标定模式）并设置图像拼接启用状态，失败时回滚至 Idle。",
+      "tags": ["mode-switching", "state-machine", "camera-config", "validation"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp:processProductionFrame",
+      "type": "function",
+      "name": "processProductionFrame",
+      "filePath": "PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp",
+      "lineRange": [278, 328],
+      "summary": "生产模式帧处理核心：执行 ShapeModel 模板匹配→若成功则通过 NinePointModule 将像素坐标转为世界坐标→将位置结果通过 ControlModule（Modbus）写入 PLC 寄存器。",
+      "tags": ["production", "template-matching", "coordinate-transform", "plc"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp:checkCalibReadiness",
+      "type": "function",
+      "name": "checkCalibReadiness",
+      "filePath": "PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp",
+      "lineRange": [134, 152],
+      "summary": "检查标定模式就绪性：验证标定配置模块已初始化并且标定板描述文件路径非空。",
+      "tags": ["readiness-check", "calibration", "validation"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp:checkProductionReadiness",
+      "type": "function",
+      "name": "checkProductionReadiness",
+      "filePath": "PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp",
+      "lineRange": [154, 163],
+      "summary": "检查生产模式就绪性：先执行标定就绪性检查，再验证模型已加载且 PLC 已连接。",
+      "tags": ["readiness-check", "production", "validation"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp:configureCameraForDebug",
+      "type": "function",
+      "name": "configureCameraForDebug",
+      "filePath": "PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp",
+      "lineRange": [167, 176],
+      "summary": "将双相机配置为调试模式（自由运行/连续采集模式），适用于 Debug 运行模式下的实时图像预览。",
+      "tags": ["camera-config", "debug-mode", "free-run"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp:configureCameraForProduction",
+      "type": "function",
+      "name": "configureCameraForProduction",
+      "filePath": "PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp",
+      "lineRange": [178, 189],
+      "summary": "将双相机配置为生产模式（硬件触发模式），适用于 Production 运行模式下由外部传感器触发采集。",
+      "tags": ["camera-config", "production-mode", "trigger-mode"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/Business/Business/src/Business.cpp:build",
+      "type": "function",
+      "name": "build",
+      "filePath": "PunchPressVision/Business/Business/src/Business.cpp",
+      "lineRange": [11, 26],
+      "summary": "按序构造并初始化 6 个子业务模块（CalibBun→TwoCameraSpliceBun→NinePointBun→CameraBun→ShapeModeManagerBun→LightControlBun），将 infra 引用注入每个模块并调用其 build()。",
+      "tags": ["lifecycle", "dependency-injection", "orchestration"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/Business/CalibBun/src/CalibBun.cpp:calibrateFromImages",
+      "type": "function",
+      "name": "calibrateFromImages",
+      "filePath": "PunchPressVision/Business/CalibBun/src/CalibBun.cpp",
+      "lineRange": [20, 160],
+      "summary": "Halcon 相机标定核心入口：验证输入图像和标定板描述文件→创建 Halcon 标定数据对象→设置相机参数和标定板→对每张有效图像执行 FindCalibObject→调用 CalibrateCameras 计算内外参→获取结果并设置原点姿态→将标定结果写入 calibConfig 持久化。",
+      "tags": ["calibration", "halcon", "camera-params", "image-processing"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:PunchPressVision/Business/CalibBun/src/CalibBun.cpp:drawCalibMarks",
+      "type": "function",
+      "name": "drawCalibMarks",
+      "filePath": "PunchPressVision/Business/CalibBun/src/CalibBun.cpp",
+      "lineRange": [162, 269],
+      "summary": "在输入图像上绘制标定板标记：创建 Halcon 标定数据→设置参数→图像预处理（RGB 转灰度）→FindCalibObject 查找标定板→提取观测点轮廓并生成十字交叉 XLD 标记→返回标定状态（isOk）、标记 XLD 和区域。",
+      "tags": ["calibration", "halcon", "visualization", "image-processing"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:PunchPressVision/Business/CalibBun/src/CalibBun.cpp:undistortImage",
+      "type": "function",
+      "name": "undistortImage",
+      "filePath": "PunchPressVision/Business/CalibBun/src/CalibBun.cpp",
+      "lineRange": [271, 296],
+      "summary": "对输入图像执行径向畸变校正：检查标定数据有效性→使用 ChangeRadialDistortionCamPar 自适应调整畸变模型→调用 ChangeRadialDistortionImage 生成校正后的 HImage 并返回。",
+      "tags": ["distortion-correction", "halcon", "image-processing"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/App/PunchPressApp/test/src/PunchPressApp.t.cpp:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "PunchPressVision/App/PunchPressApp/test/src/PunchPressApp.t.cpp",
+      "lineRange": [7, 22],
+      "summary": "PunchPressApp 集成测试入口函数：创建 QCoreApplication→构建 inf::infrastructure 和 bun::Business→创建并启动 PunchPressApp→进入 Qt 事件循环。",
+      "tags": ["test", "entry-point", "integration-test"],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:PunchPressVision/App/PunchPressApp/include/app/PunchPressApp.hpp",
+      "target": "class:PunchPressVision/App/PunchPressApp/include/app/PunchPressApp.hpp:PunchPressApp",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/App/PunchPressApp/include/app/PunchPressApp.hpp",
+      "target": "class:PunchPressVision/App/PunchPressApp/include/app/PunchPressApp.hpp:PunchPressApp",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp",
+      "target": "function:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp:build",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp",
+      "target": "function:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp:build",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp",
+      "target": "function:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp:start",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp",
+      "target": "function:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp:start",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp",
+      "target": "function:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp:performStartupCheck",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp",
+      "target": "function:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp:performStartupCheck",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp",
+      "target": "function:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp:switchToMode",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp",
+      "target": "function:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp:switchToMode",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp",
+      "target": "function:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp:processProductionFrame",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp",
+      "target": "function:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp:processProductionFrame",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp",
+      "target": "function:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp:checkCalibReadiness",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp",
+      "target": "function:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp:checkCalibReadiness",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp",
+      "target": "function:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp:checkProductionReadiness",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp",
+      "target": "function:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp:checkProductionReadiness",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp",
+      "target": "function:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp:configureCameraForDebug",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp",
+      "target": "function:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp:configureCameraForDebug",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp",
+      "target": "function:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp:configureCameraForProduction",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp",
+      "target": "function:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp:configureCameraForProduction",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/Business/Business/include/Business/Business.hpp",
+      "target": "class:PunchPressVision/Business/Business/include/Business/Business.hpp:Business",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/Business/Business/include/Business/Business.hpp",
+      "target": "class:PunchPressVision/Business/Business/include/Business/Business.hpp:Business",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/Business/Business/src/Business.cpp",
+      "target": "function:PunchPressVision/Business/Business/src/Business.cpp:build",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/Business/Business/src/Business.cpp",
+      "target": "function:PunchPressVision/Business/Business/src/Business.cpp:build",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/Business/CalibBun/include/Business/CalibBun/CalibBun.hpp",
+      "target": "class:PunchPressVision/Business/CalibBun/include/Business/CalibBun/CalibBun.hpp:CalibBun",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/Business/CalibBun/include/Business/CalibBun/CalibBun.hpp",
+      "target": "class:PunchPressVision/Business/CalibBun/include/Business/CalibBun/CalibBun.hpp:CalibBun",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/Business/CalibBun/src/CalibBun.cpp",
+      "target": "function:PunchPressVision/Business/CalibBun/src/CalibBun.cpp:calibrateFromImages",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/Business/CalibBun/src/CalibBun.cpp",
+      "target": "function:PunchPressVision/Business/CalibBun/src/CalibBun.cpp:calibrateFromImages",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/Business/CalibBun/src/CalibBun.cpp",
+      "target": "function:PunchPressVision/Business/CalibBun/src/CalibBun.cpp:drawCalibMarks",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/Business/CalibBun/src/CalibBun.cpp",
+      "target": "function:PunchPressVision/Business/CalibBun/src/CalibBun.cpp:drawCalibMarks",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/Business/CalibBun/src/CalibBun.cpp",
+      "target": "function:PunchPressVision/Business/CalibBun/src/CalibBun.cpp:undistortImage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/Business/CalibBun/src/CalibBun.cpp",
+      "target": "function:PunchPressVision/Business/CalibBun/src/CalibBun.cpp:undistortImage",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/App/PunchPressApp/test/src/PunchPressApp.t.cpp",
+      "target": "function:PunchPressVision/App/PunchPressApp/test/src/PunchPressApp.t.cpp:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/App/PunchPressApp/test/src/PunchPressApp.t.cpp",
+      "target": "function:PunchPressVision/App/PunchPressApp/test/src/PunchPressApp.t.cpp:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "document:PunchPressVision/App/PunchPressApp/CMakeLists.txt",
+      "target": "file:PunchPressVision/App/PunchPressApp/include/app/PunchPressApp.hpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/App/PunchPressApp/CMakeLists.txt",
+      "target": "file:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/App/PunchPressApp/CMakeLists.txt",
+      "target": "document:PunchPressVision/App/PunchPressApp/test/CMakeLists.txt",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:PunchPressVision/App/PunchPressApp/test/CMakeLists.txt",
+      "target": "file:PunchPressVision/App/PunchPressApp/test/src/PunchPressApp.t.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/Business/Business/CMakeLists.txt",
+      "target": "file:PunchPressVision/Business/Business/include/Business/Business.hpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/Business/Business/CMakeLists.txt",
+      "target": "file:PunchPressVision/Business/Business/src/Business.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/Business/Business/CMakeLists.txt",
+      "target": "document:PunchPressVision/Business/Business/test/CMakeLists.txt",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:PunchPressVision/Business/Business/test/CMakeLists.txt",
+      "target": "file:PunchPressVision/Business/Business/test/src/CalibBun.t.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/Business/CalibBun/CMakeLists.txt",
+      "target": "file:PunchPressVision/Business/CalibBun/include/Business/CalibBun/CalibBun.hpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/Business/CalibBun/CMakeLists.txt",
+      "target": "file:PunchPressVision/Business/CalibBun/src/CalibBun.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/Business/CalibBun/CMakeLists.txt",
+      "target": "document:PunchPressVision/Business/CalibBun/test/CMakeLists.txt",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:cmake/AddThirdSDKTargets.cmake",
+      "target": "document:PunchPressVision/Business/CalibBun/CMakeLists.txt",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:cmake/CMakeCacheIni.cmake",
+      "target": "file:cmake/AddThirdSDKTargets.cmake",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:cmake/func.cmake",
+      "target": "document:PunchPressVision/App/PunchPressApp/test/CMakeLists.txt",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp",
+      "target": "file:PunchPressVision/App/PunchPressApp/test/src/PunchPressApp.t.cpp",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:PunchPressVision/Business/CalibBun/src/CalibBun.cpp",
+      "target": "file:PunchPressVision/Business/Business/test/src/CalibBun.t.cpp",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:PunchPressVision/App/PunchPressApp/include/app/PunchPressApp.hpp",
+      "target": "file:PunchPressVision/Business/Business/include/Business/Business.hpp",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp",
+      "target": "file:PunchPressVision/App/PunchPressApp/include/app/PunchPressApp.hpp",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/Business/Business/src/Business.cpp",
+      "target": "file:PunchPressVision/Business/Business/include/Business/Business.hpp",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/Business/CalibBun/src/CalibBun.cpp",
+      "target": "file:PunchPressVision/Business/CalibBun/include/Business/CalibBun/CalibBun.hpp",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/Business/Business/include/Business/Business.hpp",
+      "target": "file:PunchPressVision/Business/CalibBun/include/Business/CalibBun/CalibBun.hpp",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.claude/settings.json",
+      "target": "file:.understand-anything/.understandignore",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:.understand-anything/config.json",
+      "target": "file:.understand-anything/.understandignore",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:cmake/CMakeCacheIni.cmake",
+      "target": "file:cmake/func.cmake",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:Folder.DotSettings",
+      "target": "file:Folder.DotSettings.user",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    }
+  ]
+}

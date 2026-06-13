@@ -1,0 +1,116 @@
+{
+  "nodes": [
+    {
+      "id": "file:PunchPressVision/UI/UIModule/ui/DlgCloseForm.ui",
+      "type": "file",
+      "name": "DlgCloseForm.ui",
+      "filePath": "PunchPressVision/UI/UIModule/ui/DlgCloseForm.ui",
+      "summary": "关机确认对话框 UI 定义，包含中英双语提示文本（“是否关机? Do You Want To Close Computer?”），提供重启、关闭、是、否四个操作按钮，采用圆角卡片式视觉风格。",
+      "tags": ["ui-form", "dialog", "shutdown", "confirmation"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/UI/UIModule/ui/DlgJiudianbiaoding.ui",
+      "type": "file",
+      "name": "DlgJiudianbiaoding.ui",
+      "filePath": "PunchPressVision/UI/UIModule/ui/DlgJiudianbiaoding.ui",
+      "summary": "九点标定对话框 UI 定义，左侧为图像显示区域，中间为双相机控制面板（曝光/增益设置、开始/停止拍照），右侧为标定操作面板，包含九点图像表格、移除/移除所有、读取图片、ROI绘制、测量矩形参数（高/宽/对比度/个数）、矩形识别开关和九点标定执行按钮。",
+      "tags": ["ui-form", "dialog", "calibration", "nine-point", "camera-control", "image-processing", "measurement"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:PunchPressVision/UI/UIModule/ui/LoadingDialog.ui",
+      "type": "file",
+      "name": "LoadingDialog.ui",
+      "filePath": "PunchPressVision/UI/UIModule/ui/LoadingDialog.ui",
+      "summary": "加载中对话框 UI 模板，包含 $centralwidget$ 占位符，是一个极简的 QDialog 壳，用于在运行时动态填充加载动画或进度提示内容。",
+      "tags": ["ui-form", "dialog", "loading", "template", "placeholder"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/UI/UIModule/ui/PicturesViewer.ui",
+      "type": "file",
+      "name": "PicturesViewer.ui",
+      "filePath": "PunchPressVision/UI/UIModule/ui/PicturesViewer.ui",
+      "summary": "图片浏览查看器主窗口 UI 定义，左侧为文件目录树（QTreeView），中央为图片显示区域（QLabel），右侧为图片列表（QListView），底部工具栏提供退出、全部删除、删除、上一个/下一个类别、上一张/下一张等导航与操作按钮，附带完整的自定义滚动条和树形视图样式表。",
+      "tags": ["ui-form", "main-window", "image-viewer", "file-browser", "navigation"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:PunchPressVision/UI/UIModule/ui/PictureViewerThumbnails.ui",
+      "type": "file",
+      "name": "PictureViewerThumbnails.ui",
+      "filePath": "PunchPressVision/UI/UIModule/ui/PictureViewerThumbnails.ui",
+      "summary": "缩略图模式图片查看器主窗口 UI 定义，左侧为文件目录树，中央为缩略图网格显示区域，底部工具栏提供退出、全部删除、删除、放大、缩小、上一张/下一张按钮，专注于缩略图导航和缩放浏览。",
+      "tags": ["ui-form", "main-window", "image-viewer", "thumbnails", "zoom", "navigation"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/UI/UIModule/ui/PictureViewerUtilty.ui",
+      "type": "file",
+      "name": "PictureViewerUtilty.ui",
+      "filePath": "PunchPressVision/UI/UIModule/ui/PictureViewerUtilty.ui",
+      "summary": "精简图片查看器主窗口 UI 定义，仅包含图片显示区域和底部工具栏（退出、删除、上一张、下一张），不含文件目录树和图片列表，适合快速查看或嵌入式使用场景。",
+      "tags": ["ui-form", "main-window", "image-viewer", "simplified", "utility"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/UI/UIModule/ui/PunchPress.ui",
+      "type": "file",
+      "name": "PunchPress.ui",
+      "filePath": "PunchPressVision/UI/UIModule/ui/PunchPress.ui",
+      "summary": "冲压机视觉检测主窗口 UI 定义，标题为“冲床检测”。左侧为黑色背景的图像显示区（含 ModelId 标签），右侧面板从上至下依次为：标题栏与退出按钮、相机1/2及PLC状态显示区、双相机曝光与增益参数控制区、调试/工作模式及上下光源选择区、保存参数与设置偏移量按钮、QTabWidget 分页（“功能”页：畸变矫正/九点标定/图像拼接/保存所有参数；“模板”页：创建模版/修改模板/模版加载/奇偶裁切）、信息表格及公司信息标签。",
+      "tags": ["ui-form", "main-window", "entry-point", "vision-inspection", "camera-control", "calibration", "template-management"],
+      "complexity": "complex",
+      "languageNotes": "Qt Designer UI 文件，通过 UIC 编译生成 C++ 头文件 Ui::PunchPressClass，由对应的 QMainWindow 派生类加载。使用 QTabWidget 组织功能与模板管理两大模块，RadioButton 实现调试/工作模式及光源切换。"
+    },
+    {
+      "id": "file:PunchPressVision/UI/UIModule/ui/rqw_ImageEnlargedDisplay.ui",
+      "type": "file",
+      "name": "rqw_ImageEnlargedDisplay.ui",
+      "filePath": "PunchPressVision/UI/UIModule/ui/rqw_ImageEnlargedDisplay.ui",
+      "summary": "图像放大显示对话框 UI 定义，标题为“几号工位”，包含大尺寸图像显示区域和底部工具栏（退出、上一个工位、下一个工位），用于工位间切换查看放大的检测图像。",
+      "tags": ["ui-form", "dialog", "image-display", "workstation", "navigation"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/UI/UIModule/ui/WarningInfoList.ui",
+      "type": "file",
+      "name": "WarningInfoList.ui",
+      "filePath": "PunchPressVision/UI/UIModule/ui/WarningInfoList.ui",
+      "summary": "警告信息列表对话框 UI 定义，使用 QTableView 以表格形式展示告警记录，支持排序和交替行颜色，底部提供退出和清除所有按钮，用于集中显示系统运行过程中产生的警告和异常信息。",
+      "tags": ["ui-form", "dialog", "warning", "table-view", "alert-list"],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:PunchPressVision/UI/UIModule/ui/PunchPress.ui",
+      "target": "file:PunchPressVision/UI/UIModule/ui/DlgJiudianbiaoding.ui",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:PunchPressVision/UI/UIModule/ui/PicturesViewer.ui",
+      "target": "file:PunchPressVision/UI/UIModule/ui/PictureViewerThumbnails.ui",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:PunchPressVision/UI/UIModule/ui/PicturesViewer.ui",
+      "target": "file:PunchPressVision/UI/UIModule/ui/PictureViewerUtilty.ui",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:PunchPressVision/UI/UIModule/ui/PictureViewerThumbnails.ui",
+      "target": "file:PunchPressVision/UI/UIModule/ui/PictureViewerUtilty.ui",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "projectRoot": "D:/Workplace/rep/PunchPressVision",
+  "batchFiles": [
+    {"path": ".understand-anything/intermediate/batch-1.json", "language": "json", "sizeLines": 143, "fileCategory": "config"},
+    {"path": ".understand-anything/intermediate/batch-2.json", "language": "json", "sizeLines": 94, "fileCategory": "config"},
+    {"path": ".understand-anything/intermediate/batch-3.json", "language": "json", "sizeLines": 705, "fileCategory": "config"},
+    {"path": ".understand-anything/intermediate/batch-4.json", "language": "json", "sizeLines": 762, "fileCategory": "config"},
+    {"path": ".understand-anything/intermediate/batch-5.json", "language": "json", "sizeLines": 1250, "fileCategory": "config"},
+    {"path": ".understand-anything/intermediate/batches.json", "language": "json", "sizeLines": 2687, "fileCategory": "config"},
+    {"path": ".understand-anything/intermediate/scan-result.json", "language": "json", "sizeLines": 507, "fileCategory": "config"}
+  ],
+  "batchImportData": {".understand-anything/intermediate/batch-1.json":[],".understand-anything/intermediate/batch-2.json":[],".understand-anything/intermediate/batch-3.json":[],".understand-anything/intermediate/batch-4.json":[],".understand-anything/intermediate/batch-5.json":[],".understand-anything/intermediate/batches.json":[],".understand-anything/intermediate/scan-result.json":[]}
+}

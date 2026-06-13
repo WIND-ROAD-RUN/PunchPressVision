@@ -1,0 +1,167 @@
+{
+  "nodes": [
+    {
+      "id": "file:PunchPressVision/UI/UIModule/include/WarnUtilty.hpp",
+      "type": "file",
+      "name": "WarnUtilty.hpp",
+      "filePath": "PunchPressVision/UI/UIModule/include/WarnUtilty.hpp",
+      "summary": "定义警告信息的核心数据模型，包含 WarningType 枚举和 WarningInfo 结构体，用于在整个警告系统中传递警告类型、消息文本、时间戳和唯一标识。",
+      "tags": ["data-model", "type-definition", "warning"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:PunchPressVision/UI/UIModule/include/WarnUtilty.hpp:WarningInfo",
+      "type": "class",
+      "name": "WarningInfo",
+      "filePath": "PunchPressVision/UI/UIModule/include/WarnUtilty.hpp",
+      "lineRange": [17, 25],
+      "summary": "警告信息数据结构体，包含警告类型（Warning/Error/Info）、消息文本、时间戳和 warningId，用作整个警告模块的数据载体。",
+      "tags": ["data-model", "struct", "warning"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/UI/UIModule/include/WarningInfoList.h",
+      "type": "file",
+      "name": "WarningInfoList.h",
+      "filePath": "PunchPressVision/UI/UIModule/include/WarningInfoList.h",
+      "summary": "警告历史记录对话框，继承 QDialog，使用 QStandardItemModel 以列表形式展示历史警告信息，提供清空警告的信号与槽机制。",
+      "tags": ["qt-widget", "dialog", "warning", "ui"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:PunchPressVision/UI/UIModule/include/WarningInfoList.h:WarningInfoList",
+      "type": "class",
+      "name": "WarningInfoList",
+      "filePath": "PunchPressVision/UI/UIModule/include/WarningInfoList.h",
+      "lineRange": [13, 39],
+      "summary": "基于 QDialog 的警告历史列表对话框，通过 QStandardItemModel 展示警告记录，暴露 setWarningHistory 接口接收外部数据，并通过 clearWarnings 信号支持一键清空。",
+      "tags": ["qt-widget", "dialog", "warning", "ui"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/UI/UIModule/include/rqw_LabelClickable.h",
+      "type": "file",
+      "name": "rqw_LabelClickable.h",
+      "filePath": "PunchPressVision/UI/UIModule/include/rqw_LabelClickable.h",
+      "summary": "可点击的 QLabel 派生控件，重写 mousePressEvent 并发射 clicked() 信号，为需要点击交互的标签组件提供基类。",
+      "tags": ["qt-widget", "event-handler", "label", "base-class"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:PunchPressVision/UI/UIModule/include/rqw_LabelClickable.h:ClickableLabel",
+      "type": "class",
+      "name": "ClickableLabel",
+      "filePath": "PunchPressVision/UI/UIModule/include/rqw_LabelClickable.h",
+      "lineRange": [11, 24],
+      "summary": "继承 QLabel 的可点击标签基类，通过重写 mousePressEvent 处理鼠标点击并发射 clicked() 信号，供 LabelWarning 等子类继承。",
+      "tags": ["qt-widget", "event-handler", "base-class", "signal"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/UI/UIModule/include/rqw_LabelWarning.h",
+      "type": "file",
+      "name": "rqw_LabelWarning.h",
+      "filePath": "PunchPressVision/UI/UIModule/include/rqw_LabelWarning.h",
+      "summary": "警告状态标签控件，继承 ClickableLabel，通过双定时器实现红色警告、灰色超时、黑色归位的颜色渐变机制，并提供线程安全的警告队列与历史记录管理。",
+      "tags": ["qt-widget", "warning", "timer", "thread-safe", "label"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:PunchPressVision/UI/UIModule/include/rqw_LabelWarning.h:LabelWarning",
+      "type": "class",
+      "name": "LabelWarning",
+      "filePath": "PunchPressVision/UI/UIModule/include/rqw_LabelWarning.h",
+      "lineRange": [14, 84],
+      "summary": "继承 ClickableLabel 的警告标签控件，集成双定时器驱动的颜色状态机（红→灰→黑）、线程安全（std::mutex）的警告队列 push/pop/top 操作、历史记录增删查改以及可配置的警告/超时颜色与灰色持续时间。",
+      "tags": ["qt-widget", "warning", "timer", "thread-safe", "state-machine"],
+      "complexity": "moderate",
+      "languageNotes": "使用双重 QTimer 实现警告状态的颜色渐变有限状态机（红→灰→黑），并通过 std::mutex 保护 deque 容器的并发访问，确保多线程环境下的警告推送与读取安全。"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:PunchPressVision/UI/UIModule/include/WarnUtilty.hpp",
+      "target": "class:PunchPressVision/UI/UIModule/include/WarnUtilty.hpp:WarningInfo",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/UI/UIModule/include/WarnUtilty.hpp",
+      "target": "class:PunchPressVision/UI/UIModule/include/WarnUtilty.hpp:WarningInfo",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/UI/UIModule/include/WarningInfoList.h",
+      "target": "class:PunchPressVision/UI/UIModule/include/WarningInfoList.h:WarningInfoList",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/UI/UIModule/include/WarningInfoList.h",
+      "target": "file:PunchPressVision/UI/UIModule/include/WarnUtilty.hpp",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:PunchPressVision/UI/UIModule/include/rqw_LabelClickable.h",
+      "target": "class:PunchPressVision/UI/UIModule/include/rqw_LabelClickable.h:ClickableLabel",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/UI/UIModule/include/rqw_LabelClickable.h",
+      "target": "class:PunchPressVision/UI/UIModule/include/rqw_LabelClickable.h:ClickableLabel",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/UI/UIModule/include/rqw_LabelWarning.h",
+      "target": "class:PunchPressVision/UI/UIModule/include/rqw_LabelWarning.h:LabelWarning",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/UI/UIModule/include/rqw_LabelWarning.h",
+      "target": "class:PunchPressVision/UI/UIModule/include/rqw_LabelWarning.h:LabelWarning",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/UI/UIModule/include/rqw_LabelWarning.h",
+      "target": "file:PunchPressVision/UI/UIModule/include/rqw_LabelClickable.h",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:PunchPressVision/UI/UIModule/include/rqw_LabelWarning.h",
+      "target": "file:PunchPressVision/UI/UIModule/include/WarningInfoList.h",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:PunchPressVision/UI/UIModule/include/rqw_LabelWarning.h",
+      "target": "file:PunchPressVision/UI/UIModule/include/WarnUtilty.hpp",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "class:PunchPressVision/UI/UIModule/include/rqw_LabelWarning.h:LabelWarning",
+      "target": "class:PunchPressVision/UI/UIModule/include/rqw_LabelClickable.h:ClickableLabel",
+      "type": "inherits",
+      "direction": "forward",
+      "weight": 0.9
+    }
+  ]
+}

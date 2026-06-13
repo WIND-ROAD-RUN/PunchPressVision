@@ -1,0 +1,31 @@
+{
+  "projectRoot": "D:/Workplace/rep/PunchPressVision",
+  "batchFiles": [
+    {"path": "PunchPressVision/Business/CalibBun/test/include/CalibBun.t.hpp", "language": "cpp", "sizeLines": 2, "fileCategory": "code"},
+    {"path": "PunchPressVision/Business/CalibBun/test/src/CalibBun.t.cpp", "language": "cpp", "sizeLines": 6, "fileCategory": "code"},
+    {"path": "PunchPressVision/Business/CameraBun/CMakeLists.txt", "language": "txt", "sizeLines": 32, "fileCategory": "docs"},
+    {"path": "PunchPressVision/Business/CameraBun/include/Business/CameraBun/CameraBun.hpp", "language": "cpp", "sizeLines": 54, "fileCategory": "code"},
+    {"path": "PunchPressVision/Business/CameraBun/include/Business/CameraBun/CameraImgConvert.hpp", "language": "cpp", "sizeLines": 15, "fileCategory": "code"},
+    {"path": "PunchPressVision/Business/CameraBun/src/CameraBun.cpp", "language": "cpp", "sizeLines": 131, "fileCategory": "code"},
+    {"path": "PunchPressVision/Business/CameraBun/src/CameraImgConvert.cpp", "language": "cpp", "sizeLines": 92, "fileCategory": "code"},
+    {"path": "PunchPressVision/Business/CameraBun/test/CMakeLists.txt", "language": "txt", "sizeLines": 23, "fileCategory": "docs"},
+    {"path": "PunchPressVision/Business/CameraBun/test/include/CameraBun.t.hpp", "language": "cpp", "sizeLines": 2, "fileCategory": "code"},
+    {"path": "PunchPressVision/Business/CameraBun/test/src/CameraBun.t.cpp", "language": "cpp", "sizeLines": 6, "fileCategory": "code"},
+    {"path": "PunchPressVision/Business/CMakeLists.txt", "language": "txt", "sizeLines": 7, "fileCategory": "docs"},
+    {"path": "PunchPressVision/Business/LightControlBun/CMakeLists.txt", "language": "txt", "sizeLines": 33, "fileCategory": "docs"},
+    {"path": "PunchPressVision/Business/LightControlBun/include/Business/LightControlBun/LightControlBun.hpp", "language": "cpp", "sizeLines": 36, "fileCategory": "code"},
+    {"path": "PunchPressVision/Business/LightControlBun/src/LightControlBun.cpp", "language": "cpp", "sizeLines": 49, "fileCategory": "code"},
+    {"path": "PunchPressVision/Business/LightControlBun/test/CMakeLists.txt", "language": "txt", "sizeLines": 22, "fileCategory": "docs"},
+    {"path": "PunchPressVision/Business/LightControlBun/test/include/LightControlBun.t.hpp", "language": "cpp", "sizeLines": 1, "fileCategory": "code"},
+    {"path": "PunchPressVision/Business/LightControlBun/test/src/LightControlBun.t.cpp", "language": "cpp", "sizeLines": 6, "fileCategory": "code"},
+    {"path": "PunchPressVision/Business/NinePointBun/CMakeLists.txt", "language": "txt", "sizeLines": 32, "fileCategory": "docs"},
+    {"path": "PunchPressVision/Business/NinePointBun/include/Business/NinePointBun/NinePointBun.hpp", "language": "cpp", "sizeLines": 73, "fileCategory": "code"},
+    {"path": "PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp", "language": "cpp", "sizeLines": 229, "fileCategory": "code"},
+    {"path": "PunchPressVision/Business/NinePointBun/test/CMakeLists.txt", "language": "txt", "sizeLines": 23, "fileCategory": "docs"},
+    {"path": "PunchPressVision/Business/NinePointBun/test/include/NinePointBun.t.hpp", "language": "cpp", "sizeLines": 2, "fileCategory": "code"},
+    {"path": "PunchPressVision/Business/NinePointBun/test/src/NinePointBun.t.cpp", "language": "cpp", "sizeLines": 6, "fileCategory": "code"},
+    {"path": "PunchPressVision/Business/ShapeModeManagerBun/CMakeLists.txt", "language": "txt", "sizeLines": 32, "fileCategory": "docs"},
+    {"path": "PunchPressVision/Business/ShapeModeManagerBun/include/Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp", "language": "cpp", "sizeLines": 99, "fileCategory": "code"}
+  ],
+  "batchImportData": {"PunchPressVision/Business/CalibBun/test/include/CalibBun.t.hpp":[],"PunchPressVision/Business/CalibBun/test/src/CalibBun.t.cpp":[],"PunchPressVision/Business/CameraBun/CMakeLists.txt":[],"PunchPressVision/Business/CameraBun/include/Business/CameraBun/CameraBun.hpp":[],"PunchPressVision/Business/CameraBun/include/Business/CameraBun/CameraImgConvert.hpp":[],"PunchPressVision/Business/CameraBun/src/CameraBun.cpp":[],"PunchPressVision/Business/CameraBun/src/CameraImgConvert.cpp":[],"PunchPressVision/Business/CameraBun/test/CMakeLists.txt":[],"PunchPressVision/Business/CameraBun/test/include/CameraBun.t.hpp":[],"PunchPressVision/Business/CameraBun/test/src/CameraBun.t.cpp":[],"PunchPressVision/Business/CMakeLists.txt":[],"PunchPressVision/Business/LightControlBun/CMakeLists.txt":[],"PunchPressVision/Business/LightControlBun/include/Business/LightControlBun/LightControlBun.hpp":[],"PunchPressVision/Business/LightControlBun/src/LightControlBun.cpp":[],"PunchPressVision/Business/LightControlBun/test/CMakeLists.txt":[],"PunchPressVision/Business/LightControlBun/test/include/LightControlBun.t.hpp":[],"PunchPressVision/Business/LightControlBun/test/src/LightControlBun.t.cpp":[],"PunchPressVision/Business/NinePointBun/CMakeLists.txt":[],"PunchPressVision/Business/NinePointBun/include/Business/NinePointBun/NinePointBun.hpp":[],"PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp":[],"PunchPressVision/Business/NinePointBun/test/CMakeLists.txt":[],"PunchPressVision/Business/NinePointBun/test/include/NinePointBun.t.hpp":[],"PunchPressVision/Business/NinePointBun/test/src/NinePointBun.t.cpp":[],"PunchPressVision/Business/ShapeModeManagerBun/CMakeLists.txt":[],"PunchPressVision/Business/ShapeModeManagerBun/include/Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp":[]}
+}

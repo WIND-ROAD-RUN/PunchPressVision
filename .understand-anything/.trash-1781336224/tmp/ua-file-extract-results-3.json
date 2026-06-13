@@ -1,0 +1,1808 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 25,
+  "filesSkipped": [],
+  "results": [
+    {
+      "path": ".claude/settings.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 5,
+      "nonEmptyLines": 5,
+      "sections": [
+        {
+          "heading": "enabledPlugins",
+          "level": 1,
+          "line": 2
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 1
+      }
+    },
+    {
+      "path": ".understand-anything/.understandignore",
+      "language": "unknown",
+      "fileCategory": "code",
+      "totalLines": 21,
+      "nonEmptyLines": 18,
+      "metrics": {}
+    },
+    {
+      "path": ".understand-anything/config.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 3,
+      "nonEmptyLines": 3,
+      "sections": [
+        {
+          "heading": "outputLanguage",
+          "level": 1,
+          "line": 2
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 1
+      }
+    },
+    {
+      "path": "cmake/AddThirdSDKTargets.cmake",
+      "language": "cmake",
+      "fileCategory": "code",
+      "totalLines": 41,
+      "nonEmptyLines": 30,
+      "metrics": {}
+    },
+    {
+      "path": "cmake/CMakeCacheIni.cmake",
+      "language": "cmake",
+      "fileCategory": "code",
+      "totalLines": 22,
+      "nonEmptyLines": 18,
+      "metrics": {}
+    },
+    {
+      "path": "cmake/func.cmake",
+      "language": "cmake",
+      "fileCategory": "code",
+      "totalLines": 6,
+      "nonEmptyLines": 6,
+      "metrics": {}
+    },
+    {
+      "path": "Folder.DotSettings",
+      "language": "dotsettings",
+      "fileCategory": "code",
+      "totalLines": 15,
+      "nonEmptyLines": 15,
+      "metrics": {}
+    },
+    {
+      "path": "Folder.DotSettings.user",
+      "language": "user",
+      "fileCategory": "code",
+      "totalLines": 9,
+      "nonEmptyLines": 9,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/app/CMakeLists.txt",
+      "language": "txt",
+      "fileCategory": "docs",
+      "totalLines": 1,
+      "nonEmptyLines": 1,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/App/PunchPressApp/CMakeLists.txt",
+      "language": "txt",
+      "fileCategory": "docs",
+      "totalLines": 34,
+      "nonEmptyLines": 27,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/App/PunchPressApp/include/app/PunchPressApp.hpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 76,
+      "nonEmptyLines": 60,
+      "classes": [
+        {
+          "name": "PunchPressApp",
+          "startLine": 21,
+          "endLine": 75,
+          "methods": [
+            "build",
+            "destroy",
+            "start",
+            "stop",
+            "switchToMode",
+            "currentMode",
+            "performStartupCheck",
+            "checkCalibReadiness",
+            "checkProductionReadiness",
+            "configureCameraForDebug",
+            "configureCameraForProduction",
+            "configureCameraForCalibration",
+            "modeChanged",
+            "startupCheckFailed",
+            "frameReady",
+            "positionResultReady",
+            "cameraConnectionChanged",
+            "onFrameReady",
+            "onCameraConnectionChanged",
+            "checkSingleInstance",
+            "checkMVSProcessConflict",
+            "checkConfigIntegrity",
+            "processProductionFrame"
+          ],
+          "properties": [
+            "public",
+            "business_",
+            "currentMode_",
+            "instanceLock_"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "PunchPressApp",
+          "line": 21,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 1,
+        "functionCount": 0,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 329,
+      "nonEmptyLines": 284,
+      "functions": [
+        {
+          "name": "PunchPressApp",
+          "startLine": 10,
+          "endLine": 14,
+          "params": [
+            "business",
+            "parent"
+          ]
+        },
+        {
+          "name": "~PunchPressApp",
+          "startLine": 16,
+          "endLine": 19,
+          "params": []
+        },
+        {
+          "name": "build",
+          "startLine": 21,
+          "endLine": 31,
+          "params": []
+        },
+        {
+          "name": "destroy",
+          "startLine": 33,
+          "endLine": 37,
+          "params": []
+        },
+        {
+          "name": "start",
+          "startLine": 39,
+          "endLine": 49,
+          "params": []
+        },
+        {
+          "name": "stop",
+          "startLine": 51,
+          "endLine": 56,
+          "params": []
+        },
+        {
+          "name": "currentMode",
+          "startLine": 58,
+          "endLine": 61,
+          "params": []
+        },
+        {
+          "name": "performStartupCheck",
+          "startLine": 64,
+          "endLine": 105,
+          "params": [
+            "errorMsg"
+          ]
+        },
+        {
+          "name": "checkSingleInstance",
+          "startLine": 107,
+          "endLine": 113,
+          "params": []
+        },
+        {
+          "name": "checkMVSProcessConflict",
+          "startLine": 115,
+          "endLine": 123,
+          "params": []
+        },
+        {
+          "name": "checkConfigIntegrity",
+          "startLine": 125,
+          "endLine": 130,
+          "params": []
+        },
+        {
+          "name": "checkCalibReadiness",
+          "startLine": 134,
+          "endLine": 152,
+          "params": []
+        },
+        {
+          "name": "checkProductionReadiness",
+          "startLine": 154,
+          "endLine": 163,
+          "params": []
+        },
+        {
+          "name": "configureCameraForDebug",
+          "startLine": 167,
+          "endLine": 176,
+          "params": []
+        },
+        {
+          "name": "configureCameraForProduction",
+          "startLine": 178,
+          "endLine": 189,
+          "params": []
+        },
+        {
+          "name": "configureCameraForCalibration",
+          "startLine": 191,
+          "endLine": 195,
+          "params": []
+        },
+        {
+          "name": "switchToMode",
+          "startLine": 199,
+          "endLine": 259,
+          "params": [
+            "mode",
+            "errorMsg"
+          ]
+        },
+        {
+          "name": "onFrameReady",
+          "startLine": 263,
+          "endLine": 271,
+          "params": [
+            "image",
+            "camIdx"
+          ]
+        },
+        {
+          "name": "onCameraConnectionChanged",
+          "startLine": 273,
+          "endLine": 276,
+          "params": [
+            "idx",
+            "connected",
+            "reason"
+          ]
+        },
+        {
+          "name": "processProductionFrame",
+          "startLine": 278,
+          "endLine": 328,
+          "params": [
+            "image"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "PunchPressApp",
+          "line": 10,
+          "isDefault": false
+        },
+        {
+          "name": "~PunchPressApp",
+          "line": 16,
+          "isDefault": false
+        },
+        {
+          "name": "build",
+          "line": 21,
+          "isDefault": false
+        },
+        {
+          "name": "destroy",
+          "line": 33,
+          "isDefault": false
+        },
+        {
+          "name": "start",
+          "line": 39,
+          "isDefault": false
+        },
+        {
+          "name": "stop",
+          "line": 51,
+          "isDefault": false
+        },
+        {
+          "name": "currentMode",
+          "line": 58,
+          "isDefault": false
+        },
+        {
+          "name": "performStartupCheck",
+          "line": 64,
+          "isDefault": false
+        },
+        {
+          "name": "checkSingleInstance",
+          "line": 107,
+          "isDefault": false
+        },
+        {
+          "name": "checkMVSProcessConflict",
+          "line": 115,
+          "isDefault": false
+        },
+        {
+          "name": "checkConfigIntegrity",
+          "line": 125,
+          "isDefault": false
+        },
+        {
+          "name": "checkCalibReadiness",
+          "line": 134,
+          "isDefault": false
+        },
+        {
+          "name": "checkProductionReadiness",
+          "line": 154,
+          "isDefault": false
+        },
+        {
+          "name": "configureCameraForDebug",
+          "line": 167,
+          "isDefault": false
+        },
+        {
+          "name": "configureCameraForProduction",
+          "line": 178,
+          "isDefault": false
+        },
+        {
+          "name": "configureCameraForCalibration",
+          "line": 191,
+          "isDefault": false
+        },
+        {
+          "name": "switchToMode",
+          "line": 199,
+          "isDefault": false
+        },
+        {
+          "name": "onFrameReady",
+          "line": 263,
+          "isDefault": false
+        },
+        {
+          "name": "onCameraConnectionChanged",
+          "line": 273,
+          "isDefault": false
+        },
+        {
+          "name": "processProductionFrame",
+          "line": 278,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "~PunchPressApp",
+          "callee": "destroy",
+          "lineNumber": 18
+        },
+        {
+          "caller": "build",
+          "callee": "QObject::connect",
+          "lineNumber": 26
+        },
+        {
+          "caller": "build",
+          "callee": "get",
+          "lineNumber": 26
+        },
+        {
+          "caller": "build",
+          "callee": "QObject::connect",
+          "lineNumber": 28
+        },
+        {
+          "caller": "build",
+          "callee": "get",
+          "lineNumber": 28
+        },
+        {
+          "caller": "destroy",
+          "callee": "QObject::disconnect",
+          "lineNumber": 36
+        },
+        {
+          "caller": "destroy",
+          "callee": "get",
+          "lineNumber": 36
+        },
+        {
+          "caller": "start",
+          "callee": "infrastructure",
+          "lineNumber": 42
+        },
+        {
+          "caller": "start",
+          "callee": "connectToPLC",
+          "lineNumber": 47
+        },
+        {
+          "caller": "stop",
+          "callee": "infrastructure",
+          "lineNumber": 53
+        },
+        {
+          "caller": "stop",
+          "callee": "disconnectPLC",
+          "lineNumber": 55
+        },
+        {
+          "caller": "currentMode",
+          "callee": "load",
+          "lineNumber": 60
+        },
+        {
+          "caller": "performStartupCheck",
+          "callee": "checkSingleInstance",
+          "lineNumber": 67
+        },
+        {
+          "caller": "performStartupCheck",
+          "callee": "QStringLiteral",
+          "lineNumber": 69
+        },
+        {
+          "caller": "performStartupCheck",
+          "callee": "checkMVSProcessConflict",
+          "lineNumber": 76
+        },
+        {
+          "caller": "performStartupCheck",
+          "callee": "QStringLiteral",
+          "lineNumber": 78
+        },
+        {
+          "caller": "performStartupCheck",
+          "callee": "checkConfigIntegrity",
+          "lineNumber": 85
+        },
+        {
+          "caller": "performStartupCheck",
+          "callee": "QStringLiteral",
+          "lineNumber": 87
+        },
+        {
+          "caller": "performStartupCheck",
+          "callee": "checkCalibReadiness",
+          "lineNumber": 94
+        },
+        {
+          "caller": "performStartupCheck",
+          "callee": "allReady",
+          "lineNumber": 95
+        },
+        {
+          "caller": "performStartupCheck",
+          "callee": "QStringLiteral",
+          "lineNumber": 98
+        },
+        {
+          "caller": "performStartupCheck",
+          "callee": "QStringLiteral",
+          "lineNumber": 99
+        },
+        {
+          "caller": "performStartupCheck",
+          "callee": "QStringLiteral",
+          "lineNumber": 100
+        },
+        {
+          "caller": "performStartupCheck",
+          "callee": "QStringLiteral",
+          "lineNumber": 101
+        },
+        {
+          "caller": "checkSingleInstance",
+          "callee": "std::make_unique<QSystemSemaphore>",
+          "lineNumber": 109
+        },
+        {
+          "caller": "checkSingleInstance",
+          "callee": "QStringLiteral",
+          "lineNumber": 110
+        },
+        {
+          "caller": "checkSingleInstance",
+          "callee": "acquire",
+          "lineNumber": 112
+        },
+        {
+          "caller": "checkMVSProcessConflict",
+          "callee": "start",
+          "lineNumber": 118
+        },
+        {
+          "caller": "checkMVSProcessConflict",
+          "callee": "QStringList",
+          "lineNumber": 118
+        },
+        {
+          "caller": "checkMVSProcessConflict",
+          "callee": "waitForFinished",
+          "lineNumber": 119
+        },
+        {
+          "caller": "checkMVSProcessConflict",
+          "callee": "QString::fromLocal8Bit",
+          "lineNumber": 121
+        },
+        {
+          "caller": "checkMVSProcessConflict",
+          "callee": "readAllStandardOutput",
+          "lineNumber": 121
+        },
+        {
+          "caller": "checkMVSProcessConflict",
+          "callee": "contains",
+          "lineNumber": 122
+        },
+        {
+          "caller": "checkCalibReadiness",
+          "callee": "infrastructure",
+          "lineNumber": 137
+        },
+        {
+          "caller": "checkCalibReadiness",
+          "callee": "Length",
+          "lineNumber": 141
+        },
+        {
+          "caller": "checkCalibReadiness",
+          "callee": "Length",
+          "lineNumber": 145
+        },
+        {
+          "caller": "checkCalibReadiness",
+          "callee": "IsInitialized",
+          "lineNumber": 149
+        },
+        {
+          "caller": "checkProductionReadiness",
+          "callee": "checkCalibReadiness",
+          "lineNumber": 157
+        },
+        {
+          "caller": "checkProductionReadiness",
+          "callee": "isModelLoaded",
+          "lineNumber": 159
+        },
+        {
+          "caller": "checkProductionReadiness",
+          "callee": "infrastructure",
+          "lineNumber": 160
+        },
+        {
+          "caller": "checkProductionReadiness",
+          "callee": "isConnected",
+          "lineNumber": 161
+        },
+        {
+          "caller": "configureCameraForDebug",
+          "callee": "infrastructure",
+          "lineNumber": 170
+        },
+        {
+          "caller": "configureCameraForDebug",
+          "callee": "setFreeRunMode",
+          "lineNumber": 173
+        },
+        {
+          "caller": "configureCameraForDebug",
+          "callee": "setFreeRunMode",
+          "lineNumber": 174
+        },
+        {
+          "caller": "configureCameraForProduction",
+          "callee": "infrastructure",
+          "lineNumber": 181
+        },
+        {
+          "caller": "configureCameraForProduction",
+          "callee": "setTriggerMode",
+          "lineNumber": 184
+        },
+        {
+          "caller": "configureCameraForProduction",
+          "callee": "setTriggerMode",
+          "lineNumber": 186
+        },
+        {
+          "caller": "configureCameraForCalibration",
+          "callee": "configureCameraForDebug",
+          "lineNumber": 194
+        },
+        {
+          "caller": "switchToMode",
+          "callee": "load",
+          "lineNumber": 201
+        },
+        {
+          "caller": "switchToMode",
+          "callee": "allReady",
+          "lineNumber": 211
+        },
+        {
+          "caller": "switchToMode",
+          "callee": "checkCalibReadiness",
+          "lineNumber": 211
+        },
+        {
+          "caller": "switchToMode",
+          "callee": "QStringLiteral",
+          "lineNumber": 213
+        },
+        {
+          "caller": "switchToMode",
+          "callee": "checkProductionReadiness",
+          "lineNumber": 220
+        },
+        {
+          "caller": "switchToMode",
+          "callee": "QStringLiteral",
+          "lineNumber": 223
+        },
+        {
+          "caller": "switchToMode",
+          "callee": "checkCalibReadiness",
+          "lineNumber": 230
+        },
+        {
+          "caller": "switchToMode",
+          "callee": "QStringLiteral",
+          "lineNumber": 233
+        },
+        {
+          "caller": "switchToMode",
+          "callee": "store",
+          "lineNumber": 242
+        },
+        {
+          "caller": "switchToMode",
+          "callee": "configureCameraForDebug",
+          "lineNumber": 245
+        },
+        {
+          "caller": "switchToMode",
+          "callee": "configureCameraForProduction",
+          "lineNumber": 246
+        },
+        {
+          "caller": "switchToMode",
+          "callee": "configureCameraForCalibration",
+          "lineNumber": 249
+        },
+        {
+          "caller": "switchToMode",
+          "callee": "setSpliceEnabled",
+          "lineNumber": 255
+        },
+        {
+          "caller": "onFrameReady",
+          "callee": "load",
+          "lineNumber": 269
+        },
+        {
+          "caller": "onFrameReady",
+          "callee": "processProductionFrame",
+          "lineNumber": 270
+        },
+        {
+          "caller": "processProductionFrame",
+          "callee": "match",
+          "lineNumber": 283
+        },
+        {
+          "caller": "processProductionFrame",
+          "callee": "infrastructure",
+          "lineNumber": 291
+        },
+        {
+          "caller": "processProductionFrame",
+          "callee": "Length",
+          "lineNumber": 299
+        },
+        {
+          "caller": "processProductionFrame",
+          "callee": "pixToWorld",
+          "lineNumber": 300
+        },
+        {
+          "caller": "processProductionFrame",
+          "callee": "infrastructure",
+          "lineNumber": 319
+        },
+        {
+          "caller": "processProductionFrame",
+          "callee": "isConnected",
+          "lineNumber": 320
+        },
+        {
+          "caller": "processProductionFrame",
+          "callee": "writeFloat",
+          "lineNumber": 323
+        },
+        {
+          "caller": "processProductionFrame",
+          "callee": "static_cast<float>",
+          "lineNumber": 323
+        },
+        {
+          "caller": "processProductionFrame",
+          "callee": "writeFloat",
+          "lineNumber": 324
+        },
+        {
+          "caller": "processProductionFrame",
+          "callee": "static_cast<float>",
+          "lineNumber": 324
+        },
+        {
+          "caller": "processProductionFrame",
+          "callee": "writeFloat",
+          "lineNumber": 325
+        },
+        {
+          "caller": "processProductionFrame",
+          "callee": "static_cast<float>",
+          "lineNumber": 325
+        },
+        {
+          "caller": "processProductionFrame",
+          "callee": "writeRegister",
+          "lineNumber": 326
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 20,
+        "functionCount": 20,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/App/PunchPressApp/test/CMakeLists.txt",
+      "language": "txt",
+      "fileCategory": "docs",
+      "totalLines": 24,
+      "nonEmptyLines": 18,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/App/PunchPressApp/test/include/PunchPressApp.t.hpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 1,
+      "nonEmptyLines": 1,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/App/PunchPressApp/test/src/PunchPressApp.t.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 22,
+      "nonEmptyLines": 16,
+      "functions": [
+        {
+          "name": "main",
+          "startLine": 7,
+          "endLine": 22,
+          "params": [
+            "argc",
+            "argv"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "main",
+          "line": 7,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "main",
+          "callee": "build",
+          "lineNumber": 12
+        },
+        {
+          "caller": "main",
+          "callee": "build",
+          "lineNumber": 14
+        },
+        {
+          "caller": "main",
+          "callee": "start",
+          "lineNumber": 15
+        },
+        {
+          "caller": "main",
+          "callee": "build",
+          "lineNumber": 17
+        },
+        {
+          "caller": "main",
+          "callee": "start",
+          "lineNumber": 18
+        },
+        {
+          "caller": "main",
+          "callee": "exec",
+          "lineNumber": 21
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/Business/Business/CMakeLists.txt",
+      "language": "txt",
+      "fileCategory": "docs",
+      "totalLines": 43,
+      "nonEmptyLines": 35,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/Business/Business/include/Business/Business.hpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 37,
+      "nonEmptyLines": 34,
+      "functions": [
+        {
+          "name": "~Business",
+          "startLine": 17,
+          "endLine": 17,
+          "params": []
+        }
+      ],
+      "classes": [
+        {
+          "name": "Business",
+          "startLine": 13,
+          "endLine": 36,
+          "methods": [
+            "~Business",
+            "build",
+            "destroy",
+            "start",
+            "stop"
+          ],
+          "properties": [
+            "inf_",
+            "camera_bun",
+            "calib_bun",
+            "nine_point_bun",
+            "shape_mode_manager_bun",
+            "two_camera_splice_bun",
+            "light_control_bun"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "~Business",
+          "line": 17,
+          "isDefault": false
+        },
+        {
+          "name": "build",
+          "line": 21,
+          "isDefault": false
+        },
+        {
+          "name": "destroy",
+          "line": 22,
+          "isDefault": false
+        },
+        {
+          "name": "start",
+          "line": 23,
+          "isDefault": false
+        },
+        {
+          "name": "stop",
+          "line": 24,
+          "isDefault": false
+        },
+        {
+          "name": "Business",
+          "line": 13,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 6,
+        "functionCount": 1,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "PunchPressVision/Business/Business/src/Business.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 57,
+      "nonEmptyLines": 50,
+      "functions": [
+        {
+          "name": "Business",
+          "startLine": 5,
+          "endLine": 9,
+          "params": [
+            "inf"
+          ]
+        },
+        {
+          "name": "build",
+          "startLine": 11,
+          "endLine": 26,
+          "params": []
+        },
+        {
+          "name": "destroy",
+          "startLine": 28,
+          "endLine": 36,
+          "params": []
+        },
+        {
+          "name": "start",
+          "startLine": 38,
+          "endLine": 46,
+          "params": []
+        },
+        {
+          "name": "stop",
+          "startLine": 48,
+          "endLine": 56,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "Business",
+          "line": 5,
+          "isDefault": false
+        },
+        {
+          "name": "build",
+          "line": 11,
+          "isDefault": false
+        },
+        {
+          "name": "destroy",
+          "line": 28,
+          "isDefault": false
+        },
+        {
+          "name": "start",
+          "line": 38,
+          "isDefault": false
+        },
+        {
+          "name": "stop",
+          "line": 48,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "build",
+          "callee": "std::make_unique<CalibBun>",
+          "lineNumber": 13
+        },
+        {
+          "caller": "build",
+          "callee": "std::make_unique<TwoCameraSpliceBun>",
+          "lineNumber": 14
+        },
+        {
+          "caller": "build",
+          "callee": "std::make_unique<NinePointBun>",
+          "lineNumber": 15
+        },
+        {
+          "caller": "build",
+          "callee": "std::make_unique<CameraBun>",
+          "lineNumber": 16
+        },
+        {
+          "caller": "build",
+          "callee": "std::make_unique<ShapeModeManagerBun>",
+          "lineNumber": 17
+        },
+        {
+          "caller": "build",
+          "callee": "std::make_unique<LightControlBun>",
+          "lineNumber": 18
+        },
+        {
+          "caller": "build",
+          "callee": "build",
+          "lineNumber": 20
+        },
+        {
+          "caller": "build",
+          "callee": "build",
+          "lineNumber": 21
+        },
+        {
+          "caller": "build",
+          "callee": "build",
+          "lineNumber": 22
+        },
+        {
+          "caller": "build",
+          "callee": "build",
+          "lineNumber": 23
+        },
+        {
+          "caller": "build",
+          "callee": "build",
+          "lineNumber": 24
+        },
+        {
+          "caller": "build",
+          "callee": "build",
+          "lineNumber": 25
+        },
+        {
+          "caller": "destroy",
+          "callee": "destroy",
+          "lineNumber": 30
+        },
+        {
+          "caller": "destroy",
+          "callee": "destroy",
+          "lineNumber": 31
+        },
+        {
+          "caller": "destroy",
+          "callee": "destroy",
+          "lineNumber": 32
+        },
+        {
+          "caller": "destroy",
+          "callee": "destroy",
+          "lineNumber": 33
+        },
+        {
+          "caller": "destroy",
+          "callee": "destroy",
+          "lineNumber": 34
+        },
+        {
+          "caller": "destroy",
+          "callee": "destroy",
+          "lineNumber": 35
+        },
+        {
+          "caller": "start",
+          "callee": "start",
+          "lineNumber": 40
+        },
+        {
+          "caller": "start",
+          "callee": "start",
+          "lineNumber": 41
+        },
+        {
+          "caller": "start",
+          "callee": "start",
+          "lineNumber": 42
+        },
+        {
+          "caller": "start",
+          "callee": "start",
+          "lineNumber": 43
+        },
+        {
+          "caller": "start",
+          "callee": "start",
+          "lineNumber": 44
+        },
+        {
+          "caller": "start",
+          "callee": "start",
+          "lineNumber": 45
+        },
+        {
+          "caller": "stop",
+          "callee": "stop",
+          "lineNumber": 50
+        },
+        {
+          "caller": "stop",
+          "callee": "stop",
+          "lineNumber": 51
+        },
+        {
+          "caller": "stop",
+          "callee": "stop",
+          "lineNumber": 52
+        },
+        {
+          "caller": "stop",
+          "callee": "stop",
+          "lineNumber": 53
+        },
+        {
+          "caller": "stop",
+          "callee": "stop",
+          "lineNumber": 54
+        },
+        {
+          "caller": "stop",
+          "callee": "stop",
+          "lineNumber": 55
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 5,
+        "functionCount": 5,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/Business/Business/test/CMakeLists.txt",
+      "language": "txt",
+      "fileCategory": "docs",
+      "totalLines": 23,
+      "nonEmptyLines": 17,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/Business/Business/test/include/CalibBun.t.hpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 2,
+      "nonEmptyLines": 1,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/Business/Business/test/src/CalibBun.t.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 7,
+      "nonEmptyLines": 5,
+      "functions": [
+        {
+          "name": "main",
+          "startLine": 3,
+          "endLine": 7,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "main",
+          "line": 3,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/Business/CalibBun/CMakeLists.txt",
+      "language": "txt",
+      "fileCategory": "docs",
+      "totalLines": 33,
+      "nonEmptyLines": 26,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/Business/CalibBun/include/Business/CalibBun/CalibBun.hpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 38,
+      "nonEmptyLines": 35,
+      "classes": [
+        {
+          "name": "CalibBun",
+          "startLine": 11,
+          "endLine": 37,
+          "methods": [
+            "calibCamera",
+            "calibrateFromImages",
+            "drawCalibMarks",
+            "undistortImage",
+            "build",
+            "destroy",
+            "start",
+            "stop"
+          ],
+          "properties": [
+            "inf_"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "calibCamera",
+          "line": 17,
+          "isDefault": false
+        },
+        {
+          "name": "calibrateFromImages",
+          "line": 18,
+          "isDefault": false
+        },
+        {
+          "name": "drawCalibMarks",
+          "line": 23,
+          "isDefault": false
+        },
+        {
+          "name": "undistortImage",
+          "line": 29,
+          "isDefault": false
+        },
+        {
+          "name": "build",
+          "line": 33,
+          "isDefault": false
+        },
+        {
+          "name": "destroy",
+          "line": 34,
+          "isDefault": false
+        },
+        {
+          "name": "start",
+          "line": 35,
+          "isDefault": false
+        },
+        {
+          "name": "stop",
+          "line": 36,
+          "isDefault": false
+        },
+        {
+          "name": "CalibBun",
+          "line": 11,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 9,
+        "functionCount": 0,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "PunchPressVision/Business/CalibBun/src/CalibBun.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 318,
+      "nonEmptyLines": 269,
+      "functions": [
+        {
+          "name": "CalibBun",
+          "startLine": 7,
+          "endLine": 10,
+          "params": [
+            "inf"
+          ]
+        },
+        {
+          "name": "calibCamera",
+          "startLine": 12,
+          "endLine": 18,
+          "params": [
+            "himages"
+          ]
+        },
+        {
+          "name": "calibrateFromImages",
+          "startLine": 20,
+          "endLine": 160,
+          "params": [
+            "himages",
+            "focalLengthMm",
+            "plateThicknessMm",
+            "referenceIndex",
+            "errorMsg"
+          ]
+        },
+        {
+          "name": "drawCalibMarks",
+          "startLine": 162,
+          "endLine": 269,
+          "params": [
+            "src",
+            "cfg",
+            "isOk",
+            "outMarksXld",
+            "outMarksRegion",
+            "errorMsg"
+          ]
+        },
+        {
+          "name": "undistortImage",
+          "startLine": 271,
+          "endLine": 296,
+          "params": [
+            "himage"
+          ]
+        },
+        {
+          "name": "build",
+          "startLine": 303,
+          "endLine": 305,
+          "params": []
+        },
+        {
+          "name": "destroy",
+          "startLine": 307,
+          "endLine": 309,
+          "params": []
+        },
+        {
+          "name": "start",
+          "startLine": 311,
+          "endLine": 313,
+          "params": []
+        },
+        {
+          "name": "stop",
+          "startLine": 315,
+          "endLine": 317,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "CalibBun",
+          "line": 7,
+          "isDefault": false
+        },
+        {
+          "name": "calibCamera",
+          "line": 12,
+          "isDefault": false
+        },
+        {
+          "name": "calibrateFromImages",
+          "line": 20,
+          "isDefault": false
+        },
+        {
+          "name": "drawCalibMarks",
+          "line": 162,
+          "isDefault": false
+        },
+        {
+          "name": "undistortImage",
+          "line": 271,
+          "isDefault": false
+        },
+        {
+          "name": "build",
+          "line": 303,
+          "isDefault": false
+        },
+        {
+          "name": "destroy",
+          "line": 307,
+          "isDefault": false
+        },
+        {
+          "name": "start",
+          "line": 311,
+          "isDefault": false
+        },
+        {
+          "name": "stop",
+          "line": 315,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "calibCamera",
+          "callee": "calibrateFromImages",
+          "lineNumber": 17
+        },
+        {
+          "caller": "calibrateFromImages",
+          "callee": "empty",
+          "lineNumber": 30
+        },
+        {
+          "caller": "calibrateFromImages",
+          "callee": "empty",
+          "lineNumber": 35
+        },
+        {
+          "caller": "calibrateFromImages",
+          "callee": "IsInitialized",
+          "lineNumber": 45
+        },
+        {
+          "caller": "calibrateFromImages",
+          "callee": "GetImageSize",
+          "lineNumber": 60
+        },
+        {
+          "caller": "calibrateFromImages",
+          "callee": "D",
+          "lineNumber": 79
+        },
+        {
+          "caller": "calibrateFromImages",
+          "callee": "D",
+          "lineNumber": 80
+        },
+        {
+          "caller": "calibrateFromImages",
+          "callee": "CreateCalibData",
+          "lineNumber": 96
+        },
+        {
+          "caller": "calibrateFromImages",
+          "callee": "SetCalibDataCamParam",
+          "lineNumber": 97
+        },
+        {
+          "caller": "calibrateFromImages",
+          "callee": "HTuple",
+          "lineNumber": 97
+        },
+        {
+          "caller": "calibrateFromImages",
+          "callee": "SetCalibDataCalibObject",
+          "lineNumber": 98
+        },
+        {
+          "caller": "calibrateFromImages",
+          "callee": "c_str",
+          "lineNumber": 98
+        },
+        {
+          "caller": "calibrateFromImages",
+          "callee": "size",
+          "lineNumber": 102
+        },
+        {
+          "caller": "calibrateFromImages",
+          "callee": "IsInitialized",
+          "lineNumber": 105
+        },
+        {
+          "caller": "calibrateFromImages",
+          "callee": "CountChannels",
+          "lineNumber": 111
+        },
+        {
+          "caller": "calibrateFromImages",
+          "callee": "TupleLength",
+          "lineNumber": 112
+        },
+        {
+          "caller": "calibrateFromImages",
+          "callee": "I",
+          "lineNumber": 112
+        },
+        {
+          "caller": "calibrateFromImages",
+          "callee": "Rgb1ToGray",
+          "lineNumber": 113
+        },
+        {
+          "caller": "calibrateFromImages",
+          "callee": "FindCalibObject",
+          "lineNumber": 117
+        },
+        {
+          "caller": "calibrateFromImages",
+          "callee": "ClearCalibData",
+          "lineNumber": 123
+        },
+        {
+          "caller": "calibrateFromImages",
+          "callee": "CalibrateCameras",
+          "lineNumber": 130
+        },
+        {
+          "caller": "calibrateFromImages",
+          "callee": "GetCalibData",
+          "lineNumber": 134
+        },
+        {
+          "caller": "calibrateFromImages",
+          "callee": "std::clamp",
+          "lineNumber": 136
+        },
+        {
+          "caller": "calibrateFromImages",
+          "callee": "GetCalibData",
+          "lineNumber": 139
+        },
+        {
+          "caller": "calibrateFromImages",
+          "callee": "TupleConcat",
+          "lineNumber": 139
+        },
+        {
+          "caller": "calibrateFromImages",
+          "callee": "HTuple",
+          "lineNumber": 139
+        },
+        {
+          "caller": "calibrateFromImages",
+          "callee": "SetOriginPose",
+          "lineNumber": 142
+        },
+        {
+          "caller": "calibrateFromImages",
+          "callee": "ClearCalibData",
+          "lineNumber": 150
+        },
+        {
+          "caller": "calibrateFromImages",
+          "callee": "ClearCalibData",
+          "lineNumber": 155
+        },
+        {
+          "caller": "calibrateFromImages",
+          "callee": "std::string",
+          "lineNumber": 157
+        },
+        {
+          "caller": "calibrateFromImages",
+          "callee": "Text",
+          "lineNumber": 157
+        },
+        {
+          "caller": "calibrateFromImages",
+          "callee": "ErrorMessage",
+          "lineNumber": 157
+        },
+        {
+          "caller": "drawCalibMarks",
+          "callee": "GenEmptyObj",
+          "lineNumber": 173
+        },
+        {
+          "caller": "drawCalibMarks",
+          "callee": "GenEmptyObj",
+          "lineNumber": 174
+        },
+        {
+          "caller": "drawCalibMarks",
+          "callee": "IsInitialized",
+          "lineNumber": 176
+        },
+        {
+          "caller": "drawCalibMarks",
+          "callee": "empty",
+          "lineNumber": 182
+        },
+        {
+          "caller": "drawCalibMarks",
+          "callee": "GetImageSize",
+          "lineNumber": 191
+        },
+        {
+          "caller": "drawCalibMarks",
+          "callee": "D",
+          "lineNumber": 209
+        },
+        {
+          "caller": "drawCalibMarks",
+          "callee": "D",
+          "lineNumber": 210
+        },
+        {
+          "caller": "drawCalibMarks",
+          "callee": "CreateCalibData",
+          "lineNumber": 225
+        },
+        {
+          "caller": "drawCalibMarks",
+          "callee": "SetCalibDataCamParam",
+          "lineNumber": 226
+        },
+        {
+          "caller": "drawCalibMarks",
+          "callee": "HTuple",
+          "lineNumber": 226
+        },
+        {
+          "caller": "drawCalibMarks",
+          "callee": "SetCalibDataCalibObject",
+          "lineNumber": 227
+        },
+        {
+          "caller": "drawCalibMarks",
+          "callee": "c_str",
+          "lineNumber": 227
+        },
+        {
+          "caller": "drawCalibMarks",
+          "callee": "CountChannels",
+          "lineNumber": 232
+        },
+        {
+          "caller": "drawCalibMarks",
+          "callee": "TupleLength",
+          "lineNumber": 233
+        },
+        {
+          "caller": "drawCalibMarks",
+          "callee": "I",
+          "lineNumber": 233
+        },
+        {
+          "caller": "drawCalibMarks",
+          "callee": "Rgb1ToGray",
+          "lineNumber": 234
+        },
+        {
+          "caller": "drawCalibMarks",
+          "callee": "FindCalibObject",
+          "lineNumber": 238
+        },
+        {
+          "caller": "drawCalibMarks",
+          "callee": "GetCalibDataObservPoints",
+          "lineNumber": 241
+        },
+        {
+          "caller": "drawCalibMarks",
+          "callee": "TupleLength",
+          "lineNumber": 243
+        },
+        {
+          "caller": "drawCalibMarks",
+          "callee": "TupleLength",
+          "lineNumber": 243
+        },
+        {
+          "caller": "drawCalibMarks",
+          "callee": "ClearCalibData",
+          "lineNumber": 246
+        },
+        {
+          "caller": "drawCalibMarks",
+          "callee": "GenCrossContourXld",
+          "lineNumber": 252
+        },
+        {
+          "caller": "drawCalibMarks",
+          "callee": "ClearCalibData",
+          "lineNumber": 258
+        },
+        {
+          "caller": "drawCalibMarks",
+          "callee": "ClearCalibData",
+          "lineNumber": 263
+        },
+        {
+          "caller": "drawCalibMarks",
+          "callee": "std::string",
+          "lineNumber": 266
+        },
+        {
+          "caller": "drawCalibMarks",
+          "callee": "Text",
+          "lineNumber": 266
+        },
+        {
+          "caller": "drawCalibMarks",
+          "callee": "ErrorMessage",
+          "lineNumber": 266
+        },
+        {
+          "caller": "undistortImage",
+          "callee": "IsInitialized",
+          "lineNumber": 277
+        },
+        {
+          "caller": "undistortImage",
+          "callee": "Length",
+          "lineNumber": 277
+        },
+        {
+          "caller": "undistortImage",
+          "callee": "ChangeRadialDistortionCamPar",
+          "lineNumber": 284
+        },
+        {
+          "caller": "undistortImage",
+          "callee": "ChangeRadialDistortionImage",
+          "lineNumber": 288
+        },
+        {
+          "caller": "undistortImage",
+          "callee": "HObject",
+          "lineNumber": 288
+        },
+        {
+          "caller": "undistortImage",
+          "callee": "HImage",
+          "lineNumber": 290
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 9,
+        "functionCount": 9,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/Business/CalibBun/test/CMakeLists.txt",
+      "language": "txt",
+      "fileCategory": "docs",
+      "totalLines": 23,
+      "nonEmptyLines": 17,
+      "metrics": {}
+    }
+  ]
+}

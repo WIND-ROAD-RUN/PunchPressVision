@@ -1,0 +1,1036 @@
+{
+  "nodes": [
+    {
+      "id": "file:PunchPressVision/infrastructure/ConfigModule/osoFile/cameraCfg.oso",
+      "type": "file",
+      "name": "cameraCfg.oso",
+      "filePath": "PunchPressVision/infrastructure/ConfigModule/osoFile/cameraCfg.oso",
+      "summary": "定义相机配置的 OSO 数据模式，包含双相机的曝光时间（exposureTime1/2，默认 200）与增益（gain1/2，默认 1）字段，由 ConfigModule 负责持久化加载与保存。",
+      "tags": ["schema-definition", "configuration", "camera", "serialization"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/ConfigModule/osoFile/plcAddressCfg.oso",
+      "type": "file",
+      "name": "plcAddressCfg.oso",
+      "filePath": "PunchPressVision/infrastructure/ConfigModule/osoFile/plcAddressCfg.oso",
+      "summary": "定义 PLC Modbus 寄存器地址映射的 OSO 数据模式，包含九点标定相关寄存器（偏移量、角度、到位标志、点位序号等）的默认地址，供 ControlModule 进行 PLC 通信时引用。",
+      "tags": ["schema-definition", "configuration", "plc", "modbus", "serialization"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp",
+      "type": "file",
+      "name": "ConfigModule.cpp",
+      "filePath": "PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp",
+      "summary": "配置模块核心实现，通过 rw::oso::StorageContext 以 XML 格式持久化 baseCfg、cameraCfg、plcAddressCfg 和 visionCfg 四类配置；build() 时自动创建默认文件并反序列化（失败则静默降级保留默认值），destroy() 时自动保存并释放资源。",
+      "tags": ["configuration", "persistence", "serialization", "service"],
+      "complexity": "moderate",
+      "languageNotes": "使用 OSO 对象存储框架实现 XML 序列化；配置损坏时 catch(...) 静默回退到默认值，保证设备持续运行"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/ConfigModule/src/ConfigModulePath.cpp",
+      "type": "file",
+      "name": "ConfigModulePath.cpp",
+      "filePath": "PunchPressVision/infrastructure/ConfigModule/src/ConfigModulePath.cpp",
+      "summary": "ConfigModulePath 命名空间的实现占位文件，当前为空命名空间体，路径常量定义预计在对应头文件中完成。",
+      "tags": ["stub", "path-configuration", "configuration"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/ConfigModule/src/ConfigModuleTypes.cpp",
+      "type": "file",
+      "name": "ConfigModuleTypes.cpp",
+      "filePath": "PunchPressVision/infrastructure/ConfigModule/src/ConfigModuleTypes.cpp",
+      "summary": "ConfigModuleTypes 命名空间的实现占位文件，当前为空命名空间体，类型别名和枚举定义预计在对应头文件中完成。",
+      "tags": ["stub", "type-definition", "configuration"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:PunchPressVision/infrastructure/ConfigModule/test/CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/infrastructure/ConfigModule/test/CMakeLists.txt",
+      "summary": "ConfigModule 测试可执行文件 Test_inf_ConfigModule 的构建配置，链接 inf::ConfigModule 静态库。",
+      "tags": ["build-system", "configuration", "test", "cmake"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/ConfigModule/test/include/ConfigModule.t.hpp",
+      "type": "file",
+      "name": "ConfigModule.t.hpp",
+      "filePath": "PunchPressVision/infrastructure/ConfigModule/test/include/ConfigModule.t.hpp",
+      "summary": "ConfigModule 测试头文件桩，仅包含 #pragma once，为后续测试工具函数预留扩展空间。",
+      "tags": ["test", "stub", "header"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/ConfigModule/test/src/ConfigModule.t.cpp",
+      "type": "file",
+      "name": "ConfigModule.t.cpp",
+      "filePath": "PunchPressVision/infrastructure/ConfigModule/test/src/ConfigModule.t.cpp",
+      "summary": "ConfigModule 的冒烟测试：实例化 ConfigModule 并调用 build()，验证配置模块的基本生命周期。",
+      "tags": ["test", "smoke-test", "configuration"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:PunchPressVision/infrastructure/ControlModule/CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/infrastructure/ControlModule/CMakeLists.txt",
+      "summary": "ControlModule 静态库构建配置，公开链接 RWUL::hoepModbus、Qt6::Core 和 global::global，提供 inf::ControlModule 别名目标。",
+      "tags": ["build-system", "configuration", "cmake", "modbus"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/ControlModule/include/infrastructure/ControlModule/ControlModule.hpp",
+      "type": "file",
+      "name": "ControlModule.hpp",
+      "filePath": "PunchPressVision/infrastructure/ControlModule/include/infrastructure/ControlModule/ControlModule.hpp",
+      "summary": "PLC 控制网关头文件，声明 ControlModule 类（继承 QObject 和 global::IInfrastructure），封装 Modbus TCP 通信：连接管理、保持寄存器读写（含浮点拆分）、批量寄存器操作、线圈读写，并通过 connectionStateChanged 信号通知连接状态。",
+      "tags": ["api-handler", "modbus", "plc", "hardware-abstraction", "header"],
+      "complexity": "moderate",
+      "languageNotes": "使用 Q_OBJECT 宏支持 Qt 信号槽机制；寄存器地址映射引用 ConfigModule::plcAddressCfg"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "type": "file",
+      "name": "ControlModule.cpp",
+      "filePath": "PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "summary": "ControlModule 的完整实现：基于 rw::hoep::ModbusDevice 实现 Modbus TCP 连接/断开、保持寄存器读写（单字/浮点/批量）、线圈读写；所有操作均做空指针检查和异常捕获，连接状态通过 atomic_bool 线程安全维护并发射 Qt 信号。",
+      "tags": ["api-handler", "modbus", "plc", "hardware-abstraction", "implementation"],
+      "complexity": "moderate",
+      "languageNotes": "大端字节序（BigEndian）用于浮点寄存器编解码；使用 std::atomic_bool 配合 memory_order_release/acquire 确保线程安全"
+    },
+    {
+      "id": "document:PunchPressVision/infrastructure/ControlModule/test/CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/infrastructure/ControlModule/test/CMakeLists.txt",
+      "summary": "ControlModule 测试可执行文件 Test_inf_ControlModule 的构建配置，链接 inf::ControlModule 静态库。",
+      "tags": ["build-system", "configuration", "test", "cmake"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/ControlModule/test/include/ControlModule.t.hpp",
+      "type": "file",
+      "name": "ControlModule.t.hpp",
+      "filePath": "PunchPressVision/infrastructure/ControlModule/test/include/ControlModule.t.hpp",
+      "summary": "ControlModule 测试头文件桩，仅包含 #pragma once。",
+      "tags": ["test", "stub", "header"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/ControlModule/test/src/ControlModule.t.cpp",
+      "type": "file",
+      "name": "ControlModule.t.cpp",
+      "filePath": "PunchPressVision/infrastructure/ControlModule/test/src/ControlModule.t.cpp",
+      "summary": "ControlModule 测试桩，当前仅返回 0（空实现），尚未编写具体测试用例。",
+      "tags": ["test", "stub", "empty-test"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:PunchPressVision/infrastructure/infrastructure/CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/infrastructure/infrastructure/CMakeLists.txt",
+      "summary": "infrastructure 聚合库构建配置，公开链接全部 8 个基础设施子模块（ConfigModule、CalibConfigModule、CameraModule、NinePointModule、TwoCameraSpliceModule、ShapeModelManagerModule、ControlModule、LightIOModule），生成 inf::infrastructure 别名目标。",
+      "tags": ["build-system", "configuration", "cmake", "aggregation"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/infrastructure/include/infrastructure/infrastructure.hpp",
+      "type": "file",
+      "name": "infrastructure.hpp",
+      "filePath": "PunchPressVision/infrastructure/infrastructure/include/infrastructure/infrastructure.hpp",
+      "summary": "infrastructure 聚合根头文件，声明 infrastructure 类，通过 8 个 unique_ptr 持有所有基础设施子模块（配置、标定、相机、九点、拼接、模型管理、PLC 控制、光源 IO），对外暴露 build()/destroy() 生命周期方法。",
+      "tags": ["entry-point", "aggregation", "header", "infrastructure"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp",
+      "type": "file",
+      "name": "infrastructure.cpp",
+      "filePath": "PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp",
+      "summary": "infrastructure 聚合根实现：构造函数按序创建全部 8 个子模块；build() 按依赖顺序编排构建（配置->标定/九点/拼接->相机（注入配置）->模型管理->PLC 网关->光源 IO（注入 PLC 引用））；destroy() 逆序销毁，析构函数逆序 reset 指针确保依赖安全释放。",
+      "tags": ["entry-point", "aggregation", "lifecycle", "infrastructure"],
+      "complexity": "moderate",
+      "languageNotes": "destroy/build 遵循严格的依赖拓扑顺序：先构建的模块后销毁；光源 IO 通过 setControlModule 注入 PLC 网关指针形成运行时依赖"
+    },
+    {
+      "id": "document:PunchPressVision/infrastructure/infrastructure/test/CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/infrastructure/infrastructure/test/CMakeLists.txt",
+      "summary": "infrastructure 聚合库测试可执行文件 Test_inf_infrastructure 的构建配置，链接 inf::infrastructure 并执行 windeployqt 部署 Qt DLL。",
+      "tags": ["build-system", "configuration", "test", "cmake"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/infrastructure/test/include/infrastructure.t.hpp",
+      "type": "file",
+      "name": "infrastructure.t.hpp",
+      "filePath": "PunchPressVision/infrastructure/infrastructure/test/include/infrastructure.t.hpp",
+      "summary": "infrastructure 测试头文件桩，仅包含 #pragma once。",
+      "tags": ["test", "stub", "header"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/infrastructure/test/src/infrastructure.t.cpp",
+      "type": "file",
+      "name": "infrastructure.t.cpp",
+      "filePath": "PunchPressVision/infrastructure/infrastructure/test/src/infrastructure.t.cpp",
+      "summary": "infrastructure 聚合库的冒烟测试：实例化 inf::infrastructure 并调用 build()，验证全部子模块按序构建是否正常。",
+      "tags": ["test", "smoke-test", "integration-test"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:PunchPressVision/infrastructure/LightIOModule/CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/infrastructure/LightIOModule/CMakeLists.txt",
+      "summary": "LightIOModule 静态库构建配置，公开链接 global::global 和 inf::ControlModule，提供 inf::LightIOModule 别名目标。",
+      "tags": ["build-system", "configuration", "cmake", "io"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/LightIOModule/include/infrastructure/LightIOModule/LightIOModule.hpp",
+      "type": "file",
+      "name": "LightIOModule.hpp",
+      "filePath": "PunchPressVision/infrastructure/LightIOModule/include/infrastructure/LightIOModule/LightIOModule.hpp",
+      "summary": "光源 IO 模块头文件，声明 LightIOModule 类（继承 global::IInfrastructure），封装上/下光源的开关控制与状态查询，通过注入的 ControlModule 指针写 Modbus 线圈实现硬件控制。",
+      "tags": ["api-handler", "hardware-abstraction", "io", "header", "lighting"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp",
+      "type": "file",
+      "name": "LightIOModule.cpp",
+      "filePath": "PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp",
+      "summary": "LightIOModule 实现：build() 初始关闭全部光源，setUpperLight/setLowerLight 通过 ControlModule 写 Modbus 线圈（仅在 PLC 已连接时执行硬件操作），状态以 atomic_bool 线程安全维护。",
+      "tags": ["api-handler", "hardware-abstraction", "io", "implementation", "lighting"],
+      "complexity": "simple",
+      "languageNotes": "光源线圈地址为临时常量（kUpperLightCoil=0, kLowerLightCoil=1），待硬件确认后调整"
+    },
+    {
+      "id": "document:PunchPressVision/infrastructure/LightIOModule/test/CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/infrastructure/LightIOModule/test/CMakeLists.txt",
+      "summary": "LightIOModule 测试可执行文件 Test_inf_LightIOModule 的构建配置，链接 inf::LightIOModule 静态库。",
+      "tags": ["build-system", "configuration", "test", "cmake"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/LightIOModule/test/include/LightIOModule.t.hpp",
+      "type": "file",
+      "name": "LightIOModule.t.hpp",
+      "filePath": "PunchPressVision/infrastructure/LightIOModule/test/include/LightIOModule.t.hpp",
+      "summary": "LightIOModule 测试头文件桩，仅包含 #pragma once。",
+      "tags": ["test", "stub", "header"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp:ConfigModule",
+      "type": "class",
+      "name": "ConfigModule",
+      "filePath": "PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp",
+      "lineRange": [10, 100],
+      "summary": "配置模块核心类，管理 baseCfg、cameraCfg、plcAddressCfg、visionCfg 四类配置的 OSO 序列化生命周期：build() 加载或创建默认配置，save() 持久化到磁盘，destroy() 先保存再释放资源。",
+      "tags": ["configuration", "persistence", "serialization", "lifecycle"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:PunchPressVision/infrastructure/ControlModule/include/infrastructure/ControlModule/ControlModule.hpp:ControlModule",
+      "type": "class",
+      "name": "ControlModule",
+      "filePath": "PunchPressVision/infrastructure/ControlModule/include/infrastructure/ControlModule/ControlModule.hpp",
+      "lineRange": [30, 68],
+      "summary": "PLC 控制网关类（QObject + IInfrastructure），封装 Modbus TCP 通信：连接/断开管理、保持寄存器单字/浮点/批量读写、线圈读写，通过 connectionStateChanged 信号广播连接状态变更。",
+      "tags": ["modbus", "plc", "hardware-abstraction", "communication", "qt-signal"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:PunchPressVision/infrastructure/infrastructure/include/infrastructure/infrastructure.hpp:infrastructure",
+      "type": "class",
+      "name": "infrastructure",
+      "filePath": "PunchPressVision/infrastructure/infrastructure/include/infrastructure/infrastructure.hpp",
+      "lineRange": [14, 31],
+      "summary": "infrastructure 聚合根类，持有全部 8 个基础设施子模块的 unique_ptr，通过 build()/destroy() 按依赖拓扑顺序编排所有子模块的生命周期。",
+      "tags": ["aggregation", "lifecycle", "orchestration", "entry-point"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:PunchPressVision/infrastructure/LightIOModule/include/infrastructure/LightIOModule/LightIOModule.hpp:LightIOModule",
+      "type": "class",
+      "name": "LightIOModule",
+      "filePath": "PunchPressVision/infrastructure/LightIOModule/include/infrastructure/LightIOModule/LightIOModule.hpp",
+      "lineRange": [13, 32],
+      "summary": "光源 IO 控制类（IInfrastructure），管理上/下光源的开关状态并通过注入的 ControlModule 指针执行 Modbus 线圈写操作。",
+      "tags": ["hardware-abstraction", "io", "lighting", "lifecycle"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp:build",
+      "type": "function",
+      "name": "build",
+      "filePath": "PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp",
+      "lineRange": [18, 65],
+      "summary": "ConfigModule 构建方法：创建 XML StorageContext，确保配置目录与默认文件存在，反序列化 baseCfg/cameraCfg/plcAddressCfg，visionCfg 通过手写 IO 加载；反序列化失败时静默保留默认值保证设备可用。",
+      "tags": ["lifecycle", "configuration", "serialization", "initialization"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp:destroy",
+      "type": "function",
+      "name": "destroy",
+      "filePath": "PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp",
+      "lineRange": [67, 71],
+      "summary": "ConfigModule 销毁方法：先调用 save() 持久化配置到磁盘，再释放 StorageContext 资源。",
+      "tags": ["lifecycle", "configuration", "cleanup"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp:save",
+      "type": "function",
+      "name": "save",
+      "filePath": "PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp",
+      "lineRange": [73, 99],
+      "summary": "ConfigModule 保存方法：将 baseCfg/cameraCfg/plcAddressCfg 通过 OSO 序列化写入 XML 文件，visionCfg 通过手写 IO 保存；异常静默忽略。",
+      "tags": ["configuration", "serialization", "persistence"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp:connectToPLC",
+      "type": "function",
+      "name": "connectToPLC",
+      "filePath": "PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "lineRange": [29, 50],
+      "summary": "通过 TCP 连接 PLC：根据 ip/port 配置创建 rw::hoep::ModbusDevice 实例，调用 connect() 建立连接，通过 atomic_bool 记录状态并发射 connectionStateChanged 信号。",
+      "tags": ["modbus", "plc", "communication", "connection"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp:disconnectPLC",
+      "type": "function",
+      "name": "disconnectPLC",
+      "filePath": "PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "lineRange": [52, 68],
+      "summary": "断开 PLC 连接：调用 ModbusDevice::disconnect()，更新连接状态为 false 并发射 connectionStateChanged 信号；设备未初始化时直接返回 true。",
+      "tags": ["modbus", "plc", "communication", "disconnection"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp:writeRegister",
+      "type": "function",
+      "name": "writeRegister",
+      "filePath": "PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "lineRange": [75, 88],
+      "summary": "向 PLC 指定地址写入单个 16 位保持寄存器值，底层调用 ModbusDevice::writeUInt16Register。",
+      "tags": ["modbus", "plc", "register", "write"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp:readRegister",
+      "type": "function",
+      "name": "readRegister",
+      "filePath": "PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "lineRange": [90, 103],
+      "summary": "从 PLC 指定地址读取单个 16 位保持寄存器值，底层调用 ModbusDevice::readUInt16Register。",
+      "tags": ["modbus", "plc", "register", "read"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp:writeFloat",
+      "type": "function",
+      "name": "writeFloat",
+      "filePath": "PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "lineRange": [105, 118],
+      "summary": "向 PLC 写入浮点值（占用 2 个连续保持寄存器），底层调用 ModbusDevice::writeFloatRegister 并指定大端字节序。",
+      "tags": ["modbus", "plc", "float", "write", "register"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp:readFloat",
+      "type": "function",
+      "name": "readFloat",
+      "filePath": "PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "lineRange": [120, 133],
+      "summary": "从 PLC 读取浮点值（占用 2 个连续保持寄存器），底层调用 ModbusDevice::readFloatRegister 并指定大端字节序解码。",
+      "tags": ["modbus", "plc", "float", "read", "register"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp:writeMultipleRegisters",
+      "type": "function",
+      "name": "writeMultipleRegisters",
+      "filePath": "PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "lineRange": [135, 148],
+      "summary": "向 PLC 批量写入多个 16 位保持寄存器值，适用于九点标定等需要连续写入大量寄存器的场景。",
+      "tags": ["modbus", "plc", "batch-write", "register"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp:readMultipleRegisters",
+      "type": "function",
+      "name": "readMultipleRegisters",
+      "filePath": "PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "lineRange": [150, 164],
+      "summary": "从 PLC 批量读取多个 16 位保持寄存器值，适用于九点标定点位坐标等连续读取场景。",
+      "tags": ["modbus", "plc", "batch-read", "register"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp:writeCoil",
+      "type": "function",
+      "name": "writeCoil",
+      "filePath": "PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "lineRange": [166, 179],
+      "summary": "向 PLC 指定地址写入线圈状态（布尔值），用于控制开关量输出（如光源、电磁阀）。",
+      "tags": ["modbus", "plc", "coil", "write", "boolean"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp:readCoil",
+      "type": "function",
+      "name": "readCoil",
+      "filePath": "PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "lineRange": [181, 194],
+      "summary": "从 PLC 指定地址读取线圈状态（布尔值），用于查询开关量输入的当前状态。",
+      "tags": ["modbus", "plc", "coil", "read", "boolean"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp:infrastructure",
+      "type": "function",
+      "name": "infrastructure",
+      "filePath": "PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp",
+      "lineRange": [5, 15],
+      "summary": "infrastructure 聚合根构造函数：按序创建全部 8 个子模块实例（ConfigModule->CalibConfigModule->NinePointModule->TwoCameraSpliceModule->CameraModule->ShapeModelManagerModule->ControlModule->LightIOModule），分配 unique_ptr。",
+      "tags": ["constructor", "initialization", "aggregation"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp:build",
+      "type": "function",
+      "name": "build",
+      "filePath": "PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp",
+      "lineRange": [30, 54],
+      "summary": "infrastructure 聚合根构建方法：按依赖拓扑顺序构建各子模块——配置先行，标定/九点/拼接随后，相机注入配置后启动，模型管理器构建，PLC 网关构建，最后光源 IO 注入 PLC 指针后启动。",
+      "tags": ["lifecycle", "orchestration", "initialization", "dependency-injection"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp:destroy",
+      "type": "function",
+      "name": "destroy",
+      "filePath": "PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp",
+      "lineRange": [56, 67],
+      "summary": "infrastructure 聚合根销毁方法：逆序销毁所有子模块（先构建的后销毁），确保依赖关系在析构时不被破坏。",
+      "tags": ["lifecycle", "orchestration", "cleanup", "teardown"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp:build",
+      "type": "function",
+      "name": "build",
+      "filePath": "PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp",
+      "lineRange": [14, 19],
+      "summary": "LightIOModule 构建方法：初始关闭上/下光源，若 PLC 已连接则同步写线圈到硬件。",
+      "tags": ["lifecycle", "initialization", "lighting"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp:destroy",
+      "type": "function",
+      "name": "destroy",
+      "filePath": "PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp",
+      "lineRange": [21, 27],
+      "summary": "LightIOModule 销毁方法：关闭全部光源并置空 ControlModule 指针，确保退出时硬件回到安全状态。",
+      "tags": ["lifecycle", "cleanup", "lighting"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp:setUpperLight",
+      "type": "function",
+      "name": "setUpperLight",
+      "filePath": "PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp",
+      "lineRange": [34, 39],
+      "summary": "设置上光源开关状态：更新 atomic_bool 状态，若 PLC 已连接则通过 ControlModule::writeCoil 同步写线圈。",
+      "tags": ["lighting", "io", "control", "modbus"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp:setLowerLight",
+      "type": "function",
+      "name": "setLowerLight",
+      "filePath": "PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp",
+      "lineRange": [41, 46],
+      "summary": "设置下光源开关状态：更新 atomic_bool 状态，若 PLC 已连接则通过 ControlModule::writeCoil 同步写线圈。",
+      "tags": ["lighting", "io", "control", "modbus"],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp",
+      "target": "class:PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp:ConfigModule",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp:build",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp:destroy",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp:save",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ControlModule/include/infrastructure/ControlModule/ControlModule.hpp",
+      "target": "class:PunchPressVision/infrastructure/ControlModule/include/infrastructure/ControlModule/ControlModule.hpp:ControlModule",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp:connectToPLC",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp:disconnectPLC",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp:writeRegister",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp:readRegister",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp:writeFloat",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp:readFloat",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp:writeMultipleRegisters",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp:readMultipleRegisters",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp:writeCoil",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp:readCoil",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/infrastructure/include/infrastructure/infrastructure.hpp",
+      "target": "class:PunchPressVision/infrastructure/infrastructure/include/infrastructure/infrastructure.hpp:infrastructure",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp",
+      "target": "function:PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp:infrastructure",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp",
+      "target": "function:PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp:build",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp",
+      "target": "function:PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp:destroy",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/LightIOModule/include/infrastructure/LightIOModule/LightIOModule.hpp",
+      "target": "class:PunchPressVision/infrastructure/LightIOModule/include/infrastructure/LightIOModule/LightIOModule.hpp:LightIOModule",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp:build",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp:destroy",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp:setUpperLight",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp:setLowerLight",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp:build",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp:destroy",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp:save",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ControlModule/include/infrastructure/ControlModule/ControlModule.hpp",
+      "target": "class:PunchPressVision/infrastructure/ControlModule/include/infrastructure/ControlModule/ControlModule.hpp:ControlModule",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp:connectToPLC",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp:disconnectPLC",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp:writeRegister",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp:readRegister",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp:writeFloat",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp:readFloat",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp:writeMultipleRegisters",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp:readMultipleRegisters",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp:writeCoil",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp:readCoil",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/infrastructure/include/infrastructure/infrastructure.hpp",
+      "target": "class:PunchPressVision/infrastructure/infrastructure/include/infrastructure/infrastructure.hpp:infrastructure",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/infrastructure/include/infrastructure/infrastructure.hpp",
+      "target": "function:PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp:build",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/infrastructure/include/infrastructure/infrastructure.hpp",
+      "target": "function:PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp:destroy",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp",
+      "target": "function:PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp:infrastructure",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp",
+      "target": "function:PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp:build",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp",
+      "target": "function:PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp:destroy",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/LightIOModule/include/infrastructure/LightIOModule/LightIOModule.hpp",
+      "target": "class:PunchPressVision/infrastructure/LightIOModule/include/infrastructure/LightIOModule/LightIOModule.hpp:LightIOModule",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/LightIOModule/include/infrastructure/LightIOModule/LightIOModule.hpp",
+      "target": "function:PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp:build",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/LightIOModule/include/infrastructure/LightIOModule/LightIOModule.hpp",
+      "target": "function:PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp:destroy",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/LightIOModule/include/infrastructure/LightIOModule/LightIOModule.hpp",
+      "target": "function:PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp:setUpperLight",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/LightIOModule/include/infrastructure/LightIOModule/LightIOModule.hpp",
+      "target": "function:PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp:setLowerLight",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp:build",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp:destroy",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp:setUpperLight",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp:setLowerLight",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp:build",
+      "target": "function:PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp:build",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp:build",
+      "target": "function:PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp:build",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp:destroy",
+      "target": "function:PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp:destroy",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp:destroy",
+      "target": "function:PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp:destroy",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp:setUpperLight",
+      "target": "function:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp:writeCoil",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp:setLowerLight",
+      "target": "function:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp:writeCoil",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "document:PunchPressVision/infrastructure/ConfigModule/test/CMakeLists.txt",
+      "target": "file:PunchPressVision/infrastructure/ConfigModule/test/src/ConfigModule.t.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/infrastructure/ControlModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/infrastructure/ControlModule/test/CMakeLists.txt",
+      "target": "file:PunchPressVision/infrastructure/ControlModule/test/src/ControlModule.t.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/infrastructure/infrastructure/CMakeLists.txt",
+      "target": "file:PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/infrastructure/infrastructure/test/CMakeLists.txt",
+      "target": "file:PunchPressVision/infrastructure/infrastructure/test/src/infrastructure.t.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/infrastructure/LightIOModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/infrastructure/LightIOModule/test/CMakeLists.txt",
+      "target": "file:PunchPressVision/infrastructure/LightIOModule/test/include/LightIOModule.t.hpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/infrastructure/infrastructure/CMakeLists.txt",
+      "target": "document:PunchPressVision/infrastructure/ConfigModule/test/CMakeLists.txt",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/infrastructure/infrastructure/CMakeLists.txt",
+      "target": "document:PunchPressVision/infrastructure/ControlModule/CMakeLists.txt",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/infrastructure/infrastructure/CMakeLists.txt",
+      "target": "document:PunchPressVision/infrastructure/LightIOModule/CMakeLists.txt",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/infrastructure/LightIOModule/CMakeLists.txt",
+      "target": "document:PunchPressVision/infrastructure/ControlModule/CMakeLists.txt",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/osoFile/cameraCfg.oso",
+      "target": "file:PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp",
+      "type": "defines_schema",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/osoFile/plcAddressCfg.oso",
+      "target": "file:PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp",
+      "type": "defines_schema",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/osoFile/plcAddressCfg.oso",
+      "target": "file:PunchPressVision/infrastructure/ControlModule/include/infrastructure/ControlModule/ControlModule.hpp",
+      "type": "defines_schema",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ConfigModule/test/src/ConfigModule.t.cpp",
+      "target": "file:PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ControlModule/test/src/ControlModule.t.cpp",
+      "target": "file:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/infrastructure/test/src/infrastructure.t.cpp",
+      "target": "file:PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp",
+      "target": "file:PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp",
+      "target": "file:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp",
+      "target": "file:PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp",
+      "target": "file:PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    }
+  ]
+}

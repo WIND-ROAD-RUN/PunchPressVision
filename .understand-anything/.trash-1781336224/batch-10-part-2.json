@@ -1,0 +1,1044 @@
+{
+  "nodes": [
+    {
+      "id": "document:PunchPressVision/infrastructure/ShapeModelManagerModule/CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/CMakeLists.txt",
+      "summary": "ShapeModelManagerModule 静态库的 CMake 构建配置，链接 global::global、Halcon、JsonCpp 和 Qt::Core，设置 inf::ShapeModelManagerModule 命名空间别名。",
+      "tags": ["build-system", "configuration", "cmake"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/Config/ShapeModelItem.hpp",
+      "type": "file",
+      "name": "ShapeModelItem.hpp",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/Config/ShapeModelItem.hpp",
+      "summary": "形状模板数据模型声明文件，定义 ShapeModelData（模板图像/Halcon 模型ID/ROI 列表/预处理参数）、ShapeModelInfo（元数据/ID/时间戳）及 ShapeModelItem（聚合体）三层结构。",
+      "tags": ["data-model", "halcon-integration", "template-matching"],
+      "complexity": "complex",
+      "languageNotes": "ShapeModelData 包含 37 个字段，涵盖图像预处理（开闭运算/均值滤波）、XLD 轮廓筛选、模板匹配参数及曝光/增益等相机设置。"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/ShapeModelManagerModule.hpp",
+      "type": "file",
+      "name": "ShapeModelManagerModule.hpp",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/ShapeModelManagerModule.hpp",
+      "summary": "形状模板管理器模块类声明，继承 global::IInfrastructure，提供模板的增删改查（CRUD）及目录扫描加载功能，含 3 个重载的 changeShapeModelItem 方法。",
+      "tags": ["infrastructure", "service", "crud", "template-matching"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/ShapeModelManagerModulePath.hpp",
+      "type": "file",
+      "name": "ShapeModelManagerModulePath.hpp",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/ShapeModelManagerModulePath.hpp",
+      "summary": "定义 ShapeModelManagerModule 的数据存储根路径常量（ShapeModels 子目录），使用 inline 匿名结构体实现全局可访问的路径配置。",
+      "tags": ["configuration", "path-definition"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/ShapeModelManagerModuleTypes.hpp",
+      "type": "file",
+      "name": "ShapeModelManagerModuleTypes.hpp",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/ShapeModelManagerModuleTypes.hpp",
+      "summary": "ShapeModelManagerModule 的类型定义头文件，声明了必要的 STL 依赖但当前 inf 命名空间为空，为后续类型别名预留空间。",
+      "tags": ["type-definition", "placeholder"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "type": "file",
+      "name": "ShapeModelItem.cpp",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "summary": "形状模板数据模型的完整持久化实现（567 行），包含 JSON 配置读写、Halcon 图像/对象/Tuple 安全 I/O、参数序列化、ROI 文件管理及三层 loadInDir/saveInDir 方法。",
+      "tags": ["serialization", "persistence", "halcon-integration", "json"],
+      "complexity": "complex",
+      "languageNotes": "实现原子文件写入策略（临时文件+rename），JSON 配置与 Halcon 二进制数据混合存储，每层 ShapeModelData/Info/Item 均有独立的 loadInDir/saveInDir。"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp",
+      "type": "file",
+      "name": "ShapeModelManagerModule.cpp",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp",
+      "summary": "ShapeModelManagerModule 的完整业务逻辑实现（226 行），包括从磁盘扫描加载所有模板、UUID 生成、模板增删改查及 updateTime 自动维护。",
+      "tags": ["infrastructure", "crud", "template-management", "service"],
+      "complexity": "complex",
+      "languageNotes": "使用 QUuid::createUuid 生成唯一 ID，std::find_if 实现按 ID 查找，修改操作自动更新 updateTime 并持久化。"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModulePath.cpp",
+      "type": "file",
+      "name": "ShapeModelManagerModulePath.cpp",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModulePath.cpp",
+      "summary": "路径定义源文件，仅包含 ShapeModelManagerModulePath.hpp 的单个 include，用于触发 inline 变量的编译单元实例化。",
+      "tags": ["path-definition", "include-forwarder"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModuleTypes.cpp",
+      "type": "file",
+      "name": "ShapeModelManagerModuleTypes.cpp",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModuleTypes.cpp",
+      "summary": "类型定义源文件占位，仅包含对应的头文件 include，无实际类型实现代码。",
+      "tags": ["type-definition", "placeholder"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:PunchPressVision/infrastructure/ShapeModelManagerModule/test/CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/test/CMakeLists.txt",
+      "summary": "ShapeModelManagerModule 测试可执行文件的 CMake 构建配置，生成 Test_inf_ShapeModelManagerModule，链接 inf::ShapeModelManagerModule 并配置 windeployqt。",
+      "tags": ["build-system", "test", "cmake"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/test/include/ShapeModelManagerModule.t.hpp",
+      "type": "file",
+      "name": "ShapeModelManagerModule.t.hpp",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/test/include/ShapeModelManagerModule.t.hpp",
+      "summary": "ShapeModelManagerModule 测试类声明，定义 ShapeModelManagerModuleTest 类及 runBasicTest 静态方法。",
+      "tags": ["test", "test-fixture"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/test/src/ShapeModelManagerModule.t.cpp",
+      "type": "file",
+      "name": "ShapeModelManagerModule.t.cpp",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/test/src/ShapeModelManagerModule.t.cpp",
+      "summary": "ShapeModelManagerModule 的基础测试实现，运行模板添加、等待、再添加、按 ID 删除的端到端流程。",
+      "tags": ["test", "integration-test"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/Config/ShapeModelItem.hpp:ShapeModelData",
+      "type": "class",
+      "name": "ShapeModelData",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/Config/ShapeModelItem.hpp",
+      "lineRange": [9, 97],
+      "summary": "形状模板核心数据类，存储模板/原始图像、Halcon ModelID/MetrologyHandle、ROI 绘制列表、XLD 轮廓、中心点/偏移/角度、XLD 筛选参数、预处理配置（通道/开闭运算/均值滤波）、匹配参数、曝光/增益等 37 个字段。",
+      "tags": ["data-model", "halcon-integration", "template-matching", "vision"],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/Config/ShapeModelItem.hpp:ShapeModelInfo",
+      "type": "class",
+      "name": "ShapeModelInfo",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/Config/ShapeModelItem.hpp",
+      "lineRange": [99, 125],
+      "summary": "形状模板元数据类，包含 BaseInfo（模板名称）、唯一 ID、创建/更新时间戳和文件夹路径，提供 getter/setter 及持久化方法。",
+      "tags": ["data-model", "metadata", "serialization"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/Config/ShapeModelItem.hpp:ShapeModelItem",
+      "type": "class",
+      "name": "ShapeModelItem",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/Config/ShapeModelItem.hpp",
+      "lineRange": [127, 136],
+      "summary": "形状模板聚合体，组合 ShapeModelInfo（元数据）和 ShapeModelData（核心数据），提供统一的 loadInDir/saveInDir 入口。",
+      "tags": ["data-model", "aggregate"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/ShapeModelManagerModule.hpp:ShapeModelManagerModule",
+      "type": "class",
+      "name": "ShapeModelManagerModule",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/ShapeModelManagerModule.hpp",
+      "lineRange": [13, 37],
+      "summary": "形状模板管理器基础设施模块，继承 global::IInfrastructure，维护 ShapeModelInfo 向量并提供完整 CRUD 操作、目录扫描加载及 UUID 时间戳工具方法。",
+      "tags": ["infrastructure", "service", "crud", "template-matching"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:PunchPressVision/infrastructure/ShapeModelManagerModule/test/include/ShapeModelManagerModule.t.hpp:ShapeModelManagerModuleTest",
+      "type": "class",
+      "name": "ShapeModelManagerModuleTest",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/test/include/ShapeModelManagerModule.t.hpp",
+      "lineRange": [7, 11],
+      "summary": "ShapeModelManagerModule 测试夹具类，提供 runBasicTest 静态方法用于执行基础集成测试。",
+      "tags": ["test", "test-fixture"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:readJsonSafe",
+      "type": "function",
+      "name": "readJsonSafe",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "lineRange": [36, 50],
+      "summary": "安全地从文件读取 JSON 配置，检查文件存在性后使用 Json::parseFromStream 解析，失败时返回空 Value。",
+      "tags": ["serialization", "json", "io"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:writeJsonSafe",
+      "type": "function",
+      "name": "writeJsonSafe",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "lineRange": [52, 70],
+      "summary": "安全地将 JSON Value 原子写入文件，自动创建父目录，使用 StreamWriter 格式化输出后通过临时文件+rename 策略提交。",
+      "tags": ["serialization", "json", "io"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:writeImageSafe",
+      "type": "function",
+      "name": "writeImageSafe",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "lineRange": [72, 81],
+      "summary": "安全地将 Halcon HImage 写入文件，检查图像初始化状态后调用 WriteImage，采用原子写入策略。",
+      "tags": ["serialization", "halcon-integration", "io"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:readImageSafe",
+      "type": "function",
+      "name": "readImageSafe",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "lineRange": [83, 96],
+      "summary": "安全地从文件读取 Halcon HImage，检查文件存在性后调用 ReadImage 加载图像数据。",
+      "tags": ["serialization", "halcon-integration", "io"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:writeObjectSafe",
+      "type": "function",
+      "name": "writeObjectSafe",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "lineRange": [98, 108],
+      "summary": "安全地将 Halcon HObject（如 ROI/XLD 轮廓）写入文件，检查对象初始化状态后采用原子写入。",
+      "tags": ["serialization", "halcon-integration", "io"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:readObjectSafe",
+      "type": "function",
+      "name": "readObjectSafe",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "lineRange": [110, 123],
+      "summary": "安全地从文件读取 Halcon HObject，检查文件存在性后调用 ReadObject 加载 ROI/XLD 等对象数据。",
+      "tags": ["serialization", "halcon-integration", "io"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:clearOldRoiFiles",
+      "type": "function",
+      "name": "clearOldRoiFiles",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "lineRange": [125, 137],
+      "summary": "清理目录中旧的 ROI 文件，遍历按数字序号命名的 ROI 文件并逐个删除，用于保存前清理旧数据。",
+      "tags": ["io", "cleanup", "file-management"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:readTupleSafe",
+      "type": "function",
+      "name": "readTupleSafe",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "lineRange": [148, 161],
+      "summary": "安全地从文件读取 Halcon HTuple，检查文件存在性后封装 HalconCpp::ReadTuple 调用并处理异常。",
+      "tags": ["serialization", "halcon-integration", "io"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:writeParamsSafe_ShapeModelData",
+      "type": "function",
+      "name": "writeParamsSafe_ShapeModelData",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "lineRange": [163, 226],
+      "summary": "以 key=value 格式将 ShapeModelData 的 28 个参数原子写入文件，包含通道类型、中心点/偏移、XLD 参数、预处理开关及半径、匹配参数、曝光/增益等。",
+      "tags": ["serialization", "io", "persistence"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:readParamsSafe_ShapeModelData",
+      "type": "function",
+      "name": "readParamsSafe_ShapeModelData",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "lineRange": [235, 349],
+      "summary": "从 key=value 文本行文件解析 ShapeModelData 的 28 个参数，支持跳过空行和注释行，使用 std::stod/stoi 转换浮点和整数值。",
+      "tags": ["serialization", "parsing", "io"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:loadInDir_ShapeModelData",
+      "type": "function",
+      "name": "loadInDir_ShapeModelData",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "lineRange": [352, 429],
+      "summary": "从目录加载完整 ShapeModelData，包括参数文件、模板/原始图像、ShapeModel（ReadShapeModel）、MetrologyModel（ReadMetrologyModel）、ROI 绘制列表及 XLD 轮廓对象。",
+      "tags": ["serialization", "halcon-integration", "deserialization"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:saveInDir_ShapeModelData",
+      "type": "function",
+      "name": "saveInDir_ShapeModelData",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "lineRange": [431, 510],
+      "summary": "将完整 ShapeModelData 保存到目录，包括参数文件、图像（WriteImage）、ShapeModel（WriteShapeModel）、MetrologyModel（WriteMetrologyModel）及所有 ROI/XLD 对象。",
+      "tags": ["serialization", "halcon-integration", "persistence"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:loadInDir_ShapeModelInfo",
+      "type": "function",
+      "name": "loadInDir_ShapeModelInfo",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "lineRange": [512, 533],
+      "summary": "从目录加载 ShapeModelInfo 元数据，读取 JSON 配置文件并解析 id、名称、创建/更新时间戳及文件夹路径。",
+      "tags": ["serialization", "json", "deserialization"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:saveInDir_ShapeModelInfo",
+      "type": "function",
+      "name": "saveInDir_ShapeModelInfo",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "lineRange": [535, 554],
+      "summary": "将 ShapeModelInfo 元数据保存为 JSON 配置文件，包含 id、名称、创建/更新时间戳及文件夹路径。",
+      "tags": ["serialization", "json", "persistence"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:readAllShapeModelInfos",
+      "type": "function",
+      "name": "readAllShapeModelInfos",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp",
+      "lineRange": [25, 49],
+      "summary": "扫描 ShapeModelManagerModulePath.RootPath 目录下所有子目录，逐一加载 ShapeModelInfo 并填充 shape_model_infos_ 向量。",
+      "tags": ["io", "initialization", "directory-scan"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:addShapeModelItem",
+      "type": "function",
+      "name": "addShapeModelItem",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp",
+      "lineRange": [51, 69],
+      "summary": "创建新形状模板：生成 UUID 作为 ID、设置创建/更新时间戳和文件夹路径，保存 ShapeModelData 和元数据，加入列表并返回 ShapeModelInfo。",
+      "tags": ["crud", "create", "template-management"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:deleteShapeModelItem",
+      "type": "function",
+      "name": "deleteShapeModelItem",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp",
+      "lineRange": [71, 98],
+      "summary": "按 ID 删除形状模板：find_if 查找匹配项，删除对应文件夹及其所有内容（fs::remove_all），从内存列表中移除。",
+      "tags": ["crud", "delete", "template-management"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:getShapeModelItem",
+      "type": "function",
+      "name": "getShapeModelItem",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp",
+      "lineRange": [100, 115],
+      "summary": "按 ID 查询形状模板：find_if 查找匹配的 ShapeModelInfo，从磁盘加载完整 ShapeModelItem 数据并返回。",
+      "tags": ["crud", "read", "template-management"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:changeShapeModelItem_data",
+      "type": "function",
+      "name": "changeShapeModelItem_data",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp",
+      "lineRange": [117, 144],
+      "summary": "按 ID 更新形状模板的 ShapeModelData：加载现有数据，替换后保存，自动更新 updateTime，失败时回滚时间戳。",
+      "tags": ["crud", "update", "template-management"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:changeShapeModelItem_info",
+      "type": "function",
+      "name": "changeShapeModelItem_info",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp",
+      "lineRange": [146, 175],
+      "summary": "按 ID 更新形状模板的 ShapeModelInfo 元数据（名称等）：加载现有数据，替换 BaseInfo 后保存，自动更新 updateTime，失败时回滚。",
+      "tags": ["crud", "update", "template-management"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:changeShapeModelItem_both",
+      "type": "function",
+      "name": "changeShapeModelItem_both",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp",
+      "lineRange": [177, 207],
+      "summary": "按 ID 同时更新形状模板的 ShapeModelData 和 ShapeModelInfo：加载现有数据，替换两者后保存，自动更新 updateTime，失败时回滚。",
+      "tags": ["crud", "update", "template-management"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:build",
+      "type": "function",
+      "name": "build",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp",
+      "lineRange": [214, 217],
+      "summary": "IInfrastructure 生命周期方法，调用 readAllShapeModelInfos 从磁盘扫描并加载所有已有模板信息。",
+      "tags": ["lifecycle", "infrastructure"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:destroy",
+      "type": "function",
+      "name": "destroy",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp",
+      "lineRange": [219, 224],
+      "summary": "IInfrastructure 生命周期方法，清空内存中缓存的 shape_model_infos_ 向量以释放资源。",
+      "tags": ["lifecycle", "infrastructure"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/test/src/ShapeModelManagerModule.t.cpp:runBasicTest",
+      "type": "function",
+      "name": "runBasicTest",
+      "filePath": "PunchPressVision/infrastructure/ShapeModelManagerModule/test/src/ShapeModelManagerModule.t.cpp",
+      "lineRange": [10, 27],
+      "summary": "ShapeModelManagerModule 基础集成测试：构建管理器，添加两个模板（间隔 1 秒），然后按 ID 删除第二个模板，验证增删流程。",
+      "tags": ["test", "integration-test", "crud"],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/Config/ShapeModelItem.hpp",
+      "target": "class:PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/Config/ShapeModelItem.hpp:ShapeModelData",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/Config/ShapeModelItem.hpp",
+      "target": "class:PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/Config/ShapeModelItem.hpp:ShapeModelInfo",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/Config/ShapeModelItem.hpp",
+      "target": "class:PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/Config/ShapeModelItem.hpp:ShapeModelItem",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/ShapeModelManagerModule.hpp",
+      "target": "class:PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/ShapeModelManagerModule.hpp:ShapeModelManagerModule",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:readJsonSafe",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:writeJsonSafe",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:writeImageSafe",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:readImageSafe",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:writeObjectSafe",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:readObjectSafe",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:clearOldRoiFiles",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:readTupleSafe",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:writeParamsSafe_ShapeModelData",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:readParamsSafe_ShapeModelData",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:loadInDir_ShapeModelData",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:saveInDir_ShapeModelData",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:loadInDir_ShapeModelInfo",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:saveInDir_ShapeModelInfo",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:readAllShapeModelInfos",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:addShapeModelItem",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:deleteShapeModelItem",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:getShapeModelItem",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:changeShapeModelItem_data",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:changeShapeModelItem_info",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:changeShapeModelItem_both",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:build",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:destroy",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/test/include/ShapeModelManagerModule.t.hpp",
+      "target": "class:PunchPressVision/infrastructure/ShapeModelManagerModule/test/include/ShapeModelManagerModule.t.hpp:ShapeModelManagerModuleTest",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/test/src/ShapeModelManagerModule.t.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/test/src/ShapeModelManagerModule.t.cpp:runBasicTest",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/Config/ShapeModelItem.hpp",
+      "target": "class:PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/Config/ShapeModelItem.hpp:ShapeModelData",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/Config/ShapeModelItem.hpp",
+      "target": "class:PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/Config/ShapeModelItem.hpp:ShapeModelInfo",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/Config/ShapeModelItem.hpp",
+      "target": "class:PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/Config/ShapeModelItem.hpp:ShapeModelItem",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/ShapeModelManagerModule.hpp",
+      "target": "class:PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/ShapeModelManagerModule.hpp:ShapeModelManagerModule",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:readJsonSafe",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:writeJsonSafe",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:writeImageSafe",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:readImageSafe",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:writeObjectSafe",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:readObjectSafe",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:clearOldRoiFiles",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:readTupleSafe",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:writeParamsSafe_ShapeModelData",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:readParamsSafe_ShapeModelData",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:loadInDir_ShapeModelData",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:saveInDir_ShapeModelData",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:loadInDir_ShapeModelInfo",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:saveInDir_ShapeModelInfo",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:readAllShapeModelInfos",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:addShapeModelItem",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:deleteShapeModelItem",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:getShapeModelItem",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:changeShapeModelItem_data",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:changeShapeModelItem_info",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:changeShapeModelItem_both",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:build",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:destroy",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/test/include/ShapeModelManagerModule.t.hpp",
+      "target": "class:PunchPressVision/infrastructure/ShapeModelManagerModule/test/include/ShapeModelManagerModule.t.hpp:ShapeModelManagerModuleTest",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/test/src/ShapeModelManagerModule.t.cpp",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/test/src/ShapeModelManagerModule.t.cpp:runBasicTest",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:loadInDir_ShapeModelData",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:readParamsSafe_ShapeModelData",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:loadInDir_ShapeModelData",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:readImageSafe",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:loadInDir_ShapeModelData",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:readObjectSafe",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:saveInDir_ShapeModelData",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:writeParamsSafe_ShapeModelData",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:saveInDir_ShapeModelData",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:writeImageSafe",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:saveInDir_ShapeModelData",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:clearOldRoiFiles",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:saveInDir_ShapeModelData",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:writeObjectSafe",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:loadInDir_ShapeModelInfo",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:readJsonSafe",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:saveInDir_ShapeModelInfo",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:writeJsonSafe",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:readAllShapeModelInfos",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:loadInDir_ShapeModelInfo",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:addShapeModelItem",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:saveInDir_ShapeModelInfo",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:getShapeModelItem",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:loadInDir_ShapeModelData",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:getShapeModelItem",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:loadInDir_ShapeModelInfo",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:changeShapeModelItem_data",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:loadInDir_ShapeModelInfo",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:changeShapeModelItem_data",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:saveInDir_ShapeModelInfo",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:changeShapeModelItem_info",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:loadInDir_ShapeModelInfo",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:changeShapeModelItem_info",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:saveInDir_ShapeModelInfo",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:changeShapeModelItem_both",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:loadInDir_ShapeModelInfo",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:changeShapeModelItem_both",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp:saveInDir_ShapeModelInfo",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:build",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:readAllShapeModelInfos",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "document:PunchPressVision/infrastructure/ShapeModelManagerModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/ShapeModelManagerModule.hpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/infrastructure/ShapeModelManagerModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/infrastructure/ShapeModelManagerModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/infrastructure/ShapeModelManagerModule/test/CMakeLists.txt",
+      "target": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/test/src/ShapeModelManagerModule.t.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp",
+      "target": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/test/src/ShapeModelManagerModule.t.cpp",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+      "target": "file:PunchPressVision/infrastructure/ShapeModelManagerModule/test/src/ShapeModelManagerModule.t.cpp",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/test/src/ShapeModelManagerModule.t.cpp:runBasicTest",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:build",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/test/src/ShapeModelManagerModule.t.cpp:runBasicTest",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:addShapeModelItem",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/test/src/ShapeModelManagerModule.t.cpp:runBasicTest",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:deleteShapeModelItem",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/test/src/ShapeModelManagerModule.t.cpp:runBasicTest",
+      "target": "function:PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp:destroy",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "document:PunchPressVision/infrastructure/ShapeModelManagerModule/CMakeLists.txt",
+      "target": "document:PunchPressVision/infrastructure/ShapeModelManagerModule/test/CMakeLists.txt",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "class:PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/Config/ShapeModelItem.hpp:ShapeModelItem",
+      "target": "class:PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/Config/ShapeModelItem.hpp:ShapeModelInfo",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "class:PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/Config/ShapeModelItem.hpp:ShapeModelItem",
+      "target": "class:PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/Config/ShapeModelItem.hpp:ShapeModelData",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    }
+  ]
+}

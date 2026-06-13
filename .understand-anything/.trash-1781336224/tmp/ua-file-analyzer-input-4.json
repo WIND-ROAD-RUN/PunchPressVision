@@ -1,0 +1,15 @@
+{
+  "projectRoot": "D:/Workplace/rep/PunchPressVision",
+  "batchFiles": [
+    {"path": "CLAUDE.md", "language": "markdown", "sizeLines": 117, "fileCategory": "docs"},
+    {"path": "CMakeLists.txt", "language": "txt", "sizeLines": 27, "fileCategory": "docs"},
+    {"path": "CMakePresets.json", "language": "json", "sizeLines": 55, "fileCategory": "config"},
+    {"path": "D:WorkplacerepPunchPressVision.understand-anythingtmpua-file-analyzer-input-1.json", "language": "json", "sizeLines": 10, "fileCategory": "config"},
+    {"path": "D:WorkplacerepPunchPressVision.understand-anythingtmpua-file-analyzer-input-2.json", "language": "json", "sizeLines": 11, "fileCategory": "config"},
+    {"path": "D:WorkplacerepPunchPressVision.understand-anythingtmpua-file-analyzer-input-6.json", "language": "json", "sizeLines": 31, "fileCategory": "config"},
+    {"path": "D:WorkplacerepPunchPressVision.understand-anythingtmpua-file-analyzer-input-7.json", "language": "json", "sizeLines": 31, "fileCategory": "config"},
+    {"path": "vcpkg-configuration.json", "language": "json", "sizeLines": 14, "fileCategory": "config"},
+    {"path": "vcpkg.json", "language": "json", "sizeLines": 80, "fileCategory": "config"}
+  ],
+  "batchImportData": {"CLAUDE.md":[],"CMakeLists.txt":[],"CMakePresets.json":[],"D:WorkplacerepPunchPressVision.understand-anythingtmpua-file-analyzer-input-1.json":[],"D:WorkplacerepPunchPressVision.understand-anythingtmpua-file-analyzer-input-2.json":[],"D:WorkplacerepPunchPressVision.understand-anythingtmpua-file-analyzer-input-6.json":[],"D:WorkplacerepPunchPressVision.understand-anythingtmpua-file-analyzer-input-7.json":[],"vcpkg-configuration.json":[],"vcpkg.json":[]}
+}

@@ -1,0 +1,1415 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 25,
+  "filesSkipped": [],
+  "results": [
+    {
+      "path": "PunchPressVision/infrastructure/ConfigModule/osoFile/cameraCfg.oso",
+      "language": "oso",
+      "fileCategory": "code",
+      "totalLines": 12,
+      "nonEmptyLines": 11,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/infrastructure/ConfigModule/osoFile/plcAddressCfg.oso",
+      "language": "oso",
+      "fileCategory": "code",
+      "totalLines": 13,
+      "nonEmptyLines": 13,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 100,
+      "nonEmptyLines": 83,
+      "functions": [
+        {
+          "name": "ConfigModule",
+          "startLine": 10,
+          "endLine": 12,
+          "params": []
+        },
+        {
+          "name": "~ConfigModule",
+          "startLine": 14,
+          "endLine": 16,
+          "params": []
+        },
+        {
+          "name": "build",
+          "startLine": 18,
+          "endLine": 65,
+          "params": []
+        },
+        {
+          "name": "destroy",
+          "startLine": 67,
+          "endLine": 71,
+          "params": []
+        },
+        {
+          "name": "save",
+          "startLine": 73,
+          "endLine": 99,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "ConfigModule",
+          "line": 10,
+          "isDefault": false
+        },
+        {
+          "name": "~ConfigModule",
+          "line": 14,
+          "isDefault": false
+        },
+        {
+          "name": "build",
+          "line": 18,
+          "isDefault": false
+        },
+        {
+          "name": "destroy",
+          "line": 67,
+          "isDefault": false
+        },
+        {
+          "name": "save",
+          "line": 73,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "build",
+          "callee": "std::make_unique<rw::oso::StorageContext>",
+          "lineNumber": 20
+        },
+        {
+          "caller": "build",
+          "callee": "fs::create_directories",
+          "lineNumber": 25
+        },
+        {
+          "caller": "build",
+          "callee": "global::joinPath",
+          "lineNumber": 28
+        },
+        {
+          "caller": "build",
+          "callee": "global::joinPath",
+          "lineNumber": 30
+        },
+        {
+          "caller": "build",
+          "callee": "global::joinPath",
+          "lineNumber": 32
+        },
+        {
+          "caller": "build",
+          "callee": "ensureFileExistsSafe",
+          "lineNumber": 35
+        },
+        {
+          "caller": "build",
+          "callee": "static_cast<rw::oso::ObjectStoreAssembly>",
+          "lineNumber": 36
+        },
+        {
+          "caller": "build",
+          "callee": "ensureFileExistsSafe",
+          "lineNumber": 37
+        },
+        {
+          "caller": "build",
+          "callee": "static_cast<rw::oso::ObjectStoreAssembly>",
+          "lineNumber": 38
+        },
+        {
+          "caller": "build",
+          "callee": "ensureFileExistsSafe",
+          "lineNumber": 39
+        },
+        {
+          "caller": "build",
+          "callee": "static_cast<rw::oso::ObjectStoreAssembly>",
+          "lineNumber": 40
+        },
+        {
+          "caller": "build",
+          "callee": "loadSafeToType<Config::BaseCfg>",
+          "lineNumber": 44
+        },
+        {
+          "caller": "build",
+          "callee": "loadSafeToType<Config::cameraCfg>",
+          "lineNumber": 49
+        },
+        {
+          "caller": "build",
+          "callee": "loadSafeToType<Config::PlcAddressCfg>",
+          "lineNumber": 54
+        },
+        {
+          "caller": "build",
+          "callee": "load",
+          "lineNumber": 59
+        },
+        {
+          "caller": "build",
+          "callee": "global::joinPath",
+          "lineNumber": 59
+        },
+        {
+          "caller": "destroy",
+          "callee": "save",
+          "lineNumber": 69
+        },
+        {
+          "caller": "destroy",
+          "callee": "reset",
+          "lineNumber": 70
+        },
+        {
+          "caller": "save",
+          "callee": "fs::create_directories",
+          "lineNumber": 81
+        },
+        {
+          "caller": "save",
+          "callee": "saveSafe",
+          "lineNumber": 83
+        },
+        {
+          "caller": "save",
+          "callee": "static_cast<rw::oso::ObjectStoreAssembly>",
+          "lineNumber": 84
+        },
+        {
+          "caller": "save",
+          "callee": "global::joinPath",
+          "lineNumber": 85
+        },
+        {
+          "caller": "save",
+          "callee": "saveSafe",
+          "lineNumber": 86
+        },
+        {
+          "caller": "save",
+          "callee": "static_cast<rw::oso::ObjectStoreAssembly>",
+          "lineNumber": 87
+        },
+        {
+          "caller": "save",
+          "callee": "global::joinPath",
+          "lineNumber": 88
+        },
+        {
+          "caller": "save",
+          "callee": "saveSafe",
+          "lineNumber": 89
+        },
+        {
+          "caller": "save",
+          "callee": "static_cast<rw::oso::ObjectStoreAssembly>",
+          "lineNumber": 90
+        },
+        {
+          "caller": "save",
+          "callee": "global::joinPath",
+          "lineNumber": 91
+        },
+        {
+          "caller": "save",
+          "callee": "save",
+          "lineNumber": 93
+        },
+        {
+          "caller": "save",
+          "callee": "global::joinPath",
+          "lineNumber": 93
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 5,
+        "functionCount": 5,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/infrastructure/ConfigModule/src/ConfigModulePath.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 6,
+      "nonEmptyLines": 4,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/infrastructure/ConfigModule/src/ConfigModuleTypes.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 6,
+      "nonEmptyLines": 4,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/infrastructure/ConfigModule/test/CMakeLists.txt",
+      "language": "txt",
+      "fileCategory": "docs",
+      "totalLines": 23,
+      "nonEmptyLines": 17,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/infrastructure/ConfigModule/test/include/ConfigModule.t.hpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 2,
+      "nonEmptyLines": 1,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/infrastructure/ConfigModule/test/src/ConfigModule.t.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 11,
+      "nonEmptyLines": 8,
+      "functions": [
+        {
+          "name": "main",
+          "startLine": 5,
+          "endLine": 11,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "main",
+          "line": 5,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "main",
+          "callee": "build",
+          "lineNumber": 8
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/infrastructure/ControlModule/CMakeLists.txt",
+      "language": "txt",
+      "fileCategory": "docs",
+      "totalLines": 33,
+      "nonEmptyLines": 26,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/infrastructure/ControlModule/include/infrastructure/ControlModule/ControlModule.hpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 69,
+      "nonEmptyLines": 56,
+      "classes": [
+        {
+          "name": "ModbusDevice",
+          "startLine": 15,
+          "endLine": 15,
+          "methods": [],
+          "properties": []
+        },
+        {
+          "name": "ControlModule",
+          "startLine": 30,
+          "endLine": 68,
+          "methods": [
+            "build",
+            "destroy",
+            "connectToPLC",
+            "disconnectPLC",
+            "isConnected",
+            "writeRegister",
+            "readRegister",
+            "writeFloat",
+            "readFloat",
+            "writeMultipleRegisters",
+            "readMultipleRegisters",
+            "writeCoil",
+            "readCoil",
+            "connectionStateChanged"
+          ],
+          "properties": [
+            "public",
+            "modbusDevice_",
+            "connected_"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "ModbusDevice",
+          "line": 15,
+          "isDefault": false
+        },
+        {
+          "name": "ControlModule",
+          "line": 30,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 2,
+        "functionCount": 0,
+        "classCount": 2
+      }
+    },
+    {
+      "path": "PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 195,
+      "nonEmptyLines": 178,
+      "functions": [
+        {
+          "name": "ControlModule",
+          "startLine": 14,
+          "endLine": 14,
+          "params": []
+        },
+        {
+          "name": "~ControlModule",
+          "startLine": 15,
+          "endLine": 15,
+          "params": []
+        },
+        {
+          "name": "build",
+          "startLine": 17,
+          "endLine": 21,
+          "params": []
+        },
+        {
+          "name": "destroy",
+          "startLine": 23,
+          "endLine": 27,
+          "params": []
+        },
+        {
+          "name": "connectToPLC",
+          "startLine": 29,
+          "endLine": 50,
+          "params": [
+            "ip",
+            "port"
+          ]
+        },
+        {
+          "name": "disconnectPLC",
+          "startLine": 52,
+          "endLine": 68,
+          "params": []
+        },
+        {
+          "name": "isConnected",
+          "startLine": 70,
+          "endLine": 73,
+          "params": []
+        },
+        {
+          "name": "writeRegister",
+          "startLine": 75,
+          "endLine": 88,
+          "params": [
+            "address",
+            "value"
+          ]
+        },
+        {
+          "name": "readRegister",
+          "startLine": 90,
+          "endLine": 103,
+          "params": [
+            "address",
+            "value"
+          ]
+        },
+        {
+          "name": "writeFloat",
+          "startLine": 105,
+          "endLine": 118,
+          "params": [
+            "address",
+            "value"
+          ]
+        },
+        {
+          "name": "readFloat",
+          "startLine": 120,
+          "endLine": 133,
+          "params": [
+            "address",
+            "value"
+          ]
+        },
+        {
+          "name": "writeMultipleRegisters",
+          "startLine": 135,
+          "endLine": 148,
+          "params": [
+            "startAddr",
+            "values"
+          ]
+        },
+        {
+          "name": "readMultipleRegisters",
+          "startLine": 150,
+          "endLine": 164,
+          "params": [
+            "startAddr",
+            "count",
+            "values"
+          ]
+        },
+        {
+          "name": "writeCoil",
+          "startLine": 166,
+          "endLine": 179,
+          "params": [
+            "address",
+            "state"
+          ]
+        },
+        {
+          "name": "readCoil",
+          "startLine": 181,
+          "endLine": 194,
+          "params": [
+            "address",
+            "state"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "ControlModule",
+          "line": 14,
+          "isDefault": false
+        },
+        {
+          "name": "~ControlModule",
+          "line": 15,
+          "isDefault": false
+        },
+        {
+          "name": "build",
+          "line": 17,
+          "isDefault": false
+        },
+        {
+          "name": "destroy",
+          "line": 23,
+          "isDefault": false
+        },
+        {
+          "name": "connectToPLC",
+          "line": 29,
+          "isDefault": false
+        },
+        {
+          "name": "disconnectPLC",
+          "line": 52,
+          "isDefault": false
+        },
+        {
+          "name": "isConnected",
+          "line": 70,
+          "isDefault": false
+        },
+        {
+          "name": "writeRegister",
+          "line": 75,
+          "isDefault": false
+        },
+        {
+          "name": "readRegister",
+          "line": 90,
+          "isDefault": false
+        },
+        {
+          "name": "writeFloat",
+          "line": 105,
+          "isDefault": false
+        },
+        {
+          "name": "readFloat",
+          "line": 120,
+          "isDefault": false
+        },
+        {
+          "name": "writeMultipleRegisters",
+          "line": 135,
+          "isDefault": false
+        },
+        {
+          "name": "readMultipleRegisters",
+          "line": 150,
+          "isDefault": false
+        },
+        {
+          "name": "writeCoil",
+          "line": 166,
+          "isDefault": false
+        },
+        {
+          "name": "readCoil",
+          "line": 181,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "destroy",
+          "callee": "disconnectPLC",
+          "lineNumber": 25
+        },
+        {
+          "caller": "destroy",
+          "callee": "reset",
+          "lineNumber": 26
+        },
+        {
+          "caller": "connectToPLC",
+          "callee": "std::make_unique<rw::hoep::ModbusDevice>",
+          "lineNumber": 37
+        },
+        {
+          "caller": "connectToPLC",
+          "callee": "connect",
+          "lineNumber": 39
+        },
+        {
+          "caller": "connectToPLC",
+          "callee": "store",
+          "lineNumber": 40
+        },
+        {
+          "caller": "connectToPLC",
+          "callee": "store",
+          "lineNumber": 46
+        },
+        {
+          "caller": "disconnectPLC",
+          "callee": "disconnect",
+          "lineNumber": 59
+        },
+        {
+          "caller": "disconnectPLC",
+          "callee": "store",
+          "lineNumber": 65
+        },
+        {
+          "caller": "isConnected",
+          "callee": "load",
+          "lineNumber": 72
+        },
+        {
+          "caller": "writeRegister",
+          "callee": "writeUInt16Register",
+          "lineNumber": 81
+        },
+        {
+          "caller": "writeRegister",
+          "callee": "static_cast<rw::hoep::Address16>",
+          "lineNumber": 82
+        },
+        {
+          "caller": "readRegister",
+          "callee": "readUInt16Register",
+          "lineNumber": 96
+        },
+        {
+          "caller": "readRegister",
+          "callee": "static_cast<rw::hoep::Address16>",
+          "lineNumber": 97
+        },
+        {
+          "caller": "writeFloat",
+          "callee": "writeFloatRegister",
+          "lineNumber": 111
+        },
+        {
+          "caller": "writeFloat",
+          "callee": "static_cast<rw::hoep::Address16>",
+          "lineNumber": 112
+        },
+        {
+          "caller": "readFloat",
+          "callee": "readFloatRegister",
+          "lineNumber": 126
+        },
+        {
+          "caller": "readFloat",
+          "callee": "static_cast<rw::hoep::Address16>",
+          "lineNumber": 127
+        },
+        {
+          "caller": "writeMultipleRegisters",
+          "callee": "writeUInt16Registers",
+          "lineNumber": 141
+        },
+        {
+          "caller": "writeMultipleRegisters",
+          "callee": "static_cast<rw::hoep::Address16>",
+          "lineNumber": 142
+        },
+        {
+          "caller": "readMultipleRegisters",
+          "callee": "readUInt16Registers",
+          "lineNumber": 156
+        },
+        {
+          "caller": "readMultipleRegisters",
+          "callee": "static_cast<rw::hoep::Address16>",
+          "lineNumber": 157
+        },
+        {
+          "caller": "readMultipleRegisters",
+          "callee": "static_cast<rw::hoep::Quantity>",
+          "lineNumber": 158
+        },
+        {
+          "caller": "writeCoil",
+          "callee": "writeCoil",
+          "lineNumber": 172
+        },
+        {
+          "caller": "writeCoil",
+          "callee": "static_cast<rw::hoep::Address16>",
+          "lineNumber": 173
+        },
+        {
+          "caller": "readCoil",
+          "callee": "readCoil",
+          "lineNumber": 187
+        },
+        {
+          "caller": "readCoil",
+          "callee": "static_cast<rw::hoep::Address16>",
+          "lineNumber": 188
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 15,
+        "functionCount": 15,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/infrastructure/ControlModule/test/CMakeLists.txt",
+      "language": "txt",
+      "fileCategory": "docs",
+      "totalLines": 22,
+      "nonEmptyLines": 17,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/infrastructure/ControlModule/test/include/ControlModule.t.hpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 1,
+      "nonEmptyLines": 1,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/infrastructure/ControlModule/test/src/ControlModule.t.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 6,
+      "nonEmptyLines": 5,
+      "functions": [
+        {
+          "name": "main",
+          "startLine": 3,
+          "endLine": 6,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "main",
+          "line": 3,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/infrastructure/infrastructure/CMakeLists.txt",
+      "language": "txt",
+      "fileCategory": "docs",
+      "totalLines": 41,
+      "nonEmptyLines": 33,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/infrastructure/infrastructure/include/infrastructure/infrastructure.hpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 32,
+      "nonEmptyLines": 30,
+      "classes": [
+        {
+          "name": "infrastructure",
+          "startLine": 14,
+          "endLine": 31,
+          "methods": [
+            "build",
+            "destroy"
+          ],
+          "properties": [
+            "config_module_",
+            "calib_config_module_",
+            "two_camera_splice_module_",
+            "nine_point_module_",
+            "camera_module_",
+            "shape_model_manager_module_",
+            "control_module_",
+            "light_io_module_"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "build",
+          "line": 20,
+          "isDefault": false
+        },
+        {
+          "name": "destroy",
+          "line": 21,
+          "isDefault": false
+        },
+        {
+          "name": "infrastructure",
+          "line": 14,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 3,
+        "functionCount": 0,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 68,
+      "nonEmptyLines": 59,
+      "functions": [
+        {
+          "name": "infrastructure",
+          "startLine": 5,
+          "endLine": 15,
+          "params": []
+        },
+        {
+          "name": "~infrastructure",
+          "startLine": 17,
+          "endLine": 28,
+          "params": []
+        },
+        {
+          "name": "build",
+          "startLine": 30,
+          "endLine": 54,
+          "params": []
+        },
+        {
+          "name": "destroy",
+          "startLine": 56,
+          "endLine": 67,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "infrastructure",
+          "line": 5,
+          "isDefault": false
+        },
+        {
+          "name": "~infrastructure",
+          "line": 17,
+          "isDefault": false
+        },
+        {
+          "name": "build",
+          "line": 30,
+          "isDefault": false
+        },
+        {
+          "name": "destroy",
+          "line": 56,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "infrastructure",
+          "callee": "std::make_unique<ConfigModule>",
+          "lineNumber": 7
+        },
+        {
+          "caller": "infrastructure",
+          "callee": "std::make_unique<CalibConfigModule>",
+          "lineNumber": 8
+        },
+        {
+          "caller": "infrastructure",
+          "callee": "std::make_unique<NinePointModule>",
+          "lineNumber": 9
+        },
+        {
+          "caller": "infrastructure",
+          "callee": "std::make_unique<TwoCameraSpliceModule>",
+          "lineNumber": 10
+        },
+        {
+          "caller": "infrastructure",
+          "callee": "std::make_unique<CameraModule>",
+          "lineNumber": 11
+        },
+        {
+          "caller": "infrastructure",
+          "callee": "std::make_unique<ShapeModelManagerModule>",
+          "lineNumber": 12
+        },
+        {
+          "caller": "infrastructure",
+          "callee": "std::make_unique<ControlModule>",
+          "lineNumber": 13
+        },
+        {
+          "caller": "infrastructure",
+          "callee": "std::make_unique<LightIOModule>",
+          "lineNumber": 14
+        },
+        {
+          "caller": "~infrastructure",
+          "callee": "reset",
+          "lineNumber": 20
+        },
+        {
+          "caller": "~infrastructure",
+          "callee": "reset",
+          "lineNumber": 21
+        },
+        {
+          "caller": "~infrastructure",
+          "callee": "reset",
+          "lineNumber": 22
+        },
+        {
+          "caller": "~infrastructure",
+          "callee": "reset",
+          "lineNumber": 23
+        },
+        {
+          "caller": "~infrastructure",
+          "callee": "reset",
+          "lineNumber": 24
+        },
+        {
+          "caller": "~infrastructure",
+          "callee": "reset",
+          "lineNumber": 25
+        },
+        {
+          "caller": "~infrastructure",
+          "callee": "reset",
+          "lineNumber": 26
+        },
+        {
+          "caller": "~infrastructure",
+          "callee": "reset",
+          "lineNumber": 27
+        },
+        {
+          "caller": "build",
+          "callee": "build",
+          "lineNumber": 33
+        },
+        {
+          "caller": "build",
+          "callee": "build",
+          "lineNumber": 36
+        },
+        {
+          "caller": "build",
+          "callee": "build",
+          "lineNumber": 37
+        },
+        {
+          "caller": "build",
+          "callee": "build",
+          "lineNumber": 38
+        },
+        {
+          "caller": "build",
+          "callee": "build",
+          "lineNumber": 43
+        },
+        {
+          "caller": "build",
+          "callee": "build",
+          "lineNumber": 46
+        },
+        {
+          "caller": "build",
+          "callee": "build",
+          "lineNumber": 49
+        },
+        {
+          "caller": "build",
+          "callee": "setControlModule",
+          "lineNumber": 52
+        },
+        {
+          "caller": "build",
+          "callee": "get",
+          "lineNumber": 52
+        },
+        {
+          "caller": "build",
+          "callee": "build",
+          "lineNumber": 53
+        },
+        {
+          "caller": "destroy",
+          "callee": "destroy",
+          "lineNumber": 59
+        },
+        {
+          "caller": "destroy",
+          "callee": "destroy",
+          "lineNumber": 60
+        },
+        {
+          "caller": "destroy",
+          "callee": "destroy",
+          "lineNumber": 61
+        },
+        {
+          "caller": "destroy",
+          "callee": "destroy",
+          "lineNumber": 62
+        },
+        {
+          "caller": "destroy",
+          "callee": "destroy",
+          "lineNumber": 63
+        },
+        {
+          "caller": "destroy",
+          "callee": "destroy",
+          "lineNumber": 64
+        },
+        {
+          "caller": "destroy",
+          "callee": "destroy",
+          "lineNumber": 65
+        },
+        {
+          "caller": "destroy",
+          "callee": "destroy",
+          "lineNumber": 66
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 4,
+        "functionCount": 4,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/infrastructure/infrastructure/test/CMakeLists.txt",
+      "language": "txt",
+      "fileCategory": "docs",
+      "totalLines": 25,
+      "nonEmptyLines": 18,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/infrastructure/infrastructure/test/include/infrastructure.t.hpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 2,
+      "nonEmptyLines": 1,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/infrastructure/infrastructure/test/src/infrastructure.t.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 10,
+      "nonEmptyLines": 8,
+      "functions": [
+        {
+          "name": "main",
+          "startLine": 4,
+          "endLine": 10,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "main",
+          "line": 4,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "main",
+          "callee": "build",
+          "lineNumber": 7
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/infrastructure/LightIOModule/CMakeLists.txt",
+      "language": "txt",
+      "fileCategory": "docs",
+      "totalLines": 32,
+      "nonEmptyLines": 25,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/infrastructure/LightIOModule/include/infrastructure/LightIOModule/LightIOModule.hpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 33,
+      "nonEmptyLines": 26,
+      "classes": [
+        {
+          "name": "ControlModule",
+          "startLine": 9,
+          "endLine": 9,
+          "methods": [],
+          "properties": []
+        },
+        {
+          "name": "LightIOModule",
+          "startLine": 13,
+          "endLine": 32,
+          "methods": [
+            "build",
+            "destroy",
+            "setControlModule",
+            "setUpperLight",
+            "setLowerLight",
+            "getUpperLightState",
+            "getLowerLightState"
+          ],
+          "properties": [
+            "control_",
+            "upperLight_",
+            "lowerLight_"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "ControlModule",
+          "line": 9,
+          "isDefault": false
+        },
+        {
+          "name": "build",
+          "line": 17,
+          "isDefault": false
+        },
+        {
+          "name": "destroy",
+          "line": 18,
+          "isDefault": false
+        },
+        {
+          "name": "setControlModule",
+          "line": 21,
+          "isDefault": false
+        },
+        {
+          "name": "setUpperLight",
+          "line": 23,
+          "isDefault": false
+        },
+        {
+          "name": "setLowerLight",
+          "line": 24,
+          "isDefault": false
+        },
+        {
+          "name": "getUpperLightState",
+          "line": 25,
+          "isDefault": false
+        },
+        {
+          "name": "getLowerLightState",
+          "line": 26,
+          "isDefault": false
+        },
+        {
+          "name": "LightIOModule",
+          "line": 13,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 9,
+        "functionCount": 0,
+        "classCount": 2
+      }
+    },
+    {
+      "path": "PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 57,
+      "nonEmptyLines": 48,
+      "functions": [
+        {
+          "name": "build",
+          "startLine": 14,
+          "endLine": 19,
+          "params": []
+        },
+        {
+          "name": "destroy",
+          "startLine": 21,
+          "endLine": 27,
+          "params": []
+        },
+        {
+          "name": "setControlModule",
+          "startLine": 29,
+          "endLine": 32,
+          "params": [
+            "control"
+          ]
+        },
+        {
+          "name": "setUpperLight",
+          "startLine": 34,
+          "endLine": 39,
+          "params": [
+            "on"
+          ]
+        },
+        {
+          "name": "setLowerLight",
+          "startLine": 41,
+          "endLine": 46,
+          "params": [
+            "on"
+          ]
+        },
+        {
+          "name": "getUpperLightState",
+          "startLine": 48,
+          "endLine": 51,
+          "params": []
+        },
+        {
+          "name": "getLowerLightState",
+          "startLine": 53,
+          "endLine": 56,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "build",
+          "line": 14,
+          "isDefault": false
+        },
+        {
+          "name": "destroy",
+          "line": 21,
+          "isDefault": false
+        },
+        {
+          "name": "setControlModule",
+          "line": 29,
+          "isDefault": false
+        },
+        {
+          "name": "setUpperLight",
+          "line": 34,
+          "isDefault": false
+        },
+        {
+          "name": "setLowerLight",
+          "line": 41,
+          "isDefault": false
+        },
+        {
+          "name": "getUpperLightState",
+          "line": 48,
+          "isDefault": false
+        },
+        {
+          "name": "getLowerLightState",
+          "line": 53,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "build",
+          "callee": "setUpperLight",
+          "lineNumber": 17
+        },
+        {
+          "caller": "build",
+          "callee": "setLowerLight",
+          "lineNumber": 18
+        },
+        {
+          "caller": "destroy",
+          "callee": "setUpperLight",
+          "lineNumber": 24
+        },
+        {
+          "caller": "destroy",
+          "callee": "setLowerLight",
+          "lineNumber": 25
+        },
+        {
+          "caller": "setUpperLight",
+          "callee": "store",
+          "lineNumber": 36
+        },
+        {
+          "caller": "setUpperLight",
+          "callee": "isConnected",
+          "lineNumber": 37
+        },
+        {
+          "caller": "setUpperLight",
+          "callee": "writeCoil",
+          "lineNumber": 38
+        },
+        {
+          "caller": "setLowerLight",
+          "callee": "store",
+          "lineNumber": 43
+        },
+        {
+          "caller": "setLowerLight",
+          "callee": "isConnected",
+          "lineNumber": 44
+        },
+        {
+          "caller": "setLowerLight",
+          "callee": "writeCoil",
+          "lineNumber": 45
+        },
+        {
+          "caller": "getUpperLightState",
+          "callee": "load",
+          "lineNumber": 50
+        },
+        {
+          "caller": "getLowerLightState",
+          "callee": "load",
+          "lineNumber": 55
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 7,
+        "functionCount": 7,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/infrastructure/LightIOModule/test/CMakeLists.txt",
+      "language": "txt",
+      "fileCategory": "docs",
+      "totalLines": 22,
+      "nonEmptyLines": 17,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/infrastructure/LightIOModule/test/include/LightIOModule.t.hpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 1,
+      "nonEmptyLines": 1,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    }
+  ]
+}

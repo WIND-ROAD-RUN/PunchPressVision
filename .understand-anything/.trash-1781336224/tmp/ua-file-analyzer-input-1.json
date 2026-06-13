@@ -1,0 +1,10 @@
+{
+  "projectRoot": "D:/Workplace/rep/PunchPressVision",
+  "batchFiles": [
+    {"path": "PunchPressVision/UI/UIModule/include/WarnUtilty.hpp", "language": "cpp", "sizeLines": 26, "fileCategory": "code"},
+    {"path": "PunchPressVision/UI/UIModule/include/WarningInfoList.h", "language": "c", "sizeLines": 38, "fileCategory": "code"},
+    {"path": "PunchPressVision/UI/UIModule/include/rqw_LabelClickable.h", "language": "c", "sizeLines": 26, "fileCategory": "code"},
+    {"path": "PunchPressVision/UI/UIModule/include/rqw_LabelWarning.h", "language": "c", "sizeLines": 85, "fileCategory": "code"}
+  ],
+  "batchImportData": {"PunchPressVision/UI/UIModule/include/WarnUtilty.hpp":[],"PunchPressVision/UI/UIModule/include/WarningInfoList.h":["PunchPressVision/UI/UIModule/include/WarnUtilty.hpp"],"PunchPressVision/UI/UIModule/include/rqw_LabelClickable.h":[],"PunchPressVision/UI/UIModule/include/rqw_LabelWarning.h":["PunchPressVision/UI/UIModule/include/rqw_LabelClickable.h","PunchPressVision/UI/UIModule/include/WarningInfoList.h","PunchPressVision/UI/UIModule/include/WarnUtilty.hpp"]}
+}

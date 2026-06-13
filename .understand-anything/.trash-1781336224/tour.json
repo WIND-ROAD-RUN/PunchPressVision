@@ -1,0 +1,140 @@
+[
+  {
+    "order": 1,
+    "title": "项目概览",
+    "description": "CLAUDE.md 是项目的 AI 编码助手指导文档，也是理解整个代码库的最佳起点。它完整描述了项目的四层架构（UI/业务/基础设施/全局接口）、CMake+vcpkg+Ninja 构建体系、各模块的标准化目录结构、基于 OSO 框架的配置序列化机制，以及相机通信与 Halcon 视觉处理的核心流程。阅读本文档可建立对项目全貌的宏观认识。",
+    "nodeIds": ["document:CLAUDE.md"]
+  },
+  {
+    "order": 2,
+    "title": "应用入口点",
+    "description": "main.cpp 是整个桌面应用的启动入口，按照 infrastructure -> Business -> PunchPressApp -> PunchPress 的分层时序依次构建并启动整个视觉应用。它首先创建基础设施聚合对象和业务聚合对象，然后构造 PunchPressApp 编排层并调用 start()，最后进入 Qt 事件循环。应用退出时按逆序销毁所有组件，确保资源正确释放。理解这个启动序列，就掌握了四层架构的运行依赖关系。",
+    "nodeIds": ["file:PunchPressVision/UI/src/main.cpp"],
+    "languageLesson": "C++ 应用的分层启动模式（Layered Bootstrap）：通过严格的自底向上构建顺序（基础设施 -> 业务 -> UI），确保高层组件构造时其依赖已就绪，而析构函数按逆序自动释放资源，利用栈展开（stack unwinding）语义避免手动管理生命周期。"
+  },
+  {
+    "order": 3,
+    "title": "全局接口与类型系统",
+    "description": "GlobalInterface.hpp 定义了 IInfrastructure（build/destroy）和 IBusiness（build/destroy/start/stop）两个纯虚基类，是整个项目跨层通信的核心契约。GlobalType.hpp 则定义了 CameraIndex、RunMode、TriggerSource 等全局枚举类型。所有基础设施模块和业务模块都继承这些接口，使得聚合层可以通过统一的多态接口来编排各模块，实现了依赖倒置——高层模块不依赖低层模块的具体实现，而是依赖抽象接口。",
+    "nodeIds": [
+      "file:PunchPressVision/global/include/global/GlobalInterface.hpp",
+      "file:PunchPressVision/global/include/global/GlobalType.hpp"
+    ],
+    "languageLesson": "依赖倒置原则（Dependency Inversion Principle）的 C++ 实现：通过纯虚基类（pure virtual base class）定义接口契约，使高层聚合类（infrastructure、Business）通过 unique_ptr<IInterface> 持有子模块，编译时只依赖头文件中的抽象声明，运行时通过多态分发到具体实现。"
+  },
+  {
+    "order": 4,
+    "title": "基础设施聚合层",
+    "description": "infrastructure 类是基础设施层的聚合根（Aggregate Root），通过 8 个 unique_ptr 持有全部子模块：配置管理（ConfigModule）、标定配置（CalibConfigModule）、相机通信（CameraModule）、九点标定（NinePointModule）、双相机拼接（TwoCameraSpliceModule）、形状模板管理（ShapeModelManagerModule）、PLC 控制（ControlModule）和光源 IO（LightIOModule）。build() 方法按严格的依赖顺序编排构建：先初始化配置模块，再依次构建各硬件模块，并将配置注入到相机和光源模块中。这种设计使得基础设施层对外呈现为单一入口，业务层无需了解内部子模块的依赖关系。",
+    "nodeIds": [
+      "file:PunchPressVision/infrastructure/infrastructure/include/infrastructure/infrastructure.hpp",
+      "file:PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp"
+    ],
+    "languageLesson": "聚合根模式（Aggregate Root Pattern）在 C++ 中的实践：使用 std::unique_ptr 表达独占所有权语义，通过成员初始化列表按声明顺序创建子对象，而 build() 方法通过依赖注入（将 ConfigModule 的引用传递给 CameraModule 和 LightIOModule）来配置子模块间的协作关系。"
+  },
+  {
+    "order": 5,
+    "title": "配置系统与 OSO 序列化",
+    "description": "ConfigModule 是整个应用的配置中枢，基于 RWUL 框架的 rw::oso::StorageContext 实现持久化配置管理。它管理四类配置对象：BaseCfg（相机 IP 和 PLC 地址）、cameraCfg（曝光时间和增益）、plcAddressCfg（Modbus 寄存器地址映射）和 visionCfg（视觉检测参数）。.oso 文件是配置的模式定义（Schema），通过 CMake 的 oso_wrap_oso() 函数自动生成 C++ 头文件。build() 时自动创建默认配置文件并以 XML 格式反序列化，destroy() 时自动保存；解析失败时静默降级保留默认值。这种模式驱动（Schema-Driven）的配置方式确保了类型安全和配置版本兼容性。",
+    "nodeIds": [
+      "file:PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/ConfigModule.hpp",
+      "file:PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp",
+      "file:PunchPressVision/infrastructure/ConfigModule/osoFile/baseCfg.oso"
+    ],
+    "languageLesson": "OSO（ObjectStore）序列化框架通过 .oso 模式文件声明持久化字段，CMake 构建时自动生成 C++ 结构体和序列化代码。配置结构体实现 operator rw::oso::ObjectStoreAssembly() 进行双向转换——这类似于 Protocol Buffers 的代码生成思路，但直接嵌入 C++ 构建流程，无需外部编译器。"
+  },
+  {
+    "order": 6,
+    "title": "相机硬件抽象与心跳监控",
+    "description": "CameraModule 封装了 MVTec Halcon 兼容相机（MVSCameraPassive）的完整生命周期：双相机连接管理、触发模式切换（连续/软件触发）、曝光时间和增益的动态设置，以及心跳监控机制。它通过 Qt::DirectConnection 发射回调信号（callBackFunc）和连接状态变更信号（cameraConnectionStateChanged），供上层业务模块订阅处理。心跳监控定期检测相机连接状态——一旦连接丢失，自动触发重连逻辑，确保产线环境下的可靠性。",
+    "nodeIds": [
+      "file:PunchPressVision/infrastructure/CameraModule/include/infrastructure/CameraModule/CameraModule.hpp",
+      "file:PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp"
+    ],
+    "languageLesson": "Qt 信号槽（Signals & Slots）机制中的 DirectConnection 连接类型：当信号发射者与接收者在同一线程时，DirectConnection 使槽函数同步执行（类似普通函数调用），避免了事件队列的延迟，适合相机回调这类对实时性要求高的场景。跨线程时应使用 QueuedConnection 确保线程安全。"
+  },
+  {
+    "order": 7,
+    "title": "PLC 通信与光源 IO 控制",
+    "description": "ControlModule 基于 RWUL 的 rw::hoep::ModbusDevice 封装了 Modbus TCP 通信协议，提供保持寄存器的单字/浮点/批量读写和线圈读写功能，所有操作均做了空指针检查和异常捕获。LightIOModule 通过注入的 ControlModule 指针来写 Modbus 线圈，实现上/下光源的开关控制；所有状态以 atomic 变量维护，确保多线程安全。这两个模块展示了基础设施层中典型的'通信抽象 + 设备控制'组合模式——ControlModule 提供通用 PLC 通信能力，LightIOModule 将其特化为光源控制语义。",
+    "nodeIds": [
+      "file:PunchPressVision/infrastructure/ControlModule/include/infrastructure/ControlModule/ControlModule.hpp",
+      "file:PunchPressVision/infrastructure/LightIOModule/include/infrastructure/LightIOModule/LightIOModule.hpp"
+    ],
+    "languageLesson": "Modbus TCP 协议通过保持寄存器（Holding Registers）传输 16 位整数值，浮点数需拆分为两个寄存器传输（IEEE 754 编码）。原子操作（std::atomic）在此处用于保护光源状态变量，确保从不同线程（Qt UI 线程和 Modbus 通信线程）的读写不产生数据竞争。"
+  },
+  {
+    "order": 8,
+    "title": "业务聚合层",
+    "description": "Business 类是业务层的聚合根，持有六个业务 Bundle 的 unique_ptr：CameraBun（相机图像处理）、CalibBun（标定）、NinePointBun（九点标定）、ShapeModeManagerBun（形状模板匹配）、TwoCameraSpliceBun（双相机拼接）和 LightControlBun（光源控制）。构造函数接收 infrastructure 聚合对象的引用，并将该引用传递给各个 Bundle。build/destroy/start/stop 四个方法按固定顺序统一编排所有 Bundle 的生命周期——先构建标定模块，再构建相机模块，最后初始化光源控制，销毁时按逆序释放。这种设计确保了业务模块间的隐式依赖关系不会因构建顺序错误而崩溃。",
+    "nodeIds": [
+      "file:PunchPressVision/Business/Business/include/Business/Business.hpp",
+      "file:PunchPressVision/Business/Business/src/Business.cpp"
+    ],
+    "languageLesson": "Facade 模式（外观模式）在此表现为 Business 聚合类，它将六个业务 Bundle 的复杂生命周期管理封装为简单的 build/destroy/start/stop 四个操作。外部调用者（PunchPressApp）无需了解各 Bundle 的内部依赖，只需按序调用这四个方法即可完成整个业务层的初始化和运行控制。"
+  },
+  {
+    "order": 9,
+    "title": "相机图像处理与标定流程",
+    "description": "CameraBun 构建了完整的相机图像处理流水线：通过 CameraImgConvert 将 OpenCV 的 cv::Mat 转换为 Halcon 的 HImage 格式，然后依次进行畸变矫正（ChangeRadialDistortion）、九点坐标变换和双相机拼接缓存。CalibBun 封装了 Halcon 标定 API 的完整流程——使用 CreateCalibData 创建标定数据模型、通过 FindCalibObject 检测标定板标记、调用 CalibrateCameras 计算相机内外参数，以及通过 ChangeRadialDistortionImage 对后续采集的图像进行实时畸变校正。这两个 Bundle 紧密协作：CameraBun 提供原始图像流，CalibBun 提供矫正参数，共同构成工业视觉系统的核心数据处理链路。",
+    "nodeIds": [
+      "file:PunchPressVision/Business/CameraBun/include/Business/CameraBun/CameraBun.hpp",
+      "file:PunchPressVision/Business/CalibBun/include/Business/CalibBun/CalibBun.hpp",
+      "file:PunchPressVision/Business/CameraBun/include/Business/CameraBun/CameraImgConvert.hpp"
+    ],
+    "languageLesson": "Halcon 的 ChangeRadialDistortionImage 算子基于标定得到的相机内参（焦距、畸变系数）和外参（旋转平移矩阵），对图像进行径向畸变校正。图像格式转换（OpenCV cv::Mat -> Halcon HImage）需要根据 Mat 的通道数和数据类型选择正确的 GenImage1（单通道）或 GenImageInterleaved（三通道交错）算子。"
+  },
+  {
+    "order": 10,
+    "title": "九点标定与双相机拼接",
+    "description": "NinePointBun 实现像素坐标到世界坐标的九点标定转换：通过 Halcon 齐次变换矩阵（HomMat2D）计算像素到物理坐标的映射关系，并提供 pixToWorld() 坐标转换接口。自动标定流程通过 Modbus PLC 协同——依次移动到九个预设点位、采集图像并识别特征点，最终解算出变换矩阵。TwoCameraSpliceBun 处理双相机图像拼接标定：使用 Halcon 的标定与几何变换 API 计算两相机之间的空间关系，生成拼接映射图（Map），对后续采集的双路图像进行实时拼接，输出覆盖更大视场的合成图像。这两个模块共同解决了工业视觉中的精确定位和视野扩展问题。",
+    "nodeIds": [
+      "file:PunchPressVision/Business/NinePointBun/include/Business/NinePointBun/NinePointBun.hpp",
+      "file:PunchPressVision/Business/TwoCameraSpliceBun/include/Business/TwoCameraSpliceBun/TwoCameraSpliceBun.hpp"
+    ],
+    "languageLesson": "九点标定（Nine-Point Calibration）通过采集标定板上 9 个已知世界坐标的特征点及其对应的像素坐标，使用最小二乘法求解 3x3 齐次变换矩阵（HomMat2D），实现像素到物理坐标的高精度转换——这是机器视觉引导机械手精确定位的基础算法。Halcon 的 vector_to_proj_hom_mat2d 算子专门用于此类透视变换矩阵的计算。"
+  },
+  {
+    "order": 11,
+    "title": "形状模板匹配与光源控制",
+    "description": "ShapeModeManagerBun 管理形状模板（Shape Model）的完整生命周期：支持从 ROI 区域创建模板、CRUD 操作、模板匹配推理及模型持久化加载。底层依赖 ShapeModelItem 的数据模型（包含模板图像、Halcon 模型 ID、ROI 列表和预处理参数），通过 JSON 配置文件与 Halcon 二进制对象实现三层持久化。LightControlBun 将基础设施层的 LightIOModule 能力桥接到业务层，提供上/下光源的开关控制接口，操作后通过 Qt 信号通知光源状态变化。模板匹配和光源控制是视觉检测工位的两个关键环节——匹配定位提供精确的位置反馈，光源控制确保成像质量的一致性。",
+    "nodeIds": [
+      "file:PunchPressVision/Business/ShapeModeManagerBun/include/Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp",
+      "file:PunchPressVision/Business/LightControlBun/include/Business/LightControlBun/LightControlBun.hpp"
+    ],
+    "languageLesson": "Halcon 的 Shape-Based Matching（基于形状的模板匹配）通过 create_shape_model 从 ROI 图像中提取边缘梯度特征构建模板，find_shape_model 在目标图像中搜索匹配位置，返回位置、角度、缩放和匹配分数。匹配结果封装为 GlobalResult.hpp 中的 PositionResult 结构体（X/Y 偏移、旋转角度、得分），供上层 UI 和 PLC 控制系统消费。"
+  },
+  {
+    "order": 12,
+    "title": "应用编排与运行模式管理",
+    "description": "PunchPressApp 是应用层的编排核心，封装了完整的运行模式状态机和生命周期管理。它继承 QObject，通过信号向 UI 层暴露事件。start() 方法执行一系列启动检查：单实例检测（防止重复运行）、MVS 进程冲突检测（确保相机 SDK 独占访问）和配置完整性校验。它维护四种运行模式（Debug/Production/Calib/Splice）的状态机，每种模式配置不同的相机触发策略——生产模式使用硬件触发，调试模式使用软件触发。processProductionFrame() 方法编排生产模式下的完整帧处理流水线：检查标定就绪性 -> 采集图像 -> 执行匹配 -> 输出结果。",
+    "nodeIds": [
+      "file:PunchPressVision/App/PunchPressApp/include/app/PunchPressApp.hpp",
+      "file:PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp"
+    ],
+    "languageLesson": "状态机模式（State Machine Pattern）在工业控制软件中的应用：通过枚举 RunMode 定义有限状态集合，switchToMode() 方法封装状态转换逻辑（包括进入/退出动作），确保非法状态转换被拦截。生产模式和调试模式使用不同的相机触发策略——生产模式依赖外部硬件触发信号，调试模式允许软件手动触发，这是工业视觉软件的典型设计。"
+  },
+  {
+    "order": 13,
+    "title": "UI 主窗口与视觉交互",
+    "description": "PunchPress 是应用的主窗口，继承 QMainWindow，通过注入的 PunchPressApp 引用实现 UI 与业务层的解耦。它管理 Halcon 图形窗口（HalconView）的生命周期——将 Qt Widget 窗口句柄桥接到 Halcon 的 OpenWindow 调用，实现图像在 Qt 界面中的实时渲染。主窗口提供各子对话框的启动入口：畸变校正（DistortionCalibDialog）、九点标定（NinePointCalibDialog）、图像拼接（SpliceDialog）、模型编辑器（ModelEditorDialog）和模型管理器（ModelManagerDialog）。光源控制和模式切换通过工具栏和菜单栏触发，相机连接状态实时反馈到状态栏。PunchPress.ui 是 Qt Designer 生成的 UI 布局文件，定义了完整的控件层级。",
+    "nodeIds": [
+      "file:PunchPressVision/UI/PunchPressUI/include/UI/PunchPress.h",
+      "file:PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp",
+      "file:PunchPressVision/UI/PunchPressUI/ui/PunchPress.ui"
+    ],
+    "languageLesson": "Qt 的 .ui 文件由 Qt Designer 生成 XML 描述的控件树，CMake 通过 qt_wrap_ui() 在构建时自动生成 ui_ClassName.h 头文件，包含 setupUi() 方法用于运行时创建和布局所有控件。Halcon 图像在 Qt 中的显示通过 HWindow::OpenWindow() 传入 Qt Widget 的 winId() 实现窗口句柄级别的桥接，这是将 Halcon 渲染引擎嵌入 Qt 界面的标准做法。"
+  },
+  {
+    "order": 14,
+    "title": "构建系统与依赖管理",
+    "description": "项目使用 CMake + vcpkg + Ninja 构建体系。根 CMakeLists.txt 设定 C++17 标准并声明 global/infrastructure/Business/UI/App 的构建顺序——这个顺序与运行时启动顺序一致，确保库依赖正确解析。vcpkg.json 声明了 22 个 C++ 依赖包（Qt6、OpenCV、Halcon、jsoncpp、sqlite3、gtest、spdlog、libmodbus、libzip）。cmake/ 目录包含三个辅助脚本：CMakeCacheIni.cmake 管理外部 SDK 路径（QT_DIR、RWUL_DIR、HALCON_DIR），AddThirdSDKTargets.cmake 将 Halcon SDK 注册为 IMPORTED 接口库，func.cmake 提供构建后自动运行 windeployqt 的功能。每个模块遵循标准化的 CMakeLists.txt 模板：GLOB 收集源文件、创建静态库目标、设置命名空间别名、DEBUG_POSTFIX 后缀 'd'、并通过 add_subdirectory 引入测试。",
+    "nodeIds": [
+      "document:CMakeLists.txt",
+      "config:vcpkg.json",
+      "file:cmake/CMakeCacheIni.cmake",
+      "file:cmake/AddThirdSDKTargets.cmake"
+    ],
+    "languageLesson": "CMake 的 IMPORTED INTERFACE 目标用于包装不通过 CMake 构建的第三方 SDK（如 Halcon）。AddThirdSDKTargets.cmake 通过 add_library(Halcon INTERFACE IMPORTED) 创建虚拟目标，然后 set_target_properties 配置 INTERFACE_INCLUDE_DIRECTORIES 和 INTERFACE_LINK_LIBRARIES，使得项目代码只需 target_link_libraries(mytarget Halcon) 即可获取正确的头文件和链接库路径。vcpkg 清单模式（Manifest Mode）通过 vcpkg.json 声明依赖，vcpkg-configuration.json 指定注册表，重新运行 CMake 配置时自动安装缺失的包。"
+  }
+]

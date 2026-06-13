@@ -1,0 +1,204 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 5,
+  "filesSkipped": [
+    "D:WorkplacerepPunchPressVision.understand-anythingtmpua-file-analyzer-input-1.json",
+    "D:WorkplacerepPunchPressVision.understand-anythingtmpua-file-analyzer-input-2.json",
+    "D:WorkplacerepPunchPressVision.understand-anythingtmpua-file-analyzer-input-6.json",
+    "D:WorkplacerepPunchPressVision.understand-anythingtmpua-file-analyzer-input-7.json"
+  ],
+  "results": [
+    {
+      "path": "CLAUDE.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 117,
+      "nonEmptyLines": 87,
+      "sections": [
+        {
+          "heading": "CLAUDE.md",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "项目概述",
+          "level": 2,
+          "line": 5
+        },
+        {
+          "heading": "构建系统",
+          "level": 2,
+          "line": 9
+        },
+        {
+          "heading": "常用命令",
+          "level": 3,
+          "line": 18
+        },
+        {
+          "heading": "vcpkg",
+          "level": 3,
+          "line": 37
+        },
+        {
+          "heading": "架构",
+          "level": 2,
+          "line": 41
+        },
+        {
+          "heading": "各层职责",
+          "level": 3,
+          "line": 52
+        },
+        {
+          "heading": "模块规范",
+          "level": 3,
+          "line": 59
+        },
+        {
+          "heading": "配置系统（OSO）",
+          "level": 3,
+          "line": 79
+        },
+        {
+          "heading": "相机与视觉流程",
+          "level": 3,
+          "line": 86
+        },
+        {
+          "heading": "主要依赖",
+          "level": 2,
+          "line": 95
+        },
+        {
+          "heading": "开发注意事项",
+          "level": 2,
+          "line": 110
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 12
+      }
+    },
+    {
+      "path": "CMakeLists.txt",
+      "language": "txt",
+      "fileCategory": "docs",
+      "totalLines": 28,
+      "nonEmptyLines": 20,
+      "metrics": {}
+    },
+    {
+      "path": "CMakePresets.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 56,
+      "nonEmptyLines": 53,
+      "sections": [
+        {
+          "heading": "version",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "cmakeMinimumRequired",
+          "level": 1,
+          "line": 3
+        },
+        {
+          "heading": "configurePresets",
+          "level": 1,
+          "line": 8
+        },
+        {
+          "heading": "buildPresets",
+          "level": 1,
+          "line": 38
+        },
+        {
+          "heading": "testPresets",
+          "level": 1,
+          "line": 52
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 5
+      }
+    },
+    {
+      "path": "vcpkg-configuration.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 14,
+      "nonEmptyLines": 14,
+      "sections": [
+        {
+          "heading": "default-registry",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "registries",
+          "level": 1,
+          "line": 7
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 2
+      }
+    },
+    {
+      "path": "vcpkg.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 81,
+      "nonEmptyLines": 81,
+      "sections": [
+        {
+          "heading": "name",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "version",
+          "level": 1,
+          "line": 3
+        },
+        {
+          "heading": "description",
+          "level": 1,
+          "line": 4
+        },
+        {
+          "heading": "dependencies",
+          "level": 1,
+          "line": 5
+        },
+        {
+          "heading": "overrides",
+          "level": 1,
+          "line": 43
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 5
+      }
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "projectRoot": "D:/Workplace/rep/PunchPressVision",
+  "batchFiles": [
+    {"path": "PunchPressVision/UI/UIModule/ui/DlgCloseForm.ui", "language": "ui", "sizeLines": 295, "fileCategory": "markup"},
+    {"path": "PunchPressVision/UI/UIModule/ui/DlgJiudianbiaoding.ui", "language": "ui", "sizeLines": 1129, "fileCategory": "markup"},
+    {"path": "PunchPressVision/UI/UIModule/ui/LoadingDialog.ui", "language": "ui", "sizeLines": 22, "fileCategory": "markup"},
+    {"path": "PunchPressVision/UI/UIModule/ui/PicturesViewer.ui", "language": "ui", "sizeLines": 592, "fileCategory": "markup"},
+    {"path": "PunchPressVision/UI/UIModule/ui/PictureViewerThumbnails.ui", "language": "ui", "sizeLines": 454, "fileCategory": "markup"},
+    {"path": "PunchPressVision/UI/UIModule/ui/PictureViewerUtilty.ui", "language": "ui", "sizeLines": 224, "fileCategory": "markup"},
+    {"path": "PunchPressVision/UI/UIModule/ui/PunchPress.ui", "language": "ui", "sizeLines": 1411, "fileCategory": "markup"},
+    {"path": "PunchPressVision/UI/UIModule/ui/rqw_ImageEnlargedDisplay.ui", "language": "ui", "sizeLines": 187, "fileCategory": "markup"},
+    {"path": "PunchPressVision/UI/UIModule/ui/WarningInfoList.ui", "language": "ui", "sizeLines": 244, "fileCategory": "markup"}
+  ],
+  "batchImportData": {
+    "PunchPressVision/UI/UIModule/ui/DlgCloseForm.ui": [],
+    "PunchPressVision/UI/UIModule/ui/DlgJiudianbiaoding.ui": [],
+    "PunchPressVision/UI/UIModule/ui/LoadingDialog.ui": [],
+    "PunchPressVision/UI/UIModule/ui/PicturesViewer.ui": [],
+    "PunchPressVision/UI/UIModule/ui/PictureViewerThumbnails.ui": [],
+    "PunchPressVision/UI/UIModule/ui/PictureViewerUtilty.ui": [],
+    "PunchPressVision/UI/UIModule/ui/PunchPress.ui": [],
+    "PunchPressVision/UI/UIModule/ui/rqw_ImageEnlargedDisplay.ui": [],
+    "PunchPressVision/UI/UIModule/ui/WarningInfoList.ui": []
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "nodes": [
+    {
+      "id": "config:.understand-anything/intermediate/batch-1.json",
+      "type": "config",
+      "name": "batch-1.json",
+      "filePath": ".understand-anything/intermediate/batch-1.json",
+      "summary": "第1批文件分析产生的知识图谱片段，包含 nodes 和 edges 两个顶级节点，共计约70个图节点和若干条边关系，覆盖项目入口类、核心UI组件和基础设施模块的定义。",
+      "tags": ["knowledge-graph", "intermediate-output", "batch-fragment", "pipeline"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:.understand-anything/intermediate/batch-2.json",
+      "type": "config",
+      "name": "batch-2.json",
+      "filePath": ".understand-anything/intermediate/batch-2.json",
+      "summary": "第2批文件分析产生的知识图谱片段，包含 nodes 和 edges 两个顶级节点，覆盖7个中间管道配置文件的结构化描述及相互依赖关系。",
+      "tags": ["knowledge-graph", "intermediate-output", "batch-fragment", "pipeline"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:.understand-anything/intermediate/batch-3.json",
+      "type": "config",
+      "name": "batch-3.json",
+      "filePath": ".understand-anything/intermediate/batch-3.json",
+      "summary": "第3批文件分析产生的知识图谱片段，包含 nodes（约200节点）和 edges（约300条边）两个顶级节点，是管道中较大的批次输出之一，覆盖大量子文件节点和跨文件调用边。",
+      "tags": ["knowledge-graph", "intermediate-output", "batch-fragment", "pipeline"],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:.understand-anything/intermediate/batch-4.json",
+      "type": "config",
+      "name": "batch-4.json",
+      "filePath": ".understand-anything/intermediate/batch-4.json",
+      "summary": "第4批文件分析产生的知识图谱片段，节点数量超过第3批（约600条边），nodes 和 edges 两个顶级节点包含大量函数节点、类节点及调用关系。",
+      "tags": ["knowledge-graph", "intermediate-output", "batch-fragment", "pipeline"],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:.understand-anything/intermediate/batch-5.json",
+      "type": "config",
+      "name": "batch-5.json",
+      "filePath": ".understand-anything/intermediate/batch-5.json",
+      "summary": "第5批文件分析产生的知识图谱片段，是前5批中最大的批次输出，nodes 部分包含约610个节点条目，edges 部分包含约640条边，涵盖大量函数节点和复杂的跨文件调用图。",
+      "tags": ["knowledge-graph", "intermediate-output", "batch-fragment", "pipeline"],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:.understand-anything/intermediate/batches.json",
+      "type": "config",
+      "name": "batches.json",
+      "filePath": ".understand-anything/intermediate/batches.json",
+      "summary": "项目文件批次分配清单，定义了268个源文件按 Louvain 算法划分为14个批次，包含每个文件的导出符号映射（exportsByPath）和各批次文件列表，是文件分析器分配任务的依据。",
+      "tags": ["batch-assignment", "pipeline-configuration", "import-map", "pipeline"],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:.understand-anything/intermediate/scan-result.json",
+      "type": "config",
+      "name": "scan-result.json",
+      "filePath": ".understand-anything/intermediate/scan-result.json",
+      "summary": "项目扫描器输出，包含项目名称、描述、12种编程语言检测结果、7个框架识别（CMake、GoogleTest、Halcon、OpenCV、Qt、RWUL、vcpkg）、完整文件清单及文件间导入关系映射。",
+      "tags": ["project-scan", "pipeline-configuration", "language-detection", "framework-detection"],
+      "complexity": "complex"
+    }
+  ],
+  "edges": [
+    {
+      "source": "config:.understand-anything/intermediate/batches.json",
+      "target": "config:.understand-anything/intermediate/scan-result.json",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.understand-anything/intermediate/batch-1.json",
+      "target": "config:.understand-anything/intermediate/batches.json",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.understand-anything/intermediate/batch-2.json",
+      "target": "config:.understand-anything/intermediate/batches.json",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.understand-anything/intermediate/batch-3.json",
+      "target": "config:.understand-anything/intermediate/batches.json",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.understand-anything/intermediate/batch-4.json",
+      "target": "config:.understand-anything/intermediate/batches.json",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:.understand-anything/intermediate/batch-5.json",
+      "target": "config:.understand-anything/intermediate/batches.json",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    }
+  ]
+}

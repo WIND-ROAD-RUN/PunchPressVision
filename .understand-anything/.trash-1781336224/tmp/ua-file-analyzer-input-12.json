@@ -1,0 +1,31 @@
+{
+  "projectRoot": "D:/Workplace/rep/PunchPressVision",
+  "batchFiles": [
+    {"path": "PunchPressVision/UI/PunchPressUI/src/NinePointCalibDialog.cpp", "language": "cpp", "sizeLines": 76, "fileCategory": "code"},
+    {"path": "PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp", "language": "cpp", "sizeLines": 262, "fileCategory": "code"},
+    {"path": "PunchPressVision/UI/PunchPressUI/src/SpliceDialog.cpp", "language": "cpp", "sizeLines": 61, "fileCategory": "code"},
+    {"path": "PunchPressVision/UI/PunchPressUI/ui/Dlg_changeshapemodel.ui", "language": "ui", "sizeLines": 695, "fileCategory": "code"},
+    {"path": "PunchPressVision/UI/PunchPressUI/ui/Dlg_createshapemodel.ui", "language": "ui", "sizeLines": 1760, "fileCategory": "code"},
+    {"path": "PunchPressVision/UI/PunchPressUI/ui/Dlg_ImageStitching.ui", "language": "ui", "sizeLines": 1294, "fileCategory": "code"},
+    {"path": "PunchPressVision/UI/PunchPressUI/ui/Dlg_jibianjiaozheng.ui", "language": "ui", "sizeLines": 1703, "fileCategory": "code"},
+    {"path": "PunchPressVision/UI/PunchPressUI/ui/Dlg_OffSet.ui", "language": "ui", "sizeLines": 1284, "fileCategory": "code"},
+    {"path": "PunchPressVision/UI/PunchPressUI/ui/DlgJiudianbiaoding.ui", "language": "ui", "sizeLines": 1129, "fileCategory": "code"},
+    {"path": "PunchPressVision/UI/PunchPressUI/ui/LoadingDialog.ui", "language": "ui", "sizeLines": 22, "fileCategory": "code"},
+    {"path": "PunchPressVision/UI/PunchPressUI/ui/PunchPress.ui", "language": "ui", "sizeLines": 1411, "fileCategory": "code"},
+    {"path": "PunchPressVision/UI/src/main.cpp", "language": "cpp", "sizeLines": 43, "fileCategory": "code"},
+    {"path": "PunchPressVision/UI/UIModule/CMakeLists.txt", "language": "txt", "sizeLines": 52, "fileCategory": "docs"},
+    {"path": "PunchPressVision/UI/UIModule/include/Dlg_changeshapemodel.h", "language": "c", "sizeLines": 84, "fileCategory": "code"},
+    {"path": "PunchPressVision/UI/UIModule/include/Dlg_createshapemodel.h", "language": "c", "sizeLines": 160, "fileCategory": "code"},
+    {"path": "PunchPressVision/UI/UIModule/include/Dlg_ImageStitching.h", "language": "c", "sizeLines": 119, "fileCategory": "code"},
+    {"path": "PunchPressVision/UI/UIModule/include/Dlg_jibianjiaozheng.h", "language": "c", "sizeLines": 122, "fileCategory": "code"},
+    {"path": "PunchPressVision/UI/UIModule/include/Dlg_OffSet.h", "language": "c", "sizeLines": 58, "fileCategory": "code"},
+    {"path": "PunchPressVision/UI/UIModule/include/DlgCloseForm.h", "language": "c", "sizeLines": 28, "fileCategory": "code"},
+    {"path": "PunchPressVision/UI/UIModule/include/DlgJiudianbiaoding.h", "language": "c", "sizeLines": 180, "fileCategory": "code"},
+    {"path": "PunchPressVision/UI/UIModule/include/DraggableListWidget.h", "language": "c", "sizeLines": 43, "fileCategory": "code"},
+    {"path": "PunchPressVision/UI/UIModule/include/ImageEnlargedDisplay.h", "language": "c", "sizeLines": 56, "fileCategory": "code"},
+    {"path": "PunchPressVision/UI/UIModule/include/LoadingDialog.h", "language": "c", "sizeLines": 26, "fileCategory": "code"},
+    {"path": "PunchPressVision/UI/UIModule/include/PictureViewerThumbnails.h", "language": "c", "sizeLines": 145, "fileCategory": "code"},
+    {"path": "PunchPressVision/UI/UIModule/include/PictureViewerUtilty.h", "language": "c", "sizeLines": 43, "fileCategory": "code"}
+  ],
+  "batchImportData": {"PunchPressVision/UI/PunchPressUI/src/NinePointCalibDialog.cpp":[],"PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp":[],"PunchPressVision/UI/PunchPressUI/src/SpliceDialog.cpp":[],"PunchPressVision/UI/PunchPressUI/ui/Dlg_changeshapemodel.ui":[],"PunchPressVision/UI/PunchPressUI/ui/Dlg_createshapemodel.ui":[],"PunchPressVision/UI/PunchPressUI/ui/Dlg_ImageStitching.ui":[],"PunchPressVision/UI/PunchPressUI/ui/Dlg_jibianjiaozheng.ui":[],"PunchPressVision/UI/PunchPressUI/ui/Dlg_OffSet.ui":[],"PunchPressVision/UI/PunchPressUI/ui/DlgJiudianbiaoding.ui":[],"PunchPressVision/UI/PunchPressUI/ui/LoadingDialog.ui":[],"PunchPressVision/UI/PunchPressUI/ui/PunchPress.ui":[],"PunchPressVision/UI/src/main.cpp":[],"PunchPressVision/UI/UIModule/CMakeLists.txt":[],"PunchPressVision/UI/UIModule/include/Dlg_changeshapemodel.h":[],"PunchPressVision/UI/UIModule/include/Dlg_createshapemodel.h":[],"PunchPressVision/UI/UIModule/include/Dlg_ImageStitching.h":[],"PunchPressVision/UI/UIModule/include/Dlg_jibianjiaozheng.h":[],"PunchPressVision/UI/UIModule/include/Dlg_OffSet.h":[],"PunchPressVision/UI/UIModule/include/DlgCloseForm.h":[],"PunchPressVision/UI/UIModule/include/DlgJiudianbiaoding.h":[],"PunchPressVision/UI/UIModule/include/DraggableListWidget.h":[],"PunchPressVision/UI/UIModule/include/ImageEnlargedDisplay.h":[],"PunchPressVision/UI/UIModule/include/LoadingDialog.h":[],"PunchPressVision/UI/UIModule/include/PictureViewerThumbnails.h":[],"PunchPressVision/UI/UIModule/include/PictureViewerUtilty.h":[]}
+}

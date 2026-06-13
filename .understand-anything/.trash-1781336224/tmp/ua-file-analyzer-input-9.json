@@ -1,0 +1,31 @@
+{
+  "projectRoot": "D:/Workplace/rep/PunchPressVision",
+  "batchFiles": [
+    {"path": "PunchPressVision/infrastructure/ConfigModule/osoFile/cameraCfg.oso", "language": "oso", "sizeLines": 11, "fileCategory": "code"},
+    {"path": "PunchPressVision/infrastructure/ConfigModule/osoFile/plcAddressCfg.oso", "language": "oso", "sizeLines": 13, "fileCategory": "code"},
+    {"path": "PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp", "language": "cpp", "sizeLines": 100, "fileCategory": "code"},
+    {"path": "PunchPressVision/infrastructure/ConfigModule/src/ConfigModulePath.cpp", "language": "cpp", "sizeLines": 6, "fileCategory": "code"},
+    {"path": "PunchPressVision/infrastructure/ConfigModule/src/ConfigModuleTypes.cpp", "language": "cpp", "sizeLines": 6, "fileCategory": "code"},
+    {"path": "PunchPressVision/infrastructure/ConfigModule/test/CMakeLists.txt", "language": "txt", "sizeLines": 23, "fileCategory": "docs"},
+    {"path": "PunchPressVision/infrastructure/ConfigModule/test/include/ConfigModule.t.hpp", "language": "cpp", "sizeLines": 2, "fileCategory": "code"},
+    {"path": "PunchPressVision/infrastructure/ConfigModule/test/src/ConfigModule.t.cpp", "language": "cpp", "sizeLines": 10, "fileCategory": "code"},
+    {"path": "PunchPressVision/infrastructure/ControlModule/CMakeLists.txt", "language": "txt", "sizeLines": 33, "fileCategory": "docs"},
+    {"path": "PunchPressVision/infrastructure/ControlModule/include/infrastructure/ControlModule/ControlModule.hpp", "language": "cpp", "sizeLines": 69, "fileCategory": "code"},
+    {"path": "PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp", "language": "cpp", "sizeLines": 195, "fileCategory": "code"},
+    {"path": "PunchPressVision/infrastructure/ControlModule/test/CMakeLists.txt", "language": "txt", "sizeLines": 22, "fileCategory": "docs"},
+    {"path": "PunchPressVision/infrastructure/ControlModule/test/include/ControlModule.t.hpp", "language": "cpp", "sizeLines": 1, "fileCategory": "code"},
+    {"path": "PunchPressVision/infrastructure/ControlModule/test/src/ControlModule.t.cpp", "language": "cpp", "sizeLines": 6, "fileCategory": "code"},
+    {"path": "PunchPressVision/infrastructure/infrastructure/CMakeLists.txt", "language": "txt", "sizeLines": 40, "fileCategory": "docs"},
+    {"path": "PunchPressVision/infrastructure/infrastructure/include/infrastructure/infrastructure.hpp", "language": "cpp", "sizeLines": 32, "fileCategory": "code"},
+    {"path": "PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp", "language": "cpp", "sizeLines": 68, "fileCategory": "code"},
+    {"path": "PunchPressVision/infrastructure/infrastructure/test/CMakeLists.txt", "language": "txt", "sizeLines": 25, "fileCategory": "docs"},
+    {"path": "PunchPressVision/infrastructure/infrastructure/test/include/infrastructure.t.hpp", "language": "cpp", "sizeLines": 2, "fileCategory": "code"},
+    {"path": "PunchPressVision/infrastructure/infrastructure/test/src/infrastructure.t.cpp", "language": "cpp", "sizeLines": 9, "fileCategory": "code"},
+    {"path": "PunchPressVision/infrastructure/LightIOModule/CMakeLists.txt", "language": "txt", "sizeLines": 32, "fileCategory": "docs"},
+    {"path": "PunchPressVision/infrastructure/LightIOModule/include/infrastructure/LightIOModule/LightIOModule.hpp", "language": "cpp", "sizeLines": 33, "fileCategory": "code"},
+    {"path": "PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp", "language": "cpp", "sizeLines": 57, "fileCategory": "code"},
+    {"path": "PunchPressVision/infrastructure/LightIOModule/test/CMakeLists.txt", "language": "txt", "sizeLines": 22, "fileCategory": "docs"},
+    {"path": "PunchPressVision/infrastructure/LightIOModule/test/include/LightIOModule.t.hpp", "language": "cpp", "sizeLines": 1, "fileCategory": "code"}
+  ],
+  "batchImportData": {"PunchPressVision/infrastructure/ConfigModule/osoFile/cameraCfg.oso":[],"PunchPressVision/infrastructure/ConfigModule/osoFile/plcAddressCfg.oso":[],"PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp":[],"PunchPressVision/infrastructure/ConfigModule/src/ConfigModulePath.cpp":[],"PunchPressVision/infrastructure/ConfigModule/src/ConfigModuleTypes.cpp":[],"PunchPressVision/infrastructure/ConfigModule/test/CMakeLists.txt":[],"PunchPressVision/infrastructure/ConfigModule/test/include/ConfigModule.t.hpp":[],"PunchPressVision/infrastructure/ConfigModule/test/src/ConfigModule.t.cpp":[],"PunchPressVision/infrastructure/ControlModule/CMakeLists.txt":[],"PunchPressVision/infrastructure/ControlModule/include/infrastructure/ControlModule/ControlModule.hpp":[],"PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp":[],"PunchPressVision/infrastructure/ControlModule/test/CMakeLists.txt":[],"PunchPressVision/infrastructure/ControlModule/test/include/ControlModule.t.hpp":[],"PunchPressVision/infrastructure/ControlModule/test/src/ControlModule.t.cpp":[],"PunchPressVision/infrastructure/infrastructure/CMakeLists.txt":[],"PunchPressVision/infrastructure/infrastructure/include/infrastructure/infrastructure.hpp":[],"PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp":[],"PunchPressVision/infrastructure/infrastructure/test/CMakeLists.txt":[],"PunchPressVision/infrastructure/infrastructure/test/include/infrastructure.t.hpp":[],"PunchPressVision/infrastructure/infrastructure/test/src/infrastructure.t.cpp":[],"PunchPressVision/infrastructure/LightIOModule/CMakeLists.txt":[],"PunchPressVision/infrastructure/LightIOModule/include/infrastructure/LightIOModule/LightIOModule.hpp":[],"PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp":[],"PunchPressVision/infrastructure/LightIOModule/test/CMakeLists.txt":[],"PunchPressVision/infrastructure/LightIOModule/test/include/LightIOModule.t.hpp":[]}
+}

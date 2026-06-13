@@ -1,0 +1,2879 @@
+{
+  "schemaVersion": 1,
+  "algorithm": "louvain",
+  "totalFiles": 268,
+  "totalBatches": 14,
+  "exportsByPath": {
+    ".understand-anything/.understandignore": [],
+    "cmake/AddThirdSDKTargets.cmake": [],
+    "cmake/CMakeCacheIni.cmake": [],
+    "cmake/func.cmake": [],
+    "Folder.DotSettings": [],
+    "Folder.DotSettings.user": [],
+    "PunchPressVision/App/PunchPressApp/include/app/PunchPressApp.hpp": [
+      "PunchPressApp"
+    ],
+    "PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp": [
+      "PunchPressApp",
+      "~PunchPressApp",
+      "build",
+      "destroy",
+      "start",
+      "stop",
+      "currentMode",
+      "performStartupCheck",
+      "checkSingleInstance",
+      "checkMVSProcessConflict",
+      "checkConfigIntegrity",
+      "checkCalibReadiness",
+      "checkProductionReadiness",
+      "configureCameraForDebug",
+      "configureCameraForProduction",
+      "configureCameraForCalibration",
+      "switchToMode",
+      "onFrameReady",
+      "onCameraConnectionChanged",
+      "processProductionFrame"
+    ],
+    "PunchPressVision/App/PunchPressApp/test/include/PunchPressApp.t.hpp": [],
+    "PunchPressVision/App/PunchPressApp/test/src/PunchPressApp.t.cpp": [
+      "main"
+    ],
+    "PunchPressVision/Business/Business/include/Business/Business.hpp": [
+      "~Business",
+      "build",
+      "destroy",
+      "start",
+      "stop",
+      "Business"
+    ],
+    "PunchPressVision/Business/Business/src/Business.cpp": [
+      "Business",
+      "build",
+      "destroy",
+      "start",
+      "stop"
+    ],
+    "PunchPressVision/Business/Business/test/include/CalibBun.t.hpp": [],
+    "PunchPressVision/Business/Business/test/src/CalibBun.t.cpp": [
+      "main"
+    ],
+    "PunchPressVision/Business/CalibBun/include/Business/CalibBun/CalibBun.hpp": [
+      "calibCamera",
+      "calibrateFromImages",
+      "drawCalibMarks",
+      "undistortImage",
+      "build",
+      "destroy",
+      "start",
+      "stop",
+      "CalibBun"
+    ],
+    "PunchPressVision/Business/CalibBun/src/CalibBun.cpp": [
+      "CalibBun",
+      "calibCamera",
+      "calibrateFromImages",
+      "drawCalibMarks",
+      "undistortImage",
+      "build",
+      "destroy",
+      "start",
+      "stop"
+    ],
+    "PunchPressVision/Business/CalibBun/test/include/CalibBun.t.hpp": [],
+    "PunchPressVision/Business/CalibBun/test/src/CalibBun.t.cpp": [
+      "main"
+    ],
+    "PunchPressVision/Business/CameraBun/include/Business/CameraBun/CameraBun.hpp": [
+      "callBackFunc",
+      "cameraConnectionStateChanged",
+      "callBackFunWithCalib",
+      "CameraBun"
+    ],
+    "PunchPressVision/Business/CameraBun/include/Business/CameraBun/CameraImgConvert.hpp": [
+      "cvMatToHImage",
+      "cvMatToHImageFast",
+      "CameraImgConvert"
+    ],
+    "PunchPressVision/Business/CameraBun/src/CameraBun.cpp": [
+      "CameraBun",
+      "build",
+      "destroy",
+      "start",
+      "stop",
+      "setSpliceEnabled",
+      "applyUndistort",
+      "applyNinePointTransform",
+      "callBackFunc"
+    ],
+    "PunchPressVision/Business/CameraBun/src/CameraImgConvert.cpp": [
+      "cvMatToHImage",
+      "cvMatToHImageFast"
+    ],
+    "PunchPressVision/Business/CameraBun/test/include/CameraBun.t.hpp": [],
+    "PunchPressVision/Business/CameraBun/test/src/CameraBun.t.cpp": [
+      "main"
+    ],
+    "PunchPressVision/Business/LightControlBun/include/Business/LightControlBun/LightControlBun.hpp": [
+      "LightControlBun"
+    ],
+    "PunchPressVision/Business/LightControlBun/src/LightControlBun.cpp": [
+      "LightControlBun",
+      "setUpperLight",
+      "setLowerLight",
+      "getUpperLightState",
+      "getLowerLightState",
+      "build",
+      "destroy",
+      "start",
+      "stop"
+    ],
+    "PunchPressVision/Business/LightControlBun/test/include/LightControlBun.t.hpp": [],
+    "PunchPressVision/Business/LightControlBun/test/src/LightControlBun.t.cpp": [
+      "main"
+    ],
+    "PunchPressVision/Business/NinePointBun/include/Business/NinePointBun/NinePointBun.hpp": [
+      "Point2D",
+      "PointPair",
+      "build",
+      "destroy",
+      "start",
+      "stop",
+      "NinePointBun"
+    ],
+    "PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp": [
+      "NinePointBun",
+      "~NinePointBun",
+      "calculateNinePointConfig",
+      "calcPixToWorldHomMat2D",
+      "pixToWorld",
+      "setMechanicalCoords",
+      "startAutoCalibration",
+      "stopAutoCalibration",
+      "runAutoCalibration",
+      "build",
+      "destroy",
+      "start",
+      "stop"
+    ],
+    "PunchPressVision/Business/NinePointBun/test/include/NinePointBun.t.hpp": [],
+    "PunchPressVision/Business/NinePointBun/test/src/NinePointBun.t.cpp": [
+      "main"
+    ],
+    "PunchPressVision/Business/ShapeModeManagerBun/include/Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp": [
+      "CreateModelRequest",
+      "MatchResult",
+      "ShapeModeManagerBun"
+    ],
+    "PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp": [
+      "ShapeModeManagerBun",
+      "createModel",
+      "deleteModel",
+      "renameModel",
+      "loadModel",
+      "unloadCurrentModel",
+      "isModelLoaded",
+      "currentModelId",
+      "match",
+      "getAllModels",
+      "searchModels",
+      "build",
+      "destroy",
+      "start",
+      "stop"
+    ],
+    "PunchPressVision/Business/ShapeModeManagerBun/test/include/ShapeModeManagerBun.t.hpp": [],
+    "PunchPressVision/Business/ShapeModeManagerBun/test/src/ShapeModeManagerBun.t.cpp": [
+      "main"
+    ],
+    "PunchPressVision/Business/TwoCameraSpliceBun/include/Business/TwoCameraSpliceBun/TwoCameraSpliceBun.hpp": [
+      "calculateTwoCameraSpliceConfig",
+      "calibImage",
+      "pinjieImage",
+      "build",
+      "destroy",
+      "start",
+      "stop",
+      "TwoCameraSpliceBun"
+    ],
+    "PunchPressVision/Business/TwoCameraSpliceBun/src/TwoCameraSpliceBun.cpp": [
+      "TwoCameraSpliceBun",
+      "calculateTwoCameraSpliceConfig",
+      "calibImage",
+      "pinjieImage",
+      "build",
+      "destroy",
+      "start",
+      "stop"
+    ],
+    "PunchPressVision/Business/TwoCameraSpliceBun/test/include/TwoCameraSpliceBun.t.hpp": [],
+    "PunchPressVision/Business/TwoCameraSpliceBun/test/src/TwoCameraSpliceBun.t.cpp": [
+      "main"
+    ],
+    "PunchPressVision/global/include/global/GlobalInterface.hpp": [
+      "~IInfrastructure",
+      "build",
+      "destroy",
+      "IInfrastructure",
+      "~IBusiness",
+      "build",
+      "destroy",
+      "start",
+      "stop",
+      "IBusiness"
+    ],
+    "PunchPressVision/global/include/global/GlobalPath.hpp": [
+      "joinPath",
+      "configDir",
+      "modelDir",
+      "calibDir",
+      "logDir"
+    ],
+    "PunchPressVision/global/include/global/GlobalReadiness.hpp": [
+      "allReady",
+      "CalibReadiness",
+      "allReady",
+      "ProductionReadiness"
+    ],
+    "PunchPressVision/global/include/global/GlobalResult.hpp": [
+      "PositionResult"
+    ],
+    "PunchPressVision/global/include/global/GlobalType.hpp": [],
+    "PunchPressVision/global/src/GlobalInterface.cpp": [],
+    "PunchPressVision/global/src/GlobalPath.cpp": [],
+    "PunchPressVision/global/src/GlobalType.cpp": [],
+    "PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/CalibConfigModule.hpp": [
+      "build",
+      "destroy",
+      "save",
+      "CalibConfigModule"
+    ],
+    "PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/CalibConfigModulePath.hpp": [],
+    "PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/CalibConfigModuleTypes.hpp": [],
+    "PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/Config/CalibConfig.hpp": [
+      "saveInDir",
+      "loadInDir",
+      "CalibConfig"
+    ],
+    "PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModule.cpp": [
+      "build",
+      "destroy",
+      "save"
+    ],
+    "PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModulePath.cpp": [],
+    "PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModuleTypes.cpp": [],
+    "PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp": [
+      "trimCr",
+      "replaceFile",
+      "writeTupleSafe",
+      "readTupleSafe",
+      "writeSettingsSafe",
+      "readSettingsSafe",
+      "saveInDir",
+      "loadInDir"
+    ],
+    "PunchPressVision/infrastructure/CalibConfigModule/test/include/CalibConfigModule.t.hpp": [],
+    "PunchPressVision/infrastructure/CalibConfigModule/test/src/CalibConfigModule.t.cpp": [
+      "main"
+    ],
+    "PunchPressVision/infrastructure/CameraModule/include/infrastructure/CameraModule/CameraModule.hpp": [
+      "build",
+      "destroy",
+      "startMonitor",
+      "stopMonitor",
+      "setFreeRunMode",
+      "setTriggerMode",
+      "setExposure",
+      "setGain",
+      "captureSingleFrame",
+      "isConnected",
+      "CameraModule"
+    ],
+    "PunchPressVision/infrastructure/CameraModule/include/infrastructure/CameraModule/CameraModuleTypes.hpp": [],
+    "PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp": [
+      "toRwTriggerSource",
+      "build",
+      "startMonitor",
+      "stopMonitor",
+      "destroy",
+      "setFreeRunMode",
+      "setTriggerMode",
+      "setExposure",
+      "setGain",
+      "captureSingleFrame",
+      "isConnected"
+    ],
+    "PunchPressVision/infrastructure/CameraModule/src/CameraModuleTypes.cpp": [],
+    "PunchPressVision/infrastructure/CameraModule/test/include/CameraModule.t.hpp": [],
+    "PunchPressVision/infrastructure/CameraModule/test/src/CameraModule.t.cpp": [
+      "main"
+    ],
+    "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/baseCfg.hpp": [
+      "BaseCfg",
+      "~BaseCfg",
+      "operator==",
+      "operator!=",
+      "BaseCfg",
+      "BaseCfg",
+      "BaseCfg",
+      "oso::ObjectStoreAssembly",
+      "operator==",
+      "operator!="
+    ],
+    "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/cameraCfg.hpp": [
+      "cameraCfg",
+      "~cameraCfg",
+      "operator==",
+      "operator!=",
+      "cameraCfg",
+      "cameraCfg",
+      "cameraCfg",
+      "oso::ObjectStoreAssembly",
+      "operator==",
+      "operator!="
+    ],
+    "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/plcAddressCfg.hpp": [
+      "PlcAddressCfg",
+      "~PlcAddressCfg",
+      "operator==",
+      "operator!=",
+      "PlcAddressCfg",
+      "PlcAddressCfg",
+      "PlcAddressCfg",
+      "oso::ObjectStoreAssembly",
+      "operator==",
+      "operator!="
+    ],
+    "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/VisionCfg.hpp": [
+      "save",
+      "load",
+      "visionCfg"
+    ],
+    "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/ConfigModule.hpp": [
+      "StorageContext",
+      "build",
+      "destroy",
+      "save",
+      "ConfigModule"
+    ],
+    "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/ConfigModulePath.hpp": [],
+    "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/ConfigModuleTypes.hpp": [],
+    "PunchPressVision/infrastructure/ConfigModule/osoFile/baseCfg.oso": [],
+    "PunchPressVision/infrastructure/ConfigModule/osoFile/cameraCfg.oso": [],
+    "PunchPressVision/infrastructure/ConfigModule/osoFile/plcAddressCfg.oso": [],
+    "PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp": [
+      "ConfigModule",
+      "~ConfigModule",
+      "build",
+      "destroy",
+      "save"
+    ],
+    "PunchPressVision/infrastructure/ConfigModule/src/ConfigModulePath.cpp": [],
+    "PunchPressVision/infrastructure/ConfigModule/src/ConfigModuleTypes.cpp": [],
+    "PunchPressVision/infrastructure/ConfigModule/test/include/ConfigModule.t.hpp": [],
+    "PunchPressVision/infrastructure/ConfigModule/test/src/ConfigModule.t.cpp": [
+      "main"
+    ],
+    "PunchPressVision/infrastructure/ControlModule/include/infrastructure/ControlModule/ControlModule.hpp": [
+      "ModbusDevice",
+      "ControlModule"
+    ],
+    "PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp": [
+      "ControlModule",
+      "~ControlModule",
+      "build",
+      "destroy",
+      "connectToPLC",
+      "disconnectPLC",
+      "isConnected",
+      "writeRegister",
+      "readRegister",
+      "writeFloat",
+      "readFloat",
+      "writeMultipleRegisters",
+      "readMultipleRegisters",
+      "writeCoil",
+      "readCoil"
+    ],
+    "PunchPressVision/infrastructure/ControlModule/test/include/ControlModule.t.hpp": [],
+    "PunchPressVision/infrastructure/ControlModule/test/src/ControlModule.t.cpp": [
+      "main"
+    ],
+    "PunchPressVision/infrastructure/infrastructure/include/infrastructure/infrastructure.hpp": [
+      "build",
+      "destroy",
+      "infrastructure"
+    ],
+    "PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp": [
+      "infrastructure",
+      "~infrastructure",
+      "build",
+      "destroy"
+    ],
+    "PunchPressVision/infrastructure/infrastructure/test/include/infrastructure.t.hpp": [],
+    "PunchPressVision/infrastructure/infrastructure/test/src/infrastructure.t.cpp": [
+      "main"
+    ],
+    "PunchPressVision/infrastructure/LightIOModule/include/infrastructure/LightIOModule/LightIOModule.hpp": [
+      "ControlModule",
+      "build",
+      "destroy",
+      "setControlModule",
+      "setUpperLight",
+      "setLowerLight",
+      "getUpperLightState",
+      "getLowerLightState",
+      "LightIOModule"
+    ],
+    "PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp": [
+      "build",
+      "destroy",
+      "setControlModule",
+      "setUpperLight",
+      "setLowerLight",
+      "getUpperLightState",
+      "getLowerLightState"
+    ],
+    "PunchPressVision/infrastructure/LightIOModule/test/include/LightIOModule.t.hpp": [],
+    "PunchPressVision/infrastructure/LightIOModule/test/src/LightIOModule.t.cpp": [
+      "main"
+    ],
+    "PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/Config/NinePointConfig.hpp": [
+      "saveInDir",
+      "loadInDir",
+      "NinePointCfg"
+    ],
+    "PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/NinePointModule.hpp": [
+      "build",
+      "destroy",
+      "save",
+      "NinePointModule"
+    ],
+    "PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/NinePointModulePath.hpp": [],
+    "PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/NinePointModuleTypes.hpp": [],
+    "PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp": [
+      "trimCr",
+      "replaceFile",
+      "writeTupleSafe",
+      "readTupleSafe",
+      "writeParamsSafe",
+      "readParamsSafe",
+      "saveInDir",
+      "loadInDir"
+    ],
+    "PunchPressVision/infrastructure/NinePointModule/src/NinePointModule.cpp": [
+      "build",
+      "destroy",
+      "save"
+    ],
+    "PunchPressVision/infrastructure/NinePointModule/src/NinePointModulePath.cpp": [],
+    "PunchPressVision/infrastructure/NinePointModule/src/NinePointModuleTypes.cpp": [],
+    "PunchPressVision/infrastructure/NinePointModule/test/include/NinePointModule.t.hpp": [],
+    "PunchPressVision/infrastructure/NinePointModule/test/src/NinePointModule.t.cpp": [
+      "main"
+    ],
+    "PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/Config/ShapeModelItem.hpp": [
+      "loadInDir",
+      "saveInDir",
+      "ShapeModelData",
+      "getId",
+      "getCreateTime",
+      "getUpdateTime",
+      "getFolderPath",
+      "setId",
+      "setCreateTime",
+      "setUpdateTime",
+      "setFolderPath",
+      "loadInDir",
+      "saveInDir",
+      "ShapeModelInfo",
+      "loadInDir",
+      "saveInDir",
+      "ShapeModelItem"
+    ],
+    "PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/ShapeModelManagerModule.hpp": [
+      "readAllShapeModelInfos",
+      "addShapeModelItem",
+      "deleteShapeModelItem",
+      "getShapeModelItem",
+      "changeShapeModelItem",
+      "changeShapeModelItem",
+      "changeShapeModelItem",
+      "getCurrentTime_yyMMddHHmmsszzz",
+      "build",
+      "destroy",
+      "ShapeModelManagerModule"
+    ],
+    "PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/ShapeModelManagerModulePath.hpp": [],
+    "PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/ShapeModelManagerModuleTypes.hpp": [],
+    "PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp": [
+      "replaceFile",
+      "readJsonSafe",
+      "writeJsonSafe",
+      "writeImageSafe",
+      "readImageSafe",
+      "writeObjectSafe",
+      "readObjectSafe",
+      "clearOldRoiFiles",
+      "writeTupleSafe",
+      "readTupleSafe",
+      "writeParamsSafe",
+      "trimCr",
+      "readParamsSafe",
+      "loadInDir",
+      "saveInDir",
+      "loadInDir",
+      "saveInDir",
+      "loadInDir",
+      "saveInDir"
+    ],
+    "PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp": [
+      "ShapeModelManagerModule",
+      "~ShapeModelManagerModule",
+      "readAllShapeModelInfos",
+      "addShapeModelItem",
+      "deleteShapeModelItem",
+      "getShapeModelItem",
+      "changeShapeModelItem",
+      "changeShapeModelItem",
+      "changeShapeModelItem",
+      "getCurrentTime_yyMMddHHmmsszzz",
+      "build",
+      "destroy"
+    ],
+    "PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModulePath.cpp": [],
+    "PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModuleTypes.cpp": [],
+    "PunchPressVision/infrastructure/ShapeModelManagerModule/test/include/ShapeModelManagerModule.t.hpp": [
+      "runBasicTest",
+      "ShapeModelManagerModuleTest"
+    ],
+    "PunchPressVision/infrastructure/ShapeModelManagerModule/test/src/ShapeModelManagerModule.t.cpp": [
+      "runBasicTest",
+      "main"
+    ],
+    "PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/Config/TwoCameraSpliceConfig.hpp": [
+      "saveInDir",
+      "loadInDir",
+      "TwoCameraSpliceCfg"
+    ],
+    "PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/TwoCameraSpliceModule.hpp": [
+      "build",
+      "destroy",
+      "save",
+      "TwoCameraSpliceModule"
+    ],
+    "PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/TwoCameraSpliceModulePath.hpp": [],
+    "PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/TwoCameraSpliceModuleTypes.hpp": [],
+    "PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp": [
+      "trimCr",
+      "replaceFile",
+      "writeImageSafe",
+      "readImageSafe",
+      "writeParamsSafe",
+      "readParamsSafe",
+      "saveInDir",
+      "loadInDir"
+    ],
+    "PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModule.cpp": [
+      "build",
+      "destroy",
+      "save"
+    ],
+    "PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModulePath.cpp": [],
+    "PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModuleTypes.cpp": [],
+    "PunchPressVision/infrastructure/TwoCameraSpliceModule/test/include/TwoCameraSpliceModule.t.hpp": [],
+    "PunchPressVision/infrastructure/TwoCameraSpliceModule/test/src/TwoCameraSpliceModule.t.cpp": [
+      "main"
+    ],
+    "PunchPressVision/UI/PunchPressUI/include/UI/DistortionCalibDialog.h": [
+      "DistortionCalibDialog"
+    ],
+    "PunchPressVision/UI/PunchPressUI/include/UI/HalconView.h": [
+      "ensure",
+      "display",
+      "resizeToHost",
+      "close",
+      "HalconView"
+    ],
+    "PunchPressVision/UI/PunchPressUI/include/UI/ModelEditorDialog.h": [
+      "ModelEditorDialog"
+    ],
+    "PunchPressVision/UI/PunchPressUI/include/UI/ModelManagerDialog.h": [
+      "QLineEdit",
+      "QComboBox",
+      "QPushButton",
+      "ModelManagerDialog"
+    ],
+    "PunchPressVision/UI/PunchPressUI/include/UI/NinePointCalibDialog.h": [
+      "NinePointCalibDialog"
+    ],
+    "PunchPressVision/UI/PunchPressUI/include/UI/PunchPress.h": [
+      "PunchPress"
+    ],
+    "PunchPressVision/UI/PunchPressUI/include/UI/SpliceDialog.h": [
+      "SpliceDialog"
+    ],
+    "PunchPressVision/UI/PunchPressUI/qrc/PunchPress.qrc": [],
+    "PunchPressVision/UI/PunchPressUI/src/DistortionCalibDialog.cpp": [
+      "DistortionCalibDialog",
+      "~DistortionCalibDialog",
+      "buildConnections",
+      "onFrameReady",
+      "onCapture",
+      "onRemoveLast",
+      "onRemoveAll",
+      "onCalibrate"
+    ],
+    "PunchPressVision/UI/PunchPressUI/src/ModelEditorDialog.cpp": [
+      "ModelEditorDialog",
+      "~ModelEditorDialog",
+      "buildConnections",
+      "onFrameReady",
+      "doCreateModel"
+    ],
+    "PunchPressVision/UI/PunchPressUI/src/ModelManagerDialog.cpp": [
+      "ModelManagerDialog",
+      "~ModelManagerDialog",
+      "buildUi",
+      "refreshModelList",
+      "selectedModelId",
+      "onSearchTextChanged",
+      "onSortChanged",
+      "onLoadModel",
+      "onRenameModel",
+      "onDeleteModel"
+    ],
+    "PunchPressVision/UI/PunchPressUI/src/NinePointCalibDialog.cpp": [
+      "NinePointCalibDialog",
+      "~NinePointCalibDialog",
+      "buildConnections",
+      "onStartCalibration",
+      "onFrameReady",
+      "onCalibrationProgress",
+      "onCalibrationFinished"
+    ],
+    "PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp": [
+      "PunchPress",
+      "~PunchPress",
+      "buildConnections",
+      "ensureHalconWindow",
+      "closeHalconWindow",
+      "displayImage",
+      "showEvent",
+      "resizeEvent",
+      "onDebugToggled",
+      "onProductionToggled",
+      "onUpperLightClicked",
+      "onLowerLightClicked",
+      "onDistortionCalib",
+      "onNinePointCalib",
+      "onImageStitching",
+      "onCreateModel",
+      "onChangeModel",
+      "onLoadModel",
+      "onExit",
+      "onFrameReady",
+      "onPositionResult",
+      "onModeChanged",
+      "onCameraConnectionChanged",
+      "onStartupCheckFailed"
+    ],
+    "PunchPressVision/UI/PunchPressUI/src/SpliceDialog.cpp": [
+      "SpliceDialog",
+      "~SpliceDialog",
+      "buildConnections",
+      "onSplice",
+      "onFrameReady"
+    ],
+    "PunchPressVision/UI/PunchPressUI/ui/Dlg_changeshapemodel.ui": [],
+    "PunchPressVision/UI/PunchPressUI/ui/Dlg_createshapemodel.ui": [],
+    "PunchPressVision/UI/PunchPressUI/ui/Dlg_ImageStitching.ui": [],
+    "PunchPressVision/UI/PunchPressUI/ui/Dlg_jibianjiaozheng.ui": [],
+    "PunchPressVision/UI/PunchPressUI/ui/Dlg_OffSet.ui": [],
+    "PunchPressVision/UI/PunchPressUI/ui/DlgJiudianbiaoding.ui": [],
+    "PunchPressVision/UI/PunchPressUI/ui/LoadingDialog.ui": [],
+    "PunchPressVision/UI/PunchPressUI/ui/PunchPress.ui": [],
+    "PunchPressVision/UI/src/main.cpp": [
+      "main"
+    ],
+    "PunchPressVision/UI/UIModule/include/Dlg_changeshapemodel.h": [],
+    "PunchPressVision/UI/UIModule/include/Dlg_createshapemodel.h": [
+      "QEvent",
+      "Dlg_createshapemodel"
+    ],
+    "PunchPressVision/UI/UIModule/include/Dlg_ImageStitching.h": [],
+    "PunchPressVision/UI/UIModule/include/Dlg_jibianjiaozheng.h": [],
+    "PunchPressVision/UI/UIModule/include/Dlg_OffSet.h": [],
+    "PunchPressVision/UI/UIModule/include/DlgCloseForm.h": [],
+    "PunchPressVision/UI/UIModule/include/DlgJiudianbiaoding.h": [],
+    "PunchPressVision/UI/UIModule/include/DraggableListWidget.h": [
+      "DraggableListWidget"
+    ],
+    "PunchPressVision/UI/UIModule/include/ImageEnlargedDisplay.h": [],
+    "PunchPressVision/UI/UIModule/include/LoadingDialog.h": [],
+    "PunchPressVision/UI/UIModule/include/PictureViewerThumbnails.h": [],
+    "PunchPressVision/UI/UIModule/include/PictureViewerUtilty.h": [],
+    "PunchPressVision/UI/UIModule/include/PunchPress.h": [],
+    "PunchPressVision/UI/UIModule/include/rqw_LabelClickable.h": [
+      "ClickableLabel"
+    ],
+    "PunchPressVision/UI/UIModule/include/rqw_LabelWarning.h": [
+      "setMaxHistorySize",
+      "getHistory",
+      "setWarningColor",
+      "setTimeoutColor",
+      "setGrayDuration",
+      "addWarning",
+      "addWarning",
+      "pushWarningList",
+      "popWarningListThreadSafe",
+      "topWarningListThreadSafe",
+      "isEmptyWarningListThreadSafe",
+      "getWarningListThreadSafe",
+      "clearWarningListThreadSafe",
+      "pushHistory",
+      "updateLastHistoryTimestamp",
+      "getHistoryThreadSafe",
+      "clearHistoryThreadSafe",
+      "LabelWarning"
+    ],
+    "PunchPressVision/UI/UIModule/include/WarningInfoList.h": [],
+    "PunchPressVision/UI/UIModule/include/WarnUtilty.hpp": [
+      "WarningInfo"
+    ],
+    "PunchPressVision/UI/UIModule/qrc/Dlg_createshapemodel.qrc": [],
+    "PunchPressVision/UI/UIModule/qrc/PunchPress.qrc": [],
+    "PunchPressVision/UI/UIModule/src/Dlg_changeshapemodel.cpp": [
+      "Dlg_changeshapemodel",
+      "~Dlg_changeshapemodel"
+    ],
+    "PunchPressVision/UI/UIModule/src/Dlg_createshapemodel.cpp": [
+      "Dlg_createshapemodel",
+      "~Dlg_createshapemodel"
+    ],
+    "PunchPressVision/UI/UIModule/src/Dlg_ImageStitching.cpp": [
+      "Dlg_ImageStitching",
+      "~Dlg_ImageStitching"
+    ],
+    "PunchPressVision/UI/UIModule/src/Dlg_jibianjiaozheng.cpp": [
+      "Dlg_jibianjiaozheng",
+      "~Dlg_jibianjiaozheng"
+    ],
+    "PunchPressVision/UI/UIModule/src/Dlg_OffSet.cpp": [
+      "Dlg_OffSet",
+      "~Dlg_OffSet"
+    ],
+    "PunchPressVision/UI/UIModule/src/DlgCloseForm.cpp": [
+      "DlgCloseForm",
+      "~DlgCloseForm",
+      "build_connect",
+      "setLabelShowMessage",
+      "btn_close_clicked",
+      "btn_restart_clicked",
+      "btn_yes_clicked",
+      "btn_no_clicked"
+    ],
+    "PunchPressVision/UI/UIModule/src/DlgJiudianbiaoding.cpp": [
+      "DlgJiudianbiaoding",
+      "~DlgJiudianbiaoding"
+    ],
+    "PunchPressVision/UI/UIModule/src/DraggableListWidget.cpp": [],
+    "PunchPressVision/UI/UIModule/src/ImageEnlargedDisplay.cpp": [
+      "ImageEnlargedDisplay",
+      "~ImageEnlargedDisplay",
+      "build_ui",
+      "build_connect",
+      "initWorkStationTitleMap",
+      "initWorkStationTitleMap",
+      "initWorkStationImageMap",
+      "initWorkStationImageMap",
+      "setNum",
+      "setMonitorValue",
+      "setMonitorDisImgIndex",
+      "setGboxTitle",
+      "showEvent",
+      "setShowImg",
+      "clearImgDis",
+      "updateTitle",
+      "updateImage",
+      "pbtn_exit_clicked",
+      "pbtn_nextWork_clicked",
+      "pbtn_preWork_clicked",
+      "closeEvent"
+    ],
+    "PunchPressVision/UI/UIModule/src/LoadingDialog.cpp": [
+      "LoadingDialog",
+      "updateMessage"
+    ],
+    "PunchPressVision/UI/UIModule/src/PictureViewerThumbnails.cpp": [],
+    "PunchPressVision/UI/UIModule/src/PictureViewerUtilty.cpp": [
+      "PictureViewerUtilty",
+      "~PictureViewerUtilty",
+      "build_ui",
+      "build_connect",
+      "showEvent",
+      "setImgPath",
+      "setAllImgPath",
+      "setPositive",
+      "getCurrentImageIndex",
+      "pbtn_exit_clicked",
+      "pbtn_previousImage_clicked",
+      "pbtn_nextImage_clicked",
+      "pbtn_delete_clicked"
+    ],
+    "PunchPressVision/UI/UIModule/src/PunchPress.cpp": [
+      "PunchPress",
+      "~PunchPress"
+    ],
+    "PunchPressVision/UI/UIModule/src/rqw_LabelClickable.cpp": [
+      "mousePressEvent"
+    ],
+    "PunchPressVision/UI/UIModule/src/rqw_LabelWarning.cpp": [
+      "build_ui",
+      "build_connect",
+      "LabelWarning",
+      "addWarning",
+      "addWarning",
+      "setMaxHistorySize",
+      "getHistory",
+      "setWarningColor",
+      "setTimeoutColor",
+      "setGrayDuration",
+      "onTimeoutToGray",
+      "onTimeoutToBlack",
+      "labelClicked",
+      "clearWarningHistory",
+      "pushWarningList",
+      "popWarningListThreadSafe",
+      "topWarningListThreadSafe",
+      "isEmptyWarningListThreadSafe",
+      "getWarningListThreadSafe",
+      "clearWarningListThreadSafe",
+      "pushHistory",
+      "updateLastHistoryTimestamp",
+      "getHistoryThreadSafe",
+      "clearHistoryThreadSafe"
+    ],
+    "PunchPressVision/UI/UIModule/src/WarningInfoList.cpp": [
+      "WarningInfoList",
+      "~WarningInfoList",
+      "build_ui",
+      "build_connect",
+      "setWarningHistory",
+      "onClearWarnings"
+    ],
+    "PunchPressVision/UI/UIModule/src/WarnUtilty.cpp": [],
+    "PunchPressVision/UI/UIModule/ui/Dlg_changeshapemodel.ui": [],
+    "PunchPressVision/UI/UIModule/ui/Dlg_createshapemodel.ui": [],
+    "PunchPressVision/UI/UIModule/ui/Dlg_ImageStitching.ui": [],
+    "PunchPressVision/UI/UIModule/ui/Dlg_jibianjiaozheng.ui": [],
+    "PunchPressVision/UI/UIModule/ui/Dlg_OffSet.ui": [],
+    "PunchPressVision/UI/UIModule/ui/DlgCloseForm.ui": [],
+    "PunchPressVision/UI/UIModule/ui/DlgJiudianbiaoding.ui": [],
+    "PunchPressVision/UI/UIModule/ui/LoadingDialog.ui": [],
+    "PunchPressVision/UI/UIModule/ui/PicturesViewer.ui": [],
+    "PunchPressVision/UI/UIModule/ui/PictureViewerThumbnails.ui": [],
+    "PunchPressVision/UI/UIModule/ui/PictureViewerUtilty.ui": [],
+    "PunchPressVision/UI/UIModule/ui/PunchPress.ui": [],
+    "PunchPressVision/UI/UIModule/ui/rqw_ImageEnlargedDisplay.ui": [],
+    "PunchPressVision/UI/UIModule/ui/WarningInfoList.ui": []
+  },
+  "batches": [
+    {
+      "batchIndex": 1,
+      "files": [
+        {
+          "path": "PunchPressVision/UI/UIModule/include/WarnUtilty.hpp",
+          "language": "cpp",
+          "sizeLines": 26,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/include/WarningInfoList.h",
+          "language": "c",
+          "sizeLines": 38,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/include/rqw_LabelClickable.h",
+          "language": "c",
+          "sizeLines": 26,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/include/rqw_LabelWarning.h",
+          "language": "c",
+          "sizeLines": 85,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "PunchPressVision/UI/UIModule/include/WarnUtilty.hpp": [],
+        "PunchPressVision/UI/UIModule/include/WarningInfoList.h": [
+          "PunchPressVision/UI/UIModule/include/WarnUtilty.hpp"
+        ],
+        "PunchPressVision/UI/UIModule/include/rqw_LabelClickable.h": [],
+        "PunchPressVision/UI/UIModule/include/rqw_LabelWarning.h": [
+          "PunchPressVision/UI/UIModule/include/rqw_LabelClickable.h",
+          "PunchPressVision/UI/UIModule/include/WarningInfoList.h",
+          "PunchPressVision/UI/UIModule/include/WarnUtilty.hpp"
+        ]
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 2,
+      "files": [
+        {
+          "path": ".understand-anything/intermediate/batch-1.json",
+          "language": "json",
+          "sizeLines": 143,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".understand-anything/intermediate/batch-2.json",
+          "language": "json",
+          "sizeLines": 94,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".understand-anything/intermediate/batch-3.json",
+          "language": "json",
+          "sizeLines": 705,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".understand-anything/intermediate/batch-4.json",
+          "language": "json",
+          "sizeLines": 762,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".understand-anything/intermediate/batch-5.json",
+          "language": "json",
+          "sizeLines": 1250,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".understand-anything/intermediate/batches.json",
+          "language": "json",
+          "sizeLines": 2687,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".understand-anything/intermediate/scan-result.json",
+          "language": "json",
+          "sizeLines": 507,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        ".understand-anything/intermediate/batch-1.json": [],
+        ".understand-anything/intermediate/batch-2.json": [],
+        ".understand-anything/intermediate/batch-3.json": [],
+        ".understand-anything/intermediate/batch-4.json": [],
+        ".understand-anything/intermediate/batch-5.json": [],
+        ".understand-anything/intermediate/batches.json": [],
+        ".understand-anything/intermediate/scan-result.json": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 3,
+      "files": [
+        {
+          "path": ".understand-anything/tmp/ua-file-analyzer-input-1.json",
+          "language": "json",
+          "sizeLines": 10,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".understand-anything/tmp/ua-file-analyzer-input-2.json",
+          "language": "json",
+          "sizeLines": 11,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".understand-anything/tmp/ua-file-analyzer-input-3.json",
+          "language": "json",
+          "sizeLines": 57,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".understand-anything/tmp/ua-file-analyzer-input-4.json",
+          "language": "json",
+          "sizeLines": 57,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".understand-anything/tmp/ua-file-analyzer-input-5.json",
+          "language": "json",
+          "sizeLines": 57,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".understand-anything/tmp/ua-file-analyzer-input-8.json",
+          "language": "json",
+          "sizeLines": 31,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".understand-anything/tmp/ua-file-extract-results-1.json",
+          "language": "json",
+          "sizeLines": 245,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".understand-anything/tmp/ua-file-extract-results-2.json",
+          "language": "json",
+          "sizeLines": 198,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".understand-anything/tmp/ua-file-extract-results-3.json",
+          "language": "json",
+          "sizeLines": 1807,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".understand-anything/tmp/ua-file-extract-results-4.json",
+          "language": "json",
+          "sizeLines": 1635,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".understand-anything/tmp/ua-file-extract-results-5.json",
+          "language": "json",
+          "sizeLines": 1777,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".understand-anything/tmp/ua-import-map-input.json",
+          "language": "json",
+          "sizeLines": 248,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".understand-anything/tmp/ua-import-map-output.json",
+          "language": "json",
+          "sizeLines": 260,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".understand-anything/tmp/ua-scan-files.json",
+          "language": "json",
+          "sizeLines": 1487,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        ".understand-anything/tmp/ua-file-analyzer-input-1.json": [],
+        ".understand-anything/tmp/ua-file-analyzer-input-2.json": [],
+        ".understand-anything/tmp/ua-file-analyzer-input-3.json": [],
+        ".understand-anything/tmp/ua-file-analyzer-input-4.json": [],
+        ".understand-anything/tmp/ua-file-analyzer-input-5.json": [],
+        ".understand-anything/tmp/ua-file-analyzer-input-8.json": [],
+        ".understand-anything/tmp/ua-file-extract-results-1.json": [],
+        ".understand-anything/tmp/ua-file-extract-results-2.json": [],
+        ".understand-anything/tmp/ua-file-extract-results-3.json": [],
+        ".understand-anything/tmp/ua-file-extract-results-4.json": [],
+        ".understand-anything/tmp/ua-file-extract-results-5.json": [],
+        ".understand-anything/tmp/ua-import-map-input.json": [],
+        ".understand-anything/tmp/ua-import-map-output.json": [],
+        ".understand-anything/tmp/ua-scan-files.json": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 4,
+      "files": [
+        {
+          "path": "CLAUDE.md",
+          "language": "markdown",
+          "sizeLines": 117,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 27,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "CMakePresets.json",
+          "language": "json",
+          "sizeLines": 55,
+          "fileCategory": "config"
+        },
+        {
+          "path": "DWorkplacerepPunchPressVision.understand-anythingtmpua-file-analyzer-input-1.json",
+          "language": "json",
+          "sizeLines": 10,
+          "fileCategory": "config"
+        },
+        {
+          "path": "DWorkplacerepPunchPressVision.understand-anythingtmpua-file-analyzer-input-2.json",
+          "language": "json",
+          "sizeLines": 11,
+          "fileCategory": "config"
+        },
+        {
+          "path": "DWorkplacerepPunchPressVision.understand-anythingtmpua-file-analyzer-input-6.json",
+          "language": "json",
+          "sizeLines": 31,
+          "fileCategory": "config"
+        },
+        {
+          "path": "DWorkplacerepPunchPressVision.understand-anythingtmpua-file-analyzer-input-7.json",
+          "language": "json",
+          "sizeLines": 31,
+          "fileCategory": "config"
+        },
+        {
+          "path": "vcpkg-configuration.json",
+          "language": "json",
+          "sizeLines": 14,
+          "fileCategory": "config"
+        },
+        {
+          "path": "vcpkg.json",
+          "language": "json",
+          "sizeLines": 80,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        "CLAUDE.md": [],
+        "CMakeLists.txt": [],
+        "CMakePresets.json": [],
+        "DWorkplacerepPunchPressVision.understand-anythingtmpua-file-analyzer-input-1.json": [],
+        "DWorkplacerepPunchPressVision.understand-anythingtmpua-file-analyzer-input-2.json": [],
+        "DWorkplacerepPunchPressVision.understand-anythingtmpua-file-analyzer-input-6.json": [],
+        "DWorkplacerepPunchPressVision.understand-anythingtmpua-file-analyzer-input-7.json": [],
+        "vcpkg-configuration.json": [],
+        "vcpkg.json": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 5,
+      "files": [
+        {
+          "path": ".claude/settings.json",
+          "language": "json",
+          "sizeLines": 5,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".understand-anything/.understandignore",
+          "language": "unknown",
+          "sizeLines": 21,
+          "fileCategory": "code"
+        },
+        {
+          "path": ".understand-anything/config.json",
+          "language": "json",
+          "sizeLines": 2,
+          "fileCategory": "config"
+        },
+        {
+          "path": "cmake/AddThirdSDKTargets.cmake",
+          "language": "cmake",
+          "sizeLines": 41,
+          "fileCategory": "code"
+        },
+        {
+          "path": "cmake/CMakeCacheIni.cmake",
+          "language": "cmake",
+          "sizeLines": 21,
+          "fileCategory": "code"
+        },
+        {
+          "path": "cmake/func.cmake",
+          "language": "cmake",
+          "sizeLines": 5,
+          "fileCategory": "code"
+        },
+        {
+          "path": "Folder.DotSettings",
+          "language": "dotsettings",
+          "sizeLines": 14,
+          "fileCategory": "code"
+        },
+        {
+          "path": "Folder.DotSettings.user",
+          "language": "user",
+          "sizeLines": 8,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/app/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 1,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/App/PunchPressApp/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 34,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/App/PunchPressApp/include/app/PunchPressApp.hpp",
+          "language": "cpp",
+          "sizeLines": 76,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp",
+          "language": "cpp",
+          "sizeLines": 329,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/App/PunchPressApp/test/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 24,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/App/PunchPressApp/test/include/PunchPressApp.t.hpp",
+          "language": "cpp",
+          "sizeLines": 1,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/App/PunchPressApp/test/src/PunchPressApp.t.cpp",
+          "language": "cpp",
+          "sizeLines": 22,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/Business/Business/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 42,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/Business/Business/include/Business/Business.hpp",
+          "language": "cpp",
+          "sizeLines": 37,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/Business/Business/src/Business.cpp",
+          "language": "cpp",
+          "sizeLines": 57,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/Business/Business/test/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 23,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/Business/Business/test/include/CalibBun.t.hpp",
+          "language": "cpp",
+          "sizeLines": 2,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/Business/Business/test/src/CalibBun.t.cpp",
+          "language": "cpp",
+          "sizeLines": 6,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/Business/CalibBun/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 32,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/Business/CalibBun/include/Business/CalibBun/CalibBun.hpp",
+          "language": "cpp",
+          "sizeLines": 38,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/Business/CalibBun/src/CalibBun.cpp",
+          "language": "cpp",
+          "sizeLines": 318,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/Business/CalibBun/test/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 23,
+          "fileCategory": "docs"
+        }
+      ],
+      "batchImportData": {
+        ".claude/settings.json": [],
+        ".understand-anything/.understandignore": [],
+        ".understand-anything/config.json": [],
+        "cmake/AddThirdSDKTargets.cmake": [],
+        "cmake/CMakeCacheIni.cmake": [],
+        "cmake/func.cmake": [],
+        "Folder.DotSettings": [],
+        "Folder.DotSettings.user": [],
+        "PunchPressVision/app/CMakeLists.txt": [],
+        "PunchPressVision/App/PunchPressApp/CMakeLists.txt": [],
+        "PunchPressVision/App/PunchPressApp/include/app/PunchPressApp.hpp": [],
+        "PunchPressVision/App/PunchPressApp/src/PunchPressApp.cpp": [],
+        "PunchPressVision/App/PunchPressApp/test/CMakeLists.txt": [],
+        "PunchPressVision/App/PunchPressApp/test/include/PunchPressApp.t.hpp": [],
+        "PunchPressVision/App/PunchPressApp/test/src/PunchPressApp.t.cpp": [],
+        "PunchPressVision/Business/Business/CMakeLists.txt": [],
+        "PunchPressVision/Business/Business/include/Business/Business.hpp": [],
+        "PunchPressVision/Business/Business/src/Business.cpp": [],
+        "PunchPressVision/Business/Business/test/CMakeLists.txt": [],
+        "PunchPressVision/Business/Business/test/include/CalibBun.t.hpp": [],
+        "PunchPressVision/Business/Business/test/src/CalibBun.t.cpp": [],
+        "PunchPressVision/Business/CalibBun/CMakeLists.txt": [],
+        "PunchPressVision/Business/CalibBun/include/Business/CalibBun/CalibBun.hpp": [],
+        "PunchPressVision/Business/CalibBun/src/CalibBun.cpp": [],
+        "PunchPressVision/Business/CalibBun/test/CMakeLists.txt": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 6,
+      "files": [
+        {
+          "path": "PunchPressVision/Business/CalibBun/test/include/CalibBun.t.hpp",
+          "language": "cpp",
+          "sizeLines": 2,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/Business/CalibBun/test/src/CalibBun.t.cpp",
+          "language": "cpp",
+          "sizeLines": 6,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/Business/CameraBun/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 32,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/Business/CameraBun/include/Business/CameraBun/CameraBun.hpp",
+          "language": "cpp",
+          "sizeLines": 54,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/Business/CameraBun/include/Business/CameraBun/CameraImgConvert.hpp",
+          "language": "cpp",
+          "sizeLines": 15,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/Business/CameraBun/src/CameraBun.cpp",
+          "language": "cpp",
+          "sizeLines": 131,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/Business/CameraBun/src/CameraImgConvert.cpp",
+          "language": "cpp",
+          "sizeLines": 92,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/Business/CameraBun/test/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 23,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/Business/CameraBun/test/include/CameraBun.t.hpp",
+          "language": "cpp",
+          "sizeLines": 2,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/Business/CameraBun/test/src/CameraBun.t.cpp",
+          "language": "cpp",
+          "sizeLines": 6,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/Business/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 7,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/Business/LightControlBun/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 33,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/Business/LightControlBun/include/Business/LightControlBun/LightControlBun.hpp",
+          "language": "cpp",
+          "sizeLines": 36,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/Business/LightControlBun/src/LightControlBun.cpp",
+          "language": "cpp",
+          "sizeLines": 49,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/Business/LightControlBun/test/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 22,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/Business/LightControlBun/test/include/LightControlBun.t.hpp",
+          "language": "cpp",
+          "sizeLines": 1,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/Business/LightControlBun/test/src/LightControlBun.t.cpp",
+          "language": "cpp",
+          "sizeLines": 6,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/Business/NinePointBun/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 32,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/Business/NinePointBun/include/Business/NinePointBun/NinePointBun.hpp",
+          "language": "cpp",
+          "sizeLines": 73,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp",
+          "language": "cpp",
+          "sizeLines": 229,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/Business/NinePointBun/test/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 23,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/Business/NinePointBun/test/include/NinePointBun.t.hpp",
+          "language": "cpp",
+          "sizeLines": 2,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/Business/NinePointBun/test/src/NinePointBun.t.cpp",
+          "language": "cpp",
+          "sizeLines": 6,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/Business/ShapeModeManagerBun/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 32,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/Business/ShapeModeManagerBun/include/Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp",
+          "language": "cpp",
+          "sizeLines": 99,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "PunchPressVision/Business/CalibBun/test/include/CalibBun.t.hpp": [],
+        "PunchPressVision/Business/CalibBun/test/src/CalibBun.t.cpp": [],
+        "PunchPressVision/Business/CameraBun/CMakeLists.txt": [],
+        "PunchPressVision/Business/CameraBun/include/Business/CameraBun/CameraBun.hpp": [],
+        "PunchPressVision/Business/CameraBun/include/Business/CameraBun/CameraImgConvert.hpp": [],
+        "PunchPressVision/Business/CameraBun/src/CameraBun.cpp": [],
+        "PunchPressVision/Business/CameraBun/src/CameraImgConvert.cpp": [],
+        "PunchPressVision/Business/CameraBun/test/CMakeLists.txt": [],
+        "PunchPressVision/Business/CameraBun/test/include/CameraBun.t.hpp": [],
+        "PunchPressVision/Business/CameraBun/test/src/CameraBun.t.cpp": [],
+        "PunchPressVision/Business/CMakeLists.txt": [],
+        "PunchPressVision/Business/LightControlBun/CMakeLists.txt": [],
+        "PunchPressVision/Business/LightControlBun/include/Business/LightControlBun/LightControlBun.hpp": [],
+        "PunchPressVision/Business/LightControlBun/src/LightControlBun.cpp": [],
+        "PunchPressVision/Business/LightControlBun/test/CMakeLists.txt": [],
+        "PunchPressVision/Business/LightControlBun/test/include/LightControlBun.t.hpp": [],
+        "PunchPressVision/Business/LightControlBun/test/src/LightControlBun.t.cpp": [],
+        "PunchPressVision/Business/NinePointBun/CMakeLists.txt": [],
+        "PunchPressVision/Business/NinePointBun/include/Business/NinePointBun/NinePointBun.hpp": [],
+        "PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp": [],
+        "PunchPressVision/Business/NinePointBun/test/CMakeLists.txt": [],
+        "PunchPressVision/Business/NinePointBun/test/include/NinePointBun.t.hpp": [],
+        "PunchPressVision/Business/NinePointBun/test/src/NinePointBun.t.cpp": [],
+        "PunchPressVision/Business/ShapeModeManagerBun/CMakeLists.txt": [],
+        "PunchPressVision/Business/ShapeModeManagerBun/include/Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 7,
+      "files": [
+        {
+          "path": "PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp",
+          "language": "cpp",
+          "sizeLines": 279,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/Business/ShapeModeManagerBun/test/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 23,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/Business/ShapeModeManagerBun/test/include/ShapeModeManagerBun.t.hpp",
+          "language": "cpp",
+          "sizeLines": 2,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/Business/ShapeModeManagerBun/test/src/ShapeModeManagerBun.t.cpp",
+          "language": "cpp",
+          "sizeLines": 6,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/Business/TwoCameraSpliceBun/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 32,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/Business/TwoCameraSpliceBun/include/Business/TwoCameraSpliceBun/TwoCameraSpliceBun.hpp",
+          "language": "cpp",
+          "sizeLines": 33,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/Business/TwoCameraSpliceBun/src/TwoCameraSpliceBun.cpp",
+          "language": "cpp",
+          "sizeLines": 314,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/Business/TwoCameraSpliceBun/test/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 23,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/Business/TwoCameraSpliceBun/test/include/TwoCameraSpliceBun.t.hpp",
+          "language": "cpp",
+          "sizeLines": 2,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/Business/TwoCameraSpliceBun/test/src/TwoCameraSpliceBun.t.cpp",
+          "language": "cpp",
+          "sizeLines": 6,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 5,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/global/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 26,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/global/include/global/GlobalInterface.hpp",
+          "language": "cpp",
+          "sizeLines": 22,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/global/include/global/GlobalPath.hpp",
+          "language": "cpp",
+          "sizeLines": 26,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/global/include/global/GlobalReadiness.hpp",
+          "language": "cpp",
+          "sizeLines": 30,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/global/include/global/GlobalResult.hpp",
+          "language": "cpp",
+          "sizeLines": 14,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/global/include/global/GlobalType.hpp",
+          "language": "cpp",
+          "sizeLines": 38,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/global/src/GlobalInterface.cpp",
+          "language": "cpp",
+          "sizeLines": 0,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/global/src/GlobalPath.cpp",
+          "language": "cpp",
+          "sizeLines": 7,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/global/src/GlobalType.cpp",
+          "language": "cpp",
+          "sizeLines": 6,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/CalibConfigModule/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 32,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/CalibConfigModule.hpp",
+          "language": "cpp",
+          "sizeLines": 18,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/CalibConfigModulePath.hpp",
+          "language": "cpp",
+          "sizeLines": 11,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/CalibConfigModuleTypes.hpp",
+          "language": "cpp",
+          "sizeLines": 6,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/Config/CalibConfig.hpp",
+          "language": "cpp",
+          "sizeLines": 31,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "PunchPressVision/Business/ShapeModeManagerBun/src/ShapeModeManagerBun.cpp": [],
+        "PunchPressVision/Business/ShapeModeManagerBun/test/CMakeLists.txt": [],
+        "PunchPressVision/Business/ShapeModeManagerBun/test/include/ShapeModeManagerBun.t.hpp": [],
+        "PunchPressVision/Business/ShapeModeManagerBun/test/src/ShapeModeManagerBun.t.cpp": [],
+        "PunchPressVision/Business/TwoCameraSpliceBun/CMakeLists.txt": [],
+        "PunchPressVision/Business/TwoCameraSpliceBun/include/Business/TwoCameraSpliceBun/TwoCameraSpliceBun.hpp": [],
+        "PunchPressVision/Business/TwoCameraSpliceBun/src/TwoCameraSpliceBun.cpp": [],
+        "PunchPressVision/Business/TwoCameraSpliceBun/test/CMakeLists.txt": [],
+        "PunchPressVision/Business/TwoCameraSpliceBun/test/include/TwoCameraSpliceBun.t.hpp": [],
+        "PunchPressVision/Business/TwoCameraSpliceBun/test/src/TwoCameraSpliceBun.t.cpp": [],
+        "PunchPressVision/CMakeLists.txt": [],
+        "PunchPressVision/global/CMakeLists.txt": [],
+        "PunchPressVision/global/include/global/GlobalInterface.hpp": [],
+        "PunchPressVision/global/include/global/GlobalPath.hpp": [],
+        "PunchPressVision/global/include/global/GlobalReadiness.hpp": [],
+        "PunchPressVision/global/include/global/GlobalResult.hpp": [],
+        "PunchPressVision/global/include/global/GlobalType.hpp": [],
+        "PunchPressVision/global/src/GlobalInterface.cpp": [],
+        "PunchPressVision/global/src/GlobalPath.cpp": [],
+        "PunchPressVision/global/src/GlobalType.cpp": [],
+        "PunchPressVision/infrastructure/CalibConfigModule/CMakeLists.txt": [],
+        "PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/CalibConfigModule.hpp": [],
+        "PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/CalibConfigModulePath.hpp": [],
+        "PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/CalibConfigModuleTypes.hpp": [],
+        "PunchPressVision/infrastructure/CalibConfigModule/include/infrastructure/CalibConfigModule/Config/CalibConfig.hpp": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 8,
+      "files": [
+        {
+          "path": "PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModule.cpp",
+          "language": "cpp",
+          "sizeLines": 22,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModulePath.cpp",
+          "language": "cpp",
+          "sizeLines": 6,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModuleTypes.cpp",
+          "language": "cpp",
+          "sizeLines": 6,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp",
+          "language": "cpp",
+          "sizeLines": 136,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/CalibConfigModule/test/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 23,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/CalibConfigModule/test/include/CalibConfigModule.t.hpp",
+          "language": "cpp",
+          "sizeLines": 2,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/CalibConfigModule/test/src/CalibConfigModule.t.cpp",
+          "language": "cpp",
+          "sizeLines": 10,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/CameraModule/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 33,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/CameraModule/include/infrastructure/CameraModule/CameraModule.hpp",
+          "language": "cpp",
+          "sizeLines": 54,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/CameraModule/include/infrastructure/CameraModule/CameraModuleTypes.hpp",
+          "language": "cpp",
+          "sizeLines": 6,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp",
+          "language": "cpp",
+          "sizeLines": 215,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/CameraModule/src/CameraModuleTypes.cpp",
+          "language": "cpp",
+          "sizeLines": 6,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/CameraModule/test/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 25,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/CameraModule/test/include/CameraModule.t.hpp",
+          "language": "cpp",
+          "sizeLines": 2,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/CameraModule/test/src/CameraModule.t.cpp",
+          "language": "cpp",
+          "sizeLines": 28,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 9,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/ConfigModule/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 32,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/baseCfg.hpp",
+          "language": "cpp",
+          "sizeLines": 110,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/cameraCfg.hpp",
+          "language": "cpp",
+          "sizeLines": 110,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/plcAddressCfg.hpp",
+          "language": "cpp",
+          "sizeLines": 146,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/VisionCfg.hpp",
+          "language": "cpp",
+          "sizeLines": 76,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/ConfigModule.hpp",
+          "language": "cpp",
+          "sizeLines": 36,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/ConfigModulePath.hpp",
+          "language": "cpp",
+          "sizeLines": 18,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/ConfigModuleTypes.hpp",
+          "language": "cpp",
+          "sizeLines": 6,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/ConfigModule/osoFile/baseCfg.oso",
+          "language": "oso",
+          "sizeLines": 12,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModule.cpp": [],
+        "PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModulePath.cpp": [],
+        "PunchPressVision/infrastructure/CalibConfigModule/src/CalibConfigModuleTypes.cpp": [],
+        "PunchPressVision/infrastructure/CalibConfigModule/src/Config/CalibConfig.cpp": [],
+        "PunchPressVision/infrastructure/CalibConfigModule/test/CMakeLists.txt": [],
+        "PunchPressVision/infrastructure/CalibConfigModule/test/include/CalibConfigModule.t.hpp": [],
+        "PunchPressVision/infrastructure/CalibConfigModule/test/src/CalibConfigModule.t.cpp": [],
+        "PunchPressVision/infrastructure/CameraModule/CMakeLists.txt": [],
+        "PunchPressVision/infrastructure/CameraModule/include/infrastructure/CameraModule/CameraModule.hpp": [],
+        "PunchPressVision/infrastructure/CameraModule/include/infrastructure/CameraModule/CameraModuleTypes.hpp": [],
+        "PunchPressVision/infrastructure/CameraModule/src/CameraModule.cpp": [],
+        "PunchPressVision/infrastructure/CameraModule/src/CameraModuleTypes.cpp": [],
+        "PunchPressVision/infrastructure/CameraModule/test/CMakeLists.txt": [],
+        "PunchPressVision/infrastructure/CameraModule/test/include/CameraModule.t.hpp": [],
+        "PunchPressVision/infrastructure/CameraModule/test/src/CameraModule.t.cpp": [],
+        "PunchPressVision/infrastructure/CMakeLists.txt": [],
+        "PunchPressVision/infrastructure/ConfigModule/CMakeLists.txt": [],
+        "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/baseCfg.hpp": [],
+        "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/cameraCfg.hpp": [],
+        "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/plcAddressCfg.hpp": [],
+        "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/VisionCfg.hpp": [],
+        "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/ConfigModule.hpp": [
+          "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/Config/VisionCfg.hpp"
+        ],
+        "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/ConfigModulePath.hpp": [],
+        "PunchPressVision/infrastructure/ConfigModule/include/infrastructure/ConfigModule/ConfigModuleTypes.hpp": [],
+        "PunchPressVision/infrastructure/ConfigModule/osoFile/baseCfg.oso": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 9,
+      "files": [
+        {
+          "path": "PunchPressVision/infrastructure/ConfigModule/osoFile/cameraCfg.oso",
+          "language": "oso",
+          "sizeLines": 11,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/ConfigModule/osoFile/plcAddressCfg.oso",
+          "language": "oso",
+          "sizeLines": 13,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp",
+          "language": "cpp",
+          "sizeLines": 100,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/ConfigModule/src/ConfigModulePath.cpp",
+          "language": "cpp",
+          "sizeLines": 6,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/ConfigModule/src/ConfigModuleTypes.cpp",
+          "language": "cpp",
+          "sizeLines": 6,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/ConfigModule/test/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 23,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/ConfigModule/test/include/ConfigModule.t.hpp",
+          "language": "cpp",
+          "sizeLines": 2,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/ConfigModule/test/src/ConfigModule.t.cpp",
+          "language": "cpp",
+          "sizeLines": 10,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/ControlModule/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 33,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/ControlModule/include/infrastructure/ControlModule/ControlModule.hpp",
+          "language": "cpp",
+          "sizeLines": 69,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp",
+          "language": "cpp",
+          "sizeLines": 195,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/ControlModule/test/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 22,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/ControlModule/test/include/ControlModule.t.hpp",
+          "language": "cpp",
+          "sizeLines": 1,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/ControlModule/test/src/ControlModule.t.cpp",
+          "language": "cpp",
+          "sizeLines": 6,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/infrastructure/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 40,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/infrastructure/include/infrastructure/infrastructure.hpp",
+          "language": "cpp",
+          "sizeLines": 32,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp",
+          "language": "cpp",
+          "sizeLines": 68,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/infrastructure/test/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 25,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/infrastructure/test/include/infrastructure.t.hpp",
+          "language": "cpp",
+          "sizeLines": 2,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/infrastructure/test/src/infrastructure.t.cpp",
+          "language": "cpp",
+          "sizeLines": 9,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/LightIOModule/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 32,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/LightIOModule/include/infrastructure/LightIOModule/LightIOModule.hpp",
+          "language": "cpp",
+          "sizeLines": 33,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp",
+          "language": "cpp",
+          "sizeLines": 57,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/LightIOModule/test/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 22,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/LightIOModule/test/include/LightIOModule.t.hpp",
+          "language": "cpp",
+          "sizeLines": 1,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "PunchPressVision/infrastructure/ConfigModule/osoFile/cameraCfg.oso": [],
+        "PunchPressVision/infrastructure/ConfigModule/osoFile/plcAddressCfg.oso": [],
+        "PunchPressVision/infrastructure/ConfigModule/src/ConfigModule.cpp": [],
+        "PunchPressVision/infrastructure/ConfigModule/src/ConfigModulePath.cpp": [],
+        "PunchPressVision/infrastructure/ConfigModule/src/ConfigModuleTypes.cpp": [],
+        "PunchPressVision/infrastructure/ConfigModule/test/CMakeLists.txt": [],
+        "PunchPressVision/infrastructure/ConfigModule/test/include/ConfigModule.t.hpp": [],
+        "PunchPressVision/infrastructure/ConfigModule/test/src/ConfigModule.t.cpp": [],
+        "PunchPressVision/infrastructure/ControlModule/CMakeLists.txt": [],
+        "PunchPressVision/infrastructure/ControlModule/include/infrastructure/ControlModule/ControlModule.hpp": [],
+        "PunchPressVision/infrastructure/ControlModule/src/ControlModule.cpp": [],
+        "PunchPressVision/infrastructure/ControlModule/test/CMakeLists.txt": [],
+        "PunchPressVision/infrastructure/ControlModule/test/include/ControlModule.t.hpp": [],
+        "PunchPressVision/infrastructure/ControlModule/test/src/ControlModule.t.cpp": [],
+        "PunchPressVision/infrastructure/infrastructure/CMakeLists.txt": [],
+        "PunchPressVision/infrastructure/infrastructure/include/infrastructure/infrastructure.hpp": [],
+        "PunchPressVision/infrastructure/infrastructure/src/infrastructure.cpp": [],
+        "PunchPressVision/infrastructure/infrastructure/test/CMakeLists.txt": [],
+        "PunchPressVision/infrastructure/infrastructure/test/include/infrastructure.t.hpp": [],
+        "PunchPressVision/infrastructure/infrastructure/test/src/infrastructure.t.cpp": [],
+        "PunchPressVision/infrastructure/LightIOModule/CMakeLists.txt": [],
+        "PunchPressVision/infrastructure/LightIOModule/include/infrastructure/LightIOModule/LightIOModule.hpp": [],
+        "PunchPressVision/infrastructure/LightIOModule/src/LightIOModule.cpp": [],
+        "PunchPressVision/infrastructure/LightIOModule/test/CMakeLists.txt": [],
+        "PunchPressVision/infrastructure/LightIOModule/test/include/LightIOModule.t.hpp": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 10,
+      "files": [
+        {
+          "path": "PunchPressVision/infrastructure/LightIOModule/test/src/LightIOModule.t.cpp",
+          "language": "cpp",
+          "sizeLines": 6,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/NinePointModule/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 32,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/Config/NinePointConfig.hpp",
+          "language": "cpp",
+          "sizeLines": 32,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/NinePointModule.hpp",
+          "language": "cpp",
+          "sizeLines": 18,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/NinePointModulePath.hpp",
+          "language": "cpp",
+          "sizeLines": 11,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/NinePointModuleTypes.hpp",
+          "language": "cpp",
+          "sizeLines": 6,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp",
+          "language": "cpp",
+          "sizeLines": 180,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/NinePointModule/src/NinePointModule.cpp",
+          "language": "cpp",
+          "sizeLines": 21,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/NinePointModule/src/NinePointModulePath.cpp",
+          "language": "cpp",
+          "sizeLines": 0,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/NinePointModule/src/NinePointModuleTypes.cpp",
+          "language": "cpp",
+          "sizeLines": 6,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/NinePointModule/test/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 23,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/NinePointModule/test/include/NinePointModule.t.hpp",
+          "language": "cpp",
+          "sizeLines": 2,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/NinePointModule/test/src/NinePointModule.t.cpp",
+          "language": "cpp",
+          "sizeLines": 6,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/ShapeModelManagerModule/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 34,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/Config/ShapeModelItem.hpp",
+          "language": "cpp",
+          "sizeLines": 137,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/ShapeModelManagerModule.hpp",
+          "language": "cpp",
+          "sizeLines": 38,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/ShapeModelManagerModulePath.hpp",
+          "language": "cpp",
+          "sizeLines": 13,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/ShapeModelManagerModuleTypes.hpp",
+          "language": "cpp",
+          "sizeLines": 12,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp",
+          "language": "cpp",
+          "sizeLines": 567,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp",
+          "language": "cpp",
+          "sizeLines": 226,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModulePath.cpp",
+          "language": "cpp",
+          "sizeLines": 6,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModuleTypes.cpp",
+          "language": "cpp",
+          "sizeLines": 6,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/ShapeModelManagerModule/test/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 25,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/ShapeModelManagerModule/test/include/ShapeModelManagerModule.t.hpp",
+          "language": "cpp",
+          "sizeLines": 12,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/ShapeModelManagerModule/test/src/ShapeModelManagerModule.t.cpp",
+          "language": "cpp",
+          "sizeLines": 34,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "PunchPressVision/infrastructure/LightIOModule/test/src/LightIOModule.t.cpp": [],
+        "PunchPressVision/infrastructure/NinePointModule/CMakeLists.txt": [],
+        "PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/Config/NinePointConfig.hpp": [],
+        "PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/NinePointModule.hpp": [],
+        "PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/NinePointModulePath.hpp": [],
+        "PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/NinePointModuleTypes.hpp": [],
+        "PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp": [],
+        "PunchPressVision/infrastructure/NinePointModule/src/NinePointModule.cpp": [],
+        "PunchPressVision/infrastructure/NinePointModule/src/NinePointModulePath.cpp": [],
+        "PunchPressVision/infrastructure/NinePointModule/src/NinePointModuleTypes.cpp": [],
+        "PunchPressVision/infrastructure/NinePointModule/test/CMakeLists.txt": [],
+        "PunchPressVision/infrastructure/NinePointModule/test/include/NinePointModule.t.hpp": [],
+        "PunchPressVision/infrastructure/NinePointModule/test/src/NinePointModule.t.cpp": [],
+        "PunchPressVision/infrastructure/ShapeModelManagerModule/CMakeLists.txt": [],
+        "PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/Config/ShapeModelItem.hpp": [],
+        "PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/ShapeModelManagerModule.hpp": [],
+        "PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/ShapeModelManagerModulePath.hpp": [],
+        "PunchPressVision/infrastructure/ShapeModelManagerModule/include/infrastructure/ShapeModelManagerModule/ShapeModelManagerModuleTypes.hpp": [],
+        "PunchPressVision/infrastructure/ShapeModelManagerModule/src/Config/ShapeModelItem.cpp": [],
+        "PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModule.cpp": [],
+        "PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModulePath.cpp": [],
+        "PunchPressVision/infrastructure/ShapeModelManagerModule/src/ShapeModelManagerModuleTypes.cpp": [],
+        "PunchPressVision/infrastructure/ShapeModelManagerModule/test/CMakeLists.txt": [],
+        "PunchPressVision/infrastructure/ShapeModelManagerModule/test/include/ShapeModelManagerModule.t.hpp": [],
+        "PunchPressVision/infrastructure/ShapeModelManagerModule/test/src/ShapeModelManagerModule.t.cpp": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 11,
+      "files": [
+        {
+          "path": "PunchPressVision/infrastructure/TwoCameraSpliceModule/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 32,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/Config/TwoCameraSpliceConfig.hpp",
+          "language": "cpp",
+          "sizeLines": 33,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/TwoCameraSpliceModule.hpp",
+          "language": "cpp",
+          "sizeLines": 18,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/TwoCameraSpliceModulePath.hpp",
+          "language": "cpp",
+          "sizeLines": 11,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/TwoCameraSpliceModuleTypes.hpp",
+          "language": "cpp",
+          "sizeLines": 6,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp",
+          "language": "cpp",
+          "sizeLines": 191,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModule.cpp",
+          "language": "cpp",
+          "sizeLines": 21,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModulePath.cpp",
+          "language": "cpp",
+          "sizeLines": 6,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModuleTypes.cpp",
+          "language": "cpp",
+          "sizeLines": 6,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/TwoCameraSpliceModule/test/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 23,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/TwoCameraSpliceModule/test/include/TwoCameraSpliceModule.t.hpp",
+          "language": "cpp",
+          "sizeLines": 2,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/infrastructure/TwoCameraSpliceModule/test/src/TwoCameraSpliceModule.t.cpp",
+          "language": "cpp",
+          "sizeLines": 6,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 35,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/UI/PunchPressUI/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 36,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/UI/PunchPressUI/include/UI/DistortionCalibDialog.h",
+          "language": "c",
+          "sizeLines": 42,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/PunchPressUI/include/UI/HalconView.h",
+          "language": "c",
+          "sizeLines": 86,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/PunchPressUI/include/UI/ModelEditorDialog.h",
+          "language": "c",
+          "sizeLines": 39,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/PunchPressUI/include/UI/ModelManagerDialog.h",
+          "language": "c",
+          "sizeLines": 44,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/PunchPressUI/include/UI/NinePointCalibDialog.h",
+          "language": "c",
+          "sizeLines": 39,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/PunchPressUI/include/UI/PunchPress.h",
+          "language": "c",
+          "sizeLines": 72,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/PunchPressUI/include/UI/SpliceDialog.h",
+          "language": "c",
+          "sizeLines": 39,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/PunchPressUI/qrc/PunchPress.qrc",
+          "language": "qrc",
+          "sizeLines": 5,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/PunchPressUI/src/DistortionCalibDialog.cpp",
+          "language": "cpp",
+          "sizeLines": 108,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/PunchPressUI/src/ModelEditorDialog.cpp",
+          "language": "cpp",
+          "sizeLines": 74,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/PunchPressUI/src/ModelManagerDialog.cpp",
+          "language": "cpp",
+          "sizeLines": 174,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "PunchPressVision/infrastructure/TwoCameraSpliceModule/CMakeLists.txt": [],
+        "PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/Config/TwoCameraSpliceConfig.hpp": [],
+        "PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/TwoCameraSpliceModule.hpp": [],
+        "PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/TwoCameraSpliceModulePath.hpp": [],
+        "PunchPressVision/infrastructure/TwoCameraSpliceModule/include/infrastructure/TwoCameraSpliceModule/TwoCameraSpliceModuleTypes.hpp": [],
+        "PunchPressVision/infrastructure/TwoCameraSpliceModule/src/Config/TwoCameraSpliceConfig.cpp": [],
+        "PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModule.cpp": [],
+        "PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModulePath.cpp": [],
+        "PunchPressVision/infrastructure/TwoCameraSpliceModule/src/TwoCameraSpliceModuleTypes.cpp": [],
+        "PunchPressVision/infrastructure/TwoCameraSpliceModule/test/CMakeLists.txt": [],
+        "PunchPressVision/infrastructure/TwoCameraSpliceModule/test/include/TwoCameraSpliceModule.t.hpp": [],
+        "PunchPressVision/infrastructure/TwoCameraSpliceModule/test/src/TwoCameraSpliceModule.t.cpp": [],
+        "PunchPressVision/UI/CMakeLists.txt": [],
+        "PunchPressVision/UI/PunchPressUI/CMakeLists.txt": [],
+        "PunchPressVision/UI/PunchPressUI/include/UI/DistortionCalibDialog.h": [],
+        "PunchPressVision/UI/PunchPressUI/include/UI/HalconView.h": [],
+        "PunchPressVision/UI/PunchPressUI/include/UI/ModelEditorDialog.h": [],
+        "PunchPressVision/UI/PunchPressUI/include/UI/ModelManagerDialog.h": [],
+        "PunchPressVision/UI/PunchPressUI/include/UI/NinePointCalibDialog.h": [],
+        "PunchPressVision/UI/PunchPressUI/include/UI/PunchPress.h": [],
+        "PunchPressVision/UI/PunchPressUI/include/UI/SpliceDialog.h": [],
+        "PunchPressVision/UI/PunchPressUI/qrc/PunchPress.qrc": [],
+        "PunchPressVision/UI/PunchPressUI/src/DistortionCalibDialog.cpp": [],
+        "PunchPressVision/UI/PunchPressUI/src/ModelEditorDialog.cpp": [],
+        "PunchPressVision/UI/PunchPressUI/src/ModelManagerDialog.cpp": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 12,
+      "files": [
+        {
+          "path": "PunchPressVision/UI/PunchPressUI/src/NinePointCalibDialog.cpp",
+          "language": "cpp",
+          "sizeLines": 76,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp",
+          "language": "cpp",
+          "sizeLines": 262,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/PunchPressUI/src/SpliceDialog.cpp",
+          "language": "cpp",
+          "sizeLines": 61,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/PunchPressUI/ui/Dlg_changeshapemodel.ui",
+          "language": "ui",
+          "sizeLines": 695,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/PunchPressUI/ui/Dlg_createshapemodel.ui",
+          "language": "ui",
+          "sizeLines": 1760,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/PunchPressUI/ui/Dlg_ImageStitching.ui",
+          "language": "ui",
+          "sizeLines": 1294,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/PunchPressUI/ui/Dlg_jibianjiaozheng.ui",
+          "language": "ui",
+          "sizeLines": 1703,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/PunchPressUI/ui/Dlg_OffSet.ui",
+          "language": "ui",
+          "sizeLines": 1284,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/PunchPressUI/ui/DlgJiudianbiaoding.ui",
+          "language": "ui",
+          "sizeLines": 1129,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/PunchPressUI/ui/LoadingDialog.ui",
+          "language": "ui",
+          "sizeLines": 22,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/PunchPressUI/ui/PunchPress.ui",
+          "language": "ui",
+          "sizeLines": 1411,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/src/main.cpp",
+          "language": "cpp",
+          "sizeLines": 43,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/CMakeLists.txt",
+          "language": "txt",
+          "sizeLines": 52,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/include/Dlg_changeshapemodel.h",
+          "language": "c",
+          "sizeLines": 84,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/include/Dlg_createshapemodel.h",
+          "language": "c",
+          "sizeLines": 160,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/include/Dlg_ImageStitching.h",
+          "language": "c",
+          "sizeLines": 119,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/include/Dlg_jibianjiaozheng.h",
+          "language": "c",
+          "sizeLines": 122,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/include/Dlg_OffSet.h",
+          "language": "c",
+          "sizeLines": 58,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/include/DlgCloseForm.h",
+          "language": "c",
+          "sizeLines": 28,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/include/DlgJiudianbiaoding.h",
+          "language": "c",
+          "sizeLines": 180,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/include/DraggableListWidget.h",
+          "language": "c",
+          "sizeLines": 43,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/include/ImageEnlargedDisplay.h",
+          "language": "c",
+          "sizeLines": 56,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/include/LoadingDialog.h",
+          "language": "c",
+          "sizeLines": 26,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/include/PictureViewerThumbnails.h",
+          "language": "c",
+          "sizeLines": 145,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/include/PictureViewerUtilty.h",
+          "language": "c",
+          "sizeLines": 43,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "PunchPressVision/UI/PunchPressUI/src/NinePointCalibDialog.cpp": [],
+        "PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp": [],
+        "PunchPressVision/UI/PunchPressUI/src/SpliceDialog.cpp": [],
+        "PunchPressVision/UI/PunchPressUI/ui/Dlg_changeshapemodel.ui": [],
+        "PunchPressVision/UI/PunchPressUI/ui/Dlg_createshapemodel.ui": [],
+        "PunchPressVision/UI/PunchPressUI/ui/Dlg_ImageStitching.ui": [],
+        "PunchPressVision/UI/PunchPressUI/ui/Dlg_jibianjiaozheng.ui": [],
+        "PunchPressVision/UI/PunchPressUI/ui/Dlg_OffSet.ui": [],
+        "PunchPressVision/UI/PunchPressUI/ui/DlgJiudianbiaoding.ui": [],
+        "PunchPressVision/UI/PunchPressUI/ui/LoadingDialog.ui": [],
+        "PunchPressVision/UI/PunchPressUI/ui/PunchPress.ui": [],
+        "PunchPressVision/UI/src/main.cpp": [],
+        "PunchPressVision/UI/UIModule/CMakeLists.txt": [],
+        "PunchPressVision/UI/UIModule/include/Dlg_changeshapemodel.h": [],
+        "PunchPressVision/UI/UIModule/include/Dlg_createshapemodel.h": [],
+        "PunchPressVision/UI/UIModule/include/Dlg_ImageStitching.h": [],
+        "PunchPressVision/UI/UIModule/include/Dlg_jibianjiaozheng.h": [],
+        "PunchPressVision/UI/UIModule/include/Dlg_OffSet.h": [],
+        "PunchPressVision/UI/UIModule/include/DlgCloseForm.h": [],
+        "PunchPressVision/UI/UIModule/include/DlgJiudianbiaoding.h": [],
+        "PunchPressVision/UI/UIModule/include/DraggableListWidget.h": [],
+        "PunchPressVision/UI/UIModule/include/ImageEnlargedDisplay.h": [],
+        "PunchPressVision/UI/UIModule/include/LoadingDialog.h": [],
+        "PunchPressVision/UI/UIModule/include/PictureViewerThumbnails.h": [],
+        "PunchPressVision/UI/UIModule/include/PictureViewerUtilty.h": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 13,
+      "files": [
+        {
+          "path": "PunchPressVision/UI/UIModule/include/PunchPress.h",
+          "language": "c",
+          "sizeLines": 148,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/qrc/Dlg_createshapemodel.qrc",
+          "language": "qrc",
+          "sizeLines": 4,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/qrc/PunchPress.qrc",
+          "language": "qrc",
+          "sizeLines": 5,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/src/Dlg_changeshapemodel.cpp",
+          "language": "cpp",
+          "sizeLines": 65,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/src/Dlg_createshapemodel.cpp",
+          "language": "cpp",
+          "sizeLines": 100,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/src/Dlg_ImageStitching.cpp",
+          "language": "cpp",
+          "sizeLines": 76,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/src/Dlg_jibianjiaozheng.cpp",
+          "language": "cpp",
+          "sizeLines": 72,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/src/Dlg_OffSet.cpp",
+          "language": "cpp",
+          "sizeLines": 36,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/src/DlgCloseForm.cpp",
+          "language": "cpp",
+          "sizeLines": 118,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/src/DlgJiudianbiaoding.cpp",
+          "language": "cpp",
+          "sizeLines": 120,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/src/DraggableListWidget.cpp",
+          "language": "cpp",
+          "sizeLines": 0,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/src/ImageEnlargedDisplay.cpp",
+          "language": "cpp",
+          "sizeLines": 171,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/src/LoadingDialog.cpp",
+          "language": "cpp",
+          "sizeLines": 25,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/src/PictureViewerThumbnails.cpp",
+          "language": "cpp",
+          "sizeLines": 708,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/src/PictureViewerUtilty.cpp",
+          "language": "cpp",
+          "sizeLines": 202,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/src/PunchPress.cpp",
+          "language": "cpp",
+          "sizeLines": 250,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/src/rqw_LabelClickable.cpp",
+          "language": "cpp",
+          "sizeLines": 14,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/src/rqw_LabelWarning.cpp",
+          "language": "cpp",
+          "sizeLines": 220,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/src/WarningInfoList.cpp",
+          "language": "cpp",
+          "sizeLines": 55,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/src/WarnUtilty.cpp",
+          "language": "cpp",
+          "sizeLines": 7,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/ui/Dlg_changeshapemodel.ui",
+          "language": "ui",
+          "sizeLines": 695,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/ui/Dlg_createshapemodel.ui",
+          "language": "ui",
+          "sizeLines": 1760,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/ui/Dlg_ImageStitching.ui",
+          "language": "ui",
+          "sizeLines": 1294,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/ui/Dlg_jibianjiaozheng.ui",
+          "language": "ui",
+          "sizeLines": 1703,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/ui/Dlg_OffSet.ui",
+          "language": "ui",
+          "sizeLines": 1284,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "PunchPressVision/UI/UIModule/include/PunchPress.h": [],
+        "PunchPressVision/UI/UIModule/qrc/Dlg_createshapemodel.qrc": [],
+        "PunchPressVision/UI/UIModule/qrc/PunchPress.qrc": [],
+        "PunchPressVision/UI/UIModule/src/Dlg_changeshapemodel.cpp": [],
+        "PunchPressVision/UI/UIModule/src/Dlg_createshapemodel.cpp": [],
+        "PunchPressVision/UI/UIModule/src/Dlg_ImageStitching.cpp": [],
+        "PunchPressVision/UI/UIModule/src/Dlg_jibianjiaozheng.cpp": [],
+        "PunchPressVision/UI/UIModule/src/Dlg_OffSet.cpp": [],
+        "PunchPressVision/UI/UIModule/src/DlgCloseForm.cpp": [],
+        "PunchPressVision/UI/UIModule/src/DlgJiudianbiaoding.cpp": [],
+        "PunchPressVision/UI/UIModule/src/DraggableListWidget.cpp": [],
+        "PunchPressVision/UI/UIModule/src/ImageEnlargedDisplay.cpp": [],
+        "PunchPressVision/UI/UIModule/src/LoadingDialog.cpp": [],
+        "PunchPressVision/UI/UIModule/src/PictureViewerThumbnails.cpp": [],
+        "PunchPressVision/UI/UIModule/src/PictureViewerUtilty.cpp": [],
+        "PunchPressVision/UI/UIModule/src/PunchPress.cpp": [],
+        "PunchPressVision/UI/UIModule/src/rqw_LabelClickable.cpp": [],
+        "PunchPressVision/UI/UIModule/src/rqw_LabelWarning.cpp": [],
+        "PunchPressVision/UI/UIModule/src/WarningInfoList.cpp": [],
+        "PunchPressVision/UI/UIModule/src/WarnUtilty.cpp": [],
+        "PunchPressVision/UI/UIModule/ui/Dlg_changeshapemodel.ui": [],
+        "PunchPressVision/UI/UIModule/ui/Dlg_createshapemodel.ui": [],
+        "PunchPressVision/UI/UIModule/ui/Dlg_ImageStitching.ui": [],
+        "PunchPressVision/UI/UIModule/ui/Dlg_jibianjiaozheng.ui": [],
+        "PunchPressVision/UI/UIModule/ui/Dlg_OffSet.ui": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 14,
+      "files": [
+        {
+          "path": "PunchPressVision/UI/UIModule/ui/DlgCloseForm.ui",
+          "language": "ui",
+          "sizeLines": 295,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/ui/DlgJiudianbiaoding.ui",
+          "language": "ui",
+          "sizeLines": 1129,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/ui/LoadingDialog.ui",
+          "language": "ui",
+          "sizeLines": 22,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/ui/PicturesViewer.ui",
+          "language": "ui",
+          "sizeLines": 592,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/ui/PictureViewerThumbnails.ui",
+          "language": "ui",
+          "sizeLines": 454,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/ui/PictureViewerUtilty.ui",
+          "language": "ui",
+          "sizeLines": 224,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/ui/PunchPress.ui",
+          "language": "ui",
+          "sizeLines": 1411,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/ui/rqw_ImageEnlargedDisplay.ui",
+          "language": "ui",
+          "sizeLines": 187,
+          "fileCategory": "code"
+        },
+        {
+          "path": "PunchPressVision/UI/UIModule/ui/WarningInfoList.ui",
+          "language": "ui",
+          "sizeLines": 244,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "PunchPressVision/UI/UIModule/ui/DlgCloseForm.ui": [],
+        "PunchPressVision/UI/UIModule/ui/DlgJiudianbiaoding.ui": [],
+        "PunchPressVision/UI/UIModule/ui/LoadingDialog.ui": [],
+        "PunchPressVision/UI/UIModule/ui/PicturesViewer.ui": [],
+        "PunchPressVision/UI/UIModule/ui/PictureViewerThumbnails.ui": [],
+        "PunchPressVision/UI/UIModule/ui/PictureViewerUtilty.ui": [],
+        "PunchPressVision/UI/UIModule/ui/PunchPress.ui": [],
+        "PunchPressVision/UI/UIModule/ui/rqw_ImageEnlargedDisplay.ui": [],
+        "PunchPressVision/UI/UIModule/ui/WarningInfoList.ui": []
+      },
+      "neighborMap": {}
+    }
+  ]
+}

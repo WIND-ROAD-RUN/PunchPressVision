@@ -1,0 +1,442 @@
+{
+  "nodes": [
+    {
+      "id": "file:PunchPressVision/infrastructure/LightIOModule/test/src/LightIOModule.t.cpp",
+      "type": "file",
+      "name": "LightIOModule.t.cpp",
+      "filePath": "PunchPressVision/infrastructure/LightIOModule/test/src/LightIOModule.t.cpp",
+      "summary": "LightIOModule 模块的测试桩文件，仅包含空的 main 入口函数，尚未实现实际测试逻辑。",
+      "tags": ["test", "stub", "entry-point"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:PunchPressVision/infrastructure/NinePointModule/CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/infrastructure/NinePointModule/CMakeLists.txt",
+      "summary": "NinePointModule 静态库的 CMake 构建配置，链接 global::global 和 Halcon 依赖，设置 inf::NinePointModule 命名空间别名。",
+      "tags": ["build-system", "configuration", "cmake"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/Config/NinePointConfig.hpp",
+      "type": "file",
+      "name": "NinePointConfig.hpp",
+      "filePath": "PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/Config/NinePointConfig.hpp",
+      "summary": "九点标定配置数据结构声明，包含测量矩形参数、单应性矩阵及标定板参数，提供 saveInDir/loadInDir 持久化接口。",
+      "tags": ["data-model", "configuration", "calibration"],
+      "complexity": "simple",
+      "languageNotes": "使用 HalconCpp::HTuple 存储单应性矩阵，体现 Halcon 视觉算法集成。"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/NinePointModule.hpp",
+      "type": "file",
+      "name": "NinePointModule.hpp",
+      "filePath": "PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/NinePointModule.hpp",
+      "summary": "九点标定基础设施模块类声明，继承 global::IInfrastructure，持有 NinePointCfg 配置并实现 build/destroy/save 生命周期方法。",
+      "tags": ["infrastructure", "calibration", "service"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/NinePointModulePath.hpp",
+      "type": "file",
+      "name": "NinePointModulePath.hpp",
+      "filePath": "PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/NinePointModulePath.hpp",
+      "summary": "定义 NinePointModule 在项目根目录下的存储路径常量（NinePointModule 子目录），使用 inline 匿名结构体实现。",
+      "tags": ["configuration", "path-definition"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/NinePointModuleTypes.hpp",
+      "type": "file",
+      "name": "NinePointModuleTypes.hpp",
+      "filePath": "PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/NinePointModuleTypes.hpp",
+      "summary": "NinePointModule 的类型定义占位文件，当前仅包含空的 inf 命名空间，为后续类型扩展预留。",
+      "tags": ["type-definition", "placeholder"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp",
+      "type": "file",
+      "name": "NinePointConfig.cpp",
+      "filePath": "PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp",
+      "summary": "NinePointCfg 的持久化实现，包含原子文件写入（replaceFile）、Halcon Tuple 安全读写及基于文本行的参数序列化/反序列化逻辑。",
+      "tags": ["serialization", "persistence", "halcon-integration"],
+      "complexity": "complex",
+      "languageNotes": "通过先写临时文件再 rename 的方式实现原子文件替换；使用 key=value 文本行格式进行参数序列化。"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/NinePointModule/src/NinePointModule.cpp",
+      "type": "file",
+      "name": "NinePointModule.cpp",
+      "filePath": "PunchPressVision/infrastructure/NinePointModule/src/NinePointModule.cpp",
+      "summary": "NinePointModule 生命周期实现：build 时从磁盘加载标定配置，destroy 时自动保存配置，save 方法提供主动持久化。",
+      "tags": ["infrastructure", "lifecycle", "calibration"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/NinePointModule/src/NinePointModulePath.cpp",
+      "type": "file",
+      "name": "NinePointModulePath.cpp",
+      "filePath": "PunchPressVision/infrastructure/NinePointModule/src/NinePointModulePath.cpp",
+      "summary": "路径定义源文件，仅包含 NinePointModulePath.hpp 的单个 include，用于触发 inline 变量的编译实例化。",
+      "tags": ["path-definition", "include-forwarder"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/NinePointModule/src/NinePointModuleTypes.cpp",
+      "type": "file",
+      "name": "NinePointModuleTypes.cpp",
+      "filePath": "PunchPressVision/infrastructure/NinePointModule/src/NinePointModuleTypes.cpp",
+      "summary": "类型定义源文件占位，当前仅包含对应的头文件 include，无实际类型实现代码。",
+      "tags": ["type-definition", "placeholder"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:PunchPressVision/infrastructure/NinePointModule/test/CMakeLists.txt",
+      "type": "document",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/infrastructure/NinePointModule/test/CMakeLists.txt",
+      "summary": "NinePointModule 测试可执行文件的 CMake 构建配置，生成 Test_inf_NinePointModule，链接 inf::ConfigModule。",
+      "tags": ["build-system", "test", "cmake"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/NinePointModule/test/include/NinePointModule.t.hpp",
+      "type": "file",
+      "name": "NinePointModule.t.hpp",
+      "filePath": "PunchPressVision/infrastructure/NinePointModule/test/include/NinePointModule.t.hpp",
+      "summary": "NinePointModule 测试头文件占位，当前仅包含 #pragma once，尚未定义测试类或测试夹具。",
+      "tags": ["test", "placeholder", "stub"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/infrastructure/NinePointModule/test/src/NinePointModule.t.cpp",
+      "type": "file",
+      "name": "NinePointModule.t.cpp",
+      "filePath": "PunchPressVision/infrastructure/NinePointModule/test/src/NinePointModule.t.cpp",
+      "summary": "NinePointModule 测试实现文件，仅包含空的 main 入口函数，尚未编写实际测试用例。",
+      "tags": ["test", "stub", "entry-point"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/Config/NinePointConfig.hpp:NinePointCfg",
+      "type": "class",
+      "name": "NinePointCfg",
+      "filePath": "PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/Config/NinePointConfig.hpp",
+      "lineRange": [6, 31],
+      "summary": "九点标定配置数据类，封装测量矩形参数（长度、阈值）、标定板参数（行列数、间距）及标定结果的单应性矩阵 HTuple，提供 saveInDir/loadInDir 持久化。",
+      "tags": ["data-model", "configuration", "calibration"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/NinePointModule.hpp:NinePointModule",
+      "type": "class",
+      "name": "NinePointModule",
+      "filePath": "PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/NinePointModule.hpp",
+      "lineRange": [8, 17],
+      "summary": "九点标定基础设施模块，继承 global::IInfrastructure，管理 NinePointCfg 配置的完整生命周期：build 加载、destroy 保存。",
+      "tags": ["infrastructure", "service", "calibration"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp:readTupleSafe",
+      "type": "function",
+      "name": "readTupleSafe",
+      "filePath": "PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp",
+      "lineRange": [42, 55],
+      "summary": "安全地从文件读取 Halcon Tuple，检查文件存在性并处理异常，封装 HalconCpp::ReadTuple 调用。",
+      "tags": ["serialization", "halcon-integration", "io"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp:writeParamsSafe",
+      "type": "function",
+      "name": "writeParamsSafe",
+      "filePath": "PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp",
+      "lineRange": [57, 81],
+      "summary": "以 key=value 文本行格式将九点标定的 10 个参数原子写入文件，采用先写临时文件再 rename 的策略。",
+      "tags": ["serialization", "io", "persistence"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp:readParamsSafe",
+      "type": "function",
+      "name": "readParamsSafe",
+      "filePath": "PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp",
+      "lineRange": [83, 134],
+      "summary": "从 key=value 文本行文件解析九点标定的 10 个参数，跳过空行和注释行，使用 std::stod/stoi 进行浮点和整数转换。",
+      "tags": ["serialization", "parsing", "io"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp:saveInDir",
+      "type": "function",
+      "name": "saveInDir",
+      "filePath": "PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp",
+      "lineRange": [137, 152],
+      "summary": "将九点标定配置（单应性矩阵 Tuple + 标定参数文本文件）保存到指定目录。",
+      "tags": ["serialization", "persistence", "io"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp:loadInDir",
+      "type": "function",
+      "name": "loadInDir",
+      "filePath": "PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp",
+      "lineRange": [154, 179],
+      "summary": "从指定目录加载九点标定配置（单应性矩阵 Tuple + 标定参数文本文件），恢复完整标定状态。",
+      "tags": ["serialization", "io", "deserialization"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/NinePointModule/src/NinePointModule.cpp:build",
+      "type": "function",
+      "name": "build",
+      "filePath": "PunchPressVision/infrastructure/NinePointModule/src/NinePointModule.cpp",
+      "lineRange": [7, 10],
+      "summary": "IInfrastructure 生命周期方法，从 NinePointModulePath.RootPath 加载九点标定配置数据。",
+      "tags": ["lifecycle", "infrastructure"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/NinePointModule/src/NinePointModule.cpp:destroy",
+      "type": "function",
+      "name": "destroy",
+      "filePath": "PunchPressVision/infrastructure/NinePointModule/src/NinePointModule.cpp",
+      "lineRange": [12, 15],
+      "summary": "IInfrastructure 生命周期方法，销毁前自动调用 save 将当前标定配置持久化到磁盘。",
+      "tags": ["lifecycle", "infrastructure"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/infrastructure/NinePointModule/src/NinePointModule.cpp:save",
+      "type": "function",
+      "name": "save",
+      "filePath": "PunchPressVision/infrastructure/NinePointModule/src/NinePointModule.cpp",
+      "lineRange": [17, 20],
+      "summary": "将当前九点标定配置 ninePointConfig 持久化保存到 NinePointModulePath.RootPath 目录。",
+      "tags": ["persistence", "serialization"],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/Config/NinePointConfig.hpp",
+      "target": "class:PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/Config/NinePointConfig.hpp:NinePointCfg",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/NinePointModule.hpp",
+      "target": "class:PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/NinePointModule.hpp:NinePointModule",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp:readTupleSafe",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp:writeParamsSafe",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp:readParamsSafe",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp:saveInDir",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp:loadInDir",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/NinePointModule/src/NinePointModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/NinePointModule/src/NinePointModule.cpp:build",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/NinePointModule/src/NinePointModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/NinePointModule/src/NinePointModule.cpp:destroy",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/NinePointModule/src/NinePointModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/NinePointModule/src/NinePointModule.cpp:save",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/Config/NinePointConfig.hpp",
+      "target": "class:PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/Config/NinePointConfig.hpp:NinePointCfg",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/NinePointModule.hpp",
+      "target": "class:PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/NinePointModule.hpp:NinePointModule",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp:readTupleSafe",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp:writeParamsSafe",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp:readParamsSafe",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp:saveInDir",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp",
+      "target": "function:PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp:loadInDir",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/NinePointModule/src/NinePointModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/NinePointModule/src/NinePointModule.cpp:build",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/NinePointModule/src/NinePointModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/NinePointModule/src/NinePointModule.cpp:destroy",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/NinePointModule/src/NinePointModule.cpp",
+      "target": "function:PunchPressVision/infrastructure/NinePointModule/src/NinePointModule.cpp:save",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp:saveInDir",
+      "target": "function:PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp:writeParamsSafe",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp:loadInDir",
+      "target": "function:PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp:readParamsSafe",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/NinePointModule/src/NinePointModule.cpp:build",
+      "target": "function:PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp:loadInDir",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/NinePointModule/src/NinePointModule.cpp:destroy",
+      "target": "function:PunchPressVision/infrastructure/NinePointModule/src/NinePointModule.cpp:save",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:PunchPressVision/infrastructure/NinePointModule/src/NinePointModule.cpp:save",
+      "target": "function:PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp:saveInDir",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "document:PunchPressVision/infrastructure/NinePointModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/infrastructure/NinePointModule/include/infrastructure/NinePointModule/NinePointModule.hpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/infrastructure/NinePointModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/infrastructure/NinePointModule/src/NinePointModule.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/infrastructure/NinePointModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:PunchPressVision/infrastructure/NinePointModule/test/CMakeLists.txt",
+      "target": "file:PunchPressVision/infrastructure/NinePointModule/test/src/NinePointModule.t.cpp",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/NinePointModule/src/Config/NinePointConfig.cpp",
+      "target": "file:PunchPressVision/infrastructure/NinePointModule/test/src/NinePointModule.t.cpp",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:PunchPressVision/infrastructure/NinePointModule/src/NinePointModule.cpp",
+      "target": "file:PunchPressVision/infrastructure/NinePointModule/test/src/NinePointModule.t.cpp",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    }
+  ]
+}

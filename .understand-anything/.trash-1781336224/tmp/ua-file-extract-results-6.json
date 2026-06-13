@@ -1,0 +1,1636 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 25,
+  "filesSkipped": [],
+  "results": [
+    {
+      "path": "PunchPressVision/Business/CalibBun/test/include/CalibBun.t.hpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 2,
+      "nonEmptyLines": 1,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/Business/CalibBun/test/src/CalibBun.t.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 7,
+      "nonEmptyLines": 5,
+      "functions": [
+        {
+          "name": "main",
+          "startLine": 3,
+          "endLine": 7,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "main",
+          "line": 3,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/Business/CameraBun/CMakeLists.txt",
+      "language": "txt",
+      "fileCategory": "docs",
+      "totalLines": 33,
+      "nonEmptyLines": 26,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/Business/CameraBun/include/Business/CameraBun/CameraBun.hpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 54,
+      "nonEmptyLines": 42,
+      "classes": [
+        {
+          "name": "CameraBun",
+          "startLine": 17,
+          "endLine": 53,
+          "methods": [
+            "build",
+            "destroy",
+            "start",
+            "stop",
+            "setSpliceEnabled",
+            "callBackFunc",
+            "cameraConnectionStateChanged",
+            "callBackFunWithCalib",
+            "applyUndistort",
+            "applyNinePointTransform"
+          ],
+          "properties": [
+            "public",
+            "inf_",
+            "stitchMutex_",
+            "cam1Buffer_",
+            "cam2Buffer_",
+            "cam1Ready_",
+            "cam2Ready_",
+            "spliceEnabled_"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "callBackFunc",
+          "line": 33,
+          "isDefault": false
+        },
+        {
+          "name": "cameraConnectionStateChanged",
+          "line": 36,
+          "isDefault": false
+        },
+        {
+          "name": "callBackFunWithCalib",
+          "line": 37,
+          "isDefault": false
+        },
+        {
+          "name": "CameraBun",
+          "line": 17,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 4,
+        "functionCount": 0,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "PunchPressVision/Business/CameraBun/include/Business/CameraBun/CameraImgConvert.hpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 15,
+      "nonEmptyLines": 13,
+      "classes": [
+        {
+          "name": "CameraImgConvert",
+          "startLine": 8,
+          "endLine": 14,
+          "methods": [
+            "cvMatToHImage",
+            "cvMatToHImageFast"
+          ],
+          "properties": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "cvMatToHImage",
+          "line": 11,
+          "isDefault": false
+        },
+        {
+          "name": "cvMatToHImageFast",
+          "line": 13,
+          "isDefault": false
+        },
+        {
+          "name": "CameraImgConvert",
+          "line": 8,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 3,
+        "functionCount": 0,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "PunchPressVision/Business/CameraBun/src/CameraBun.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 131,
+      "nonEmptyLines": 114,
+      "functions": [
+        {
+          "name": "CameraBun",
+          "startLine": 7,
+          "endLine": 10,
+          "params": [
+            "inf"
+          ]
+        },
+        {
+          "name": "build",
+          "startLine": 12,
+          "endLine": 22,
+          "params": []
+        },
+        {
+          "name": "destroy",
+          "startLine": 24,
+          "endLine": 28,
+          "params": []
+        },
+        {
+          "name": "start",
+          "startLine": 30,
+          "endLine": 32,
+          "params": []
+        },
+        {
+          "name": "stop",
+          "startLine": 34,
+          "endLine": 36,
+          "params": []
+        },
+        {
+          "name": "setSpliceEnabled",
+          "startLine": 38,
+          "endLine": 41,
+          "params": [
+            "enabled"
+          ]
+        },
+        {
+          "name": "applyUndistort",
+          "startLine": 43,
+          "endLine": 66,
+          "params": [
+            "image"
+          ]
+        },
+        {
+          "name": "applyNinePointTransform",
+          "startLine": 68,
+          "endLine": 74,
+          "params": [
+            "image"
+          ]
+        },
+        {
+          "name": "callBackFunc",
+          "startLine": 76,
+          "endLine": 130,
+          "params": [
+            "matInfo",
+            "cameraIndex"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "CameraBun",
+          "line": 7,
+          "isDefault": false
+        },
+        {
+          "name": "build",
+          "line": 12,
+          "isDefault": false
+        },
+        {
+          "name": "destroy",
+          "line": 24,
+          "isDefault": false
+        },
+        {
+          "name": "start",
+          "line": 30,
+          "isDefault": false
+        },
+        {
+          "name": "stop",
+          "line": 34,
+          "isDefault": false
+        },
+        {
+          "name": "setSpliceEnabled",
+          "line": 38,
+          "isDefault": false
+        },
+        {
+          "name": "applyUndistort",
+          "line": 43,
+          "isDefault": false
+        },
+        {
+          "name": "applyNinePointTransform",
+          "line": 68,
+          "isDefault": false
+        },
+        {
+          "name": "callBackFunc",
+          "line": 76,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "build",
+          "callee": "QObject::connect",
+          "lineNumber": 17
+        },
+        {
+          "caller": "build",
+          "callee": "get",
+          "lineNumber": 17
+        },
+        {
+          "caller": "build",
+          "callee": "QObject::connect",
+          "lineNumber": 19
+        },
+        {
+          "caller": "build",
+          "callee": "get",
+          "lineNumber": 19
+        },
+        {
+          "caller": "destroy",
+          "callee": "QObject::disconnect",
+          "lineNumber": 27
+        },
+        {
+          "caller": "destroy",
+          "callee": "get",
+          "lineNumber": 27
+        },
+        {
+          "caller": "setSpliceEnabled",
+          "callee": "store",
+          "lineNumber": 40
+        },
+        {
+          "caller": "applyUndistort",
+          "callee": "Length",
+          "lineNumber": 51
+        },
+        {
+          "caller": "applyUndistort",
+          "callee": "ChangeRadialDistortionCamPar",
+          "lineNumber": 55
+        },
+        {
+          "caller": "applyUndistort",
+          "callee": "ChangeRadialDistortionImage",
+          "lineNumber": 58
+        },
+        {
+          "caller": "applyUndistort",
+          "callee": "HObject",
+          "lineNumber": 58
+        },
+        {
+          "caller": "applyUndistort",
+          "callee": "HImage",
+          "lineNumber": 60
+        },
+        {
+          "caller": "callBackFunc",
+          "callee": "CameraImgConvert::cvMatToHImage",
+          "lineNumber": 81
+        },
+        {
+          "caller": "callBackFunc",
+          "callee": "applyUndistort",
+          "lineNumber": 84
+        },
+        {
+          "caller": "callBackFunc",
+          "callee": "applyNinePointTransform",
+          "lineNumber": 87
+        },
+        {
+          "caller": "callBackFunc",
+          "callee": "load",
+          "lineNumber": 90
+        },
+        {
+          "caller": "callBackFunc",
+          "callee": "store",
+          "lineNumber": 96
+        },
+        {
+          "caller": "callBackFunc",
+          "callee": "store",
+          "lineNumber": 101
+        },
+        {
+          "caller": "callBackFunc",
+          "callee": "load",
+          "lineNumber": 104
+        },
+        {
+          "caller": "callBackFunc",
+          "callee": "load",
+          "lineNumber": 105
+        },
+        {
+          "caller": "callBackFunc",
+          "callee": "IsInitialized",
+          "lineNumber": 111
+        },
+        {
+          "caller": "callBackFunc",
+          "callee": "store",
+          "lineNumber": 116
+        },
+        {
+          "caller": "callBackFunc",
+          "callee": "store",
+          "lineNumber": 117
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 9,
+        "functionCount": 9,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/Business/CameraBun/src/CameraImgConvert.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 92,
+      "nonEmptyLines": 83,
+      "functions": [
+        {
+          "name": "cvMatToHImage",
+          "startLine": 8,
+          "endLine": 60,
+          "params": [
+            "mat"
+          ]
+        },
+        {
+          "name": "cvMatToHImageFast",
+          "startLine": 62,
+          "endLine": 91,
+          "params": [
+            "mat"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "cvMatToHImage",
+          "line": 8,
+          "isDefault": false
+        },
+        {
+          "name": "cvMatToHImageFast",
+          "line": 62,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "cvMatToHImage",
+          "callee": "empty",
+          "lineNumber": 10
+        },
+        {
+          "caller": "cvMatToHImage",
+          "callee": "HalconCpp::HImage",
+          "lineNumber": 11
+        },
+        {
+          "caller": "cvMatToHImage",
+          "callee": "channels",
+          "lineNumber": 15
+        },
+        {
+          "caller": "cvMatToHImage",
+          "callee": "isContinuous",
+          "lineNumber": 18
+        },
+        {
+          "caller": "cvMatToHImage",
+          "callee": "clone",
+          "lineNumber": 18
+        },
+        {
+          "caller": "cvMatToHImage",
+          "callee": "type",
+          "lineNumber": 23
+        },
+        {
+          "caller": "cvMatToHImage",
+          "callee": "HalconCpp::GenImage1",
+          "lineNumber": 26
+        },
+        {
+          "caller": "cvMatToHImage",
+          "callee": "CopyImage",
+          "lineNumber": 27
+        },
+        {
+          "caller": "cvMatToHImage",
+          "callee": "type",
+          "lineNumber": 29
+        },
+        {
+          "caller": "cvMatToHImage",
+          "callee": "HalconCpp::GenImage1",
+          "lineNumber": 32
+        },
+        {
+          "caller": "cvMatToHImage",
+          "callee": "CopyImage",
+          "lineNumber": 33
+        },
+        {
+          "caller": "cvMatToHImage",
+          "callee": "type",
+          "lineNumber": 39
+        },
+        {
+          "caller": "cvMatToHImage",
+          "callee": "HalconCpp::GenImageInterleaved",
+          "lineNumber": 42
+        },
+        {
+          "caller": "cvMatToHImage",
+          "callee": "CopyImage",
+          "lineNumber": 44
+        },
+        {
+          "caller": "cvMatToHImage",
+          "callee": "type",
+          "lineNumber": 50
+        },
+        {
+          "caller": "cvMatToHImage",
+          "callee": "HalconCpp::GenImageInterleaved",
+          "lineNumber": 53
+        },
+        {
+          "caller": "cvMatToHImage",
+          "callee": "CopyImage",
+          "lineNumber": 55
+        },
+        {
+          "caller": "cvMatToHImage",
+          "callee": "std::runtime_error",
+          "lineNumber": 59
+        },
+        {
+          "caller": "cvMatToHImageFast",
+          "callee": "empty",
+          "lineNumber": 65
+        },
+        {
+          "caller": "cvMatToHImageFast",
+          "callee": "HalconCpp::HImage",
+          "lineNumber": 66
+        },
+        {
+          "caller": "cvMatToHImageFast",
+          "callee": "type",
+          "lineNumber": 72
+        },
+        {
+          "caller": "cvMatToHImageFast",
+          "callee": "HalconCpp::GenImage1",
+          "lineNumber": 75
+        },
+        {
+          "caller": "cvMatToHImageFast",
+          "callee": "HalconCpp::GenImage1",
+          "lineNumber": 78
+        },
+        {
+          "caller": "cvMatToHImageFast",
+          "callee": "HalconCpp::GenImageInterleaved",
+          "lineNumber": 81
+        },
+        {
+          "caller": "cvMatToHImageFast",
+          "callee": "HalconCpp::GenImageInterleaved",
+          "lineNumber": 85
+        },
+        {
+          "caller": "cvMatToHImageFast",
+          "callee": "std::runtime_error",
+          "lineNumber": 89
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 2,
+        "functionCount": 2,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/Business/CameraBun/test/CMakeLists.txt",
+      "language": "txt",
+      "fileCategory": "docs",
+      "totalLines": 23,
+      "nonEmptyLines": 17,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/Business/CameraBun/test/include/CameraBun.t.hpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 2,
+      "nonEmptyLines": 1,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/Business/CameraBun/test/src/CameraBun.t.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 7,
+      "nonEmptyLines": 5,
+      "functions": [
+        {
+          "name": "main",
+          "startLine": 3,
+          "endLine": 7,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "main",
+          "line": 3,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/Business/CMakeLists.txt",
+      "language": "txt",
+      "fileCategory": "docs",
+      "totalLines": 7,
+      "nonEmptyLines": 7,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/Business/LightControlBun/CMakeLists.txt",
+      "language": "txt",
+      "fileCategory": "docs",
+      "totalLines": 33,
+      "nonEmptyLines": 26,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/Business/LightControlBun/include/Business/LightControlBun/LightControlBun.hpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 36,
+      "nonEmptyLines": 29,
+      "classes": [
+        {
+          "name": "LightControlBun",
+          "startLine": 12,
+          "endLine": 35,
+          "methods": [
+            "setUpperLight",
+            "setLowerLight",
+            "getUpperLightState",
+            "getLowerLightState",
+            "build",
+            "destroy",
+            "start",
+            "stop",
+            "upperLightChanged",
+            "lowerLightChanged"
+          ],
+          "properties": [
+            "public",
+            "inf_"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "LightControlBun",
+          "line": 12,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 1,
+        "functionCount": 0,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "PunchPressVision/Business/LightControlBun/src/LightControlBun.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 49,
+      "nonEmptyLines": 40,
+      "functions": [
+        {
+          "name": "LightControlBun",
+          "startLine": 5,
+          "endLine": 8,
+          "params": [
+            "inf"
+          ]
+        },
+        {
+          "name": "setUpperLight",
+          "startLine": 10,
+          "endLine": 15,
+          "params": [
+            "on"
+          ]
+        },
+        {
+          "name": "setLowerLight",
+          "startLine": 17,
+          "endLine": 22,
+          "params": [
+            "on"
+          ]
+        },
+        {
+          "name": "getUpperLightState",
+          "startLine": 24,
+          "endLine": 27,
+          "params": []
+        },
+        {
+          "name": "getLowerLightState",
+          "startLine": 29,
+          "endLine": 32,
+          "params": []
+        },
+        {
+          "name": "build",
+          "startLine": 34,
+          "endLine": 36,
+          "params": []
+        },
+        {
+          "name": "destroy",
+          "startLine": 38,
+          "endLine": 40,
+          "params": []
+        },
+        {
+          "name": "start",
+          "startLine": 42,
+          "endLine": 44,
+          "params": []
+        },
+        {
+          "name": "stop",
+          "startLine": 46,
+          "endLine": 48,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "LightControlBun",
+          "line": 5,
+          "isDefault": false
+        },
+        {
+          "name": "setUpperLight",
+          "line": 10,
+          "isDefault": false
+        },
+        {
+          "name": "setLowerLight",
+          "line": 17,
+          "isDefault": false
+        },
+        {
+          "name": "getUpperLightState",
+          "line": 24,
+          "isDefault": false
+        },
+        {
+          "name": "getLowerLightState",
+          "line": 29,
+          "isDefault": false
+        },
+        {
+          "name": "build",
+          "line": 34,
+          "isDefault": false
+        },
+        {
+          "name": "destroy",
+          "line": 38,
+          "isDefault": false
+        },
+        {
+          "name": "start",
+          "line": 42,
+          "isDefault": false
+        },
+        {
+          "name": "stop",
+          "line": 46,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "setUpperLight",
+          "callee": "setUpperLight",
+          "lineNumber": 13
+        },
+        {
+          "caller": "setLowerLight",
+          "callee": "setLowerLight",
+          "lineNumber": 20
+        },
+        {
+          "caller": "getUpperLightState",
+          "callee": "getUpperLightState",
+          "lineNumber": 26
+        },
+        {
+          "caller": "getLowerLightState",
+          "callee": "getLowerLightState",
+          "lineNumber": 31
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 9,
+        "functionCount": 9,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/Business/LightControlBun/test/CMakeLists.txt",
+      "language": "txt",
+      "fileCategory": "docs",
+      "totalLines": 22,
+      "nonEmptyLines": 17,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/Business/LightControlBun/test/include/LightControlBun.t.hpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 1,
+      "nonEmptyLines": 1,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/Business/LightControlBun/test/src/LightControlBun.t.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 6,
+      "nonEmptyLines": 5,
+      "functions": [
+        {
+          "name": "main",
+          "startLine": 3,
+          "endLine": 6,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "main",
+          "line": 3,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/Business/NinePointBun/CMakeLists.txt",
+      "language": "txt",
+      "fileCategory": "docs",
+      "totalLines": 33,
+      "nonEmptyLines": 26,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/Business/NinePointBun/include/Business/NinePointBun/NinePointBun.hpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 73,
+      "nonEmptyLines": 58,
+      "classes": [
+        {
+          "name": "Point2D",
+          "startLine": 17,
+          "endLine": 21,
+          "methods": [],
+          "properties": [
+            "x",
+            "y"
+          ]
+        },
+        {
+          "name": "PointPair",
+          "startLine": 23,
+          "endLine": 27,
+          "methods": [],
+          "properties": [
+            "pixPosition",
+            "realPosition"
+          ]
+        },
+        {
+          "name": "NinePointBun",
+          "startLine": 29,
+          "endLine": 72,
+          "methods": [
+            "calculateNinePointConfig",
+            "calcPixToWorldHomMat2D",
+            "pixToWorld",
+            "setMechanicalCoords",
+            "startAutoCalibration",
+            "stopAutoCalibration",
+            "calibrationProgress",
+            "calibrationFinished",
+            "runAutoCalibration",
+            "build",
+            "destroy",
+            "start",
+            "stop"
+          ],
+          "properties": [
+            "public",
+            "inf_",
+            "stopRequested_",
+            "worker_",
+            "mechanicalCoords_"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "Point2D",
+          "line": 17,
+          "isDefault": false
+        },
+        {
+          "name": "PointPair",
+          "line": 23,
+          "isDefault": false
+        },
+        {
+          "name": "build",
+          "line": 68,
+          "isDefault": false
+        },
+        {
+          "name": "destroy",
+          "line": 69,
+          "isDefault": false
+        },
+        {
+          "name": "start",
+          "line": 70,
+          "isDefault": false
+        },
+        {
+          "name": "stop",
+          "line": 71,
+          "isDefault": false
+        },
+        {
+          "name": "NinePointBun",
+          "line": 29,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 7,
+        "functionCount": 0,
+        "classCount": 3
+      }
+    },
+    {
+      "path": "PunchPressVision/Business/NinePointBun/src/NinePointBun.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 229,
+      "nonEmptyLines": 194,
+      "functions": [
+        {
+          "name": "NinePointBun",
+          "startLine": 9,
+          "endLine": 12,
+          "params": [
+            "inf"
+          ]
+        },
+        {
+          "name": "~NinePointBun",
+          "startLine": 14,
+          "endLine": 17,
+          "params": []
+        },
+        {
+          "name": "calculateNinePointConfig",
+          "startLine": 19,
+          "endLine": 25,
+          "params": []
+        },
+        {
+          "name": "calcPixToWorldHomMat2D",
+          "startLine": 27,
+          "endLine": 60,
+          "params": [
+            "pixPoints",
+            "worldPoints",
+            "ninePointCfg"
+          ]
+        },
+        {
+          "name": "pixToWorld",
+          "startLine": 62,
+          "endLine": 95,
+          "params": [
+            "homMat2D",
+            "pixX",
+            "pixY",
+            "outWorldX",
+            "outWorldY"
+          ]
+        },
+        {
+          "name": "setMechanicalCoords",
+          "startLine": 97,
+          "endLine": 100,
+          "params": [
+            "coords"
+          ]
+        },
+        {
+          "name": "startAutoCalibration",
+          "startLine": 102,
+          "endLine": 117,
+          "params": [
+            "errorMsg"
+          ]
+        },
+        {
+          "name": "stopAutoCalibration",
+          "startLine": 119,
+          "endLine": 124,
+          "params": []
+        },
+        {
+          "name": "runAutoCalibration",
+          "startLine": 126,
+          "endLine": 210,
+          "params": []
+        },
+        {
+          "name": "build",
+          "startLine": 212,
+          "endLine": 214,
+          "params": []
+        },
+        {
+          "name": "destroy",
+          "startLine": 216,
+          "endLine": 219,
+          "params": []
+        },
+        {
+          "name": "start",
+          "startLine": 221,
+          "endLine": 223,
+          "params": []
+        },
+        {
+          "name": "stop",
+          "startLine": 225,
+          "endLine": 228,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "NinePointBun",
+          "line": 9,
+          "isDefault": false
+        },
+        {
+          "name": "~NinePointBun",
+          "line": 14,
+          "isDefault": false
+        },
+        {
+          "name": "calculateNinePointConfig",
+          "line": 19,
+          "isDefault": false
+        },
+        {
+          "name": "calcPixToWorldHomMat2D",
+          "line": 27,
+          "isDefault": false
+        },
+        {
+          "name": "pixToWorld",
+          "line": 62,
+          "isDefault": false
+        },
+        {
+          "name": "setMechanicalCoords",
+          "line": 97,
+          "isDefault": false
+        },
+        {
+          "name": "startAutoCalibration",
+          "line": 102,
+          "isDefault": false
+        },
+        {
+          "name": "stopAutoCalibration",
+          "line": 119,
+          "isDefault": false
+        },
+        {
+          "name": "runAutoCalibration",
+          "line": 126,
+          "isDefault": false
+        },
+        {
+          "name": "build",
+          "line": 212,
+          "isDefault": false
+        },
+        {
+          "name": "destroy",
+          "line": 216,
+          "isDefault": false
+        },
+        {
+          "name": "start",
+          "line": 221,
+          "isDefault": false
+        },
+        {
+          "name": "stop",
+          "line": 225,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "~NinePointBun",
+          "callee": "stopAutoCalibration",
+          "lineNumber": 16
+        },
+        {
+          "caller": "calculateNinePointConfig",
+          "callee": "startAutoCalibration",
+          "lineNumber": 24
+        },
+        {
+          "caller": "calcPixToWorldHomMat2D",
+          "callee": "HalconCpp::HTuple",
+          "lineNumber": 31
+        },
+        {
+          "caller": "calcPixToWorldHomMat2D",
+          "callee": "size",
+          "lineNumber": 33
+        },
+        {
+          "caller": "calcPixToWorldHomMat2D",
+          "callee": "size",
+          "lineNumber": 33
+        },
+        {
+          "caller": "calcPixToWorldHomMat2D",
+          "callee": "size",
+          "lineNumber": 33
+        },
+        {
+          "caller": "calcPixToWorldHomMat2D",
+          "callee": "size",
+          "lineNumber": 40
+        },
+        {
+          "caller": "calcPixToWorldHomMat2D",
+          "callee": "Append",
+          "lineNumber": 42
+        },
+        {
+          "caller": "calcPixToWorldHomMat2D",
+          "callee": "static_cast<double>",
+          "lineNumber": 42
+        },
+        {
+          "caller": "calcPixToWorldHomMat2D",
+          "callee": "Append",
+          "lineNumber": 43
+        },
+        {
+          "caller": "calcPixToWorldHomMat2D",
+          "callee": "static_cast<double>",
+          "lineNumber": 43
+        },
+        {
+          "caller": "calcPixToWorldHomMat2D",
+          "callee": "Append",
+          "lineNumber": 45
+        },
+        {
+          "caller": "calcPixToWorldHomMat2D",
+          "callee": "static_cast<double>",
+          "lineNumber": 45
+        },
+        {
+          "caller": "calcPixToWorldHomMat2D",
+          "callee": "Append",
+          "lineNumber": 46
+        },
+        {
+          "caller": "calcPixToWorldHomMat2D",
+          "callee": "static_cast<double>",
+          "lineNumber": 46
+        },
+        {
+          "caller": "calcPixToWorldHomMat2D",
+          "callee": "HalconCpp::VectorToHomMat2d",
+          "lineNumber": 52
+        },
+        {
+          "caller": "calcPixToWorldHomMat2D",
+          "callee": "TupleLength",
+          "lineNumber": 53
+        },
+        {
+          "caller": "calcPixToWorldHomMat2D",
+          "callee": "HalconCpp::HTuple",
+          "lineNumber": 57
+        },
+        {
+          "caller": "pixToWorld",
+          "callee": "TupleLength",
+          "lineNumber": 70
+        },
+        {
+          "caller": "pixToWorld",
+          "callee": "HalconCpp::AffineTransPoint2d",
+          "lineNumber": 77
+        },
+        {
+          "caller": "pixToWorld",
+          "callee": "static_cast<double>",
+          "lineNumber": 78
+        },
+        {
+          "caller": "pixToWorld",
+          "callee": "static_cast<double>",
+          "lineNumber": 79
+        },
+        {
+          "caller": "pixToWorld",
+          "callee": "TupleLength",
+          "lineNumber": 83
+        },
+        {
+          "caller": "pixToWorld",
+          "callee": "TupleLength",
+          "lineNumber": 83
+        },
+        {
+          "caller": "pixToWorld",
+          "callee": "D",
+          "lineNumber": 87
+        },
+        {
+          "caller": "pixToWorld",
+          "callee": "D",
+          "lineNumber": 88
+        },
+        {
+          "caller": "startAutoCalibration",
+          "callee": "joinable",
+          "lineNumber": 104
+        },
+        {
+          "caller": "startAutoCalibration",
+          "callee": "size",
+          "lineNumber": 109
+        },
+        {
+          "caller": "startAutoCalibration",
+          "callee": "store",
+          "lineNumber": 114
+        },
+        {
+          "caller": "startAutoCalibration",
+          "callee": "std::thread",
+          "lineNumber": 115
+        },
+        {
+          "caller": "startAutoCalibration",
+          "callee": "runAutoCalibration",
+          "lineNumber": 115
+        },
+        {
+          "caller": "stopAutoCalibration",
+          "callee": "store",
+          "lineNumber": 121
+        },
+        {
+          "caller": "stopAutoCalibration",
+          "callee": "joinable",
+          "lineNumber": 122
+        },
+        {
+          "caller": "stopAutoCalibration",
+          "callee": "join",
+          "lineNumber": 123
+        },
+        {
+          "caller": "runAutoCalibration",
+          "callee": "static_cast<int>",
+          "lineNumber": 130
+        },
+        {
+          "caller": "runAutoCalibration",
+          "callee": "size",
+          "lineNumber": 130
+        },
+        {
+          "caller": "runAutoCalibration",
+          "callee": "get",
+          "lineNumber": 134
+        },
+        {
+          "caller": "runAutoCalibration",
+          "callee": "load",
+          "lineNumber": 138
+        },
+        {
+          "caller": "runAutoCalibration",
+          "callee": "QStringLiteral",
+          "lineNumber": 140
+        },
+        {
+          "caller": "runAutoCalibration",
+          "callee": "isConnected",
+          "lineNumber": 149
+        },
+        {
+          "caller": "runAutoCalibration",
+          "callee": "writeFloat",
+          "lineNumber": 153
+        },
+        {
+          "caller": "runAutoCalibration",
+          "callee": "static_cast<float>",
+          "lineNumber": 153
+        },
+        {
+          "caller": "runAutoCalibration",
+          "callee": "writeFloat",
+          "lineNumber": 154
+        },
+        {
+          "caller": "runAutoCalibration",
+          "callee": "static_cast<float>",
+          "lineNumber": 154
+        },
+        {
+          "caller": "runAutoCalibration",
+          "callee": "writeRegister",
+          "lineNumber": 155
+        },
+        {
+          "caller": "runAutoCalibration",
+          "callee": "static_cast<uint16_t>",
+          "lineNumber": 155
+        },
+        {
+          "caller": "runAutoCalibration",
+          "callee": "isConnected",
+          "lineNumber": 159
+        },
+        {
+          "caller": "runAutoCalibration",
+          "callee": "load",
+          "lineNumber": 162
+        },
+        {
+          "caller": "runAutoCalibration",
+          "callee": "QStringLiteral",
+          "lineNumber": 164
+        },
+        {
+          "caller": "runAutoCalibration",
+          "callee": "readRegister",
+          "lineNumber": 168
+        },
+        {
+          "caller": "runAutoCalibration",
+          "callee": "std::this_thread::sleep_for",
+          "lineNumber": 173
+        },
+        {
+          "caller": "runAutoCalibration",
+          "callee": "std::chrono::milliseconds",
+          "lineNumber": 173
+        },
+        {
+          "caller": "runAutoCalibration",
+          "callee": "QStringLiteral",
+          "lineNumber": 177
+        },
+        {
+          "caller": "runAutoCalibration",
+          "callee": "push_back",
+          "lineNumber": 188
+        },
+        {
+          "caller": "runAutoCalibration",
+          "callee": "push_back",
+          "lineNumber": 189
+        },
+        {
+          "caller": "runAutoCalibration",
+          "callee": "calcPixToWorldHomMat2D",
+          "lineNumber": 194
+        },
+        {
+          "caller": "runAutoCalibration",
+          "callee": "QStringLiteral",
+          "lineNumber": 196
+        },
+        {
+          "caller": "runAutoCalibration",
+          "callee": "save",
+          "lineNumber": 202
+        },
+        {
+          "caller": "runAutoCalibration",
+          "callee": "QStringLiteral",
+          "lineNumber": 204
+        },
+        {
+          "caller": "runAutoCalibration",
+          "callee": "QStringLiteral",
+          "lineNumber": 208
+        },
+        {
+          "caller": "destroy",
+          "callee": "stopAutoCalibration",
+          "lineNumber": 218
+        },
+        {
+          "caller": "stop",
+          "callee": "stopAutoCalibration",
+          "lineNumber": 227
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 13,
+        "functionCount": 13,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/Business/NinePointBun/test/CMakeLists.txt",
+      "language": "txt",
+      "fileCategory": "docs",
+      "totalLines": 23,
+      "nonEmptyLines": 17,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/Business/NinePointBun/test/include/NinePointBun.t.hpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 2,
+      "nonEmptyLines": 1,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/Business/NinePointBun/test/src/NinePointBun.t.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 7,
+      "nonEmptyLines": 5,
+      "functions": [
+        {
+          "name": "main",
+          "startLine": 3,
+          "endLine": 7,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "main",
+          "line": 3,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/Business/ShapeModeManagerBun/CMakeLists.txt",
+      "language": "txt",
+      "fileCategory": "docs",
+      "totalLines": 33,
+      "nonEmptyLines": 26,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/Business/ShapeModeManagerBun/include/Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 99,
+      "nonEmptyLines": 83,
+      "classes": [
+        {
+          "name": "CreateModelRequest",
+          "startLine": 19,
+          "endLine": 38,
+          "methods": [],
+          "properties": [
+            "trainingImage",
+            "roi",
+            "name",
+            "exposure",
+            "gain",
+            "upperLight",
+            "lowerLight",
+            "numLevels",
+            "angleStart",
+            "angleExtent",
+            "angleStep",
+            "optimization",
+            "metric",
+            "contrast",
+            "minContrast"
+          ]
+        },
+        {
+          "name": "MatchResult",
+          "startLine": 41,
+          "endLine": 50,
+          "methods": [],
+          "properties": [
+            "row",
+            "column",
+            "angle",
+            "score",
+            "offsetX",
+            "offsetY",
+            "found"
+          ]
+        },
+        {
+          "name": "ShapeModeManagerBun",
+          "startLine": 52,
+          "endLine": 98,
+          "methods": [
+            "createModel",
+            "deleteModel",
+            "renameModel",
+            "loadModel",
+            "unloadCurrentModel",
+            "isModelLoaded",
+            "currentModelId",
+            "match",
+            "getAllModels",
+            "searchModels",
+            "build",
+            "destroy",
+            "start",
+            "stop",
+            "modelListChanged",
+            "modelLoaded",
+            "modelUnloaded"
+          ],
+          "properties": [
+            "public",
+            "inf_",
+            "currentModelId_",
+            "currentModelHandle_",
+            "currentModelData_",
+            "modelCacheMutex_"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "CreateModelRequest",
+          "line": 19,
+          "isDefault": false
+        },
+        {
+          "name": "MatchResult",
+          "line": 41,
+          "isDefault": false
+        },
+        {
+          "name": "ShapeModeManagerBun",
+          "line": 52,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 3,
+        "functionCount": 0,
+        "classCount": 3
+      }
+    }
+  ]
+}

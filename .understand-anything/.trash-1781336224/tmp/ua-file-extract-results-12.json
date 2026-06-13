@@ -1,0 +1,1692 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 25,
+  "filesSkipped": [],
+  "results": [
+    {
+      "path": "PunchPressVision/UI/PunchPressUI/src/NinePointCalibDialog.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 76,
+      "nonEmptyLines": 65,
+      "functions": [
+        {
+          "name": "NinePointCalibDialog",
+          "startLine": 8,
+          "endLine": 16,
+          "params": [
+            "app",
+            "parent"
+          ]
+        },
+        {
+          "name": "~NinePointCalibDialog",
+          "startLine": 18,
+          "endLine": 21,
+          "params": []
+        },
+        {
+          "name": "buildConnections",
+          "startLine": 23,
+          "endLine": 41,
+          "params": []
+        },
+        {
+          "name": "onStartCalibration",
+          "startLine": 43,
+          "endLine": 58,
+          "params": []
+        },
+        {
+          "name": "onFrameReady",
+          "startLine": 60,
+          "endLine": 65,
+          "params": [
+            "image"
+          ]
+        },
+        {
+          "name": "onCalibrationProgress",
+          "startLine": 67,
+          "endLine": 70,
+          "params": [
+            "currentPoint",
+            "totalPoints"
+          ]
+        },
+        {
+          "name": "onCalibrationFinished",
+          "startLine": 72,
+          "endLine": 75,
+          "params": [
+            "message"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "NinePointCalibDialog",
+          "line": 8,
+          "isDefault": false
+        },
+        {
+          "name": "~NinePointCalibDialog",
+          "line": 18,
+          "isDefault": false
+        },
+        {
+          "name": "buildConnections",
+          "line": 23,
+          "isDefault": false
+        },
+        {
+          "name": "onStartCalibration",
+          "line": 43,
+          "isDefault": false
+        },
+        {
+          "name": "onFrameReady",
+          "line": 60,
+          "isDefault": false
+        },
+        {
+          "name": "onCalibrationProgress",
+          "line": 67,
+          "isDefault": false
+        },
+        {
+          "name": "onCalibrationFinished",
+          "line": 72,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "NinePointCalibDialog",
+          "callee": "setupUi",
+          "lineNumber": 13
+        },
+        {
+          "caller": "NinePointCalibDialog",
+          "callee": "buildConnections",
+          "lineNumber": 14
+        },
+        {
+          "caller": "NinePointCalibDialog",
+          "callee": "ensure",
+          "lineNumber": 15
+        },
+        {
+          "caller": "buildConnections",
+          "callee": "connect",
+          "lineNumber": 25
+        },
+        {
+          "caller": "buildConnections",
+          "callee": "business",
+          "lineNumber": 28
+        },
+        {
+          "caller": "buildConnections",
+          "callee": "connect",
+          "lineNumber": 31
+        },
+        {
+          "caller": "buildConnections",
+          "callee": "get",
+          "lineNumber": 31
+        },
+        {
+          "caller": "buildConnections",
+          "callee": "connect",
+          "lineNumber": 33
+        },
+        {
+          "caller": "buildConnections",
+          "callee": "get",
+          "lineNumber": 33
+        },
+        {
+          "caller": "buildConnections",
+          "callee": "connect",
+          "lineNumber": 38
+        },
+        {
+          "caller": "buildConnections",
+          "callee": "connect",
+          "lineNumber": 40
+        },
+        {
+          "caller": "onStartCalibration",
+          "callee": "business",
+          "lineNumber": 45
+        },
+        {
+          "caller": "onStartCalibration",
+          "callee": "push_back",
+          "lineNumber": 51
+        },
+        {
+          "caller": "onStartCalibration",
+          "callee": "static_cast<double>",
+          "lineNumber": 51
+        },
+        {
+          "caller": "onStartCalibration",
+          "callee": "static_cast<double>",
+          "lineNumber": 52
+        },
+        {
+          "caller": "onStartCalibration",
+          "callee": "setMechanicalCoords",
+          "lineNumber": 53
+        },
+        {
+          "caller": "onStartCalibration",
+          "callee": "startAutoCalibration",
+          "lineNumber": 56
+        },
+        {
+          "caller": "onStartCalibration",
+          "callee": "setWindowTitle",
+          "lineNumber": 57
+        },
+        {
+          "caller": "onStartCalibration",
+          "callee": "QStringLiteral",
+          "lineNumber": 57
+        },
+        {
+          "caller": "onStartCalibration",
+          "callee": "QString::fromStdString",
+          "lineNumber": 57
+        },
+        {
+          "caller": "onFrameReady",
+          "callee": "ensure",
+          "lineNumber": 63
+        },
+        {
+          "caller": "onFrameReady",
+          "callee": "display",
+          "lineNumber": 64
+        },
+        {
+          "caller": "onCalibrationProgress",
+          "callee": "setWindowTitle",
+          "lineNumber": 69
+        },
+        {
+          "caller": "onCalibrationProgress",
+          "callee": "arg",
+          "lineNumber": 69
+        },
+        {
+          "caller": "onCalibrationProgress",
+          "callee": "arg",
+          "lineNumber": 69
+        },
+        {
+          "caller": "onCalibrationProgress",
+          "callee": "QStringLiteral",
+          "lineNumber": 69
+        },
+        {
+          "caller": "onCalibrationFinished",
+          "callee": "setWindowTitle",
+          "lineNumber": 74
+        },
+        {
+          "caller": "onCalibrationFinished",
+          "callee": "QStringLiteral",
+          "lineNumber": 74
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 7,
+        "functionCount": 7,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 262,
+      "nonEmptyLines": 231,
+      "functions": [
+        {
+          "name": "PunchPress",
+          "startLine": 26,
+          "endLine": 46,
+          "params": [
+            "app",
+            "parent"
+          ]
+        },
+        {
+          "name": "~PunchPress",
+          "startLine": 48,
+          "endLine": 52,
+          "params": []
+        },
+        {
+          "name": "buildConnections",
+          "startLine": 54,
+          "endLine": 80,
+          "params": []
+        },
+        {
+          "name": "ensureHalconWindow",
+          "startLine": 82,
+          "endLine": 103,
+          "params": []
+        },
+        {
+          "name": "closeHalconWindow",
+          "startLine": 105,
+          "endLine": 113,
+          "params": []
+        },
+        {
+          "name": "displayImage",
+          "startLine": 115,
+          "endLine": 132,
+          "params": [
+            "image"
+          ]
+        },
+        {
+          "name": "showEvent",
+          "startLine": 134,
+          "endLine": 138,
+          "params": [
+            "e"
+          ]
+        },
+        {
+          "name": "resizeEvent",
+          "startLine": 140,
+          "endLine": 154,
+          "params": [
+            "e"
+          ]
+        },
+        {
+          "name": "onDebugToggled",
+          "startLine": 158,
+          "endLine": 164,
+          "params": [
+            "checked"
+          ]
+        },
+        {
+          "name": "onProductionToggled",
+          "startLine": 166,
+          "endLine": 172,
+          "params": [
+            "checked"
+          ]
+        },
+        {
+          "name": "onUpperLightClicked",
+          "startLine": 174,
+          "endLine": 179,
+          "params": []
+        },
+        {
+          "name": "onLowerLightClicked",
+          "startLine": 181,
+          "endLine": 186,
+          "params": []
+        },
+        {
+          "name": "onDistortionCalib",
+          "startLine": 188,
+          "endLine": 193,
+          "params": []
+        },
+        {
+          "name": "onNinePointCalib",
+          "startLine": 195,
+          "endLine": 200,
+          "params": []
+        },
+        {
+          "name": "onImageStitching",
+          "startLine": 202,
+          "endLine": 207,
+          "params": []
+        },
+        {
+          "name": "onCreateModel",
+          "startLine": 209,
+          "endLine": 213,
+          "params": []
+        },
+        {
+          "name": "onChangeModel",
+          "startLine": 215,
+          "endLine": 219,
+          "params": []
+        },
+        {
+          "name": "onLoadModel",
+          "startLine": 221,
+          "endLine": 225,
+          "params": []
+        },
+        {
+          "name": "onExit",
+          "startLine": 227,
+          "endLine": 230,
+          "params": []
+        },
+        {
+          "name": "onFrameReady",
+          "startLine": 232,
+          "endLine": 235,
+          "params": [
+            "image"
+          ]
+        },
+        {
+          "name": "onPositionResult",
+          "startLine": 237,
+          "endLine": 245,
+          "params": [
+            "result"
+          ]
+        },
+        {
+          "name": "onModeChanged",
+          "startLine": 247,
+          "endLine": 249,
+          "params": []
+        },
+        {
+          "name": "onCameraConnectionChanged",
+          "startLine": 251,
+          "endLine": 256,
+          "params": [
+            "idx",
+            "connected",
+            "reason"
+          ]
+        },
+        {
+          "name": "onStartupCheckFailed",
+          "startLine": 258,
+          "endLine": 261,
+          "params": [
+            "reason"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "PunchPress",
+          "line": 26,
+          "isDefault": false
+        },
+        {
+          "name": "~PunchPress",
+          "line": 48,
+          "isDefault": false
+        },
+        {
+          "name": "buildConnections",
+          "line": 54,
+          "isDefault": false
+        },
+        {
+          "name": "ensureHalconWindow",
+          "line": 82,
+          "isDefault": false
+        },
+        {
+          "name": "closeHalconWindow",
+          "line": 105,
+          "isDefault": false
+        },
+        {
+          "name": "displayImage",
+          "line": 115,
+          "isDefault": false
+        },
+        {
+          "name": "showEvent",
+          "line": 134,
+          "isDefault": false
+        },
+        {
+          "name": "resizeEvent",
+          "line": 140,
+          "isDefault": false
+        },
+        {
+          "name": "onDebugToggled",
+          "line": 158,
+          "isDefault": false
+        },
+        {
+          "name": "onProductionToggled",
+          "line": 166,
+          "isDefault": false
+        },
+        {
+          "name": "onUpperLightClicked",
+          "line": 174,
+          "isDefault": false
+        },
+        {
+          "name": "onLowerLightClicked",
+          "line": 181,
+          "isDefault": false
+        },
+        {
+          "name": "onDistortionCalib",
+          "line": 188,
+          "isDefault": false
+        },
+        {
+          "name": "onNinePointCalib",
+          "line": 195,
+          "isDefault": false
+        },
+        {
+          "name": "onImageStitching",
+          "line": 202,
+          "isDefault": false
+        },
+        {
+          "name": "onCreateModel",
+          "line": 209,
+          "isDefault": false
+        },
+        {
+          "name": "onChangeModel",
+          "line": 215,
+          "isDefault": false
+        },
+        {
+          "name": "onLoadModel",
+          "line": 221,
+          "isDefault": false
+        },
+        {
+          "name": "onExit",
+          "line": 227,
+          "isDefault": false
+        },
+        {
+          "name": "onFrameReady",
+          "line": 232,
+          "isDefault": false
+        },
+        {
+          "name": "onPositionResult",
+          "line": 237,
+          "isDefault": false
+        },
+        {
+          "name": "onModeChanged",
+          "line": 247,
+          "isDefault": false
+        },
+        {
+          "name": "onCameraConnectionChanged",
+          "line": 251,
+          "isDefault": false
+        },
+        {
+          "name": "onStartupCheckFailed",
+          "line": 258,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "PunchPress",
+          "callee": "setupUi",
+          "lineNumber": 31
+        },
+        {
+          "caller": "PunchPress",
+          "callee": "buildConnections",
+          "lineNumber": 32
+        },
+        {
+          "caller": "PunchPress",
+          "callee": "ensureHalconWindow",
+          "lineNumber": 33
+        },
+        {
+          "caller": "PunchPress",
+          "callee": "performStartupCheck",
+          "lineNumber": 37
+        },
+        {
+          "caller": "PunchPress",
+          "callee": "rw::rqwu::MessageBox::warning",
+          "lineNumber": 39
+        },
+        {
+          "caller": "PunchPress",
+          "callee": "QStringLiteral",
+          "lineNumber": 39
+        },
+        {
+          "caller": "PunchPress",
+          "callee": "isEmpty",
+          "lineNumber": 41
+        },
+        {
+          "caller": "PunchPress",
+          "callee": "rw::rqwu::MessageBox::information",
+          "lineNumber": 44
+        },
+        {
+          "caller": "PunchPress",
+          "callee": "QStringLiteral",
+          "lineNumber": 44
+        },
+        {
+          "caller": "~PunchPress",
+          "callee": "closeHalconWindow",
+          "lineNumber": 50
+        },
+        {
+          "caller": "buildConnections",
+          "callee": "connect",
+          "lineNumber": 57
+        },
+        {
+          "caller": "buildConnections",
+          "callee": "connect",
+          "lineNumber": 59
+        },
+        {
+          "caller": "buildConnections",
+          "callee": "connect",
+          "lineNumber": 61
+        },
+        {
+          "caller": "buildConnections",
+          "callee": "connect",
+          "lineNumber": 63
+        },
+        {
+          "caller": "buildConnections",
+          "callee": "connect",
+          "lineNumber": 65
+        },
+        {
+          "caller": "buildConnections",
+          "callee": "connect",
+          "lineNumber": 69
+        },
+        {
+          "caller": "buildConnections",
+          "callee": "connect",
+          "lineNumber": 70
+        },
+        {
+          "caller": "buildConnections",
+          "callee": "connect",
+          "lineNumber": 71
+        },
+        {
+          "caller": "buildConnections",
+          "callee": "connect",
+          "lineNumber": 72
+        },
+        {
+          "caller": "buildConnections",
+          "callee": "connect",
+          "lineNumber": 73
+        },
+        {
+          "caller": "buildConnections",
+          "callee": "connect",
+          "lineNumber": 74
+        },
+        {
+          "caller": "buildConnections",
+          "callee": "connect",
+          "lineNumber": 75
+        },
+        {
+          "caller": "buildConnections",
+          "callee": "connect",
+          "lineNumber": 76
+        },
+        {
+          "caller": "buildConnections",
+          "callee": "connect",
+          "lineNumber": 77
+        },
+        {
+          "caller": "buildConnections",
+          "callee": "connect",
+          "lineNumber": 78
+        },
+        {
+          "caller": "buildConnections",
+          "callee": "connect",
+          "lineNumber": 79
+        },
+        {
+          "caller": "ensureHalconWindow",
+          "callee": "Length",
+          "lineNumber": 85
+        },
+        {
+          "caller": "ensureHalconWindow",
+          "callee": "static_cast<Hlong>",
+          "lineNumber": 94
+        },
+        {
+          "caller": "ensureHalconWindow",
+          "callee": "winId",
+          "lineNumber": 94
+        },
+        {
+          "caller": "ensureHalconWindow",
+          "callee": "OpenWindow",
+          "lineNumber": 95
+        },
+        {
+          "caller": "ensureHalconWindow",
+          "callee": "width",
+          "lineNumber": 95
+        },
+        {
+          "caller": "ensureHalconWindow",
+          "callee": "height",
+          "lineNumber": 95
+        },
+        {
+          "caller": "ensureHalconWindow",
+          "callee": "SetWindowAttr",
+          "lineNumber": 96
+        },
+        {
+          "caller": "closeHalconWindow",
+          "callee": "Length",
+          "lineNumber": 108
+        },
+        {
+          "caller": "closeHalconWindow",
+          "callee": "CloseWindow",
+          "lineNumber": 110
+        },
+        {
+          "caller": "closeHalconWindow",
+          "callee": "HTuple",
+          "lineNumber": 112
+        },
+        {
+          "caller": "displayImage",
+          "callee": "IsInitialized",
+          "lineNumber": 118
+        },
+        {
+          "caller": "displayImage",
+          "callee": "Length",
+          "lineNumber": 118
+        },
+        {
+          "caller": "displayImage",
+          "callee": "GetImageSize",
+          "lineNumber": 123
+        },
+        {
+          "caller": "displayImage",
+          "callee": "SetPart",
+          "lineNumber": 124
+        },
+        {
+          "caller": "displayImage",
+          "callee": "I",
+          "lineNumber": 124
+        },
+        {
+          "caller": "displayImage",
+          "callee": "I",
+          "lineNumber": 124
+        },
+        {
+          "caller": "displayImage",
+          "callee": "ClearWindow",
+          "lineNumber": 125
+        },
+        {
+          "caller": "displayImage",
+          "callee": "DispObj",
+          "lineNumber": 126
+        },
+        {
+          "caller": "showEvent",
+          "callee": "QMainWindow::showEvent",
+          "lineNumber": 136
+        },
+        {
+          "caller": "showEvent",
+          "callee": "ensureHalconWindow",
+          "lineNumber": 137
+        },
+        {
+          "caller": "resizeEvent",
+          "callee": "QMainWindow::resizeEvent",
+          "lineNumber": 142
+        },
+        {
+          "caller": "resizeEvent",
+          "callee": "Length",
+          "lineNumber": 143
+        },
+        {
+          "caller": "resizeEvent",
+          "callee": "HalconCpp::SetWindowExtents",
+          "lineNumber": 147
+        },
+        {
+          "caller": "resizeEvent",
+          "callee": "width",
+          "lineNumber": 148
+        },
+        {
+          "caller": "resizeEvent",
+          "callee": "height",
+          "lineNumber": 148
+        },
+        {
+          "caller": "resizeEvent",
+          "callee": "IsInitialized",
+          "lineNumber": 149
+        },
+        {
+          "caller": "resizeEvent",
+          "callee": "displayImage",
+          "lineNumber": 150
+        },
+        {
+          "caller": "onDebugToggled",
+          "callee": "switchToMode",
+          "lineNumber": 162
+        },
+        {
+          "caller": "onDebugToggled",
+          "callee": "isEmpty",
+          "lineNumber": 162
+        },
+        {
+          "caller": "onDebugToggled",
+          "callee": "rw::rqwu::MessageBox::warning",
+          "lineNumber": 163
+        },
+        {
+          "caller": "onDebugToggled",
+          "callee": "QStringLiteral",
+          "lineNumber": 163
+        },
+        {
+          "caller": "onProductionToggled",
+          "callee": "switchToMode",
+          "lineNumber": 170
+        },
+        {
+          "caller": "onProductionToggled",
+          "callee": "rw::rqwu::MessageBox::warning",
+          "lineNumber": 171
+        },
+        {
+          "caller": "onProductionToggled",
+          "callee": "QStringLiteral",
+          "lineNumber": 171
+        },
+        {
+          "caller": "onUpperLightClicked",
+          "callee": "business",
+          "lineNumber": 176
+        },
+        {
+          "caller": "onUpperLightClicked",
+          "callee": "setUpperLight",
+          "lineNumber": 178
+        },
+        {
+          "caller": "onUpperLightClicked",
+          "callee": "isChecked",
+          "lineNumber": 178
+        },
+        {
+          "caller": "onLowerLightClicked",
+          "callee": "business",
+          "lineNumber": 183
+        },
+        {
+          "caller": "onLowerLightClicked",
+          "callee": "setLowerLight",
+          "lineNumber": 185
+        },
+        {
+          "caller": "onLowerLightClicked",
+          "callee": "isChecked",
+          "lineNumber": 185
+        },
+        {
+          "caller": "onDistortionCalib",
+          "callee": "switchToMode",
+          "lineNumber": 190
+        },
+        {
+          "caller": "onDistortionCalib",
+          "callee": "exec",
+          "lineNumber": 192
+        },
+        {
+          "caller": "onNinePointCalib",
+          "callee": "switchToMode",
+          "lineNumber": 197
+        },
+        {
+          "caller": "onNinePointCalib",
+          "callee": "exec",
+          "lineNumber": 199
+        },
+        {
+          "caller": "onImageStitching",
+          "callee": "switchToMode",
+          "lineNumber": 204
+        },
+        {
+          "caller": "onImageStitching",
+          "callee": "exec",
+          "lineNumber": 206
+        },
+        {
+          "caller": "onCreateModel",
+          "callee": "exec",
+          "lineNumber": 212
+        },
+        {
+          "caller": "onChangeModel",
+          "callee": "exec",
+          "lineNumber": 218
+        },
+        {
+          "caller": "onLoadModel",
+          "callee": "exec",
+          "lineNumber": 224
+        },
+        {
+          "caller": "onExit",
+          "callee": "close",
+          "lineNumber": 229
+        },
+        {
+          "caller": "onFrameReady",
+          "callee": "displayImage",
+          "lineNumber": 234
+        },
+        {
+          "caller": "onPositionResult",
+          "callee": "arg",
+          "lineNumber": 240
+        },
+        {
+          "caller": "onPositionResult",
+          "callee": "arg",
+          "lineNumber": 240
+        },
+        {
+          "caller": "onPositionResult",
+          "callee": "arg",
+          "lineNumber": 240
+        },
+        {
+          "caller": "onPositionResult",
+          "callee": "arg",
+          "lineNumber": 240
+        },
+        {
+          "caller": "onPositionResult",
+          "callee": "QStringLiteral",
+          "lineNumber": 240
+        },
+        {
+          "caller": "onPositionResult",
+          "callee": "QStringLiteral",
+          "lineNumber": 243
+        },
+        {
+          "caller": "onPositionResult",
+          "callee": "showMessage",
+          "lineNumber": 244
+        },
+        {
+          "caller": "onPositionResult",
+          "callee": "statusBar",
+          "lineNumber": 244
+        },
+        {
+          "caller": "onCameraConnectionChanged",
+          "callee": "QStringLiteral",
+          "lineNumber": 253
+        },
+        {
+          "caller": "onCameraConnectionChanged",
+          "callee": "QStringLiteral",
+          "lineNumber": 253
+        },
+        {
+          "caller": "onCameraConnectionChanged",
+          "callee": "showMessage",
+          "lineNumber": 254
+        },
+        {
+          "caller": "onCameraConnectionChanged",
+          "callee": "statusBar",
+          "lineNumber": 254
+        },
+        {
+          "caller": "onCameraConnectionChanged",
+          "callee": "arg",
+          "lineNumber": 254
+        },
+        {
+          "caller": "onCameraConnectionChanged",
+          "callee": "QStringLiteral",
+          "lineNumber": 254
+        },
+        {
+          "caller": "onCameraConnectionChanged",
+          "callee": "QStringLiteral",
+          "lineNumber": 255
+        },
+        {
+          "caller": "onCameraConnectionChanged",
+          "callee": "QStringLiteral",
+          "lineNumber": 255
+        },
+        {
+          "caller": "onStartupCheckFailed",
+          "callee": "rw::rqwu::MessageBox::critical",
+          "lineNumber": 260
+        },
+        {
+          "caller": "onStartupCheckFailed",
+          "callee": "QStringLiteral",
+          "lineNumber": 260
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 24,
+        "functionCount": 24,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/UI/PunchPressUI/src/SpliceDialog.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 61,
+      "nonEmptyLines": 55,
+      "functions": [
+        {
+          "name": "SpliceDialog",
+          "startLine": 8,
+          "endLine": 17,
+          "params": [
+            "app",
+            "parent"
+          ]
+        },
+        {
+          "name": "~SpliceDialog",
+          "startLine": 19,
+          "endLine": 22,
+          "params": []
+        },
+        {
+          "name": "buildConnections",
+          "startLine": 24,
+          "endLine": 30,
+          "params": []
+        },
+        {
+          "name": "onSplice",
+          "startLine": 32,
+          "endLine": 44,
+          "params": []
+        },
+        {
+          "name": "onFrameReady",
+          "startLine": 46,
+          "endLine": 60,
+          "params": [
+            "image",
+            "camIdx"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "SpliceDialog",
+          "line": 8,
+          "isDefault": false
+        },
+        {
+          "name": "~SpliceDialog",
+          "line": 19,
+          "isDefault": false
+        },
+        {
+          "name": "buildConnections",
+          "line": 24,
+          "isDefault": false
+        },
+        {
+          "name": "onSplice",
+          "line": 32,
+          "isDefault": false
+        },
+        {
+          "name": "onFrameReady",
+          "line": 46,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "SpliceDialog",
+          "callee": "setupUi",
+          "lineNumber": 13
+        },
+        {
+          "caller": "SpliceDialog",
+          "callee": "buildConnections",
+          "lineNumber": 14
+        },
+        {
+          "caller": "SpliceDialog",
+          "callee": "ensure",
+          "lineNumber": 15
+        },
+        {
+          "caller": "SpliceDialog",
+          "callee": "ensure",
+          "lineNumber": 16
+        },
+        {
+          "caller": "buildConnections",
+          "callee": "connect",
+          "lineNumber": 26
+        },
+        {
+          "caller": "buildConnections",
+          "callee": "connect",
+          "lineNumber": 28
+        },
+        {
+          "caller": "buildConnections",
+          "callee": "connect",
+          "lineNumber": 29
+        },
+        {
+          "caller": "onSplice",
+          "callee": "business",
+          "lineNumber": 34
+        },
+        {
+          "caller": "onSplice",
+          "callee": "IsInitialized",
+          "lineNumber": 37
+        },
+        {
+          "caller": "onSplice",
+          "callee": "IsInitialized",
+          "lineNumber": 37
+        },
+        {
+          "caller": "onSplice",
+          "callee": "setWindowTitle",
+          "lineNumber": 39
+        },
+        {
+          "caller": "onSplice",
+          "callee": "QStringLiteral",
+          "lineNumber": 39
+        },
+        {
+          "caller": "onSplice",
+          "callee": "calculateTwoCameraSpliceConfig",
+          "lineNumber": 42
+        },
+        {
+          "caller": "onSplice",
+          "callee": "setWindowTitle",
+          "lineNumber": 43
+        },
+        {
+          "caller": "onSplice",
+          "callee": "QStringLiteral",
+          "lineNumber": 43
+        },
+        {
+          "caller": "onFrameReady",
+          "callee": "ensure",
+          "lineNumber": 51
+        },
+        {
+          "caller": "onFrameReady",
+          "callee": "display",
+          "lineNumber": 52
+        },
+        {
+          "caller": "onFrameReady",
+          "callee": "ensure",
+          "lineNumber": 57
+        },
+        {
+          "caller": "onFrameReady",
+          "callee": "display",
+          "lineNumber": 58
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 5,
+        "functionCount": 5,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/UI/PunchPressUI/ui/Dlg_changeshapemodel.ui",
+      "language": "ui",
+      "fileCategory": "code",
+      "totalLines": 695,
+      "nonEmptyLines": 671,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/UI/PunchPressUI/ui/Dlg_createshapemodel.ui",
+      "language": "ui",
+      "fileCategory": "code",
+      "totalLines": 1760,
+      "nonEmptyLines": 1653,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/UI/PunchPressUI/ui/Dlg_ImageStitching.ui",
+      "language": "ui",
+      "fileCategory": "code",
+      "totalLines": 1294,
+      "nonEmptyLines": 1251,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/UI/PunchPressUI/ui/Dlg_jibianjiaozheng.ui",
+      "language": "ui",
+      "fileCategory": "code",
+      "totalLines": 1703,
+      "nonEmptyLines": 1640,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/UI/PunchPressUI/ui/Dlg_OffSet.ui",
+      "language": "ui",
+      "fileCategory": "code",
+      "totalLines": 1284,
+      "nonEmptyLines": 1216,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/UI/PunchPressUI/ui/DlgJiudianbiaoding.ui",
+      "language": "ui",
+      "fileCategory": "code",
+      "totalLines": 1129,
+      "nonEmptyLines": 1074,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/UI/PunchPressUI/ui/LoadingDialog.ui",
+      "language": "ui",
+      "fileCategory": "code",
+      "totalLines": 22,
+      "nonEmptyLines": 22,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/UI/PunchPressUI/ui/PunchPress.ui",
+      "language": "ui",
+      "fileCategory": "code",
+      "totalLines": 1411,
+      "nonEmptyLines": 1348,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/UI/src/main.cpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 43,
+      "nonEmptyLines": 34,
+      "functions": [
+        {
+          "name": "main",
+          "startLine": 11,
+          "endLine": 43,
+          "params": [
+            "argc",
+            "argv"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "main",
+          "line": 11,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "main",
+          "callee": "build",
+          "lineNumber": 17
+        },
+        {
+          "caller": "main",
+          "callee": "build",
+          "lineNumber": 21
+        },
+        {
+          "caller": "main",
+          "callee": "start",
+          "lineNumber": 22
+        },
+        {
+          "caller": "main",
+          "callee": "build",
+          "lineNumber": 26
+        },
+        {
+          "caller": "main",
+          "callee": "start",
+          "lineNumber": 27
+        },
+        {
+          "caller": "main",
+          "callee": "show",
+          "lineNumber": 31
+        },
+        {
+          "caller": "main",
+          "callee": "exec",
+          "lineNumber": 33
+        },
+        {
+          "caller": "main",
+          "callee": "stop",
+          "lineNumber": 36
+        },
+        {
+          "caller": "main",
+          "callee": "destroy",
+          "lineNumber": 37
+        },
+        {
+          "caller": "main",
+          "callee": "stop",
+          "lineNumber": 38
+        },
+        {
+          "caller": "main",
+          "callee": "destroy",
+          "lineNumber": 39
+        },
+        {
+          "caller": "main",
+          "callee": "destroy",
+          "lineNumber": 40
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/CMakeLists.txt",
+      "language": "txt",
+      "fileCategory": "docs",
+      "totalLines": 52,
+      "nonEmptyLines": 37,
+      "metrics": {}
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/include/Dlg_changeshapemodel.h",
+      "language": "c",
+      "fileCategory": "code",
+      "totalLines": 84,
+      "nonEmptyLines": 74,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/include/Dlg_createshapemodel.h",
+      "language": "c",
+      "fileCategory": "code",
+      "totalLines": 160,
+      "nonEmptyLines": 135,
+      "classes": [
+        {
+          "name": "QEvent",
+          "startLine": 31,
+          "endLine": 31,
+          "methods": [],
+          "properties": []
+        },
+        {
+          "name": "Dlg_createshapemodel",
+          "startLine": 33,
+          "endLine": 160,
+          "methods": [],
+          "properties": [
+            "public",
+            "ui"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "QEvent",
+          "line": 31,
+          "isDefault": false
+        },
+        {
+          "name": "Dlg_createshapemodel",
+          "line": 33,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 2,
+        "functionCount": 0,
+        "classCount": 2
+      }
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/include/Dlg_ImageStitching.h",
+      "language": "c",
+      "fileCategory": "code",
+      "totalLines": 119,
+      "nonEmptyLines": 101,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/include/Dlg_jibianjiaozheng.h",
+      "language": "c",
+      "fileCategory": "code",
+      "totalLines": 122,
+      "nonEmptyLines": 104,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/include/Dlg_OffSet.h",
+      "language": "c",
+      "fileCategory": "code",
+      "totalLines": 58,
+      "nonEmptyLines": 51,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/include/DlgCloseForm.h",
+      "language": "c",
+      "fileCategory": "code",
+      "totalLines": 28,
+      "nonEmptyLines": 23,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/include/DlgJiudianbiaoding.h",
+      "language": "c",
+      "fileCategory": "code",
+      "totalLines": 180,
+      "nonEmptyLines": 146,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/include/DraggableListWidget.h",
+      "language": "c",
+      "fileCategory": "code",
+      "totalLines": 44,
+      "nonEmptyLines": 39,
+      "functions": [
+        {
+          "name": "mousePressEvent",
+          "startLine": 15,
+          "endLine": 22,
+          "params": [
+            "event"
+          ]
+        },
+        {
+          "name": "mouseMoveEvent",
+          "startLine": 24,
+          "endLine": 31,
+          "params": [
+            "event"
+          ]
+        },
+        {
+          "name": "mouseReleaseEvent",
+          "startLine": 33,
+          "endLine": 39,
+          "params": [
+            "event"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "DraggableListWidget",
+          "startLine": 6,
+          "endLine": 44,
+          "methods": [
+            "mousePressEvent",
+            "mouseMoveEvent",
+            "mouseReleaseEvent"
+          ],
+          "properties": [
+            "m_dragging",
+            "m_lastMousePos"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "DraggableListWidget",
+          "line": 6,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "mousePressEvent",
+          "callee": "button",
+          "lineNumber": 16
+        },
+        {
+          "caller": "mousePressEvent",
+          "callee": "pos",
+          "lineNumber": 18
+        },
+        {
+          "caller": "mousePressEvent",
+          "callee": "setCursor",
+          "lineNumber": 19
+        },
+        {
+          "caller": "mousePressEvent",
+          "callee": "QListWidget::mousePressEvent",
+          "lineNumber": 21
+        },
+        {
+          "caller": "mouseMoveEvent",
+          "callee": "y",
+          "lineNumber": 26
+        },
+        {
+          "caller": "mouseMoveEvent",
+          "callee": "pos",
+          "lineNumber": 26
+        },
+        {
+          "caller": "mouseMoveEvent",
+          "callee": "y",
+          "lineNumber": 26
+        },
+        {
+          "caller": "mouseMoveEvent",
+          "callee": "setValue",
+          "lineNumber": 27
+        },
+        {
+          "caller": "mouseMoveEvent",
+          "callee": "verticalScrollBar",
+          "lineNumber": 27
+        },
+        {
+          "caller": "mouseMoveEvent",
+          "callee": "value",
+          "lineNumber": 27
+        },
+        {
+          "caller": "mouseMoveEvent",
+          "callee": "verticalScrollBar",
+          "lineNumber": 27
+        },
+        {
+          "caller": "mouseMoveEvent",
+          "callee": "pos",
+          "lineNumber": 28
+        },
+        {
+          "caller": "mouseMoveEvent",
+          "callee": "QListWidget::mouseMoveEvent",
+          "lineNumber": 30
+        },
+        {
+          "caller": "mouseReleaseEvent",
+          "callee": "button",
+          "lineNumber": 34
+        },
+        {
+          "caller": "mouseReleaseEvent",
+          "callee": "unsetCursor",
+          "lineNumber": 36
+        },
+        {
+          "caller": "mouseReleaseEvent",
+          "callee": "QListWidget::mouseReleaseEvent",
+          "lineNumber": 38
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 1,
+        "functionCount": 3,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/include/ImageEnlargedDisplay.h",
+      "language": "c",
+      "fileCategory": "code",
+      "totalLines": 56,
+      "nonEmptyLines": 49,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/include/LoadingDialog.h",
+      "language": "c",
+      "fileCategory": "code",
+      "totalLines": 26,
+      "nonEmptyLines": 19,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/include/PictureViewerThumbnails.h",
+      "language": "c",
+      "fileCategory": "code",
+      "totalLines": 146,
+      "nonEmptyLines": 132,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/include/PictureViewerUtilty.h",
+      "language": "c",
+      "fileCategory": "code",
+      "totalLines": 43,
+      "nonEmptyLines": 37,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    }
+  ]
+}

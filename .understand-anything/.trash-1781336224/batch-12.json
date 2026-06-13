@@ -1,0 +1,809 @@
+{
+  "nodes": [
+    {
+      "id": "file:PunchPressVision/UI/PunchPressUI/src/NinePointCalibDialog.cpp",
+      "type": "file",
+      "name": "NinePointCalibDialog.cpp",
+      "filePath": "PunchPressVision/UI/PunchPressUI/src/NinePointCalibDialog.cpp",
+      "summary": "九点标定对话框的实现，负责启动自动九点标定流程、接收相机帧图像并在 Halcon 视图中显示，同时监听标定进度与完成信号并反映到窗口标题上。",
+      "tags": ["dialog", "calibration", "ui-implementation", "signal-slot"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp",
+      "type": "file",
+      "name": "PunchPress.cpp",
+      "filePath": "PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp",
+      "summary": "主窗口实现，管理 Halcon 图形窗口的生命周期、图像显示、光源控制、各子对话框（畸变校正、九点标定、图像拼接、形状模型）的启动入口，以及模式切换与相机连接状态反馈。",
+      "tags": ["main-window", "entry-point", "halcon", "ui-implementation", "signal-slot"],
+      "complexity": "complex",
+      "languageNotes": "主窗口包含大量 if 0 禁用的功能块，目前仅保留核心的 Halcon 窗口管理、光源切换和子对话框启动逻辑。"
+    },
+    {
+      "id": "file:PunchPressVision/UI/PunchPressUI/src/SpliceDialog.cpp",
+      "type": "file",
+      "name": "SpliceDialog.cpp",
+      "filePath": "PunchPressVision/UI/PunchPressUI/src/SpliceDialog.cpp",
+      "summary": "双相机拼接对话框实现，接收来自两个相机的帧图像并分别在两个 Halcon 视图中展示，点击拼接按钮后调用 TwoCameraSpliceBun 计算拼接参数。",
+      "tags": ["dialog", "camera", "image-stitching", "ui-implementation"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/UI/PunchPressUI/ui/Dlg_changeshapemodel.ui",
+      "type": "file",
+      "name": "Dlg_changeshapemodel.ui",
+      "filePath": "PunchPressVision/UI/PunchPressUI/ui/Dlg_changeshapemodel.ui",
+      "summary": "更换形状模型对话框的 Qt Designer UI 布局文件，定义了更换模型的交互界面控件层级。",
+      "tags": ["ui-layout", "qt-designer", "shape-model"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:PunchPressVision/UI/PunchPressUI/ui/Dlg_createshapemodel.ui",
+      "type": "file",
+      "name": "Dlg_createshapemodel.ui",
+      "filePath": "PunchPressVision/UI/PunchPressUI/ui/Dlg_createshapemodel.ui",
+      "summary": "创建形状模型对话框的 Qt Designer UI 布局文件，包含大面积的 Halcon 图像显示区域和形状模型创建参数控件。",
+      "tags": ["ui-layout", "qt-designer", "shape-model"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:PunchPressVision/UI/PunchPressUI/ui/Dlg_ImageStitching.ui",
+      "type": "file",
+      "name": "Dlg_ImageStitching.ui",
+      "filePath": "PunchPressVision/UI/PunchPressUI/ui/Dlg_ImageStitching.ui",
+      "summary": "图像拼接对话框的 Qt Designer UI 布局文件，包含两个相机图像显示区域和拼接参数设置控件。",
+      "tags": ["ui-layout", "qt-designer", "image-stitching"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:PunchPressVision/UI/PunchPressUI/ui/Dlg_jibianjiaozheng.ui",
+      "type": "file",
+      "name": "Dlg_jibianjiaozheng.ui",
+      "filePath": "PunchPressVision/UI/PunchPressUI/ui/Dlg_jibianjiaozheng.ui",
+      "summary": "畸变校正对话框的 Qt Designer UI 布局文件，提供标定图像采集列表、相机控制按钮和标定参数输入区域。",
+      "tags": ["ui-layout", "qt-designer", "calibration", "distortion-correction"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:PunchPressVision/UI/PunchPressUI/ui/Dlg_OffSet.ui",
+      "type": "file",
+      "name": "Dlg_OffSet.ui",
+      "filePath": "PunchPressVision/UI/PunchPressUI/ui/Dlg_OffSet.ui",
+      "summary": "偏移补偿对话框的 Qt Designer UI 布局文件，为 A/B 两组工位提供位移、旋转角度等补偿参数的微调控件。",
+      "tags": ["ui-layout", "qt-designer", "offset-compensation"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:PunchPressVision/UI/PunchPressUI/ui/DlgJiudianbiaoding.ui",
+      "type": "file",
+      "name": "DlgJiudianbiaoding.ui",
+      "filePath": "PunchPressVision/UI/PunchPressUI/ui/DlgJiudianbiaoding.ui",
+      "summary": "九点标定对话框的 Qt Designer UI 布局文件，提供图像显示区、标定控制按钮和九点结果列表。",
+      "tags": ["ui-layout", "qt-designer", "nine-point-calibration"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:PunchPressVision/UI/PunchPressUI/ui/LoadingDialog.ui",
+      "type": "file",
+      "name": "LoadingDialog.ui",
+      "filePath": "PunchPressVision/UI/PunchPressUI/ui/LoadingDialog.ui",
+      "summary": "加载进度对话框的简洁 Qt Designer UI 布局，包含进度条和提示标签。",
+      "tags": ["ui-layout", "qt-designer", "loading"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/UI/PunchPressUI/ui/PunchPress.ui",
+      "type": "file",
+      "name": "PunchPress.ui",
+      "filePath": "PunchPressVision/UI/PunchPressUI/ui/PunchPress.ui",
+      "summary": "主窗口 PunchPress 的 Qt Designer UI 布局文件，定义了应用主界面的完整控件层级，包括菜单栏、工具栏、状态栏和中央 Halcon 图像显示区域。",
+      "tags": ["ui-layout", "qt-designer", "main-window"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:PunchPressVision/UI/src/main.cpp",
+      "type": "file",
+      "name": "main.cpp",
+      "filePath": "PunchPressVision/UI/src/main.cpp",
+      "summary": "应用入口点，按 infrastructure → Business → PunchPressApp → PunchPress 的分层启动时序构建并启动整个视觉应用，并在事件循环结束后逆序销毁。",
+      "tags": ["entry-point", "application", "bootstrap", "orchestration"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:PunchPressVision/UI/UIModule/CMakeLists.txt",
+      "type": "config",
+      "name": "CMakeLists.txt",
+      "filePath": "PunchPressVision/UI/UIModule/CMakeLists.txt",
+      "summary": "UIModule 静态库的 CMake 构建配置，GLOB 收集源码、头文件和 .ui/.qrc 资源，通过 qt_wrap_ui 生成 UI 头文件，链接 Qt6 Core/Widgets/Concurrent 和 RWUL::rqwu 库，并注册 UI::UIModule 别名目标。",
+      "tags": ["build-system", "cmake", "qt", "ui-module"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/UI/UIModule/include/Dlg_changeshapemodel.h",
+      "type": "file",
+      "name": "Dlg_changeshapemodel.h",
+      "filePath": "PunchPressVision/UI/UIModule/include/Dlg_changeshapemodel.h",
+      "summary": "更换形状模型对话框的头文件声明，继承 QDialog，当前仅激活构造/析构函数，其余功能（ROI 编辑、形状模型匹配等）均在 if 0 块中暂未启用。",
+      "tags": ["header", "dialog", "shape-model", "stub"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/UI/UIModule/include/Dlg_createshapemodel.h",
+      "type": "file",
+      "name": "Dlg_createshapemodel.h",
+      "filePath": "PunchPressVision/UI/UIModule/include/Dlg_createshapemodel.h",
+      "summary": "创建形状模型对话框的头文件声明，继承 QDialog，当前仅激活构造/析构函数，完整的 Halcon 窗口管理、ROI 绘制、XLD 轮廓创建等逻辑均在 if 0 块中暂未启用。",
+      "tags": ["header", "dialog", "shape-model", "stub"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:PunchPressVision/UI/UIModule/include/Dlg_ImageStitching.h",
+      "type": "file",
+      "name": "Dlg_ImageStitching.h",
+      "filePath": "PunchPressVision/UI/UIModule/include/Dlg_ImageStitching.h",
+      "summary": "图像拼接对话框的头文件声明，继承 QDialog，当前仅激活构造/析构函数，Halcon 多窗口显示、拼接参数管理等功能在 if 0 块中暂未启用。",
+      "tags": ["header", "dialog", "image-stitching", "stub"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/UI/UIModule/include/Dlg_jibianjiaozheng.h",
+      "type": "file",
+      "name": "Dlg_jibianjiaozheng.h",
+      "filePath": "PunchPressVision/UI/UIModule/include/Dlg_jibianjiaozheng.h",
+      "summary": "畸变校正对话框的头文件声明，继承 QDialog，当前仅激活构造/析构函数，标定图像采集、Halcon 标定板检测、相机内外参计算等功能在 if 0 块中暂未启用。",
+      "tags": ["header", "dialog", "calibration", "distortion-correction", "stub"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/UI/UIModule/include/Dlg_OffSet.h",
+      "type": "file",
+      "name": "Dlg_OffSet.h",
+      "filePath": "PunchPressVision/UI/UIModule/include/Dlg_OffSet.h",
+      "summary": "偏移补偿对话框的头文件声明，继承 QDialog，当前仅激活构造/析构函数，双工位位移、旋转角度补偿的完整逻辑在 if 0 块中暂未启用。",
+      "tags": ["header", "dialog", "offset-compensation", "stub"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/UI/UIModule/include/DlgCloseForm.h",
+      "type": "file",
+      "name": "DlgCloseForm.h",
+      "filePath": "PunchPressVision/UI/UIModule/include/DlgCloseForm.h",
+      "summary": "关闭确认对话框头文件，继承 QDialog，提供关闭、重启、确认、取消四个操作按钮，可设置自定义提示消息。",
+      "tags": ["header", "dialog", "confirmation"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/UI/UIModule/include/DlgJiudianbiaoding.h",
+      "type": "file",
+      "name": "DlgJiudianbiaoding.h",
+      "filePath": "PunchPressVision/UI/UIModule/include/DlgJiudianbiaoding.h",
+      "summary": "九点标定对话框的头文件声明，继承 QDialog，当前仅激活构造/析构函数，完整的 Halcon 九点标定、双相机拼接辅助、矩形查找等功能在 if 0 块中暂未启用。",
+      "tags": ["header", "dialog", "nine-point-calibration", "stub"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:PunchPressVision/UI/UIModule/include/DraggableListWidget.h",
+      "type": "file",
+      "name": "DraggableListWidget.h",
+      "filePath": "PunchPressVision/UI/UIModule/include/DraggableListWidget.h",
+      "summary": "可拖拽列表控件头文件，继承 QListWidget，通过重写鼠标事件实现垂直滚动条拖拽功能，用于图像列表等场景。",
+      "tags": ["header", "widget", "custom-control"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/UI/UIModule/include/ImageEnlargedDisplay.h",
+      "type": "file",
+      "name": "ImageEnlargedDisplay.h",
+      "filePath": "PunchPressVision/UI/UIModule/include/ImageEnlargedDisplay.h",
+      "summary": "图像放大显示对话框头文件，继承 QDialog，支持多工位图像的放大查看、前后翻页切换以及工位标题与图像映射管理。",
+      "tags": ["header", "dialog", "image-viewer"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:PunchPressVision/UI/UIModule/include/LoadingDialog.h",
+      "type": "file",
+      "name": "LoadingDialog.h",
+      "filePath": "PunchPressVision/UI/UIModule/include/LoadingDialog.h",
+      "summary": "加载进度对话框头文件，继承 QDialog，包含进度条和文本标签，用于长时间操作时的进度提示。",
+      "tags": ["header", "dialog", "loading", "progress"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:PunchPressVision/UI/UIModule/include/PictureViewerThumbnails.h",
+      "type": "file",
+      "name": "PictureViewerThumbnails.h",
+      "filePath": "PunchPressVision/UI/UIModule/include/PictureViewerThumbnails.h",
+      "summary": "图片查看缩略图主窗口头文件，整个文件被 if 0 禁用，原设计包含缩略图异步加载线程、FIFO 缓存、分类树和拖拽列表等完整图片浏览功能。",
+      "tags": ["header", "image-viewer", "thumbnail", "disabled"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:PunchPressVision/UI/UIModule/include/PictureViewerUtilty.h",
+      "type": "file",
+      "name": "PictureViewerUtilty.h",
+      "filePath": "PunchPressVision/UI/UIModule/include/PictureViewerUtilty.h",
+      "summary": "图片查看工具头文件，继承 QMainWindow，提供单张图片查看、前后翻页和删除功能，支持正片/负片双路径管理。",
+      "tags": ["header", "image-viewer", "utility"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/UI/PunchPressUI/src/NinePointCalibDialog.cpp:buildConnections",
+      "type": "function",
+      "name": "buildConnections",
+      "filePath": "PunchPressVision/UI/PunchPressUI/src/NinePointCalibDialog.cpp",
+      "lineRange": [23, 41],
+      "summary": "建立九点标定对话框的信号-槽连接，将 PunchPressApp 的帧就绪信号、NinePointBun 的标定进度与完成信号绑定到对话框的对应槽函数，并连接界面按钮点击事件。",
+      "tags": ["signal-slot", "wiring", "calibration"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/UI/PunchPressUI/src/NinePointCalibDialog.cpp:onStartCalibration",
+      "type": "function",
+      "name": "onStartCalibration",
+      "filePath": "PunchPressVision/UI/PunchPressUI/src/NinePointCalibDialog.cpp",
+      "lineRange": [43, 58],
+      "summary": "响应开始标定按钮点击，生成占位的 3x3 网格机械坐标，设置到 NinePointBun 后启动自动九点标定流程，失败时将错误信息显示到窗口标题。",
+      "tags": ["calibration", "nine-point", "slot-handler"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp:PunchPress",
+      "type": "function",
+      "name": "PunchPress",
+      "filePath": "PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp",
+      "lineRange": [26, 46],
+      "summary": "主窗口构造函数，初始化 UI 布局、建立信号-槽连接、创建 Halcon 窗口，并执行启动自检，根据检查结果展示信息或警告弹窗。",
+      "tags": ["constructor", "initialization", "halcon", "startup-check"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp:buildConnections",
+      "type": "function",
+      "name": "buildConnections",
+      "filePath": "PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp",
+      "lineRange": [54, 80],
+      "summary": "建立主窗口的全部信号-槽连接，包括模式切换、光源控制、各子对话框启动按钮、相机帧接收、定位结果更新和连接状态变更等信号。",
+      "tags": ["signal-slot", "wiring", "main-window"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp:ensureHalconWindow",
+      "type": "function",
+      "name": "ensureHalconWindow",
+      "filePath": "PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp",
+      "lineRange": [82, 103],
+      "summary": "确保 Halcon 图形窗口已创建并绑定到 Qt 控件上，通过 winId 获取原生窗口句柄后调用 OpenWindow 创建 Halcon 显示窗口，并设置缓冲区模式。",
+      "tags": ["halcon", "window-management", "initialization"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp:displayImage",
+      "type": "function",
+      "name": "displayImage",
+      "filePath": "PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp",
+      "lineRange": [115, 132],
+      "summary": "在 Halcon 窗口中显示图像，先获取图像尺寸并设置显示区域（SetPart），再清除窗口后绘制图像对象（DispObj）。",
+      "tags": ["halcon", "image-display", "rendering"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp:resizeEvent",
+      "type": "function",
+      "name": "resizeEvent",
+      "filePath": "PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp",
+      "lineRange": [140, 154],
+      "summary": "窗口大小变化事件处理，先调用父类 resizeEvent，然后更新 Halcon 窗口范围并重新显示最后缓存的图像以适配新的窗口尺寸。",
+      "tags": ["event-handler", "halcon", "resize"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/UI/PunchPressUI/src/SpliceDialog.cpp:onSplice",
+      "type": "function",
+      "name": "onSplice",
+      "filePath": "PunchPressVision/UI/PunchPressUI/src/SpliceDialog.cpp",
+      "lineRange": [32, 44],
+      "summary": "响应拼接按钮点击，检查两个相机帧图像是否已初始化，若就绪则调用 TwoCameraSpliceBun 计算双相机拼接参数并更新窗口标题。",
+      "tags": ["image-stitching", "slot-handler", "camera"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:PunchPressVision/UI/PunchPressUI/src/SpliceDialog.cpp:onFrameReady",
+      "type": "function",
+      "name": "onFrameReady",
+      "filePath": "PunchPressVision/UI/PunchPressUI/src/SpliceDialog.cpp",
+      "lineRange": [46, 60],
+      "summary": "接收相机帧就绪信号，根据 CameraIndex 将图像分别存入 cam1Frame_ 或 cam2Frame_，并在对应的 Halcon 视图中显示。",
+      "tags": ["frame-handler", "camera", "image-display"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:PunchPressVision/UI/src/main.cpp:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "PunchPressVision/UI/src/main.cpp",
+      "lineRange": [11, 43],
+      "summary": "应用主入口函数，按 infrastructure→Business→PunchPressApp 顺序构建并启动各层，创建主窗口并进入 Qt 事件循环，退出后逆序停止并销毁各层资源。",
+      "tags": ["entry-point", "bootstrap", "orchestration", "lifecycle"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:PunchPressVision/UI/UIModule/include/DlgCloseForm.h:DlgCloseForm",
+      "type": "class",
+      "name": "DlgCloseForm",
+      "filePath": "PunchPressVision/UI/UIModule/include/DlgCloseForm.h",
+      "lineRange": [9, 27],
+      "summary": "关闭确认对话框类，继承 QDialog，提供关闭/重启/确认/取消四个操作按钮和自定义提示消息设置，通过 Qt 信号-槽机制响应按钮点击。",
+      "tags": ["dialog", "confirmation", "qt-widget"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:PunchPressVision/UI/UIModule/include/DraggableListWidget.h:DraggableListWidget",
+      "type": "class",
+      "name": "DraggableListWidget",
+      "filePath": "PunchPressVision/UI/UIModule/include/DraggableListWidget.h",
+      "lineRange": [6, 44],
+      "summary": "可拖拽列表控件类，继承 QListWidget，重写鼠标按下/移动/释放事件，通过计算鼠标位移驱动垂直滚动条实现拖拽滚动，适用于图像缩略图列表等场景。",
+      "tags": ["custom-control", "widget", "drag", "list"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:PunchPressVision/UI/UIModule/include/ImageEnlargedDisplay.h:ImageEnlargedDisplay",
+      "type": "class",
+      "name": "ImageEnlargedDisplay",
+      "filePath": "PunchPressVision/UI/UIModule/include/ImageEnlargedDisplay.h",
+      "lineRange": [9, 55],
+      "summary": "图像放大显示对话框类，继承 QDialog，支持多工位图像映射管理、前后工位翻页切换、放大查看，并通过外部布尔标志和索引指针实现显示状态与当前图像索引的监控联动。",
+      "tags": ["dialog", "image-viewer", "enlarged-display"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:PunchPressVision/UI/UIModule/include/LoadingDialog.h:LoadingDialog",
+      "type": "class",
+      "name": "LoadingDialog",
+      "filePath": "PunchPressVision/UI/UIModule/include/LoadingDialog.h",
+      "lineRange": [11, 26],
+      "summary": "加载进度对话框类，继承 QDialog，内嵌 QLabel 和 QProgressBar，通过 updateMessage 方法动态更新提示文本。",
+      "tags": ["dialog", "loading", "progress", "qt-widget"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:PunchPressVision/UI/UIModule/include/PictureViewerUtilty.h:PictureViewerUtilty",
+      "type": "class",
+      "name": "PictureViewerUtilty",
+      "filePath": "PunchPressVision/UI/UIModule/include/PictureViewerUtilty.h",
+      "lineRange": [9, 43],
+      "summary": "图片查看工具类，继承 QMainWindow，提供单张图片查看、前后翻页和删除功能，支持正片/负片双路径切换，通过 imagesDeleted 信号通知外部图像已删除。",
+      "tags": ["image-viewer", "utility", "qt-widget"],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/src/NinePointCalibDialog.cpp",
+      "target": "function:PunchPressVision/UI/PunchPressUI/src/NinePointCalibDialog.cpp:buildConnections",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/src/NinePointCalibDialog.cpp",
+      "target": "function:PunchPressVision/UI/PunchPressUI/src/NinePointCalibDialog.cpp:onStartCalibration",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/src/NinePointCalibDialog.cpp",
+      "target": "function:PunchPressVision/UI/PunchPressUI/src/NinePointCalibDialog.cpp:buildConnections",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/src/NinePointCalibDialog.cpp",
+      "target": "function:PunchPressVision/UI/PunchPressUI/src/NinePointCalibDialog.cpp:onStartCalibration",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp",
+      "target": "function:PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp:PunchPress",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp",
+      "target": "function:PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp:buildConnections",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp",
+      "target": "function:PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp:ensureHalconWindow",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp",
+      "target": "function:PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp:displayImage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp",
+      "target": "function:PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp:resizeEvent",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp",
+      "target": "function:PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp:PunchPress",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp",
+      "target": "function:PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp:buildConnections",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp",
+      "target": "function:PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp:ensureHalconWindow",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp",
+      "target": "function:PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp:displayImage",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp",
+      "target": "function:PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp:resizeEvent",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/src/SpliceDialog.cpp",
+      "target": "function:PunchPressVision/UI/PunchPressUI/src/SpliceDialog.cpp:onSplice",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/src/SpliceDialog.cpp",
+      "target": "function:PunchPressVision/UI/PunchPressUI/src/SpliceDialog.cpp:onFrameReady",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/src/SpliceDialog.cpp",
+      "target": "function:PunchPressVision/UI/PunchPressUI/src/SpliceDialog.cpp:onSplice",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/src/SpliceDialog.cpp",
+      "target": "function:PunchPressVision/UI/PunchPressUI/src/SpliceDialog.cpp:onFrameReady",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/UI/src/main.cpp",
+      "target": "function:PunchPressVision/UI/src/main.cpp:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/UI/src/main.cpp",
+      "target": "function:PunchPressVision/UI/src/main.cpp:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/UI/UIModule/include/DlgCloseForm.h",
+      "target": "class:PunchPressVision/UI/UIModule/include/DlgCloseForm.h:DlgCloseForm",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/UI/UIModule/include/DlgCloseForm.h",
+      "target": "class:PunchPressVision/UI/UIModule/include/DlgCloseForm.h:DlgCloseForm",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/UI/UIModule/include/DraggableListWidget.h",
+      "target": "class:PunchPressVision/UI/UIModule/include/DraggableListWidget.h:DraggableListWidget",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/UI/UIModule/include/DraggableListWidget.h",
+      "target": "class:PunchPressVision/UI/UIModule/include/DraggableListWidget.h:DraggableListWidget",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/UI/UIModule/include/ImageEnlargedDisplay.h",
+      "target": "class:PunchPressVision/UI/UIModule/include/ImageEnlargedDisplay.h:ImageEnlargedDisplay",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/UI/UIModule/include/ImageEnlargedDisplay.h",
+      "target": "class:PunchPressVision/UI/UIModule/include/ImageEnlargedDisplay.h:ImageEnlargedDisplay",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/UI/UIModule/include/LoadingDialog.h",
+      "target": "class:PunchPressVision/UI/UIModule/include/LoadingDialog.h:LoadingDialog",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/UI/UIModule/include/LoadingDialog.h",
+      "target": "class:PunchPressVision/UI/UIModule/include/LoadingDialog.h:LoadingDialog",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:PunchPressVision/UI/UIModule/include/PictureViewerUtilty.h",
+      "target": "class:PunchPressVision/UI/UIModule/include/PictureViewerUtilty.h:PictureViewerUtilty",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:PunchPressVision/UI/UIModule/include/PictureViewerUtilty.h",
+      "target": "class:PunchPressVision/UI/UIModule/include/PictureViewerUtilty.h:PictureViewerUtilty",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "config:PunchPressVision/UI/UIModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/UI/UIModule/include/Dlg_changeshapemodel.h",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:PunchPressVision/UI/UIModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/UI/UIModule/include/Dlg_createshapemodel.h",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:PunchPressVision/UI/UIModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/UI/UIModule/include/Dlg_ImageStitching.h",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:PunchPressVision/UI/UIModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/UI/UIModule/include/Dlg_jibianjiaozheng.h",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:PunchPressVision/UI/UIModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/UI/UIModule/include/Dlg_OffSet.h",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:PunchPressVision/UI/UIModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/UI/UIModule/include/DlgCloseForm.h",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:PunchPressVision/UI/UIModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/UI/UIModule/include/DlgJiudianbiaoding.h",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:PunchPressVision/UI/UIModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/UI/UIModule/include/DraggableListWidget.h",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:PunchPressVision/UI/UIModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/UI/UIModule/include/ImageEnlargedDisplay.h",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:PunchPressVision/UI/UIModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/UI/UIModule/include/LoadingDialog.h",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:PunchPressVision/UI/UIModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/UI/UIModule/include/PictureViewerThumbnails.h",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:PunchPressVision/UI/UIModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/UI/UIModule/include/PictureViewerUtilty.h",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:PunchPressVision/UI/UIModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/UI/PunchPressUI/ui/Dlg_changeshapemodel.ui",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:PunchPressVision/UI/UIModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/UI/PunchPressUI/ui/Dlg_createshapemodel.ui",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:PunchPressVision/UI/UIModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/UI/PunchPressUI/ui/Dlg_ImageStitching.ui",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:PunchPressVision/UI/UIModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/UI/PunchPressUI/ui/Dlg_jibianjiaozheng.ui",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:PunchPressVision/UI/UIModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/UI/PunchPressUI/ui/Dlg_OffSet.ui",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:PunchPressVision/UI/UIModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/UI/PunchPressUI/ui/DlgJiudianbiaoding.ui",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:PunchPressVision/UI/UIModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/UI/PunchPressUI/ui/LoadingDialog.ui",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:PunchPressVision/UI/UIModule/CMakeLists.txt",
+      "target": "file:PunchPressVision/UI/PunchPressUI/ui/PunchPress.ui",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/ui/Dlg_changeshapemodel.ui",
+      "target": "file:PunchPressVision/UI/UIModule/include/Dlg_changeshapemodel.h",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/ui/Dlg_createshapemodel.ui",
+      "target": "file:PunchPressVision/UI/UIModule/include/Dlg_createshapemodel.h",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/ui/Dlg_ImageStitching.ui",
+      "target": "file:PunchPressVision/UI/UIModule/include/Dlg_ImageStitching.h",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/ui/Dlg_jibianjiaozheng.ui",
+      "target": "file:PunchPressVision/UI/UIModule/include/Dlg_jibianjiaozheng.h",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/ui/Dlg_OffSet.ui",
+      "target": "file:PunchPressVision/UI/UIModule/include/Dlg_OffSet.h",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/ui/DlgJiudianbiaoding.ui",
+      "target": "file:PunchPressVision/UI/UIModule/include/DlgJiudianbiaoding.h",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/ui/LoadingDialog.ui",
+      "target": "file:PunchPressVision/UI/UIModule/include/LoadingDialog.h",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/ui/PunchPress.ui",
+      "target": "file:PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/src/NinePointCalibDialog.cpp",
+      "target": "file:PunchPressVision/UI/PunchPressUI/ui/DlgJiudianbiaoding.ui",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/src/SpliceDialog.cpp",
+      "target": "file:PunchPressVision/UI/PunchPressUI/ui/Dlg_ImageStitching.ui",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:PunchPressVision/UI/PunchPressUI/src/PunchPress.cpp",
+      "target": "file:PunchPressVision/UI/PunchPressUI/ui/PunchPress.ui",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    }
+  ]
+}

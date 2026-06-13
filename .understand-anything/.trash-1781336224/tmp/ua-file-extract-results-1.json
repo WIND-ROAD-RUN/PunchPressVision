@@ -1,0 +1,246 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 4,
+  "filesSkipped": [],
+  "results": [
+    {
+      "path": "PunchPressVision/UI/UIModule/include/WarnUtilty.hpp",
+      "language": "cpp",
+      "fileCategory": "code",
+      "totalLines": 27,
+      "nonEmptyLines": 24,
+      "classes": [
+        {
+          "name": "WarningInfo",
+          "startLine": 17,
+          "endLine": 25,
+          "methods": [],
+          "properties": [
+            "type",
+            "message",
+            "timestamp",
+            "warningId"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "WarningInfo",
+          "line": 17,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 1,
+        "functionCount": 0,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/include/WarningInfoList.h",
+      "language": "c",
+      "fileCategory": "code",
+      "totalLines": 39,
+      "nonEmptyLines": 31,
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/include/rqw_LabelClickable.h",
+      "language": "c",
+      "fileCategory": "code",
+      "totalLines": 26,
+      "nonEmptyLines": 21,
+      "functions": [
+        {
+          "name": "~ClickableLabel",
+          "startLine": 17,
+          "endLine": 17,
+          "params": []
+        }
+      ],
+      "classes": [
+        {
+          "name": "ClickableLabel",
+          "startLine": 11,
+          "endLine": 24,
+          "methods": [
+            "~ClickableLabel",
+            "clicked",
+            "mousePressEvent"
+          ],
+          "properties": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "ClickableLabel",
+          "line": 11,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "PunchPressVision/UI/UIModule/include/rqw_LabelWarning.h",
+      "language": "c",
+      "fileCategory": "code",
+      "totalLines": 86,
+      "nonEmptyLines": 71,
+      "classes": [
+        {
+          "name": "LabelWarning",
+          "startLine": 14,
+          "endLine": 84,
+          "methods": [
+            "build_ui",
+            "build_connect",
+            "setMaxHistorySize",
+            "getHistory",
+            "setWarningColor",
+            "setTimeoutColor",
+            "setGrayDuration",
+            "addWarning",
+            "addWarning",
+            "pushWarningList",
+            "popWarningListThreadSafe",
+            "topWarningListThreadSafe",
+            "isEmptyWarningListThreadSafe",
+            "getWarningListThreadSafe",
+            "clearWarningListThreadSafe",
+            "pushHistory",
+            "updateLastHistoryTimestamp",
+            "getHistoryThreadSafe",
+            "clearHistoryThreadSafe",
+            "onTimeoutToGray",
+            "onTimeoutToBlack",
+            "labelClicked",
+            "clearWarningHistory"
+          ],
+          "properties": [
+            "private",
+            "_timerToGray",
+            "_timerToBlack",
+            "_currentMessage",
+            "_maxHistorySize",
+            "_warningColor",
+            "_timeoutColor",
+            "_grayDuration",
+            "_warningList",
+            "_history",
+            "_historyMutex",
+            "_warningListMutex"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "setMaxHistorySize",
+          "line": 28,
+          "isDefault": false
+        },
+        {
+          "name": "getHistory",
+          "line": 31,
+          "isDefault": false
+        },
+        {
+          "name": "setWarningColor",
+          "line": 34,
+          "isDefault": false
+        },
+        {
+          "name": "setTimeoutColor",
+          "line": 37,
+          "isDefault": false
+        },
+        {
+          "name": "setGrayDuration",
+          "line": 40,
+          "isDefault": false
+        },
+        {
+          "name": "addWarning",
+          "line": 42,
+          "isDefault": false
+        },
+        {
+          "name": "addWarning",
+          "line": 43,
+          "isDefault": false
+        },
+        {
+          "name": "pushWarningList",
+          "line": 46,
+          "isDefault": false
+        },
+        {
+          "name": "popWarningListThreadSafe",
+          "line": 47,
+          "isDefault": false
+        },
+        {
+          "name": "topWarningListThreadSafe",
+          "line": 48,
+          "isDefault": false
+        },
+        {
+          "name": "isEmptyWarningListThreadSafe",
+          "line": 49,
+          "isDefault": false
+        },
+        {
+          "name": "getWarningListThreadSafe",
+          "line": 50,
+          "isDefault": false
+        },
+        {
+          "name": "clearWarningListThreadSafe",
+          "line": 51,
+          "isDefault": false
+        },
+        {
+          "name": "pushHistory",
+          "line": 54,
+          "isDefault": false
+        },
+        {
+          "name": "updateLastHistoryTimestamp",
+          "line": 55,
+          "isDefault": false
+        },
+        {
+          "name": "getHistoryThreadSafe",
+          "line": 56,
+          "isDefault": false
+        },
+        {
+          "name": "clearHistoryThreadSafe",
+          "line": 57,
+          "isDefault": false
+        },
+        {
+          "name": "LabelWarning",
+          "line": 14,
+          "isDefault": false
+        }
+      ],
+      "metrics": {
+        "importCount": 3,
+        "exportCount": 18,
+        "functionCount": 0,
+        "classCount": 1
+      }
+    }
+  ]
+}
