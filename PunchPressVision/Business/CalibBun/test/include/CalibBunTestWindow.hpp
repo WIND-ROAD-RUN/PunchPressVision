@@ -2,6 +2,7 @@
 
 #include <atomic>
 
+#include <QComboBox>
 #include <QMainWindow>
 #include <QPushButton>
 #include <QSpinBox>
@@ -39,6 +40,7 @@ private slots:
     void onSetGain();
     void onToggleUndistort(bool checked);
     void onStartStop();
+    void onCameraSelected(int index);
 
 signals:
     void frameReady(HalconCpp::HImage image);
@@ -46,6 +48,9 @@ signals:
 private:
     void buildUi();
     void buildConnections();
+    void updateConnectionStatus();
+    static global::CameraIndex cameraIndexFromCombo(int index);
+    static QString cameraDisplayName(global::CameraIndex idx);
 
 private:
     inf::infrastructure& inf_;
@@ -57,7 +62,9 @@ private:
     QPushButton* undistortBtn_ = nullptr;
     QSpinBox* exposureSpin_ = nullptr;
     QSpinBox* gainSpin_ = nullptr;
+    QComboBox* cameraSelect_ = nullptr;
 
+    std::atomic<global::CameraIndex> selectedCamera_{ global::CameraIndex::Camera1 };
     std::atomic_bool undistortEnabled_{ false };
     std::atomic_bool isRunning_{ false };
     bool halconWindowEnsured_ = false;

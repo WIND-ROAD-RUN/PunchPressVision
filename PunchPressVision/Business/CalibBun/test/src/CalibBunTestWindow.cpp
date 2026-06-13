@@ -4,6 +4,7 @@
 
 #include <QApplication>
 #include <QCloseEvent>
+#include <QComboBox>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMessageBox>
@@ -20,6 +21,7 @@ CalibBunTestWindow::CalibBunTestWindow(inf::infrastructure& inf, QWidget* parent
 {
     buildUi();
     buildConnections();
+    updateConnectionStatus();
 }
 
 CalibBunTestWindow::~CalibBunTestWindow()
@@ -46,6 +48,13 @@ void CalibBunTestWindow::buildUi()
     undistortBtn_ = new QPushButton(QStringLiteral("畸变矫正"), this);
     undistortBtn_->setCheckable(true);
     controlLayout->addWidget(undistortBtn_);
+
+    controlLayout->addWidget(new QLabel(QStringLiteral("当前相机:"), this));
+    cameraSelect_ = new QComboBox(this);
+    cameraSelect_->addItem(QStringLiteral("相机1"), static_cast<int>(global::CameraIndex::Camera1));
+    cameraSelect_->addItem(QStringLiteral("相机2"), static_cast<int>(global::CameraIndex::Camera2));
+    cameraSelect_->setCurrentIndex(0);
+    controlLayout->addWidget(cameraSelect_);
 
     controlLayout->addStretch();
 
@@ -88,6 +97,8 @@ void CalibBunTestWindow::buildConnections()
 {
     connect(startStopBtn_, &QPushButton::clicked, this, &CalibBunTestWindow::onStartStop);
     connect(undistortBtn_, &QPushButton::toggled, this, &CalibBunTestWindow::onToggleUndistort);
+    connect(cameraSelect_, QOverload<int>::of(&QComboBox::currentIndexChanged),
+        this, &CalibBunTestWindow::onCameraSelected);
 
     // 相机回调使用 DirectConnection，在采集线程中处理图像并排队到 UI 线程显示
     if (inf_.camera_module_)
@@ -134,7 +145,8 @@ void CalibBunTestWindow::closeEvent(QCloseEvent* event)
 
 void CalibBunTestWindow::onCameraFrame(rw::hoec::MatInfo matInfo, global::CameraIndex cameraIndex)
 {
-    (void)cameraIndex;
+    if (cameraIndex != selectedCamera_.load(std::memory_order_acquire))
+        return;
 
     try
     {
@@ -160,12 +172,10 @@ void CalibBunTestWindow::onDisplayFrame(HalconCpp::HImage image)
 
 void CalibBunTestWindow::onConnectionChanged(global::CameraIndex idx, bool connected, QString reason)
 {
-    const QString name = (idx == global::CameraIndex::Camera1)
-        ? QStringLiteral("相机1") : QStringLiteral("相机2");
-    if (connected)
-        statusBar()->showMessage(name + QStringLiteral(" 已连接"));
-    else
-        statusBar()->showMessage(name + QStringLiteral(" 未连接: ") + reason);
+    (void)idx;
+    (void)connected;
+    (void)reason;
+    updateConnectionStatus();
 }
 
 void CalibBunTestWindow::onSetExposure()
@@ -174,13 +184,15 @@ void CalibBunTestWindow::onSetExposure()
         return;
 
     const int value = exposureSpin_->value();
-    const bool ok1 = inf_.camera_module_->setExposure(global::CameraIndex::Camera1, value);
-    const bool ok2 = inf_.camera_module_->setExposure(global::CameraIndex::Camera2, value);
+    const global::CameraIndex idx = cameraIndexFromCombo(cameraSelect_->currentIndex());
+    const bool ok = inf_.camera_module_->setExposure(idx, value);
 
-    if (ok1 || ok2)
-        statusBar()->showMessage(QStringLiteral("曝光已设置为 %1 us").arg(value));
+    if (ok)
+        statusBar()->showMessage(QStringLiteral("%1 曝光已设置为 %2 us")
+            .arg(cameraDisplayName(idx)).arg(value));
     else
-        QMessageBox::warning(this, QStringLiteral("设置失败"), QStringLiteral("无法设置相机曝光"));
+        QMessageBox::warning(this, QStringLiteral("设置失败"),
+            QStringLiteral("无法设置 %1 曝光").arg(cameraDisplayName(idx)));
 }
 
 void CalibBunTestWindow::onSetGain()
@@ -189,13 +201,15 @@ void CalibBunTestWindow::onSetGain()
         return;
 
     const int value = gainSpin_->value();
-    const bool ok1 = inf_.camera_module_->setGain(global::CameraIndex::Camera1, value);
-    const bool ok2 = inf_.camera_module_->setGain(global::CameraIndex::Camera2, value);
+    const global::CameraIndex idx = cameraIndexFromCombo(cameraSelect_->currentIndex());
+    const bool ok = inf_.camera_module_->setGain(idx, value);
 
-    if (ok1 || ok2)
-        statusBar()->showMessage(QStringLiteral("增益已设置为 %1").arg(value));
+    if (ok)
+        statusBar()->showMessage(QStringLiteral("%1 增益已设置为 %2")
+            .arg(cameraDisplayName(idx)).arg(value));
     else
-        QMessageBox::warning(this, QStringLiteral("设置失败"), QStringLiteral("无法设置相机增益"));
+        QMessageBox::warning(this, QStringLiteral("设置失败"),
+            QStringLiteral("无法设置 %1 增益").arg(cameraDisplayName(idx)));
 }
 
 void CalibBunTestWindow::onToggleUndistort(bool checked)
@@ -224,4 +238,41 @@ void CalibBunTestWindow::onStartStop()
         startStopBtn_->setText(QStringLiteral("停止采集"));
         statusBar()->showMessage(QStringLiteral("采集中..."));
     }
+}
+
+void CalibBunTestWindow::onCameraSelected(int index)
+{
+    const global::CameraIndex idx = cameraIndexFromCombo(index);
+    selectedCamera_.store(idx, std::memory_order_release);
+    statusBar()->showMessage(QStringLiteral("当前操作/显示已切换到 %1").arg(cameraDisplayName(idx)));
+}
+
+void CalibBunTestWindow::updateConnectionStatus()
+{
+    if (!inf_.camera_module_)
+    {
+        statusBar()->showMessage(QStringLiteral("相机模块未初始化"));
+        return;
+    }
+
+    const bool cam1 = inf_.camera_module_->isConnected(global::CameraIndex::Camera1);
+    const bool cam2 = inf_.camera_module_->isConnected(global::CameraIndex::Camera2);
+
+    const QString msg = QStringLiteral("相机1: %1 | 相机2: %2 | 当前: %3")
+        .arg(cam1 ? QStringLiteral("已连接") : QStringLiteral("未连接"))
+        .arg(cam2 ? QStringLiteral("已连接") : QStringLiteral("未连接"))
+        .arg(cameraDisplayName(selectedCamera_.load(std::memory_order_acquire)));
+
+    statusBar()->showMessage(msg);
+}
+
+global::CameraIndex CalibBunTestWindow::cameraIndexFromCombo(int index)
+{
+    return (index == 1) ? global::CameraIndex::Camera2 : global::CameraIndex::Camera1;
+}
+
+QString CalibBunTestWindow::cameraDisplayName(global::CameraIndex idx)
+{
+    return (idx == global::CameraIndex::Camera1)
+        ? QStringLiteral("相机1") : QStringLiteral("相机2");
 }
