@@ -6,13 +6,21 @@
 #include <QCloseEvent>
 #include <QComboBox>
 #include <QHBoxLayout>
+#include <QImage>
 #include <QLabel>
 #include <QMessageBox>
+#include <QPixmap>
 #include <QResizeEvent>
 #include <QShowEvent>
 #include <QSpinBox>
 #include <QStatusBar>
 #include <QVBoxLayout>
+
+#include <opencv2/core/mat.hpp>
+#include <opencv2/imgproc.hpp>
+
+// 将相机回调收到的 cv::Mat 转换为可在 QLabel 中显示的 QImage
+static QImage cvMatToQImage(const cv::Mat& mat);
 
 CalibBunTestWindow::CalibBunTestWindow(inf::infrastructure& inf, QWidget* parent)
     : QMainWindow(parent)
@@ -79,12 +87,32 @@ void CalibBunTestWindow::buildUi()
 
     rootLayout->addLayout(controlLayout);
 
-    // 图像显示区
-    imageHost_ = new QWidget(this);
-    imageHost_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    imageHost_->setMinimumSize(640, 480);
-    imageHost_->setStyleSheet(QStringLiteral("background-color: #333;"));
-    rootLayout->addWidget(imageHost_, 1);
+    // 图像显示区：左 Halcon，右原始 Mat
+    auto* imageLayout = new QHBoxLayout();
+    imageLayout->setSpacing(8);
+
+    auto* halconPanel = new QVBoxLayout();
+    halconPanel->setSpacing(4);
+    halconPanel->addWidget(new QLabel(QStringLiteral("Halcon 图像"), this));
+    halconHost_ = new QWidget(this);
+    halconHost_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    halconHost_->setMinimumSize(320, 240);
+    halconHost_->setStyleSheet(QStringLiteral("background-color: #333;"));
+    halconPanel->addWidget(halconHost_, 1);
+    imageLayout->addLayout(halconPanel, 1);
+
+    auto* matPanel = new QVBoxLayout();
+    matPanel->setSpacing(4);
+    matPanel->addWidget(new QLabel(QStringLiteral("原始 Mat 图像"), this));
+    matView_ = new QLabel(this);
+    matView_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    matView_->setMinimumSize(320, 240);
+    matView_->setAlignment(Qt::AlignCenter);
+    matView_->setStyleSheet(QStringLiteral("background-color: #333;"));
+    matPanel->addWidget(matView_, 1);
+    imageLayout->addLayout(matPanel, 1);
+
+    rootLayout->addLayout(imageLayout, 1);
 
     // 状态栏提示
     statusBar()->showMessage(QStringLiteral("就绪"));
@@ -109,9 +137,11 @@ void CalibBunTestWindow::buildConnections()
             this, &CalibBunTestWindow::onConnectionChanged, Qt::QueuedConnection);
     }
 
-    // 显示信号必须排队到 UI 线程，避免在非 UI 线程操作 Halcon 窗口
+    // 显示信号必须排队到 UI 线程，避免在非 UI 线程操作 Halcon 窗口 / QLabel
     connect(this, &CalibBunTestWindow::frameReady,
         this, &CalibBunTestWindow::onDisplayFrame, Qt::QueuedConnection);
+    connect(this, &CalibBunTestWindow::matFrameReady,
+        this, &CalibBunTestWindow::onMatDisplayFrame, Qt::QueuedConnection);
 }
 
 void CalibBunTestWindow::showEvent(QShowEvent* event)
@@ -120,7 +150,7 @@ void CalibBunTestWindow::showEvent(QShowEvent* event)
 
     if (!halconWindowEnsured_)
     {
-        halconView_.ensure(imageHost_);
+        halconView_.ensure(halconHost_);
         halconWindowEnsured_ = true;
     }
 }
@@ -129,6 +159,7 @@ void CalibBunTestWindow::resizeEvent(QResizeEvent* event)
 {
     QMainWindow::resizeEvent(event);
     halconView_.resizeToHost();
+    refreshMatView();
 }
 
 void CalibBunTestWindow::closeEvent(QCloseEvent* event)
@@ -150,14 +181,18 @@ void CalibBunTestWindow::onCameraFrame(rw::hoec::MatInfo matInfo, global::Camera
 
     try
     {
+        // 左侧：经 cvMatToHImage + 可选畸变矫正后的 Halcon 图像
         HalconCpp::HImage hImage = bun::CameraImgConvert::cvMatToHImage(matInfo.mat);
-        if (!hImage.IsInitialized())
-            return;
+        if (hImage.IsInitialized())
+        {
+            if (undistortEnabled_.load(std::memory_order_acquire))
+                hImage = calibBun_.undistortImage(hImage);
 
-        if (undistortEnabled_.load(std::memory_order_acquire))
-            hImage = calibBun_.undistortImage(hImage);
+            emit frameReady(hImage);
+        }
 
-        emit frameReady(hImage);
+        // 右侧：原始 cv::Mat，用于排查转换或 Halcon 内部问题
+        emit matFrameReady(cvMatToQImage(matInfo.mat));
     }
     catch (...)
     {
@@ -168,6 +203,27 @@ void CalibBunTestWindow::onCameraFrame(rw::hoec::MatInfo matInfo, global::Camera
 void CalibBunTestWindow::onDisplayFrame(HalconCpp::HImage image)
 {
     halconView_.display(image);
+}
+
+void CalibBunTestWindow::onMatDisplayFrame(QImage image)
+{
+    if (image.isNull())
+        return;
+
+    lastMatImage_ = image;
+    refreshMatView();
+}
+
+void CalibBunTestWindow::refreshMatView()
+{
+    if (lastMatImage_.isNull() || !matView_)
+        return;
+
+    const QSize viewSize = matView_->size();
+    if (viewSize.width() > 0 && viewSize.height() > 0)
+        matView_->setPixmap(QPixmap::fromImage(lastMatImage_).scaled(viewSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    else
+        matView_->setPixmap(QPixmap::fromImage(lastMatImage_));
 }
 
 void CalibBunTestWindow::onConnectionChanged(global::CameraIndex idx, bool connected, QString reason)
@@ -275,4 +331,42 @@ QString CalibBunTestWindow::cameraDisplayName(global::CameraIndex idx)
 {
     return (idx == global::CameraIndex::Camera1)
         ? QStringLiteral("相机1") : QStringLiteral("相机2");
+}
+
+static QImage cvMatToQImage(const cv::Mat& mat)
+{
+    if (mat.empty())
+        return QImage();
+
+    switch (mat.type())
+    {
+    case CV_8UC1:
+    {
+        return QImage(mat.data, mat.cols, mat.rows,
+            static_cast<int>(mat.step), QImage::Format_Grayscale8).copy();
+    }
+    case CV_8UC3:
+    {
+        cv::Mat rgb;
+        cv::cvtColor(mat, rgb, cv::COLOR_BGR2RGB);
+        return QImage(rgb.data, rgb.cols, rgb.rows,
+            static_cast<int>(rgb.step), QImage::Format_RGB888).copy();
+    }
+    case CV_8UC4:
+    {
+        cv::Mat rgba;
+        cv::cvtColor(mat, rgba, cv::COLOR_BGRA2RGBA);
+        return QImage(rgba.data, rgba.cols, rgba.rows,
+            static_cast<int>(rgba.step), QImage::Format_RGBA8888).copy();
+    }
+    case CV_16UC1:
+    {
+        cv::Mat gray8;
+        cv::normalize(mat, gray8, 0, 255, cv::NORM_MINMAX, CV_8UC1);
+        return QImage(gray8.data, gray8.cols, gray8.rows,
+            static_cast<int>(gray8.step), QImage::Format_Grayscale8).copy();
+    }
+    default:
+        return QImage();
+    }
 }

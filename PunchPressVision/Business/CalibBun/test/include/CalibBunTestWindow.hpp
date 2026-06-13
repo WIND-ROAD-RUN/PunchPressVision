@@ -3,6 +3,7 @@
 #include <atomic>
 
 #include <QComboBox>
+#include <QLabel>
 #include <QMainWindow>
 #include <QPushButton>
 #include <QSpinBox>
@@ -34,6 +35,7 @@ protected:
 private slots:
     void onCameraFrame(rw::hoec::MatInfo matInfo, global::CameraIndex cameraIndex);
     void onDisplayFrame(HalconCpp::HImage image);
+    void onMatDisplayFrame(QImage image);
     void onConnectionChanged(global::CameraIndex idx, bool connected, QString reason);
 
     void onSetExposure();
@@ -44,11 +46,13 @@ private slots:
 
 signals:
     void frameReady(HalconCpp::HImage image);
+    void matFrameReady(QImage image);
 
 private:
     void buildUi();
     void buildConnections();
     void updateConnectionStatus();
+    void refreshMatView();
     static global::CameraIndex cameraIndexFromCombo(int index);
     static QString cameraDisplayName(global::CameraIndex idx);
 
@@ -57,7 +61,8 @@ private:
     bun::CalibBun calibBun_;
     ui::HalconView halconView_;
 
-    QWidget* imageHost_ = nullptr;
+    QWidget* halconHost_ = nullptr;
+    QLabel* matView_ = nullptr;
     QPushButton* startStopBtn_ = nullptr;
     QPushButton* undistortBtn_ = nullptr;
     QSpinBox* exposureSpin_ = nullptr;
@@ -68,4 +73,5 @@ private:
     std::atomic_bool undistortEnabled_{ false };
     std::atomic_bool isRunning_{ false };
     bool halconWindowEnsured_ = false;
+    QImage lastMatImage_;
 };
