@@ -53,6 +53,7 @@ private:
     void buildConnections();
     void updateConnectionStatus();
     void refreshMatView();
+    void applyDefaultCameraParams();
     static global::CameraIndex cameraIndexFromCombo(int index);
     static QString cameraDisplayName(global::CameraIndex idx);
 

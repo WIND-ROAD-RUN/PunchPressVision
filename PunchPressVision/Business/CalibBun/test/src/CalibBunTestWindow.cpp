@@ -30,6 +30,7 @@ CalibBunTestWindow::CalibBunTestWindow(inf::infrastructure& inf, QWidget* parent
     buildUi();
     buildConnections();
     updateConnectionStatus();
+    applyDefaultCameraParams();
 }
 
 CalibBunTestWindow::~CalibBunTestWindow()
@@ -368,5 +369,30 @@ static QImage cvMatToQImage(const cv::Mat& mat)
     }
     default:
         return QImage();
+    }
+}
+
+void CalibBunTestWindow::applyDefaultCameraParams()
+{
+    if (!inf_.camera_module_)
+        return;
+
+    const int exposure = exposureSpin_->value();
+    const int gain = gainSpin_->value();
+
+    bool ok = true;
+    ok &= inf_.camera_module_->setExposure(global::CameraIndex::Camera1, exposure);
+    ok &= inf_.camera_module_->setExposure(global::CameraIndex::Camera2, exposure);
+    ok &= inf_.camera_module_->setGain(global::CameraIndex::Camera1, gain);
+    ok &= inf_.camera_module_->setGain(global::CameraIndex::Camera2, gain);
+
+    if (ok)
+    {
+        statusBar()->showMessage(QStringLiteral("已按默认值设置曝光=%1us, 增益=%2")
+            .arg(exposure).arg(gain));
+    }
+    else
+    {
+        statusBar()->showMessage(QStringLiteral("部分相机默认参数设置失败，请检查连接"));
     }
 }
