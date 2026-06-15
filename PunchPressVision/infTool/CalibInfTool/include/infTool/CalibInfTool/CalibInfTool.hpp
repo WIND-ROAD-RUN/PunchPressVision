@@ -11,7 +11,7 @@
 namespace infTool
 {
 	class CalibInfTool
-		: public global::IInfTool
+		:public QObject, public global::IInfTool
 	{
 		Q_OBJECT
 
@@ -34,6 +34,9 @@ namespace infTool
 
 	public slots:
 		void onCameraFrame(rw::hoec::MatInfo matInfo, global::CameraIndex cameraIndex);
+
+	signals:
+		void callBackFunc(HalconCpp::HImage img, global::CameraIndex cameraIndex);
 
 	private:
 		inf::infrastructure& inf_;
