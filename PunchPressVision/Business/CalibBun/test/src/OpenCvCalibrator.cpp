@@ -4,6 +4,10 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/core/persistence.hpp>
+#include <opencv2/features2d.hpp>
+
+#include <filesystem>
+#include <sstream>
 
 OpenCvCalibrator::OpenCvCalibrator()
     : boardSize_(7, 7)
@@ -99,9 +103,40 @@ bool OpenCvCalibrator::addCalibrationImage(const cv::Mat& image)
             ? cv::CALIB_CB_SYMMETRIC_GRID
             : cv::CALIB_CB_ASYMMETRIC_GRID;
 
+        // 1. 先尝试 OpenCV 默认 blob 检测器
         found = cv::findCirclesGrid(
             image, boardSize_, corners,
             flags | cv::CALIB_CB_CLUSTERING);
+
+        // 2. 失败后使用 SimpleBlobDetector 重试（分别尝试黑圆、白圆）
+        if (!found)
+        {
+            cv::SimpleBlobDetector::Params params;
+            params.filterByArea = true;
+            params.minArea = 50.0f;
+            params.maxArea = static_cast<float>(imageSize_.area()) / 10.0f;
+            params.filterByCircularity = true;
+            params.minCircularity = 0.7f;
+            params.filterByConvexity = true;
+            params.minConvexity = 0.8f;
+            params.filterByInertia = true;
+            params.minInertiaRatio = 0.4f;
+
+            // 尝试黑圆（白底黑圆标定板）
+            params.blobColor = 0;
+            cv::Ptr<cv::SimpleBlobDetector> detector = cv::SimpleBlobDetector::create(params);
+            found = cv::findCirclesGrid(image, boardSize_, corners,
+                flags | cv::CALIB_CB_CLUSTERING, detector);
+
+            // 尝试白圆（黑底白圆标定板）
+            if (!found)
+            {
+                params.blobColor = 255;
+                detector = cv::SimpleBlobDetector::create(params);
+                found = cv::findCirclesGrid(image, boardSize_, corners,
+                    flags | cv::CALIB_CB_CLUSTERING, detector);
+            }
+        }
     }
 
     if (!found)
