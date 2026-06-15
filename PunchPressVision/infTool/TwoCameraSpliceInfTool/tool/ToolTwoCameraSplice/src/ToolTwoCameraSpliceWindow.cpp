@@ -451,7 +451,17 @@ void ToolTwoCameraSpliceWindow::btn_takePicture_clicked()
 		winCam2_.lastImage = cam2Image_;
 	}
 
-	
+	// 将拍照图像存入 TwoCameraSpliceCfg，供后续测试/标定使用
+	if (inf_.two_camera_splice_module_)
+	{
+		auto& spliceCfg = inf_.two_camera_splice_module_->twoCameraSpliceConfig;
+		if (ok1) spliceCfg.camera1Piccture = static_cast<HalconCpp::HObject>(cam1Image_);
+		if (ok2) spliceCfg.camera2Piccture = static_cast<HalconCpp::HObject>(cam2Image_);
+	}
+
+	statusBar()->showMessage(
+		ok1 && ok2 ? QStringLiteral("拍照完成")
+				   : QStringLiteral("拍照完成（部分相机未就绪）"));
 }
 
 // ===================================================================
@@ -632,8 +642,8 @@ void ToolTwoCameraSpliceWindow::btn_test_clicked()
 		return;
 	}
 
-	// 使用拍照时缓存的图像（内存中）
-	if (!cam1Ready_ || !cam2Ready_)
+	// 使用 TwoCameraSpliceCfg 中缓存的拍照图像
+	if (!spliceCfg.camera1Piccture.IsInitialized() || !spliceCfg.camera2Piccture.IsInitialized())
 	{
 		QMessageBox::warning(this, QStringLiteral("提示"),
 			QStringLiteral("相机图像未就绪，请先拍照"));
@@ -666,10 +676,10 @@ void ToolTwoCameraSpliceWindow::btn_test_clicked()
 		return;
 	}
 
-	// 执行标定拼接
+	// 标定：使用 TwoCameraSpliceCfg 中存储的拍照图像
 	std::string errorMsg;
-	HalconCpp::HObject ho1 = static_cast<HalconCpp::HObject>(cam1Image_);
-	HalconCpp::HObject ho2 = static_cast<HalconCpp::HObject>(cam2Image_);
+	HalconCpp::HObject ho1 = spliceCfg.camera1Piccture;
+	HalconCpp::HObject ho2 = spliceCfg.camera2Piccture;
 
 	const bool ok = spliceTool_->calibImage(ho1, ho2, item1, item2, spliceCfg, &errorMsg);
 	if (!ok)
@@ -678,8 +688,18 @@ void ToolTwoCameraSpliceWindow::btn_test_clicked()
 		return;
 	}
 
+	// 拼接：使用当前实时显示的图像
+	if (!cam1Ready_ || !cam2Ready_)
+	{
+		QMessageBox::warning(this, QStringLiteral("提示"),
+			QStringLiteral("实时图像未就绪，请确认相机正在采集"));
+		return;
+	}
+	HalconCpp::HObject live1 = static_cast<HalconCpp::HObject>(cam1Image_);
+	HalconCpp::HObject live2 = static_cast<HalconCpp::HObject>(cam2Image_);
+
 	HalconCpp::HObject stitched;
-	if (!spliceTool_->pinjieImage(ho1, ho2, spliceCfg, stitched))
+	if (!spliceTool_->pinjieImage(live1, live2, spliceCfg, stitched))
 	{
 		QMessageBox::warning(this, QStringLiteral("拼接失败"), QStringLiteral("图像拼接失败"));
 		return;
