@@ -6,15 +6,12 @@
 #include "halconcpp/HalconCpp.h"
 #include "rwul/hoecm/hoec_m.hpp"
 
-#include <QObject>
-
 #include <vector>
 
 namespace infTool
 {
 	class CalibInfTool
-		: public QObject
-		, public global::IBusiness
+		: public global::IInfTool
 	{
 		Q_OBJECT
 
@@ -37,9 +34,6 @@ namespace infTool
 
 	public slots:
 		void onCameraFrame(rw::hoec::MatInfo matInfo, global::CameraIndex cameraIndex);
-
-	signals:
-		void callBackFunc(HalconCpp::HImage img, global::CameraIndex cameraIndex);
 
 	private:
 		inf::infrastructure& inf_;

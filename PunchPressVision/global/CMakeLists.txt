@@ -11,6 +11,11 @@ list(APPEND SRC_LIST ${INCLUDE_LIST})
 
 add_library(${global_TARGET} STATIC ${SRC_LIST} )
 
+target_link_libraries(${global_TARGET}
+	PUBLIC
+		Qt6::Core
+)
+
 set_target_properties(${global_TARGET} PROPERTIES
 	DEBUG_POSTFIX "d"
 	RELEASE_POSTFIX ""
