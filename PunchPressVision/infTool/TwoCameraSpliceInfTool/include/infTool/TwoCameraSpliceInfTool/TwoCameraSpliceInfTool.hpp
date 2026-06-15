@@ -9,8 +9,9 @@
 namespace infTool
 {
 	class TwoCameraSpliceInfTool
-		: public global::IBusiness
+		: public global::IInfTool
 	{
+		Q_OBJECT
 	public:
 		explicit TwoCameraSpliceInfTool(inf::infrastructure& inf);
 	private:

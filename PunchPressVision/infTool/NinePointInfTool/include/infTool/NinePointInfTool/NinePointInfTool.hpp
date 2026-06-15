@@ -4,9 +4,6 @@
 #include <thread>
 #include <vector>
 
-#include <QObject>
-#include <QString>
-
 #include "global/GlobalInterface.hpp"
 #include "infrastructure/infrastructure.hpp"
 
@@ -27,7 +24,7 @@ namespace infTool
 	};
 
 	class NinePointInfTool
-		: public QObject, public global::IBusiness
+		: public global::IInfTool
 	{
 		Q_OBJECT
 	public:
