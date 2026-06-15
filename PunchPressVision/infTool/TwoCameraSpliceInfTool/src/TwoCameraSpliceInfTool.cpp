@@ -299,6 +299,8 @@ namespace infTool
 
 	void TwoCameraSpliceInfTool::onCalibFrame(HalconCpp::HImage img, global::CameraIndex cameraIndex)
 	{
+		//TODO:
+
 		// 按相机索引缓存矫正后的图像
 		switch (cameraIndex)
 		{
