@@ -10,9 +10,6 @@
 #include <QStatusBar>
 
 #include "app/PunchPressApp.hpp"
-#include "UI/DistortionCalibDialog.h"
-#include "UI/NinePointCalibDialog.h"
-#include "UI/SpliceDialog.h"
 #include "UI/ModelManagerDialog.h"
 #include "UI/ModelEditorDialog.h"
 
@@ -70,9 +67,6 @@ namespace ui
 		connect(ui->rbtn_work, &QRadioButton::toggled, this, &PunchPress::onProductionToggled);
 		connect(ui->rbtn_upLight, &QRadioButton::clicked, this, &PunchPress::onUpperLightClicked);
 		connect(ui->rbtn_downLight, &QRadioButton::clicked, this, &PunchPress::onLowerLightClicked);
-		connect(ui->pbtn_distortionCalib, &QPushButton::clicked, this, &PunchPress::onDistortionCalib);
-		connect(ui->pbtn_ninePointCalib, &QPushButton::clicked, this, &PunchPress::onNinePointCalib);
-		connect(ui->pbtn_imageStitching, &QPushButton::clicked, this, &PunchPress::onImageStitching);
 		connect(ui->pbtn_createModel, &QPushButton::clicked, this, &PunchPress::onCreateModel);
 		connect(ui->pbtn_changeModel, &QPushButton::clicked, this, &PunchPress::onChangeModel);
 		connect(ui->pbtn_loadModel, &QPushButton::clicked, this, &PunchPress::onLoadModel);
@@ -183,27 +177,6 @@ namespace ui
 		auto& biz = app_.business();
 		if (biz.light_control_bun)
 			biz.light_control_bun->setLowerLight(ui->rbtn_downLight->isChecked());
-	}
-
-	void PunchPress::onDistortionCalib()
-	{
-		app_.switchToMode(global::RunMode::CalibDistortion);
-		DistortionCalibDialog dlg(app_, this);
-		dlg.exec();
-	}
-
-	void PunchPress::onNinePointCalib()
-	{
-		app_.switchToMode(global::RunMode::CalibNinePoint);
-		NinePointCalibDialog dlg(app_, this);
-		dlg.exec();
-	}
-
-	void PunchPress::onImageStitching()
-	{
-		app_.switchToMode(global::RunMode::Splice);
-		SpliceDialog dlg(app_, this);
-		dlg.exec();
 	}
 
 	void PunchPress::onCreateModel()

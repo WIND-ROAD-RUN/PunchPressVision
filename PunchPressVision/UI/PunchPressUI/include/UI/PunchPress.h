@@ -39,9 +39,6 @@ namespace ui
 		void onLowerLightClicked();
 
 		// 标定/模型对话框
-		void onDistortionCalib();
-		void onNinePointCalib();
-		void onImageStitching();
 		void onCreateModel();
 		void onChangeModel();
 		void onLoadModel();
