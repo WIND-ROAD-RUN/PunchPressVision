@@ -99,63 +99,88 @@ bool OpenCvCalibrator::addCalibrationImage(const cv::Mat& image)
     }
     else
     {
-        // 对称/非对称圆点：findCirclesGrid 内部会自动处理灰度转换
+        // 对称/非对称圆点
         const int flags = (pattern_ == CalibrationPattern::SymmetricCircles)
             ? cv::CALIB_CB_SYMMETRIC_GRID
             : cv::CALIB_CB_ASYMMETRIC_GRID;
 
-        // 1. 先尝试 OpenCV 默认 blob 检测器
-        found = cv::findCirclesGrid(
-            image, boardSize_, corners,
+        // 预处理：灰度 -> 高斯模糊 -> Otsu 二值化（黑圆变白色）
+        cv::Mat gray;
+        if (image.channels() == 1)
+            gray = image.clone();
+        else
+            cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
+
+        cv::Mat blurred;
+        cv::GaussianBlur(gray, blurred, cv::Size(5, 5), 0);
+
+        cv::Mat binary;
+        cv::threshold(blurred, binary, 0, 255, cv::THRESH_BINARY_INV | cv::THRESH_OTSU);
+
+        // 1. 对原图用默认检测器
+        found = cv::findCirclesGrid(image, boardSize_, corners,
             flags | cv::CALIB_CB_CLUSTERING);
 
-        // 2. 失败后使用 SimpleBlobDetector 重试（分别尝试黑圆、白圆）
+        // 2. 对二值图用默认检测器
+        if (!found)
+        {
+            found = cv::findCirclesGrid(binary, boardSize_, corners,
+                flags | cv::CALIB_CB_CLUSTERING);
+        }
+
+        // 3. 对二值图用 SimpleBlobDetector，不加 CLUSTERING（圆在 binary 中为白色）
         if (!found)
         {
             cv::SimpleBlobDetector::Params params;
             params.filterByArea = true;
-            params.minArea = 50.0f;
+            params.minArea = 1000.0f;
             params.maxArea = static_cast<float>(imageSize_.area()) / 10.0f;
             params.filterByCircularity = true;
-            params.minCircularity = 0.7f;
-            params.filterByConvexity = true;
-            params.minConvexity = 0.8f;
-            params.filterByInertia = true;
-            params.minInertiaRatio = 0.4f;
+            params.minCircularity = 0.5f;
+            params.filterByConvexity = false;
+            params.filterByInertia = false;
+            params.blobColor = 255;
 
-            // 尝试黑圆（白底黑圆标定板）
-            params.blobColor = 0;
             cv::Ptr<cv::SimpleBlobDetector> detector = cv::SimpleBlobDetector::create(params);
-            found = cv::findCirclesGrid(image, boardSize_, corners,
-                flags | cv::CALIB_CB_CLUSTERING, detector);
-
-            // 尝试白圆（黑底白圆标定板）
-            if (!found)
-            {
-                params.blobColor = 255;
-                detector = cv::SimpleBlobDetector::create(params);
-                found = cv::findCirclesGrid(image, boardSize_, corners,
-                    flags | cv::CALIB_CB_CLUSTERING, detector);
-            }
+            found = cv::findCirclesGrid(binary, boardSize_, corners, flags, detector);
         }
 
-        // 调试：如果全部失败，保存 SimpleBlobDetector 找到的 blobs
+        // 4. 对二值图用 SimpleBlobDetector，加 CLUSTERING
+        if (!found)
+        {
+            cv::SimpleBlobDetector::Params params;
+            params.filterByArea = true;
+            params.minArea = 1000.0f;
+            params.maxArea = static_cast<float>(imageSize_.area()) / 10.0f;
+            params.filterByCircularity = true;
+            params.minCircularity = 0.5f;
+            params.filterByConvexity = false;
+            params.filterByInertia = false;
+            params.blobColor = 255;
+
+            cv::Ptr<cv::SimpleBlobDetector> detector = cv::SimpleBlobDetector::create(params);
+            found = cv::findCirclesGrid(binary, boardSize_, corners,
+                flags | cv::CALIB_CB_CLUSTERING, detector);
+        }
+
+        // 调试：如果全部失败，保存二值图和检测到的 blobs
         if (!found)
         {
             cv::SimpleBlobDetector::Params debugParams;
             debugParams.filterByArea = true;
-            debugParams.minArea = 10.0f;
+            debugParams.minArea = 1000.0f;
             debugParams.maxArea = static_cast<float>(imageSize_.area()) / 5.0f;
             debugParams.filterByCircularity = true;
             debugParams.minCircularity = 0.5f;
             debugParams.filterByConvexity = false;
             debugParams.filterByInertia = false;
+            debugParams.blobColor = 255;
 
             cv::Ptr<cv::SimpleBlobDetector> debugDetector = cv::SimpleBlobDetector::create(debugParams);
             std::vector<cv::KeyPoint> keypoints;
-            debugDetector->detect(image, keypoints);
+            debugDetector->detect(binary, keypoints);
 
-            saveDebugImage(image, keypoints, "all_blobs");
+            saveDebugImage(binary, keypoints, "binary_blobs");
         }
     }
 
