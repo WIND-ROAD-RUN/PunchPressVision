@@ -4,13 +4,20 @@
 #include "infrastructure/infrastructure.hpp"
 
 #include "halconcpp/HalconCpp.h"
+#include "rwul/hoecm/hoec_m.hpp"
+
+#include <QObject>
+
 #include <vector>
 
 namespace infTool
 {
 	class CalibInfTool
-		: public global::IBusiness
+		: public QObject
+		, public global::IBusiness
 	{
+		Q_OBJECT
+
 	public:
 		explicit CalibInfTool(inf::infrastructure& inf);
 	public:
@@ -27,6 +34,13 @@ namespace infTool
 			HalconCpp::HObject& outMarksRegion,
 			std::string* errorMsg = nullptr);
 		HalconCpp::HImage undistortImage(const HalconCpp::HImage& himage);
+
+	public slots:
+		void onCameraFrame(rw::hoec::MatInfo matInfo, global::CameraIndex cameraIndex);
+
+	signals:
+		void callBackFunc(HalconCpp::HImage img, global::CameraIndex cameraIndex);
+
 	private:
 		inf::infrastructure& inf_;
 	public:

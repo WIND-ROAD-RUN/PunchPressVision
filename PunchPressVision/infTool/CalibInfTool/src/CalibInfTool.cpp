@@ -4,6 +4,56 @@
 
 namespace infTool
 {
+	namespace PRIVATE
+	{
+		HalconCpp::HImage cvMatToHImage(const cv::Mat& mat)
+		{
+			// 检查输入 cv::Mat 是否为空
+			if (mat.empty())
+			{
+				throw std::invalid_argument("Input cv::Mat is empty.");
+			}
+
+			// 获取 cv::Mat 的宽度、高度和通道数
+			int width = mat.cols;
+			int height = mat.rows;
+			int channels = mat.channels();
+
+			HalconCpp::HImage hImage;
+
+			// 根据 cv::Mat 的通道数生成对应的 HImage
+			if (channels == 1)
+			{
+				// 单通道灰度图像
+				hImage.GenImage1("byte", width, height, const_cast<void*>(static_cast<const void*>(mat.data)));
+			}
+			else if (channels == 3)
+			{
+				// 三通道彩色图像，OpenCV 默认存储顺序为 BGR
+				hImage.GenImageInterleaved(
+					const_cast<void*>(static_cast<const void*>(mat.data)), // PixelPointer
+					"bgr",                                                // ColorFormat
+					width,                                                 // OriginalWidth
+					height,                                                // OriginalHeight
+					0,                                                     // Alignment
+					"byte",                                                // Type
+					width,                                                 // ImageWidth
+					height,                                                // ImageHeight
+					0,                                                     // StartRow
+					0,                                                     // StartColumn
+					8,                                                     // BitsPerChannel
+					0                                                      // BitShift
+				);
+			}
+			else
+			{
+				throw std::invalid_argument("Unsupported cv::Mat format. Only 1-channel and 3-channel images are supported.");
+			}
+
+			return hImage;
+		}
+	}
+
 	CalibInfTool::CalibInfTool(inf::infrastructure& inf)
 		: inf_(inf)
 	{
@@ -300,12 +350,35 @@ namespace infTool
 
 
 
+	void CalibInfTool::onCameraFrame(rw::hoec::MatInfo matInfo, global::CameraIndex cameraIndex)
+	{
+		if (!matInfo.mat.empty())
+		{
+			// TODO:
+			
+			auto hImage = PRIVATE::cvMatToHImage(matInfo.mat);
+			emit callBackFunc(hImage, cameraIndex);
+		}
+
+	}
+
 	void CalibInfTool::build()
 	{
+		// 桥接 CameraModule 的原始帧信号，经 onCameraFrame 处理后转发
+		if (inf_.camera_module_)
+		{
+			connect(inf_.camera_module_.get(), &inf::CameraModule::callBackFunc,
+				this, &CalibInfTool::onCameraFrame, Qt::DirectConnection);
+		}
 	}
 
 	void CalibInfTool::destroy()
 	{
+		if (inf_.camera_module_)
+		{
+			disconnect(inf_.camera_module_.get(), &inf::CameraModule::callBackFunc,
+				this, &CalibInfTool::onCameraFrame);
+		}
 	}
 
 	void CalibInfTool::start()
