@@ -1,6 +1,8 @@
 #include "rwul_calibRefactor.hpp"
 
 #include "opencv2/features2d.hpp"
+#include "opencv2/highgui.hpp"
+#include "opencv2/imgproc.hpp"
 
 namespace rwul
 {
@@ -22,6 +24,18 @@ namespace rwul
         std::vector<cv::KeyPoint> keypoints;
         debugDetector->detect(mat, keypoints);
 
-        //saveDebugImage(binary, keypoints, "binary_blobs");
+        cv::Mat display;
+        if (mat.channels() == 1)
+            cv::cvtColor(mat, display, cv::COLOR_GRAY2BGR);
+        else
+            display = mat.clone();
+
+        cv::drawKeypoints(display, keypoints, display, cv::Scalar(0, 0, 255),
+            cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+
+        cv::namedWindow("test", cv::WINDOW_NORMAL);
+        cv::resizeWindow("test", 1920, 1080);
+        cv::imshow("test", display);
+        cv::waitKey(0);
 	}
 }

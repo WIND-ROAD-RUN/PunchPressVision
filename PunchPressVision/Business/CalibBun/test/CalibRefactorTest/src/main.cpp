@@ -6,7 +6,7 @@
 
 int main(int argc, char* argv[])
 {
-    const char* path = (argc > 1) ? argv[1] : "calib.png";
+    const char* path = (argc > 1) ? argv[1] : R"(C:\Users\abuwi\Desktop\temp\calib_20260615_100422_224.png)";
 
     cv::Mat img = cv::imread(path, cv::IMREAD_UNCHANGED);
     if (img.empty())
