@@ -2,7 +2,8 @@
 
 #include <filesystem>
 #include <fstream>
-#include <string>
+
+#include <json/json.h>
 
 namespace Config
 {
@@ -10,100 +11,48 @@ namespace Config
 	{
 		namespace fs = std::filesystem;
 
-		constexpr const char* kCameraParametersFile = "camera_parameters.tup";
-		constexpr const char* kCameraPoseFile = "camera_pose.tup";
-		constexpr const char* kSettingsFile = "camera_settings.txt";
-
-		std::string trimCr(const std::string& s)
-		{
-			if (!s.empty() && s.back() == '\r')
-				return s.substr(0, s.size() - 1);
-			return s;
-		}
+		constexpr const char* kCalibConfigFile = "calib_config.json";
 
 		void replaceFile(const fs::path& tmp, const fs::path& target)
 		{
-			if (fs::exists(target))
-			{
-				try { fs::remove(target); }
-				catch (...) {}
-			}
-			fs::rename(tmp, target);
+			std::error_code ec;
+			if (fs::exists(target, ec))
+				fs::remove(target, ec);
+			fs::rename(tmp, target, ec);
 		}
 
-		void writeTupleSafe(const fs::path& filePath, const HalconCpp::HTuple& tuple)
+		// HTuple 元素可能是 double 或 string，逐个序列化到 JSON 数组
+		Json::Value tupleToJson(const HalconCpp::HTuple& t)
 		{
-			fs::create_directories(filePath.parent_path());
-			fs::path tmp = filePath;
-			tmp += ".tmp";
-			HalconCpp::WriteTuple(tuple, tmp.string().c_str());
-			replaceFile(tmp, filePath);
+			Json::Value arr(Json::arrayValue);
+			for (Hlong i = 0; i < t.Length(); ++i)
+			{
+				HalconCpp::HTuple elem = t[i];
+				// 尝试以 double 读取，失败则当作 string
+				bool isNumeric = true;
+				try { elem.D(); }
+				catch (const HalconCpp::HException&) { isNumeric = false; }
+
+				if (isNumeric)
+					arr.append(elem.D());
+				else
+					arr.append(elem.S());
+			}
+			return arr;
 		}
 
-		bool readTupleSafe(const fs::path& filePath, HalconCpp::HTuple& tuple)
+		HalconCpp::HTuple jsonToTuple(const Json::Value& arr)
 		{
-			if (!fs::exists(filePath))
-				return false;
-			try
+			HalconCpp::HTuple t;
+			for (Json::ArrayIndex i = 0; i < arr.size(); ++i)
 			{
-				HalconCpp::ReadTuple(filePath.string().c_str(), &tuple);
+				const auto& elem = arr[i];
+				if (elem.isNumeric())
+					t.Append(elem.asDouble());
+				else if (elem.isString())
+					t.Append(elem.asString().c_str());
 			}
-			catch (...)
-			{
-				return false;
-			}
-			return true;
-		}
-
-		void writeSettingsSafe(const fs::path& filePath, double exposure, double gain, const std::string& boardDescrPath)
-		{
-			fs::create_directories(filePath.parent_path());
-			fs::path tmp = filePath;
-			tmp += ".tmp";
-			std::ofstream ofs(tmp);
-			if (!ofs)
-				return;
-			ofs << "cameraExposure=" << exposure << '\n';
-			ofs << "cameraGain=" << gain << '\n';
-			if (!boardDescrPath.empty())
-				ofs << "calibBoardDescrPath=" << boardDescrPath << '\n';
-			ofs.close();
-			replaceFile(tmp, filePath);
-		}
-
-		bool readSettingsSafe(const fs::path& filePath, double& exposure, double& gain, std::string& boardDescrPath)
-		{
-			if (!fs::exists(filePath))
-				return false;
-			std::ifstream ifs(filePath);
-			if (!ifs)
-				return false;
-			std::string line;
-			while (std::getline(ifs, line))
-			{
-				line = trimCr(line);
-				if (line.empty() || line.front() == '#')
-					continue;
-				const auto pos = line.find('=');
-				if (pos == std::string::npos)
-					continue;
-				const std::string key = line.substr(0, pos);
-				const std::string value = line.substr(pos + 1);
-				try
-				{
-					if (key == "cameraExposure")
-						exposure = std::stod(value);
-					else if (key == "cameraGain")
-						gain = std::stod(value);
-					else if (key == "calibBoardDescrPath")
-						boardDescrPath = value;
-				}
-				catch (...)
-				{
-					continue;
-				}
-			}
-			return true;
+			return t;
 		}
 	}
 
@@ -111,10 +60,28 @@ namespace Config
 	{
 		try
 		{
+			Json::Value root;
+			root["cameraParameters"] = tupleToJson(cameraParameters);
+			root["cameraPose"] = tupleToJson(cameraPose);
+			root["calibrationErrors"] = tupleToJson(calibrationErrors);
+			root["cameraExposure"] = cameraExposure;
+			root["cameraGain"] = cameraGain;
+			root["calibrationReferenceIndex"] = calibrationReferenceIndex;
+
 			const fs::path dir(dirPath);
-			writeTupleSafe(dir / kCameraParametersFile, cameraParameters);
-			writeTupleSafe(dir / kCameraPoseFile, cameraPose);
-			writeSettingsSafe(dir / kSettingsFile, cameraExposure, cameraGain, calibBoardDescrPath);
+			fs::create_directories(dir);
+
+			const fs::path tmp = dir / (std::string(kCalibConfigFile) + ".tmp");
+			{
+				std::ofstream ofs(tmp);
+				if (!ofs)
+					return;
+				Json::StreamWriterBuilder builder;
+				builder["indentation"] = "  ";
+				std::unique_ptr<Json::StreamWriter> writer(builder.newStreamWriter());
+				writer->write(root, &ofs);
+			}
+			replaceFile(tmp, dir / kCalibConfigFile);
 		}
 		catch (...)
 		{
@@ -126,17 +93,40 @@ namespace Config
 	{
 		try
 		{
-			const fs::path dir(dirPath);
 			cameraExposure = 10000.0;
 			cameraGain = 5.0;
-			calibBoardDescrPath.clear();
-			readTupleSafe(dir / kCameraParametersFile, cameraParameters);
-			readTupleSafe(dir / kCameraPoseFile, cameraPose);
-			readSettingsSafe(dir / kSettingsFile, cameraExposure, cameraGain, calibBoardDescrPath);
+			calibrationReferenceIndex = 0;
+
+			const fs::path filePath = fs::path(dirPath) / kCalibConfigFile;
+			if (!fs::exists(filePath))
+				return;
+
+			std::ifstream ifs(filePath);
+			if (!ifs)
+				return;
+
+			Json::CharReaderBuilder builder;
+			JSONCPP_STRING errs;
+			Json::Value root;
+			if (!Json::parseFromStream(builder, ifs, &root, &errs))
+				return;
+
+			if (root.isMember("cameraParameters"))
+				cameraParameters = jsonToTuple(root["cameraParameters"]);
+			if (root.isMember("cameraPose"))
+				cameraPose = jsonToTuple(root["cameraPose"]);
+			if (root.isMember("calibrationErrors"))
+				calibrationErrors = jsonToTuple(root["calibrationErrors"]);
+			if (root.isMember("cameraExposure"))
+				cameraExposure = root["cameraExposure"].asDouble();
+			if (root.isMember("cameraGain"))
+				cameraGain = root["cameraGain"].asDouble();
+			if (root.isMember("calibrationReferenceIndex"))
+				calibrationReferenceIndex = root["calibrationReferenceIndex"].asInt();
 		}
 		catch (...)
 		{
-			// Ignore load errors; missing files keep the default values.
+			// Ignore load errors; missing file keeps the default values.
 		}
 	}
 }
