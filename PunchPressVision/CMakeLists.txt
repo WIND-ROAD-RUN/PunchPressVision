@@ -1,5 +1,6 @@
 add_subdirectory(global)
 add_subdirectory(infrastructure)
+add_subdirectory(infTool)
 add_subdirectory(Business)
 add_subdirectory(app)
 add_subdirectory(UI)

@@ -28,9 +28,9 @@ namespace ui
 		auto& biz = app_.business();
 		if (biz.nine_point_bun)
 		{
-			connect(biz.nine_point_bun.get(), &bun::NinePointBun::calibrationProgress,
+			connect(biz.nine_point_bun, &infTool::NinePointBun::calibrationProgress,
 				this, &NinePointCalibDialog::onCalibrationProgress, Qt::QueuedConnection);
-			connect(biz.nine_point_bun.get(), &bun::NinePointBun::calibrationFinished,
+			connect(biz.nine_point_bun, &infTool::NinePointBun::calibrationFinished,
 				this, &NinePointCalibDialog::onCalibrationFinished, Qt::QueuedConnection);
 		}
 
@@ -46,7 +46,7 @@ namespace ui
 		if (!biz.nine_point_bun)
 			return;
 		// TODO(硬件/UI): 九点机械坐标应由 UI 输入或配置给出，这里用占位的网格点。
-		std::vector<bun::Point2D> coords;
+		std::vector<infTool::Point2D> coords;
 		for (int i = 0; i < 9; ++i)
 			coords.push_back(bun::Point2D{ static_cast<double>((i % 3) * 10),
 				static_cast<double>((i / 3) * 10) });

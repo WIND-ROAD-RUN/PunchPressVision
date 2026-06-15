@@ -1,4 +1,4 @@
-set(Bun_TARGET Business)
+set(Bun_TARGET TwoCameraSpliceBun)
 
 file(GLOB_RECURSE INCLUDE_LIST CONFIGURE_DEPENDS
 	"${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp"
@@ -16,14 +16,6 @@ target_link_libraries(${Bun_TARGET}
 		inf::infrastructure
 )
 
-target_link_libraries(${Bun_TARGET}
-	PUBLIC
-		infTool::infTool
-		bun::CalibBun
-		bun::ShapeModeManagerBun
-		bun::LightControlBun
-)
-
 set_target_properties(${Bun_TARGET} PROPERTIES
 	DEBUG_POSTFIX "d"
 	RELEASE_POSTFIX ""
@@ -36,6 +28,6 @@ target_include_directories(${Bun_TARGET}
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/private/include>
 )
 
-add_library(bun::${Bun_TARGET} ALIAS ${Bun_TARGET})
+add_library(infTool::${Bun_TARGET} ALIAS ${Bun_TARGET})
 
 add_subdirectory(./test)

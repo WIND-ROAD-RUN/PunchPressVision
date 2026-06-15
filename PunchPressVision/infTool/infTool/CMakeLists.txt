@@ -1,4 +1,4 @@
-set(Bun_TARGET Business)
+set(InfTool_TARGET infTool)
 
 file(GLOB_RECURSE INCLUDE_LIST CONFIGURE_DEPENDS
 	"${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp"
@@ -9,33 +9,28 @@ file(GLOB_RECURSE SRC_LIST CONFIGURE_DEPENDS
 )
 list(APPEND SRC_LIST ${INCLUDE_LIST})
 
-add_library(${Bun_TARGET} STATIC ${SRC_LIST} )
+add_library(${InfTool_TARGET} STATIC ${SRC_LIST})
 
-target_link_libraries(${Bun_TARGET}
+target_link_libraries(${InfTool_TARGET}
 	PUBLIC
 		inf::infrastructure
+		infTool::CameraBun
+		infTool::NinePointBun
+		infTool::TwoCameraSpliceBun
 )
 
-target_link_libraries(${Bun_TARGET}
-	PUBLIC
-		infTool::infTool
-		bun::CalibBun
-		bun::ShapeModeManagerBun
-		bun::LightControlBun
-)
-
-set_target_properties(${Bun_TARGET} PROPERTIES
+set_target_properties(${InfTool_TARGET} PROPERTIES
 	DEBUG_POSTFIX "d"
 	RELEASE_POSTFIX ""
 )
 
-target_include_directories(${Bun_TARGET} 
-	PUBLIC 
+target_include_directories(${InfTool_TARGET}
+	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 	PRIVATE
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/private/include>
 )
 
-add_library(bun::${Bun_TARGET} ALIAS ${Bun_TARGET})
+add_library(infTool::${InfTool_TARGET} ALIAS ${InfTool_TARGET})
 
 add_subdirectory(./test)
