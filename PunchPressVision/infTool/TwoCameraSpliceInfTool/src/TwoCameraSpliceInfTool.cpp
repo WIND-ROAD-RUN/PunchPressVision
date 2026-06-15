@@ -2,8 +2,9 @@
 
 namespace infTool
 {
-	TwoCameraSpliceInfTool::TwoCameraSpliceInfTool(inf::infrastructure& inf)
+	TwoCameraSpliceInfTool::TwoCameraSpliceInfTool(inf::infrastructure& inf, CalibInfTool& calibTool)
 		: inf_(inf)
+		, calib_tool_(calibTool)
 	{
 	}
 
