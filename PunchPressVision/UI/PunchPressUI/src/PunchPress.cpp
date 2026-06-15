@@ -11,7 +11,6 @@
 
 #include "app/PunchPressApp.hpp"
 #include "UI/ModelManagerDialog.h"
-#include "UI/ModelEditorDialog.h"
 
 // 取消 Win32 MessageBox 宏，使用 rw::rqwu::MessageBox。
 #ifdef MessageBox
@@ -67,9 +66,7 @@ namespace ui
 		connect(ui->rbtn_work, &QRadioButton::toggled, this, &PunchPress::onProductionToggled);
 		connect(ui->rbtn_upLight, &QRadioButton::clicked, this, &PunchPress::onUpperLightClicked);
 		connect(ui->rbtn_downLight, &QRadioButton::clicked, this, &PunchPress::onLowerLightClicked);
-		connect(ui->pbtn_createModel, &QPushButton::clicked, this, &PunchPress::onCreateModel);
-		connect(ui->pbtn_changeModel, &QPushButton::clicked, this, &PunchPress::onChangeModel);
-		connect(ui->pbtn_loadModel, &QPushButton::clicked, this, &PunchPress::onLoadModel);
+		connect(ui->pbtn_modelManager, &QPushButton::clicked, this, &PunchPress::onModelManager);
 		connect(ui->pbtn_exit, &QPushButton::clicked, this, &PunchPress::onExit);
 	}
 
@@ -179,19 +176,7 @@ namespace ui
 			biz.light_control_bun->setLowerLight(ui->rbtn_downLight->isChecked());
 	}
 
-	void PunchPress::onCreateModel()
-	{
-		ModelEditorDialog dlg(app_, this);
-		dlg.exec();
-	}
-
-	void PunchPress::onChangeModel()
-	{
-		ModelManagerDialog dlg(app_, this);
-		dlg.exec();
-	}
-
-	void PunchPress::onLoadModel()
+	void PunchPress::onModelManager()
 	{
 		ModelManagerDialog dlg(app_, this);
 		dlg.exec();

@@ -38,10 +38,8 @@ namespace ui
 		void onUpperLightClicked();
 		void onLowerLightClicked();
 
-		// 标定/模型对话框
-		void onCreateModel();
-		void onChangeModel();
-		void onLoadModel();
+		// 模型管理
+		void onModelManager();
 
 		// 系统
 		void onExit();
