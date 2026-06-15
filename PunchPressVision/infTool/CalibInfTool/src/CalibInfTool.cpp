@@ -2,6 +2,8 @@
 
 #include <algorithm>
 
+#include <QObject>
+
 namespace infTool
 {
 	namespace PRIVATE
@@ -371,7 +373,7 @@ namespace infTool
 		// 桥接 CameraModule 的原始帧信号，经 onCameraFrame 处理后转发
 		if (inf_.camera_module_)
 		{
-			connect(inf_.camera_module_.get(), &inf::CameraModule::callBackFunc,
+			QObject::connect(inf_.camera_module_.get(), &inf::CameraModule::callBackFunc,
 				this, &CalibInfTool::onCameraFrame, Qt::DirectConnection);
 		}
 	}
@@ -380,7 +382,7 @@ namespace infTool
 	{
 		if (inf_.camera_module_)
 		{
-			disconnect(inf_.camera_module_.get(), &inf::CameraModule::callBackFunc,
+			QObject::disconnect(inf_.camera_module_.get(), &inf::CameraModule::callBackFunc,
 				this, &CalibInfTool::onCameraFrame);
 		}
 	}
