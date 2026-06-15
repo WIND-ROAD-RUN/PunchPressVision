@@ -1,6 +1,5 @@
 #include "CalibBunTestWindow.hpp"
 
-#include "Business/CameraBun/CameraImgConvert.hpp"
 #include "OpenCvCalibrator.hpp"
 
 #include <QApplication>
@@ -15,7 +14,6 @@
 #include <QMessageBox>
 #include <QPixmap>
 #include <QResizeEvent>
-#include <QShowEvent>
 #include <QSpinBox>
 #include <QStatusBar>
 #include <QVBoxLayout>
@@ -38,10 +36,7 @@ CalibBunTestWindow::CalibBunTestWindow(inf::infrastructure& inf, QWidget* parent
     applyDefaultCameraParams();
 }
 
-CalibBunTestWindow::~CalibBunTestWindow()
-{
-    halconView_.close();
-}
+CalibBunTestWindow::~CalibBunTestWindow() = default;
 
 void CalibBunTestWindow::buildUi()
 {
@@ -108,30 +103,31 @@ void CalibBunTestWindow::buildUi()
 
     rootLayout->addLayout(controlLayout);
 
-    // 图像显示区：左 Halcon，右原始 Mat
+    // 图像显示区：左矫正后，右原始
     auto* imageLayout = new QHBoxLayout();
     imageLayout->setSpacing(8);
 
-    auto* halconPanel = new QVBoxLayout();
-    halconPanel->setSpacing(4);
-    halconPanel->addWidget(new QLabel(QStringLiteral("OpenCV 矫正后 (Halcon 显示)"), this));
-    halconHost_ = new QWidget(this);
-    halconHost_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    halconHost_->setMinimumSize(320, 240);
-    halconHost_->setStyleSheet(QStringLiteral("background-color: #333;"));
-    halconPanel->addWidget(halconHost_, 1);
-    imageLayout->addLayout(halconPanel, 1);
+    auto* undistortedPanel = new QVBoxLayout();
+    undistortedPanel->setSpacing(4);
+    undistortedPanel->addWidget(new QLabel(QStringLiteral("OpenCV 矫正后"), this));
+    undistortedView_ = new QLabel(this);
+    undistortedView_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    undistortedView_->setMinimumSize(320, 240);
+    undistortedView_->setAlignment(Qt::AlignCenter);
+    undistortedView_->setStyleSheet(QStringLiteral("background-color: #333;"));
+    undistortedPanel->addWidget(undistortedView_, 1);
+    imageLayout->addLayout(undistortedPanel, 1);
 
-    auto* matPanel = new QVBoxLayout();
-    matPanel->setSpacing(4);
-    matPanel->addWidget(new QLabel(QStringLiteral("原始 Mat 图像"), this));
-    matView_ = new QLabel(this);
-    matView_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    matView_->setMinimumSize(320, 240);
-    matView_->setAlignment(Qt::AlignCenter);
-    matView_->setStyleSheet(QStringLiteral("background-color: #333;"));
-    matPanel->addWidget(matView_, 1);
-    imageLayout->addLayout(matPanel, 1);
+    auto* originalPanel = new QVBoxLayout();
+    originalPanel->setSpacing(4);
+    originalPanel->addWidget(new QLabel(QStringLiteral("原始图像"), this));
+    originalView_ = new QLabel(this);
+    originalView_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    originalView_->setMinimumSize(320, 240);
+    originalView_->setAlignment(Qt::AlignCenter);
+    originalView_->setStyleSheet(QStringLiteral("background-color: #333;"));
+    originalPanel->addWidget(originalView_, 1);
+    imageLayout->addLayout(originalPanel, 1);
 
     rootLayout->addLayout(imageLayout, 1);
 
@@ -164,29 +160,18 @@ void CalibBunTestWindow::buildConnections()
             this, &CalibBunTestWindow::onConnectionChanged, Qt::QueuedConnection);
     }
 
-    // 显示信号必须排队到 UI 线程，避免在非 UI 线程操作 Halcon 窗口 / QLabel
-    connect(this, &CalibBunTestWindow::frameReady,
-        this, &CalibBunTestWindow::onDisplayFrame, Qt::QueuedConnection);
-    connect(this, &CalibBunTestWindow::matFrameReady,
-        this, &CalibBunTestWindow::onMatDisplayFrame, Qt::QueuedConnection);
-}
-
-void CalibBunTestWindow::showEvent(QShowEvent* event)
-{
-    QMainWindow::showEvent(event);
-
-    if (!halconWindowEnsured_)
-    {
-        halconView_.ensure(halconHost_);
-        halconWindowEnsured_ = true;
-    }
+    // 显示信号排队到 UI 线程
+    connect(this, &CalibBunTestWindow::originalFrameReady,
+        this, &CalibBunTestWindow::onOriginalDisplayFrame, Qt::QueuedConnection);
+    connect(this, &CalibBunTestWindow::undistortedFrameReady,
+        this, &CalibBunTestWindow::onUndistortedDisplayFrame, Qt::QueuedConnection);
 }
 
 void CalibBunTestWindow::resizeEvent(QResizeEvent* event)
 {
     QMainWindow::resizeEvent(event);
-    halconView_.resizeToHost();
-    refreshMatView();
+    refreshOriginalView();
+    refreshUndistortedView();
 }
 
 void CalibBunTestWindow::closeEvent(QCloseEvent* event)
@@ -197,7 +182,6 @@ void CalibBunTestWindow::closeEvent(QCloseEvent* event)
             inf_.camera_module_->stopMonitor();
         isRunning_.store(false);
     }
-    halconView_.close();
     event->accept();
 }
 
@@ -211,17 +195,15 @@ void CalibBunTestWindow::onCameraFrame(rw::hoec::MatInfo matInfo, global::Camera
         // 缓存当前原始帧，用于保存标定图
         lastRawMat_ = matInfo.mat.clone();
 
-        // 左侧：经 OpenCV 畸变矫正后的图像 -> Halcon 显示
-        cv::Mat displayMat = matInfo.mat;
+        // 左侧：OpenCV 畸变矫正后的图像
+        cv::Mat undistortedMat = matInfo.mat;
         if (undistortEnabled_.load(std::memory_order_acquire))
-            displayMat = calibrator_->undistort(displayMat);
+            undistortedMat = calibrator_->undistort(undistortedMat);
 
-        HalconCpp::HImage hImage = bun::CameraImgConvert::cvMatToHImage(displayMat);
-        if (hImage.IsInitialized())
-            emit frameReady(hImage);
+        emit undistortedFrameReady(cvMatToQImage(undistortedMat));
 
         // 右侧：原始 cv::Mat，便于与左侧矫正结果对比
-        emit matFrameReady(cvMatToQImage(matInfo.mat));
+        emit originalFrameReady(cvMatToQImage(matInfo.mat));
     }
     catch (...)
     {
@@ -229,30 +211,46 @@ void CalibBunTestWindow::onCameraFrame(rw::hoec::MatInfo matInfo, global::Camera
     }
 }
 
-void CalibBunTestWindow::onDisplayFrame(HalconCpp::HImage image)
-{
-    halconView_.display(image);
-}
-
-void CalibBunTestWindow::onMatDisplayFrame(QImage image)
+void CalibBunTestWindow::onOriginalDisplayFrame(QImage image)
 {
     if (image.isNull())
         return;
 
-    lastMatImage_ = image;
-    refreshMatView();
+    lastOriginalImage_ = image;
+    refreshOriginalView();
 }
 
-void CalibBunTestWindow::refreshMatView()
+void CalibBunTestWindow::onUndistortedDisplayFrame(QImage image)
 {
-    if (lastMatImage_.isNull() || !matView_)
+    if (image.isNull())
         return;
 
-    const QSize viewSize = matView_->size();
+    lastUndistortedImage_ = image;
+    refreshUndistortedView();
+}
+
+void CalibBunTestWindow::refreshOriginalView()
+{
+    if (lastOriginalImage_.isNull() || !originalView_)
+        return;
+
+    const QSize viewSize = originalView_->size();
     if (viewSize.width() > 0 && viewSize.height() > 0)
-        matView_->setPixmap(QPixmap::fromImage(lastMatImage_).scaled(viewSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        originalView_->setPixmap(QPixmap::fromImage(lastOriginalImage_).scaled(viewSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     else
-        matView_->setPixmap(QPixmap::fromImage(lastMatImage_));
+        originalView_->setPixmap(QPixmap::fromImage(lastOriginalImage_));
+}
+
+void CalibBunTestWindow::refreshUndistortedView()
+{
+    if (lastUndistortedImage_.isNull() || !undistortedView_)
+        return;
+
+    const QSize viewSize = undistortedView_->size();
+    if (viewSize.width() > 0 && viewSize.height() > 0)
+        undistortedView_->setPixmap(QPixmap::fromImage(lastUndistortedImage_).scaled(viewSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    else
+        undistortedView_->setPixmap(QPixmap::fromImage(lastUndistortedImage_));
 }
 
 void CalibBunTestWindow::onConnectionChanged(global::CameraIndex idx, bool connected, QString reason)

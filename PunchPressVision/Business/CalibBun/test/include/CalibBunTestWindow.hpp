@@ -10,16 +10,11 @@
 #include <QSpinBox>
 #include <QWidget>
 
-#include "UI/HalconView.h"
 #include "global/GlobalType.hpp"
 #include "infrastructure/infrastructure.hpp"
 #include "rwul/hoecm/hoec_m.hpp"
 
 class OpenCvCalibrator;
-
-#include <QMetaType>
-
-Q_DECLARE_METATYPE(HalconCpp::HImage)
 
 class CalibBunTestWindow : public QMainWindow
 {
@@ -30,14 +25,13 @@ public:
     ~CalibBunTestWindow() override;
 
 protected:
-    void showEvent(QShowEvent* event) override;
     void resizeEvent(QResizeEvent* event) override;
     void closeEvent(QCloseEvent* event) override;
 
 private slots:
     void onCameraFrame(rw::hoec::MatInfo matInfo, global::CameraIndex cameraIndex);
-    void onDisplayFrame(HalconCpp::HImage image);
-    void onMatDisplayFrame(QImage image);
+    void onOriginalDisplayFrame(QImage image);
+    void onUndistortedDisplayFrame(QImage image);
     void onConnectionChanged(global::CameraIndex idx, bool connected, QString reason);
 
     void onSetExposure();
@@ -54,14 +48,15 @@ private slots:
     void onLoadParams();
 
 signals:
-    void frameReady(HalconCpp::HImage image);
-    void matFrameReady(QImage image);
+    void originalFrameReady(QImage image);
+    void undistortedFrameReady(QImage image);
 
 private:
     void buildUi();
     void buildConnections();
     void updateConnectionStatus();
-    void refreshMatView();
+    void refreshOriginalView();
+    void refreshUndistortedView();
     void applyDefaultCameraParams();
     static global::CameraIndex cameraIndexFromCombo(int index);
     static QString cameraDisplayName(global::CameraIndex idx);
@@ -69,10 +64,9 @@ private:
 private:
     inf::infrastructure& inf_;
     std::unique_ptr<OpenCvCalibrator> calibrator_;
-    ui::HalconView halconView_;
 
-    QWidget* halconHost_ = nullptr;
-    QLabel* matView_ = nullptr;
+    QLabel* originalView_ = nullptr;
+    QLabel* undistortedView_ = nullptr;
     QPushButton* startStopBtn_ = nullptr;
     QPushButton* undistortBtn_ = nullptr;
     QPushButton* loadCalibImagesBtn_ = nullptr;
@@ -87,8 +81,9 @@ private:
     std::atomic<global::CameraIndex> selectedCamera_{ global::CameraIndex::Camera1 };
     std::atomic_bool undistortEnabled_{ false };
     std::atomic_bool isRunning_{ false };
-    bool halconWindowEnsured_ = false;
-    QImage lastMatImage_;
+
+    QImage lastOriginalImage_;
+    QImage lastUndistortedImage_;
     cv::Mat lastRawMat_;
     QString lastCalibDir_;
 };

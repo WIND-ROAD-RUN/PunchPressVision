@@ -20,7 +20,7 @@ target_include_directories(${Bun_TARGET}
 )
 
 target_link_libraries(${Bun_TARGET} PRIVATE
-    bun::CameraBun
+    inf::infrastructure
     Qt6::Core
     Qt6::Widgets
     ${OpenCV_LIBS}
