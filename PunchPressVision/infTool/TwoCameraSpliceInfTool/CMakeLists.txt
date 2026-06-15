@@ -30,4 +30,5 @@ target_include_directories(${Bun_TARGET}
 
 add_library(infTool::${Bun_TARGET} ALIAS ${Bun_TARGET})
 
+add_subdirectory(./tool/ToolTwoCameraSplice)
 add_subdirectory(./test)
