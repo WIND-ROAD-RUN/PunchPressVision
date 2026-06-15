@@ -10,7 +10,7 @@
 
 CornerPreviewDialog::CornerPreviewDialog(
     infTool::CalibInfTool& calibTool,
-    Config::CalibConfig& cfg,
+    Config::CalibConfigItem& cfg,
     const std::vector<HalconCpp::HImage>& images,
     QWidget* parent)
     : QDialog(parent)

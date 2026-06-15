@@ -11,7 +11,7 @@
 #include "DisplayView.hpp"
 
 namespace infTool { class CalibInfTool; }
-namespace Config { class CalibConfig; }
+namespace Config { class CalibConfigItem; }
 
 /**
  * @brief Halcon 标定板标记点预览对话框。
@@ -25,7 +25,7 @@ class CornerPreviewDialog : public QDialog
 
 public:
     explicit CornerPreviewDialog(infTool::CalibInfTool& calibTool,
-        Config::CalibConfig& cfg,
+        Config::CalibConfigItem& cfg,
         const std::vector<HalconCpp::HImage>& images,
         QWidget* parent = nullptr);
 
@@ -44,7 +44,7 @@ private:
 
 private:
     infTool::CalibInfTool& calibTool_;
-    Config::CalibConfig& cfg_;
+    Config::CalibConfigItem& cfg_;
     const std::vector<HalconCpp::HImage>& images_;
     size_t currentIndex_ = 0;
 

@@ -28,7 +28,6 @@ namespace Config
 			for (Hlong i = 0; i < t.Length(); ++i)
 			{
 				HalconCpp::HTuple elem = t[i];
-				// 尝试以 double 读取，失败则当作 string
 				bool isNumeric = true;
 				try { elem.D(); }
 				catch (const HalconCpp::HException&) { isNumeric = false; }
@@ -36,7 +35,7 @@ namespace Config
 				if (isNumeric)
 					arr.append(elem.D());
 				else
-					arr.append(elem.S());
+					arr.append(static_cast<const char*>(elem.S()));
 			}
 			return arr;
 		}
@@ -54,19 +53,65 @@ namespace Config
 			}
 			return t;
 		}
+
+		// 将 CalibConfigItem 序列化到 JSON 对象
+		Json::Value itemToJson(const CalibConfigItem& item)
+		{
+			Json::Value obj;
+			obj["cameraParameters"] = tupleToJson(item.cameraParameters);
+			obj["cameraPose"] = tupleToJson(item.cameraPose);
+			obj["calibrationErrors"] = tupleToJson(item.calibrationErrors);
+			obj["cameraExposure"] = item.cameraExposure;
+			obj["cameraGain"] = item.cameraGain;
+			obj["calibBoardDescrPath"] = item.calibBoardDescrPath;
+			obj["calibrationReferenceIndex"] = item.calibrationReferenceIndex;
+			return obj;
+		}
+
+		// 从 JSON 对象反序列化到 CalibConfigItem
+		void jsonToItem(const Json::Value& obj, CalibConfigItem& item)
+		{
+			if (obj.isMember("cameraParameters"))
+				item.cameraParameters = jsonToTuple(obj["cameraParameters"]);
+			if (obj.isMember("cameraPose"))
+				item.cameraPose = jsonToTuple(obj["cameraPose"]);
+			if (obj.isMember("calibrationErrors"))
+				item.calibrationErrors = jsonToTuple(obj["calibrationErrors"]);
+			if (obj.isMember("cameraExposure"))
+				item.cameraExposure = obj["cameraExposure"].asDouble();
+			if (obj.isMember("cameraGain"))
+				item.cameraGain = obj["cameraGain"].asDouble();
+			if (obj.isMember("calibBoardDescrPath"))
+				item.calibBoardDescrPath = obj["calibBoardDescrPath"].asString();
+			if (obj.isMember("calibrationReferenceIndex"))
+				item.calibrationReferenceIndex = obj["calibrationReferenceIndex"].asInt();
+		}
+
+		const char* cameraIndexKey(global::CameraIndex idx)
+		{
+			switch (idx)
+			{
+			case global::CameraIndex::Camera1: return "Camera1";
+			case global::CameraIndex::Camera2: return "Camera2";
+			}
+			return "Unknown";
+		}
+
+		global::CameraIndex keyToCameraIndex(const std::string& key)
+		{
+			if (key == "Camera2")
+				return global::CameraIndex::Camera2;
+			return global::CameraIndex::Camera1;
+		}
 	}
 
 	void CalibConfig::saveInDir(const std::string& dirPath)
 	{
 		try
 		{
-			Json::Value root;
-			root["cameraParameters"] = tupleToJson(cameraParameters);
-			root["cameraPose"] = tupleToJson(cameraPose);
-			root["calibrationErrors"] = tupleToJson(calibrationErrors);
-			root["cameraExposure"] = cameraExposure;
-			root["cameraGain"] = cameraGain;
-			root["calibrationReferenceIndex"] = calibrationReferenceIndex;
+			Json::Value root(Json::objectValue);
+			for (const auto& [idx, item] : _calibConfigMap)
+				root[cameraIndexKey(idx)] = itemToJson(item);
 
 			const fs::path dir(dirPath);
 			fs::create_directories(dir);
@@ -93,9 +138,7 @@ namespace Config
 	{
 		try
 		{
-			cameraExposure = 10000.0;
-			cameraGain = 5.0;
-			calibrationReferenceIndex = 0;
+			_calibConfigMap.clear();
 
 			const fs::path filePath = fs::path(dirPath) / kCalibConfigFile;
 			if (!fs::exists(filePath))
@@ -111,18 +154,17 @@ namespace Config
 			if (!Json::parseFromStream(builder, ifs, &root, &errs))
 				return;
 
-			if (root.isMember("cameraParameters"))
-				cameraParameters = jsonToTuple(root["cameraParameters"]);
-			if (root.isMember("cameraPose"))
-				cameraPose = jsonToTuple(root["cameraPose"]);
-			if (root.isMember("calibrationErrors"))
-				calibrationErrors = jsonToTuple(root["calibrationErrors"]);
-			if (root.isMember("cameraExposure"))
-				cameraExposure = root["cameraExposure"].asDouble();
-			if (root.isMember("cameraGain"))
-				cameraGain = root["cameraGain"].asDouble();
-			if (root.isMember("calibrationReferenceIndex"))
-				calibrationReferenceIndex = root["calibrationReferenceIndex"].asInt();
+			// 新格式: { "Camera1": {...}, "Camera2": {...} }
+			if (root.isObject())
+			{
+				for (auto it = root.begin(); it != root.end(); ++it)
+				{
+					const global::CameraIndex idx = keyToCameraIndex(it.key().asString());
+					CalibConfigItem item;
+					jsonToItem(*it, item);
+					_calibConfigMap[idx] = std::move(item);
+				}
+			}
 		}
 		catch (...)
 		{

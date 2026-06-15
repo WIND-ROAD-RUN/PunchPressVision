@@ -61,22 +61,22 @@ namespace infTool
 	{
 	}
 
-	void CalibInfTool::calibCamera(const std::vector<HalconCpp::HImage>& himages)
+	void CalibInfTool::calibCamera(const std::vector<HalconCpp::HImage>& himages,
+		Config::CalibConfigItem& item)
 	{
-		// 便捷封装：使用默认焦距/板厚执行标定。结果由 calibrateFromImages
-		// 直接写入 inf_.calib_config_module_->calibConfig（不再用空配置覆盖）。
 		std::string err;
-		calibrateFromImages(himages, /*focalLengthMm*/ 8.0, /*plateThicknessMm*/ 0.0, /*referenceIndex*/ 0, &err);
+		calibrateFromImages(himages, /*focalLengthMm*/ 8.0, /*plateThicknessMm*/ 0.0,
+			item, /*referenceIndex*/ 0, &err);
 	}
 	
 	bool CalibInfTool::calibrateFromImages(const std::vector<HalconCpp::HImage>& himages,
 		double focalLengthMm,
 		double plateThicknessMm,
+		Config::CalibConfigItem& item,
 		int referenceIndex,
 		std::string* errorMsg)
 	{
 		using namespace HalconCpp;
-		auto& cfg = inf_.calib_config_module_->calibConfig;
 
 		// 基础校验
 		if (himages.empty())
@@ -84,7 +84,7 @@ namespace infTool
 			if (errorMsg) *errorMsg = "图像列表为空";
 			return false;
 		}
-		if (cfg.calibBoardDescrPath.empty())
+		if (item.calibBoardDescrPath.empty())
 		{
 			if (errorMsg) *errorMsg = "标定板描述文件路径为空";
 			return false;
@@ -147,7 +147,7 @@ namespace infTool
 			// 创建 CalibData 并设置相机初始参数与标定对象描述
 			CreateCalibData("calibration_object", 1, 1, &hv_CalibHandle);
 			SetCalibDataCamParam(hv_CalibHandle, 0, HTuple(), hv_StartParameters);
-			SetCalibDataCalibObject(hv_CalibHandle, 0, cfg.calibBoardDescrPath.c_str());
+			SetCalibDataCalibObject(hv_CalibHandle, 0, item.calibBoardDescrPath.c_str());
 
 			// 为每张有效图像执行 FindCalibObject（观测 index 连续递增）
 			int usedIndex = 0;
@@ -193,11 +193,11 @@ namespace infTool
 			// 根据板厚调整原点（与 HDevelop 一致）
 			SetOriginPose(hv_CameraPose, 0.0, 0.0, plateThicknessMm / 1000.0, &hv_CameraPose);
 
-			// 写入 CalibConfig
-			cfg.cameraParameters = hv_CameraParameters;
-			cfg.cameraPose = hv_CameraPose;
-			cfg.calibrationErrors = hv_Errors;
-			cfg.calibrationReferenceIndex = referenceIndex;
+			// 写入 CalibConfigItem
+			item.cameraParameters = hv_CameraParameters;
+			item.cameraPose = hv_CameraPose;
+			item.calibrationErrors = hv_Errors;
+			item.calibrationReferenceIndex = referenceIndex;
 
 			ClearCalibData(hv_CalibHandle);
 			return true;
@@ -212,7 +212,7 @@ namespace infTool
 	}
 	//测试发现，FindCalibObject 成功时会返回标记点坐标，但如果没有找到标定板，则不会抛出异常，而是返回空坐标。因此在后续获取坐标时需要检查是否成功找到标定板。
 	bool CalibInfTool::drawCalibMarks(const HalconCpp::HImage& src,
-		Config::CalibConfig& cfg,
+		Config::CalibConfigItem& item,
 		bool& isOk,
 		HalconCpp::HObject& outMarksXld,
 		HalconCpp::HObject& outMarksRegion,
@@ -231,7 +231,7 @@ namespace infTool
 			return false;
 		}
 
-		if (cfg.calibBoardDescrPath.empty())
+		if (item.calibBoardDescrPath.empty())
 		{
 			if (errorMsg) *errorMsg = "标定板描述文件路径为空";
 			return false;
@@ -276,7 +276,7 @@ namespace infTool
 		{
 			CreateCalibData("calibration_object", 1, 1, &hv_CalibHandle);
 			SetCalibDataCamParam(hv_CalibHandle, 0, HTuple(), StartParameters);
-			SetCalibDataCalibObject(hv_CalibHandle, 0, cfg.calibBoardDescrPath.c_str());
+			SetCalibDataCalibObject(hv_CalibHandle, 0, item.calibBoardDescrPath.c_str());
 
 			// 转灰度再找板（更稳）
 			HImage hGray;
@@ -320,25 +320,26 @@ namespace infTool
 		}
 	}
 
-	HalconCpp::HImage CalibInfTool::undistortImage(const HalconCpp::HImage& himage)
+	HalconCpp::HImage CalibInfTool::undistortImage(const HalconCpp::HImage& himage,
+		global::CameraIndex cameraIndex)
 	{
 		using namespace HalconCpp;
-		auto& cfg = inf_.calib_config_module_->calibConfig;
+		auto& item = inf_.calib_config_module_->calibConfig.item(cameraIndex);
 
 		// 未标定或输入无效时原样返回，确保流水线不中断
-		if (!himage.IsInitialized() || cfg.cameraParameters.Length() == 0)
+		if (!himage.IsInitialized() || item.cameraParameters.Length() == 0)
 			return himage;
 
 		try
 		{
 			// 生成无畸变（理想）相机参数
 			HTuple camParRectified;
-			ChangeRadialDistortionCamPar("fixed", cfg.cameraParameters, 0, &camParRectified);
+			ChangeRadialDistortionCamPar("fixed", item.cameraParameters, 0, &camParRectified);
 
 			// 执行畸变矫正（Region 传空对象表示对整图处理）
 			HObject rectified;
 			ChangeRadialDistortionImage(himage, HObject(), &rectified,
-				cfg.cameraParameters, camParRectified);
+				item.cameraParameters, camParRectified);
 			return HImage(rectified);
 		}
 		catch (const HException&)

@@ -356,16 +356,18 @@ void ToolCalibDistortionWindow::initBoardDescrPath()
 
     if (!foundPath.empty())
     {
-        cfg.calibBoardDescrPath = foundPath;
+        // 为两个相机都设置标定板描述文件路径
+        cfg.item(global::CameraIndex::Camera1).calibBoardDescrPath = foundPath;
+        cfg.item(global::CameraIndex::Camera2).calibBoardDescrPath = foundPath;
         ui->calibBoardPathEdit->setText(QString::fromStdString(foundPath));
         statusBar()->showMessage(
             QStringLiteral("标定板描述文件: %1").arg(QString::fromStdString(foundPath)));
     }
-    else if (!cfg.calibBoardDescrPath.empty())
+    else if (!cfg.item(global::CameraIndex::Camera1).calibBoardDescrPath.empty())
     {
         // config 中未找到 .descr 但已有旧路径则沿用
         ui->calibBoardPathEdit->setText(
-            QString::fromStdString(cfg.calibBoardDescrPath));
+            QString::fromStdString(cfg.item(global::CameraIndex::Camera1).calibBoardDescrPath));
     }
     else
     {
@@ -437,8 +439,8 @@ void ToolCalibDistortionWindow::onSaveCurrentFrame()
         return;
     }
 
-    auto& cfg = inf_.calib_config_module_->calibConfig;
-    if (cfg.calibBoardDescrPath.empty())
+    auto& item = inf_.calib_config_module_->calibConfig.item(camIdx);
+    if (item.calibBoardDescrPath.empty())
     {
         QMessageBox::warning(this, QStringLiteral("保存失败"),
             QStringLiteral("未设置标定板描述文件（.descr），无法校验图像"));
@@ -448,7 +450,7 @@ void ToolCalibDistortionWindow::onSaveCurrentFrame()
     bool isOk = false;
     HalconCpp::HObject marksXld, marksRegion;
     std::string err;
-    calibInfTool_->drawCalibMarks(hImg, cfg, isOk, marksXld, marksRegion, &err);
+    calibInfTool_->drawCalibMarks(hImg, item, isOk, marksXld, marksRegion, &err);
 
     if (!isOk)
     {
@@ -487,9 +489,10 @@ void ToolCalibDistortionWindow::onSaveCurrentFrame()
 
 void ToolCalibDistortionWindow::onCalibrate()
 {
-    auto& cfg = inf_.calib_config_module_->calibConfig;
+    const global::CameraIndex camIdx = selectedCamera_.load(std::memory_order_acquire);
+    auto& item = inf_.calib_config_module_->calibConfig.item(camIdx);
 
-    if (cfg.calibBoardDescrPath.empty())
+    if (item.calibBoardDescrPath.empty())
     {
         QMessageBox::warning(this, QStringLiteral("标定失败"),
             QStringLiteral("请先选择标定板描述文件（.descr）"));
@@ -512,7 +515,7 @@ void ToolCalibDistortionWindow::onCalibrate()
 
     std::string err;
     const bool ok = calibInfTool_->calibrateFromImages(
-        capturedImages_, focalLength, plateThickness, /*referenceIndex*/ 0, &err);
+        capturedImages_, focalLength, plateThickness, item, /*referenceIndex*/ 0, &err);
 
     if (!ok)
     {
@@ -525,7 +528,7 @@ void ToolCalibDistortionWindow::onCalibrate()
     const std::string configDir = inf::CalibConfigModulePath.RootPath;
     try
     {
-        cfg.saveInDir(configDir);
+        inf_.calib_config_module_->calibConfig.saveInDir(configDir);
         statusBar()->showMessage(
             QStringLiteral("标定参数已自动保存至：%1")
                 .arg(QString::fromStdString(configDir)));
@@ -538,13 +541,13 @@ void ToolCalibDistortionWindow::onCalibrate()
     }
 
     // 构建详细标定信息
-    const auto& cp = cfg.cameraParameters;  // area_scan_polynomial: 13 elements
-    const auto& pose = cfg.cameraPose;      // [tx, ty, tz, rx, ry, rz, type]
+    const auto& cp = item.cameraParameters;  // area_scan_polynomial: 13 elements
+    const auto& pose = item.cameraPose;      // [tx, ty, tz, rx, ry, rz, type]
 
     // RMS
     QString rmsStr = QStringLiteral("N/A");
-    if (cfg.calibrationErrors.Length() > 0)
-        rmsStr = QString::number(cfg.calibrationErrors[0].D(), 'f', 4);
+    if (item.calibrationErrors.Length() > 0)
+        rmsStr = QString::number(item.calibrationErrors[0].D(), 'f', 4);
 
     // 焦距
     QString focusStr = QStringLiteral("N/A");
@@ -589,8 +592,9 @@ void ToolCalibDistortionWindow::onCalibrate()
         pixelEquivStr = QString::number(pe, 'f', 5) + QStringLiteral(" mm/px");
     }
 
+    const QString camDisplayName = cameraDisplayName(camIdx);
     const QString info = QStringLiteral(
-        "Halcon 标定完成\n\n"
+        "%15 Halcon 标定完成\n\n"
         "━━━━ 相机内参 ━━━━\n"
         "  类型: area_scan_polynomial\n"
         "  焦距: %1\n"
@@ -610,9 +614,10 @@ void ToolCalibDistortionWindow::onCalibrate()
         .arg(focusStr, sxStr, syStr, cxStr, cyStr,
              k1Str, k2Str, k3Str, p1Str, p2Str,
              wdStr, pixelEquivStr, rmsStr,
-             QString::fromStdString(configDir));
+             QString::fromStdString(configDir),
+             camDisplayName);
 
-    QMessageBox::information(this, QStringLiteral("标定完成"), info);
+    QMessageBox::information(this, QStringLiteral("标定完成 — %1").arg(camDisplayName), info);
 }
 
 void ToolCalibDistortionWindow::onPreviewCorners()
@@ -624,15 +629,16 @@ void ToolCalibDistortionWindow::onPreviewCorners()
         return;
     }
 
-    auto& cfg = inf_.calib_config_module_->calibConfig;
-    if (cfg.calibBoardDescrPath.empty())
+    const global::CameraIndex camIdx = selectedCamera_.load(std::memory_order_acquire);
+    auto& item = inf_.calib_config_module_->calibConfig.item(camIdx);
+    if (item.calibBoardDescrPath.empty())
     {
         QMessageBox::warning(this, QStringLiteral("角点预览"),
             QStringLiteral("请先选择标定板描述文件（.descr）"));
         return;
     }
 
-    CornerPreviewDialog dlg(*calibInfTool_, cfg, capturedImages_, this);
+    CornerPreviewDialog dlg(*calibInfTool_, item, capturedImages_, this);
     dlg.exec();
 }
 

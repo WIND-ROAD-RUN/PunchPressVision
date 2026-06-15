@@ -18,19 +18,22 @@ namespace infTool
 	public:
 		explicit CalibInfTool(inf::infrastructure& inf);
 	public:
-		void calibCamera(const std::vector<HalconCpp::HImage>& himages);
+		void calibCamera(const std::vector<HalconCpp::HImage>& himages,
+			Config::CalibConfigItem& item);
 		bool calibrateFromImages(const std::vector<HalconCpp::HImage>& himages,
 			double focalLengthMm,
 			double plateThicknessMm,
+			Config::CalibConfigItem& item,
 			int referenceIndex = 0,
 			std::string* errorMsg = nullptr);
 		bool drawCalibMarks(const HalconCpp::HImage& src,
-			Config::CalibConfig& cfg,
+			Config::CalibConfigItem& item,
 			bool& isOk,
 			HalconCpp::HObject& outMarksXld,
 			HalconCpp::HObject& outMarksRegion,
 			std::string* errorMsg = nullptr);
-		HalconCpp::HImage undistortImage(const HalconCpp::HImage& himage);
+		HalconCpp::HImage undistortImage(const HalconCpp::HImage& himage,
+			global::CameraIndex cameraIndex = global::CameraIndex::Camera1);
 
 	public slots:
 		void onCameraFrame(rw::hoec::MatInfo matInfo, global::CameraIndex cameraIndex);
