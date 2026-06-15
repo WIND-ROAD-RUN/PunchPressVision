@@ -67,15 +67,15 @@ namespace ui
 
 		// UI 控件 → 槽
 		connect(ui->rbtn_debug, &QRadioButton::toggled, this, &PunchPress::onDebugToggled);
-		connect(ui->rbtn_removeFunc, &QRadioButton::toggled, this, &PunchPress::onProductionToggled);
+		connect(ui->rbtn_work, &QRadioButton::toggled, this, &PunchPress::onProductionToggled);
 		connect(ui->rbtn_upLight, &QRadioButton::clicked, this, &PunchPress::onUpperLightClicked);
 		connect(ui->rbtn_downLight, &QRadioButton::clicked, this, &PunchPress::onLowerLightClicked);
-		connect(ui->btn_jibianjiaozheng, &QPushButton::clicked, this, &PunchPress::onDistortionCalib);
-		connect(ui->btn_jiudianbiaoding, &QPushButton::clicked, this, &PunchPress::onNinePointCalib);
-		connect(ui->btn_imageStitching, &QPushButton::clicked, this, &PunchPress::onImageStitching);
-		connect(ui->btn_createModel, &QPushButton::clicked, this, &PunchPress::onCreateModel);
-		connect(ui->btn_changeModel, &QPushButton::clicked, this, &PunchPress::onChangeModel);
-		connect(ui->btn_loadModel, &QPushButton::clicked, this, &PunchPress::onLoadModel);
+		connect(ui->pbtn_distortionCalib, &QPushButton::clicked, this, &PunchPress::onDistortionCalib);
+		connect(ui->pbtn_ninePointCalib, &QPushButton::clicked, this, &PunchPress::onNinePointCalib);
+		connect(ui->pbtn_imageStitching, &QPushButton::clicked, this, &PunchPress::onImageStitching);
+		connect(ui->pbtn_createModel, &QPushButton::clicked, this, &PunchPress::onCreateModel);
+		connect(ui->pbtn_changeModel, &QPushButton::clicked, this, &PunchPress::onChangeModel);
+		connect(ui->pbtn_loadModel, &QPushButton::clicked, this, &PunchPress::onLoadModel);
 		connect(ui->pbtn_exit, &QPushButton::clicked, this, &PunchPress::onExit);
 	}
 
@@ -87,7 +87,7 @@ namespace ui
 		try
 		{
 			// 将 Halcon 窗口嵌入图像显示标签
-			QWidget* host = ui->label_imgDisplay_1;
+			QWidget* host = ui->label_imgDisplay;
 			if (!host)
 				return false;
 			halconHost_ = host;
