@@ -5,12 +5,16 @@
 #include "infTool/CalibInfTool/CalibInfTool.hpp"
 #include "infrastructure/infrastructure.hpp"
 #include "infrastructure/CalibConfigModule/Config/CalibConfig.hpp"
+#include "infrastructure/CalibConfigModule/CalibConfigModulePath.hpp"
 #include "infrastructure/TwoCameraSpliceModule/Config/TwoCameraSpliceConfig.hpp"
 #include "rwul/hoecm/hoec_m.hpp"
 
 #include <QCloseEvent>
 #include <QEvent>
 #include <QInputDialog>
+#include <QStatusBar>
+
+#include <filesystem>
 #include <QLabel>
 #include <QMessageBox>
 #include <QResizeEvent>
@@ -64,6 +68,7 @@ ToolTwoCameraSpliceWindow::ToolTwoCameraSpliceWindow(inf::infrastructure& inf, Q
 
 	buildUi();
 	buildConnections();
+	initCaltabDescrPath();
 	syncConfigToUi();
 }
 
@@ -143,6 +148,54 @@ void ToolTwoCameraSpliceWindow::buildConnections()
 
 	connect(ui->btn_test, &QPushButton::clicked, this, &ToolTwoCameraSpliceWindow::btn_test_clicked);
 	connect(ui->btn_exit, &QPushButton::clicked, this, &ToolTwoCameraSpliceWindow::btn_exit_clicked);
+}
+
+// ===================================================================
+// 自动发现标定板描述文件（仿照 ToolCalibDistortionWindow::initBoardDescrPath）
+// ===================================================================
+void ToolTwoCameraSpliceWindow::initCaltabDescrPath()
+{
+	namespace fs = std::filesystem;
+
+	const std::string configDir = inf::CalibConfigModulePath.RootPath;
+	std::string foundPath;
+	std::error_code ec;
+
+	if (fs::exists(configDir, ec) && fs::is_directory(configDir, ec))
+	{
+		for (const auto& entry : fs::directory_iterator(configDir, ec))
+		{
+			if (entry.is_regular_file(ec)
+				&& entry.path().extension() == ".descr")
+			{
+				foundPath = entry.path().string();
+				break;
+			}
+		}
+	}
+
+	if (inf_.two_camera_splice_module_)
+	{
+		auto& spliceCfg = inf_.two_camera_splice_module_->twoCameraSpliceConfig;
+
+		if (!foundPath.empty())
+		{
+			spliceCfg.caltabDescrPath = foundPath;
+			statusBar()->showMessage(
+				QStringLiteral("标定板描述文件: %1").arg(QString::fromStdString(foundPath)));
+		}
+		else if (!spliceCfg.caltabDescrPath.empty())
+		{
+			statusBar()->showMessage(
+				QStringLiteral("标定板描述文件(已缓存): %1")
+					.arg(QString::fromStdString(spliceCfg.caltabDescrPath)));
+		}
+		else
+		{
+			statusBar()->showMessage(
+				QStringLiteral("config 目录下未找到 .descr 描述文件"));
+		}
+	}
 }
 
 // ===================================================================
@@ -367,14 +420,8 @@ void ToolTwoCameraSpliceWindow::btn_takePicture_clicked()
 		winCam2_.lastImage = cam2Image_;
 	}
 
-	// 直接 UI 线程刷新
-	if (ok1 && ensureHalconWindow(DisplayWindow::Cam1))
-		redrawDisplay(DisplayWindow::Cam1);
-	if (ok2 && ensureHalconWindow(DisplayWindow::Cam2))
-		redrawDisplay(DisplayWindow::Cam2);
+	
 
-	if (!ok1 || !ok2)
-		QMessageBox::warning(this, QStringLiteral("拍照"), QStringLiteral("部分相机抓帧失败"));
 }
 
 // ===================================================================
@@ -527,13 +574,13 @@ void ToolTwoCameraSpliceWindow::btn_test_clicked()
 
 	const auto& item1 = calibCfg.item(global::CameraIndex::Camera1);
 	const auto& item2 = calibCfg.item(global::CameraIndex::Camera2);
-	if (item1.calibBoardDescrPath.empty())
+
+	if (spliceCfg.caltabDescrPath.empty())
 	{
 		QMessageBox::warning(this, QStringLiteral("提示"),
-			QStringLiteral("标定板描述文件路径为空，请先在标定工具中设置"));
+			QStringLiteral("标定板描述文件路径为空，请在 config 目录下放置 .descr 文件"));
 		return;
 	}
-	spliceCfg.caltabDescrPath = item1.calibBoardDescrPath;
 
 	if (!cam1Ready_ || !cam2Ready_)
 	{

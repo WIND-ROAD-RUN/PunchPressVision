@@ -63,6 +63,7 @@ private slots:
 private:
 	void buildUi();
 	void buildConnections();
+	void initCaltabDescrPath();
 	void syncConfigToUi();
 
 	// Halcon 窗口管理
