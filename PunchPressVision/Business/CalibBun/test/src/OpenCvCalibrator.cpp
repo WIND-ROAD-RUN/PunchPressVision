@@ -7,6 +7,7 @@
 #include <opencv2/features2d.hpp>
 
 #include <filesystem>
+#include <iomanip>
 #include <sstream>
 
 OpenCvCalibrator::OpenCvCalibrator()
@@ -137,6 +138,25 @@ bool OpenCvCalibrator::addCalibrationImage(const cv::Mat& image)
                     flags | cv::CALIB_CB_CLUSTERING, detector);
             }
         }
+
+        // 调试：如果全部失败，保存 SimpleBlobDetector 找到的 blobs
+        if (!found)
+        {
+            cv::SimpleBlobDetector::Params debugParams;
+            debugParams.filterByArea = true;
+            debugParams.minArea = 10.0f;
+            debugParams.maxArea = static_cast<float>(imageSize_.area()) / 5.0f;
+            debugParams.filterByCircularity = true;
+            debugParams.minCircularity = 0.5f;
+            debugParams.filterByConvexity = false;
+            debugParams.filterByInertia = false;
+
+            cv::Ptr<cv::SimpleBlobDetector> debugDetector = cv::SimpleBlobDetector::create(debugParams);
+            std::vector<cv::KeyPoint> keypoints;
+            debugDetector->detect(image, keypoints);
+
+            saveDebugImage(image, keypoints, "all_blobs");
+        }
     }
 
     if (!found)
@@ -239,6 +259,32 @@ void OpenCvCalibrator::updateUndistortMaps()
         CV_16SC2,
         map1_,
         map2_);
+}
+
+void OpenCvCalibrator::saveDebugImage(const cv::Mat& image, const std::vector<cv::KeyPoint>& keypoints, const std::string& suffix) const
+{
+    try
+    {
+        std::filesystem::path dir = std::filesystem::current_path() / "debug_calib";
+        std::filesystem::create_directories(dir);
+
+        cv::Mat display;
+        if (image.channels() == 1)
+            cv::cvtColor(image, display, cv::COLOR_GRAY2BGR);
+        else
+            display = image.clone();
+
+        cv::drawKeypoints(display, keypoints, display, cv::Scalar(0, 0, 255),
+            cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+
+        std::ostringstream oss;
+        oss << "debug_" << std::setw(3) << std::setfill('0') << debugCounter_++ << "_" << suffix << ".png";
+        cv::imwrite((dir / oss.str()).string(), display);
+    }
+    catch (...)
+    {
+        // 调试保存失败时忽略，避免影响主流程
+    }
 }
 
 cv::Mat OpenCvCalibrator::undistort(const cv::Mat& src) const

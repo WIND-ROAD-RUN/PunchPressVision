@@ -100,6 +100,7 @@ public:
 private:
     std::vector<cv::Point3f> generateObjectPoints() const;
     void updateUndistortMaps();
+    void saveDebugImage(const cv::Mat& image, const std::vector<cv::KeyPoint>& keypoints, const std::string& suffix) const;
 
 private:
     cv::Size boardSize_;
@@ -110,6 +111,8 @@ private:
     std::vector<std::vector<cv::Point3f>> objectPoints_;
     std::vector<std::vector<cv::Point2f>> imagePoints_;
     std::vector<cv::Mat> cornerImages_;
+
+    mutable int debugCounter_ = 0;
 
     cv::Mat cameraMatrix_;
     cv::Mat distCoeffs_;
