@@ -191,6 +191,82 @@
      </layout>
     </item>
     <item>
+     <layout class="QHBoxLayout" name="calibParamsLayout">
+      <property name="spacing">
+       <number>8</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="labelBoardPath">
+        <property name="text">
+         <string>标定板描述文件:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="calibBoardPathEdit">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+        <property name="placeholderText">
+         <string>config 目录下自动检测 .descr</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="labelFocalLength">
+        <property name="text">
+         <string>焦距(mm):</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDoubleSpinBox" name="focalLengthSpin">
+        <property name="minimum">
+         <double>0.100000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>100.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>8.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.500000000000000</double>
+        </property>
+        <property name="decimals">
+         <number>2</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="labelPlateThickness">
+        <property name="text">
+         <string>板厚(mm):</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDoubleSpinBox" name="plateThicknessSpin">
+        <property name="minimum">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>100.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.500000000000000</double>
+        </property>
+        <property name="decimals">
+         <number>2</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
      <layout class="QHBoxLayout" name="imageLayout">
       <property name="spacing">
        <number>8</number>
@@ -208,7 +284,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="undistortedView">
+         <widget class="QWidget" name="undistortedView" native="true">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>0</horstretch>
@@ -220,9 +296,6 @@
             <width>320</width>
             <height>240</height>
            </size>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
           </property>
           <property name="styleSheet">
            <string notr="true">background-color: #333;</string>
@@ -244,7 +317,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="originalView">
+         <widget class="QWidget" name="originalView" native="true">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>0</horstretch>
@@ -256,9 +329,6 @@
             <width>320</width>
             <height>240</height>
            </size>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
           </property>
           <property name="styleSheet">
            <string notr="true">background-color: #333;</string>
