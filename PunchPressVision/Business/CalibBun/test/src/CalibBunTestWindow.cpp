@@ -31,6 +31,7 @@ CalibBunTestWindow::CalibBunTestWindow(inf::infrastructure& inf, QWidget* parent
     , inf_(inf)
     , calibrator_(std::make_unique<OpenCvCalibrator>())
 {
+    calibrator_->setBoardSize(cv::Size(7, 7), 10, CalibrationPattern::SymmetricCircles);
     buildUi();
     buildConnections();
     updateConnectionStatus();
