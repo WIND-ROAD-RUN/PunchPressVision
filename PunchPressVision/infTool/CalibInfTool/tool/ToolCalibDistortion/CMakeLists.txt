@@ -18,6 +18,7 @@ target_include_directories(${Bun_TARGET}
 )
 
 target_link_libraries(${Bun_TARGET} PRIVATE
+    infTool::CalibInfTool
     inf::infrastructure
     Halcon
     Qt6::Core
