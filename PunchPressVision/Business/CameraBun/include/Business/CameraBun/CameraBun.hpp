@@ -8,6 +8,7 @@
 #include "global/GlobalInterface.hpp"
 #include "global/GlobalType.hpp"
 #include "infrastructure/infrastructure.hpp"
+#include "infTool/infTool.hpp"
 
 #include "halconcpp/HalconCpp.h"
 
@@ -19,7 +20,7 @@ namespace bun
 	{
 		Q_OBJECT
 	public:
-		explicit CameraBun(inf::infrastructure& inf);
+		explicit CameraBun(inf::infrastructure& inf, infTool::infTool& infTool);
 
 		void build() override;
 		void destroy() override;
@@ -38,6 +39,7 @@ namespace bun
 
 	private:
 		inf::infrastructure& inf_;
+		infTool::infTool& inf_tool_;
 
 		// 图像处理流水线
 		HalconCpp::HImage applyUndistort(const HalconCpp::HImage& image);

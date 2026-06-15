@@ -2,8 +2,9 @@
 
 namespace bun
 {
-	ShapeModeManagerBun::ShapeModeManagerBun(inf::infrastructure& inf)
+	ShapeModeManagerBun::ShapeModeManagerBun(inf::infrastructure& inf, infTool::infTool& infTool)
 		: inf_(inf)
+		, inf_tool_(infTool)
 	{
 	}
 

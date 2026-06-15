@@ -4,6 +4,7 @@
 
 #include "global/GlobalInterface.hpp"
 #include "infrastructure/infrastructure.hpp"
+#include "infTool/infTool.hpp"
 
 namespace bun
 {
@@ -14,7 +15,7 @@ namespace bun
 	{
 		Q_OBJECT
 	public:
-		explicit LightControlBun(inf::infrastructure& inf);
+		explicit LightControlBun(inf::infrastructure& inf, infTool::infTool& infTool);
 
 		void setUpperLight(bool on);
 		void setLowerLight(bool on);
@@ -32,5 +33,6 @@ namespace bun
 
 	private:
 		inf::infrastructure& inf_;
+		infTool::infTool& inf_tool_;
 	};
 }

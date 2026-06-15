@@ -4,8 +4,9 @@
 
 namespace bun
 {
-	CameraBun::CameraBun(inf::infrastructure& inf)
+	CameraBun::CameraBun(inf::infrastructure& inf, infTool::infTool& infTool)
 		: inf_(inf)
+		, inf_tool_(infTool)
 	{
 	}
 

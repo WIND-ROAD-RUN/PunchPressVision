@@ -2,8 +2,9 @@
 
 namespace bun
 {
-	LightControlBun::LightControlBun(inf::infrastructure& inf)
+	LightControlBun::LightControlBun(inf::infrastructure& inf, infTool::infTool& infTool)
 		: inf_(inf)
+		, inf_tool_(infTool)
 	{
 	}
 

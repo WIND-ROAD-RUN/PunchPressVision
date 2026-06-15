@@ -10,6 +10,7 @@
 
 #include "global/GlobalInterface.hpp"
 #include "infrastructure/infrastructure.hpp"
+#include "infTool/infTool.hpp"
 
 #include "halconcpp/HalconCpp.h"
 
@@ -54,7 +55,7 @@ namespace bun
 	{
 		Q_OBJECT
 	public:
-		explicit ShapeModeManagerBun(inf::infrastructure& inf);
+		explicit ShapeModeManagerBun(inf::infrastructure& inf, infTool::infTool& infTool);
 
 		// 模型 CRUD（FR-024 ~ FR-030）
 		bool createModel(const CreateModelRequest& req,
@@ -89,6 +90,7 @@ namespace bun
 
 	private:
 		inf::infrastructure& inf_;
+		infTool::infTool& inf_tool_;
 
 		// 当前加载的模型缓存
 		std::string currentModelId_;

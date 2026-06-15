@@ -14,6 +14,7 @@ add_library(${Bun_TARGET} STATIC ${SRC_LIST} )
 target_link_libraries(${Bun_TARGET}
 	PUBLIC
 		inf::infrastructure
+		infTool::infTool
 )
 
 set_target_properties(${Bun_TARGET} PROPERTIES
