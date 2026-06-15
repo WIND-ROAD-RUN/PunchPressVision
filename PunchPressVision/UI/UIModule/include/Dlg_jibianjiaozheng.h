@@ -4,7 +4,7 @@
 #include <QListView>
 #include <QSize>
 #if 0 // --- 以下项目引用暂时注释 ---
-#include "CalibParam.hpp"
+#include "infrastructure/CalibConfigModule/Config/CalibConfig.hpp"
 #include "func/ProcessModule.hpp"
 #include "ui_Dlg_jibianjiaozheng.h"
 #include <opencv2/opencv.hpp>
@@ -37,8 +37,8 @@ public:
 	void build_ui();
 	void build_connect();
 
-	void saveCalibParam();
-	void loadCalibParam();
+	void saveConfig::CalibConfigItem();
+	void loadConfig::CalibConfigItem();
 protected:
 	void resizeEvent(QResizeEvent*) override;
 	void showEvent(QShowEvent* event) override;
@@ -90,13 +90,13 @@ private:
 public:
 	bool saveNowImageToCalibSlot(QVector<cv::Mat>& calibImages, const cv::Mat& nowImage, int slotIndex);
 	bool drawCalibMarks(const HalconCpp::HImage& src, bool& isOk, HalconCpp::HObject& outMarksXld, HalconCpp::HObject& outMarksRegion);
-	CalibParam calibrateFromImages(const QVector<HalconCpp::HImage*>& images, const std::string& descrPath, int referenceIndex);
+	Config::CalibConfigItem calibrateFromImages(const QVector<HalconCpp::HImage*>& images, const std::string& descrPath, int referenceIndex);
 	bool blendYellowRegion(const HalconCpp::HImage& src,const HalconCpp::HObject& region,double alpha01,HalconCpp::HImage& out);
 
 	HalconCpp::HImage* nowImage = nullptr;
-	CalibParam _calibParam;
+	Config::CalibConfigItem _calibParam;
 
-	void updateUiFromCalibParam();
+	void updateUiFromConfig::CalibConfigItem();
 	void initial_calibParamUi();
 public slots:
 	void onCameraDisplay(rw::rqwc::MatInfo matInfo, size_t index);

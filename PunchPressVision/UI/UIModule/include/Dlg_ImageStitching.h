@@ -6,7 +6,7 @@
 #include "ImageStitcchingParam.hpp"
 #include "ui_Dlg_ImageStitching.h"
 #include "ProcessModule.hpp"
-#include "CalibParam.hpp"
+#include "infrastructure/CalibConfigModule/Config/CalibConfig.hpp"
 
 namespace HalconCpp
 {
@@ -111,8 +111,8 @@ private:
 	HalconCpp::HImage* _camera2Image = nullptr;
 
 	ImageStitcchingParam _stitchParam{};
-	CalibParam _cam1Calib{};
-	CalibParam _cam2Calib{};
+	Config::CalibConfigItem _cam1Calib{};
+	Config::CalibConfigItem _cam2Calib{};
 #endif
 private:
 	Ui::Dlg_ImageStitchingClass *ui;

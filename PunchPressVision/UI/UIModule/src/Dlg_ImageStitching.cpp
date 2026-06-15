@@ -1,7 +1,7 @@
 #include "Dlg_ImageStitching.h"
 #include "ui_Dlg_ImageStitching.h"
 #if 0 // --- 以下项目引用暂时注释 ---
-#include "data/CalibParam.hpp"
+#include "infrastructure/CalibConfigModule/Config/CalibConfig.hpp"
 #include "data/ImageStitcchingParam.hpp"
 #include "Modules.hpp"
 

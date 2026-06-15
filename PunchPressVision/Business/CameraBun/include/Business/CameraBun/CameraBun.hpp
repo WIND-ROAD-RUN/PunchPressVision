@@ -42,7 +42,7 @@ namespace bun
 		infTool::infTool& inf_tool_;
 
 		// 图像处理流水线
-		HalconCpp::HImage applyUndistort(const HalconCpp::HImage& image);
+		HalconCpp::HImage applyUndistort(const HalconCpp::HImage& image, global::CameraIndex cameraIndex);
 		HalconCpp::HImage applyNinePointTransform(const HalconCpp::HImage& image);
 
 		// 双相机拼接缓存

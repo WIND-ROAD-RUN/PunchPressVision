@@ -21,7 +21,7 @@ namespace infTool
 	public:
 		void calculateTwoCameraSpliceConfig(const HalconCpp::HImage& himage1, const HalconCpp::HImage& himage2);
 		bool calibImage(HalconCpp::HObject image1, HalconCpp::HObject image2,
-			Config::CalibConfig cam1Calib, Config::CalibConfig cam2Calib,
+			const Config::CalibConfigItem& cam1Calib, const Config::CalibConfigItem& cam2Calib,
 			Config::TwoCameraSpliceCfg& spliceCfg,
 			std::string* errorMsg = nullptr);
 		bool pinjieImage(HalconCpp::HObject& image1, HalconCpp::HObject& image2,
