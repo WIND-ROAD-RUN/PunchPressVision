@@ -65,6 +65,7 @@ private:
 	void buildConnections();
 	void initCaltabDescrPath();
 	void syncConfigToUi();
+	void applyCalibParams();
 
 	// Halcon 窗口管理
 	enum class DisplayWindow { Cam1, Cam2, Stitched };

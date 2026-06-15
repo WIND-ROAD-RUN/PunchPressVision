@@ -10,6 +10,8 @@
 #include "rwul/hoecm/hoec_m.hpp"
 
 #include <QCloseEvent>
+#include <QDateTime>
+#include <QDir>
 #include <QEvent>
 #include <QInputDialog>
 #include <QStatusBar>
@@ -70,6 +72,7 @@ ToolTwoCameraSpliceWindow::ToolTwoCameraSpliceWindow(inf::infrastructure& inf, Q
 	buildConnections();
 	initCaltabDescrPath();
 	syncConfigToUi();
+	applyCalibParams();
 }
 
 ToolTwoCameraSpliceWindow::~ToolTwoCameraSpliceWindow()
@@ -212,6 +215,34 @@ void ToolTwoCameraSpliceWindow::syncConfigToUi()
 		QString::number(cfg.DiffHeight * 1000.0, 'f', 2));
 	ui->btn_caiqiebili->setText(
 		QString::number(cfg.OverlapInPercent, 'f', 1));
+}
+
+// ===================================================================
+// 从 CalibConfig 加载曝光/增益到 UI 并生效到相机
+// ===================================================================
+void ToolTwoCameraSpliceWindow::applyCalibParams()
+{
+	if (!inf_.calib_config_module_)
+		return;
+
+	auto& calib = inf_.calib_config_module_->calibConfig;
+	const auto& item1 = calib.item(global::CameraIndex::Camera1);
+	const auto& item2 = calib.item(global::CameraIndex::Camera2);
+
+	// 同步到 UI
+	ui->btn_zengyi1->setText(QString::number(item1.cameraGain, 'f', 0));
+	ui->btn_baoguang1->setText(QString::number(item1.cameraExposure, 'f', 0));
+	ui->btn_zengyi2->setText(QString::number(item2.cameraGain, 'f', 0));
+	ui->btn_baoguang2->setText(QString::number(item2.cameraExposure, 'f', 0));
+
+	// 生效到相机
+	if (inf_.camera_module_)
+	{
+		inf_.camera_module_->setGain(global::CameraIndex::Camera1, item1.cameraGain);
+		inf_.camera_module_->setExposure(global::CameraIndex::Camera1, item1.cameraExposure);
+		inf_.camera_module_->setGain(global::CameraIndex::Camera2, item2.cameraGain);
+		inf_.camera_module_->setExposure(global::CameraIndex::Camera2, item2.cameraExposure);
+	}
 }
 
 // ===================================================================
@@ -421,7 +452,6 @@ void ToolTwoCameraSpliceWindow::btn_takePicture_clicked()
 	}
 
 	
-
 }
 
 // ===================================================================
@@ -437,6 +467,11 @@ void ToolTwoCameraSpliceWindow::btn_zengyi1_clicked()
 	ui->btn_zengyi1->setText(QString::number(v));
 	if (inf_.camera_module_)
 		inf_.camera_module_->setGain(global::CameraIndex::Camera1, v);
+	if (inf_.calib_config_module_)
+	{
+		inf_.calib_config_module_->calibConfig.item(global::CameraIndex::Camera1).cameraGain = v;
+		inf_.calib_config_module_->calibConfig.saveInDir(inf::CalibConfigModulePath.RootPath);
+	}
 }
 
 void ToolTwoCameraSpliceWindow::btn_baoguang1_clicked()
@@ -449,6 +484,11 @@ void ToolTwoCameraSpliceWindow::btn_baoguang1_clicked()
 	ui->btn_baoguang1->setText(QString::number(v));
 	if (inf_.camera_module_)
 		inf_.camera_module_->setExposure(global::CameraIndex::Camera1, v);
+	if (inf_.calib_config_module_)
+	{
+		inf_.calib_config_module_->calibConfig.item(global::CameraIndex::Camera1).cameraExposure = v;
+		inf_.calib_config_module_->calibConfig.saveInDir(inf::CalibConfigModulePath.RootPath);
+	}
 }
 
 void ToolTwoCameraSpliceWindow::btn_zengyi2_clicked()
@@ -461,6 +501,11 @@ void ToolTwoCameraSpliceWindow::btn_zengyi2_clicked()
 	ui->btn_zengyi2->setText(QString::number(v));
 	if (inf_.camera_module_)
 		inf_.camera_module_->setGain(global::CameraIndex::Camera2, v);
+	if (inf_.calib_config_module_)
+	{
+		inf_.calib_config_module_->calibConfig.item(global::CameraIndex::Camera2).cameraGain = v;
+		inf_.calib_config_module_->calibConfig.saveInDir(inf::CalibConfigModulePath.RootPath);
+	}
 }
 
 void ToolTwoCameraSpliceWindow::btn_baoguang2_clicked()
@@ -473,6 +518,11 @@ void ToolTwoCameraSpliceWindow::btn_baoguang2_clicked()
 	ui->btn_baoguang2->setText(QString::number(v));
 	if (inf_.camera_module_)
 		inf_.camera_module_->setExposure(global::CameraIndex::Camera2, v);
+	if (inf_.calib_config_module_)
+	{
+		inf_.calib_config_module_->calibConfig.item(global::CameraIndex::Camera2).cameraExposure = v;
+		inf_.calib_config_module_->calibConfig.saveInDir(inf::CalibConfigModulePath.RootPath);
+	}
 }
 
 // ===================================================================
@@ -568,9 +618,9 @@ void ToolTwoCameraSpliceWindow::btn_test_clicked()
 	auto& spliceCfg = inf_.two_camera_splice_module_->twoCameraSpliceConfig;
 	auto& calibCfg  = inf_.calib_config_module_->calibConfig;
 
-	// DiffHeight（UI mm → 内部 m）
-	spliceCfg.DiffHeight = ui->btn_xiangjiwuliaohebiaodingbangaoduchazhi->text().toDouble() / 1000.0;
-	spliceCfg.OverlapInPercent = ui->btn_caiqiebili->text().toDouble();
+	// DiffHeight / OverlapInPercent 在 btn_*_clicked 中已同步到 config，
+	// 保存最新值确保拼接使用
+	inf_.two_camera_splice_module_->save();
 
 	const auto& item1 = calibCfg.item(global::CameraIndex::Camera1);
 	const auto& item2 = calibCfg.item(global::CameraIndex::Camera2);
@@ -582,9 +632,37 @@ void ToolTwoCameraSpliceWindow::btn_test_clicked()
 		return;
 	}
 
+	// 使用拍照时缓存的图像（内存中）
 	if (!cam1Ready_ || !cam2Ready_)
 	{
-		QMessageBox::warning(this, QStringLiteral("提示"), QStringLiteral("相机图像未就绪，请先拍照"));
+		QMessageBox::warning(this, QStringLiteral("提示"),
+			QStringLiteral("相机图像未就绪，请先拍照"));
+		return;
+	}
+
+	// 从相机1标定参数计算像素当量（若 config 中为 0）
+	// pixTowWorld = PixelSize × |tz| / Focus，单位 m/px
+	if (spliceCfg.pixTowWorld == 0.0)
+	{
+		const auto& cp   = item1.cameraParameters;
+		const auto& pose = item1.cameraPose;
+		if (cp.TupleLength() >= 13 && pose.TupleLength() >= 7)
+		{
+			constexpr double kPixelSizeM = 2.4e-06;  // 2.4 μm → m
+			const double focus = cp[1].D();            // 焦距 (m)
+			const double tz    = std::abs(pose[2].D());// 工作距离 (m)
+			if (focus > 0.0)
+			{
+				spliceCfg.pixTowWorld = kPixelSizeM * tz / focus;
+				inf_.two_camera_splice_module_->save();
+			}
+		}
+	}
+
+	if (spliceCfg.pixTowWorld == 0.0)
+	{
+		QMessageBox::warning(this, QStringLiteral("提示"),
+			QStringLiteral("像素当量(pixTowWorld)为 0，请先完成相机标定"));
 		return;
 	}
 
