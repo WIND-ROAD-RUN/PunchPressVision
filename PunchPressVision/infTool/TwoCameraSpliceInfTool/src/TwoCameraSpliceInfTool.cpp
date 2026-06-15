@@ -1,13 +1,13 @@
-#include "infTool/TwoCameraSpliceBun/TwoCameraSpliceBun.hpp"
+#include "infTool/TwoCameraSpliceInfTool/TwoCameraSpliceInfTool.hpp"
 
 namespace infTool
 {
-	TwoCameraSpliceBun::TwoCameraSpliceBun(inf::infrastructure& inf)
+	TwoCameraSpliceInfTool::TwoCameraSpliceInfTool(inf::infrastructure& inf)
 		: inf_(inf)
 	{
 	}
 
-	void TwoCameraSpliceBun::calculateTwoCameraSpliceConfig(const HalconCpp::HImage& himage1,
+	void TwoCameraSpliceInfTool::calculateTwoCameraSpliceConfig(const HalconCpp::HImage& himage1,
 		const HalconCpp::HImage& himage2)
 	{
 		// 复用已实现的 calibImage 计算拼接映射，结果写入拼接配置模块并持久化。
@@ -30,7 +30,7 @@ namespace infTool
 		}
 	}
 
-	bool TwoCameraSpliceBun::calibImage(HalconCpp::HObject image1, HalconCpp::HObject image2,
+	bool TwoCameraSpliceInfTool::calibImage(HalconCpp::HObject image1, HalconCpp::HObject image2,
 		Config::CalibConfig cam1Calib, Config::CalibConfig cam2Calib,
 		Config::TwoCameraSpliceCfg& spliceCfg,
 		std::string* errorMsg)
@@ -264,7 +264,7 @@ namespace infTool
 		}
 	}
 
-	bool TwoCameraSpliceBun::pinjieImage(HalconCpp::HObject& image1, HalconCpp::HObject& image2,
+	bool TwoCameraSpliceInfTool::pinjieImage(HalconCpp::HObject& image1, HalconCpp::HObject& image2,
 		Config::TwoCameraSpliceCfg& spliceCfg,
 		HalconCpp::HObject& stitchedImage)
 	{
@@ -296,19 +296,19 @@ namespace infTool
 		}
 	}
 
-	void TwoCameraSpliceBun::build()
+	void TwoCameraSpliceInfTool::build()
 	{
 	}
 
-	void TwoCameraSpliceBun::destroy()
+	void TwoCameraSpliceInfTool::destroy()
 	{
 	}
 
-	void TwoCameraSpliceBun::start()
+	void TwoCameraSpliceInfTool::start()
 	{
 	}
 
-	void TwoCameraSpliceBun::stop()
+	void TwoCameraSpliceInfTool::stop()
 	{
 	}
 }

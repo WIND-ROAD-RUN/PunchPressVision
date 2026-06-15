@@ -1,4 +1,4 @@
-#include "infTool/NinePointBun/NinePointBun.hpp"
+#include "infTool/NinePointInfTool/NinePointInfTool.hpp"
 
 #include <chrono>
 
@@ -6,17 +6,17 @@
 
 namespace infTool
 {
-	NinePointBun::NinePointBun(inf::infrastructure& inf)
+	NinePointInfTool::NinePointInfTool(inf::infrastructure& inf)
 		: inf_(inf)
 	{
 	}
 
-	NinePointBun::~NinePointBun()
+	NinePointInfTool::~NinePointInfTool()
 	{
 		stopAutoCalibration();
 	}
 
-	void NinePointBun::calculateNinePointConfig()
+	void NinePointInfTool::calculateNinePointConfig()
 	{
 		// 触发自动化九点标定流程（PLC 协同），结果写入并持久化到 NinePointModule。
 		// 不再用空配置覆盖现有标定结果。
@@ -24,7 +24,7 @@ namespace infTool
 		startAutoCalibration(&err);
 	}
 
-	bool NinePointBun::calcPixToWorldHomMat2D(const std::vector<Point2D>& pixPoints,
+	bool NinePointInfTool::calcPixToWorldHomMat2D(const std::vector<Point2D>& pixPoints,
 		const std::vector<Point2D>& worldPoints,
 		Config::NinePointCfg& ninePointCfg)
 	{
@@ -59,7 +59,7 @@ namespace infTool
 		}
 	}
 
-	bool NinePointBun::pixToWorld(const HalconCpp::HTuple& homMat2D,
+	bool NinePointInfTool::pixToWorld(const HalconCpp::HTuple& homMat2D,
 		double pixX, double pixY,
 		double& outWorldX, double& outWorldY)
 	{
@@ -94,12 +94,12 @@ namespace infTool
 		}
 	}
 
-	void NinePointBun::setMechanicalCoords(const std::vector<Point2D>& coords)
+	void NinePointInfTool::setMechanicalCoords(const std::vector<Point2D>& coords)
 	{
 		mechanicalCoords_ = coords;
 	}
 
-	bool NinePointBun::startAutoCalibration(std::string* errorMsg)
+	bool NinePointInfTool::startAutoCalibration(std::string* errorMsg)
 	{
 		if (worker_.joinable())
 		{
@@ -116,14 +116,14 @@ namespace infTool
 		return true;
 	}
 
-	void NinePointBun::stopAutoCalibration()
+	void NinePointInfTool::stopAutoCalibration()
 	{
 		stopRequested_.store(true, std::memory_order_release);
 		if (worker_.joinable())
 			worker_.join();
 	}
 
-	void NinePointBun::runAutoCalibration()
+	void NinePointInfTool::runAutoCalibration()
 	{
 		try
 		{
@@ -209,20 +209,20 @@ namespace infTool
 		}
 	}
 
-	void NinePointBun::build()
+	void NinePointInfTool::build()
 	{
 	}
 
-	void NinePointBun::destroy()
+	void NinePointInfTool::destroy()
 	{
 		stopAutoCalibration();
 	}
 
-	void NinePointBun::start()
+	void NinePointInfTool::start()
 	{
 	}
 
-	void NinePointBun::stop()
+	void NinePointInfTool::stop()
 	{
 		stopAutoCalibration();
 	}

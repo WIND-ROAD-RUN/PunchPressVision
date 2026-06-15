@@ -1,4 +1,4 @@
-add_subdirectory(CalibBun)
-add_subdirectory(NinePointBun)
-add_subdirectory(TwoCameraSpliceBun)
+add_subdirectory(CalibInfTool)
+add_subdirectory(NinePointInfTool)
+add_subdirectory(TwoCameraSpliceInfTool)
 add_subdirectory(infTool)

@@ -8,11 +8,11 @@
 
 namespace infTool
 {
-	class CalibBun
+	class CalibInfTool
 		: public global::IBusiness
 	{
 	public:
-		explicit CalibBun(inf::infrastructure& inf);
+		explicit CalibInfTool(inf::infrastructure& inf);
 	public:
 		void calibCamera(const std::vector<HalconCpp::HImage>& himages);
 		bool calibrateFromImages(const std::vector<HalconCpp::HImage>& himages,

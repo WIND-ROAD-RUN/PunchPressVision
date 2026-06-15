@@ -1,4 +1,4 @@
-set(Bun_TARGET TwoCameraSpliceBun)
+set(Bun_TARGET CalibInfTool)
 
 file(GLOB_RECURSE INCLUDE_LIST CONFIGURE_DEPENDS
 	"${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp"
@@ -21,8 +21,8 @@ set_target_properties(${Bun_TARGET} PROPERTIES
 	RELEASE_POSTFIX ""
 )
 
-target_include_directories(${Bun_TARGET} 
-	PUBLIC 
+target_include_directories(${Bun_TARGET}
+	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 	PRIVATE
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/private/include>

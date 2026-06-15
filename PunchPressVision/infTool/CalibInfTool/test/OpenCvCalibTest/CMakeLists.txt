@@ -1,4 +1,4 @@
-set(Bun_TARGET Test_infTool_TwoCameraSpliceBun)
+set(Bun_TARGET Test_infTool_CalibInfTool)
 
 file(GLOB_RECURSE INCLUDE_LIST CONFIGURE_DEPENDS
 	"${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp"
@@ -15,10 +15,15 @@ add_executable(${Bun_TARGET} ${SRC_LIST})
 target_include_directories(${Bun_TARGET}
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+	PRIVATE
+		${CMAKE_SOURCE_DIR}/PunchPressVision/UI/PunchPressUI/include
 )
 
 target_link_libraries(${Bun_TARGET} PRIVATE
-    infTool::TwoCameraSpliceBun
+    inf::infrastructure
+    Qt6::Core
+    Qt6::Widgets
+    ${OpenCV_LIBS}
 )
 
 add_windeployqt(${Bun_TARGET})

@@ -1,4 +1,4 @@
-set(Bun_TARGET NinePointBun)
+set(Bun_TARGET TwoCameraSpliceInfTool)
 
 file(GLOB_RECURSE INCLUDE_LIST CONFIGURE_DEPENDS
 	"${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp"

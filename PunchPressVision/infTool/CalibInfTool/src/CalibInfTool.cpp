@@ -1,15 +1,15 @@
-#include "infTool/CalibBun/CalibBun.hpp"
+#include "infTool/CalibInfTool/CalibInfTool.hpp"
 
 #include <algorithm>
 
 namespace infTool
 {
-	CalibBun::CalibBun(inf::infrastructure& inf)
+	CalibInfTool::CalibInfTool(inf::infrastructure& inf)
 		: inf_(inf)
 	{
 	}
 
-	void CalibBun::calibCamera(const std::vector<HalconCpp::HImage>& himages)
+	void CalibInfTool::calibCamera(const std::vector<HalconCpp::HImage>& himages)
 	{
 		// 便捷封装：使用默认焦距/板厚执行标定。结果由 calibrateFromImages
 		// 直接写入 inf_.calib_config_module_->calibConfig（不再用空配置覆盖）。
@@ -17,7 +17,7 @@ namespace infTool
 		calibrateFromImages(himages, /*focalLengthMm*/ 8.0, /*plateThicknessMm*/ 0.0, /*referenceIndex*/ 0, &err);
 	}
 	
-	bool CalibBun::calibrateFromImages(const std::vector<HalconCpp::HImage>& himages,
+	bool CalibInfTool::calibrateFromImages(const std::vector<HalconCpp::HImage>& himages,
 		double focalLengthMm,
 		double plateThicknessMm,
 		int referenceIndex,
@@ -159,7 +159,7 @@ namespace infTool
 		}
 	}
 	//测试发现，FindCalibObject 成功时会返回标记点坐标，但如果没有找到标定板，则不会抛出异常，而是返回空坐标。因此在后续获取坐标时需要检查是否成功找到标定板。
-	bool CalibBun::drawCalibMarks(const HalconCpp::HImage& src,
+	bool CalibInfTool::drawCalibMarks(const HalconCpp::HImage& src,
 		Config::CalibConfig& cfg,
 		bool& isOk,
 		HalconCpp::HObject& outMarksXld,
@@ -268,7 +268,7 @@ namespace infTool
 		}
 	}
 
-	HalconCpp::HImage CalibBun::undistortImage(const HalconCpp::HImage& himage)
+	HalconCpp::HImage CalibInfTool::undistortImage(const HalconCpp::HImage& himage)
 	{
 		using namespace HalconCpp;
 		auto& cfg = inf_.calib_config_module_->calibConfig;
@@ -300,19 +300,19 @@ namespace infTool
 
 
 
-	void CalibBun::build()
+	void CalibInfTool::build()
 	{
 	}
 
-	void CalibBun::destroy()
+	void CalibInfTool::destroy()
 	{
 	}
 
-	void CalibBun::start()
+	void CalibInfTool::start()
 	{
 	}
 
-	void CalibBun::stop()
+	void CalibInfTool::stop()
 	{
 	}
 }

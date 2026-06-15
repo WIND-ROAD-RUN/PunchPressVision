@@ -28,9 +28,9 @@ namespace ui
 		auto& biz = app_.business();
 		if (biz.nine_point_bun)
 		{
-			connect(biz.nine_point_bun, &infTool::NinePointBun::calibrationProgress,
+			connect(biz.nine_point_bun, &infTool::NinePointInfTool::calibrationProgress,
 				this, &NinePointCalibDialog::onCalibrationProgress, Qt::QueuedConnection);
-			connect(biz.nine_point_bun, &infTool::NinePointBun::calibrationFinished,
+			connect(biz.nine_point_bun, &infTool::NinePointInfTool::calibrationFinished,
 				this, &NinePointCalibDialog::onCalibrationFinished, Qt::QueuedConnection);
 		}
 

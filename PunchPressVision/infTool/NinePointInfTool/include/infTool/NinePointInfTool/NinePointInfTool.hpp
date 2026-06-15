@@ -26,13 +26,13 @@ namespace infTool
 		Point2D realPosition;
 	};
 
-	class NinePointBun
+	class NinePointInfTool
 		: public QObject, public global::IBusiness
 	{
 		Q_OBJECT
 	public:
-		explicit NinePointBun(inf::infrastructure& inf);
-		~NinePointBun() override;
+		explicit NinePointInfTool(inf::infrastructure& inf);
+		~NinePointInfTool() override;
 
 		//TODO:这里定义九点标定的算法，包含输入类型的定义和返回结果的定义
 		void calculateNinePointConfig();

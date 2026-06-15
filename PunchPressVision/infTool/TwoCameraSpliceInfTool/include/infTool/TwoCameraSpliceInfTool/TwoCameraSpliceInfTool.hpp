@@ -8,11 +8,11 @@
 
 namespace infTool
 {
-	class TwoCameraSpliceBun
+	class TwoCameraSpliceInfTool
 		: public global::IBusiness
 	{
 	public:
-		explicit TwoCameraSpliceBun(inf::infrastructure& inf);
+		explicit TwoCameraSpliceInfTool(inf::infrastructure& inf);
 	private:
 		inf::infrastructure& inf_;
 	public:

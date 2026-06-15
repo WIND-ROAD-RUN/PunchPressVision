@@ -8,9 +8,9 @@
 namespace bun
 {
 	// 保持旧命名空间别名，减少 App/UI 改动
-	using CalibBun = infTool::CalibBun;
-	using NinePointBun = infTool::NinePointBun;
-	using TwoCameraSpliceBun = infTool::TwoCameraSpliceBun;
+	using CalibBun = infTool::CalibInfTool;
+	using NinePointBun = infTool::NinePointInfTool;
+	using TwoCameraSpliceBun = infTool::TwoCameraSpliceInfTool;
 	using Point2D = infTool::Point2D;
 	using PointPair = infTool::PointPair;
 
@@ -37,10 +37,10 @@ namespace bun
 		const infTool::infTool& infTool() const { return *infTool_; }
 	public:
 		std::unique_ptr<CameraBun> camera_bun;
-		infTool::CalibBun* calib_bun{ nullptr };
-		infTool::NinePointBun* nine_point_bun{ nullptr };
+		infTool::CalibInfTool* calib_bun{ nullptr };
+		infTool::NinePointInfTool* nine_point_bun{ nullptr };
 		std::unique_ptr<ShapeModeManagerBun> shape_mode_manager_bun;
-		infTool::TwoCameraSpliceBun* two_camera_splice_bun{ nullptr };
+		infTool::TwoCameraSpliceInfTool* two_camera_splice_bun{ nullptr };
 		std::unique_ptr<LightControlBun> light_control_bun;
 	};
 }

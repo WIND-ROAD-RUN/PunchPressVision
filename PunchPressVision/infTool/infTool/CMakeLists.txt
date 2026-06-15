@@ -14,9 +14,9 @@ add_library(${InfTool_TARGET} STATIC ${SRC_LIST})
 target_link_libraries(${InfTool_TARGET}
 	PUBLIC
 		inf::infrastructure
-		infTool::CalibBun
-		infTool::NinePointBun
-		infTool::TwoCameraSpliceBun
+		infTool::CalibInfTool
+		infTool::NinePointInfTool
+		infTool::TwoCameraSpliceInfTool
 )
 
 set_target_properties(${InfTool_TARGET} PROPERTIES
