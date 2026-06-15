@@ -16,13 +16,13 @@
 
 class OpenCvCalibrator;
 
-class CalibBunTestWindow : public QMainWindow
+class CalibDistortionToolWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit CalibBunTestWindow(inf::infrastructure& inf, QWidget* parent = nullptr);
-    ~CalibBunTestWindow() override;
+    explicit CalibDistortionToolWindow(inf::infrastructure& inf, QWidget* parent = nullptr);
+    ~CalibDistortionToolWindow() override;
 
 protected:
     void resizeEvent(QResizeEvent* event) override;

@@ -1,4 +1,4 @@
-#include "CalibBunTestWindow.hpp"
+#include "CalibDistortionToolWindow.hpp"
 
 #include <QApplication>
 #include <QMetaType>
@@ -20,8 +20,8 @@ int main(int argc, char* argv[])
     inf::infrastructure inf;
     inf.build();
 
-    CalibBunTestWindow wnd(inf);
-    wnd.setWindowTitle(QStringLiteral("CalibBun 畸变矫正测试窗口"));
+    CalibDistortionToolWindow wnd(inf);
+    wnd.setWindowTitle(QStringLiteral("CalibDistortionTool 畸变矫正工具"));
     wnd.resize(1024, 768);
     wnd.show();
 
