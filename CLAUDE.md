@@ -78,6 +78,30 @@ ModuleName/
 - 头文件搜索路径使用 `$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>`。
 - 每个模块的 `test/` 子目录生成独立测试可执行文件，命名格式为 `Test_inf_<Module>`、`Test_infTool_<Module>` 或 `Test_bun_<Bundle>`。
 
+### 独立工具程序 (tool/)
+
+部分 infTool 模块提供独立的 GUI 工具程序，位于 `tool/` 子目录下。它们通过 Qt 窗口提供交互式视觉调试与标定功能，供开发者在集成到主应用前独立验证算法。
+
+| 工具 | 路径 | 说明 |
+|------|------|------|
+| `ToolCalibDistortion` | `infTool/CalibInfTool/tool/ToolCalibDistortion/` | 基于 OpenCV 的相机畸变标定与矫正工具。支持实时相机预览、棋盘格/圆点标定板标定、角点检测预览、YAML 参数存取及实时畸变矫正对比。 |
+
+工具目录遵循精简的 CMake 可执行文件结构：
+
+```
+tool/ToolXxx/
+  CMakeLists.txt              → add_executable(ToolXxx …)
+  include/ToolXxxWindow.hpp   → QMainWindow 主窗口类
+  include/…                   → 辅助控件/算法头文件
+  src/ToolXxxWindow.cpp
+  src/main.cpp
+```
+
+- CMake 目标名与目录名一致（`Tool<Name>` 模式）。
+- 窗口类命名为 `ToolXxxWindow`，继承 `QMainWindow`。
+- 工具通过父模块的 `CMakeLists.txt` 中 `add_subdirectory(./tool/ToolXxx)` 挂载。
+- 链接依赖显式声明（如 `inf::infrastructure`、`Halcon`、`Qt6::Widgets`、`${OpenCV_LIBS}`）。
+
 ### 配置系统（OSO）
 
 项目使用 RWUL 的 `oso`（ObjectStore）序列化框架进行持久化配置：

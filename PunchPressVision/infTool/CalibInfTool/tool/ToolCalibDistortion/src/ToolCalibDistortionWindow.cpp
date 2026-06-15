@@ -1,4 +1,4 @@
-#include "CalibDistortionToolWindow.hpp"
+#include "ToolCalibDistortionWindow.hpp"
 
 #include "CornerPreviewDialog.hpp"
 #include "OpenCvCalibrator.hpp"
@@ -26,7 +26,7 @@
 // 将相机回调收到的 cv::Mat 转换为可在 QLabel 中显示的 QImage
 static QImage cvMatToQImage(const cv::Mat& mat);
 
-CalibDistortionToolWindow::CalibDistortionToolWindow(inf::infrastructure& inf, QWidget* parent)
+ToolCalibDistortionWindow::ToolCalibDistortionWindow(inf::infrastructure& inf, QWidget* parent)
     : QMainWindow(parent)
     , inf_(inf)
     , calibrator_(std::make_unique<OpenCvCalibrator>())
@@ -38,9 +38,9 @@ CalibDistortionToolWindow::CalibDistortionToolWindow(inf::infrastructure& inf, Q
     applyDefaultCameraParams();
 }
 
-CalibDistortionToolWindow::~CalibDistortionToolWindow() = default;
+ToolCalibDistortionWindow::~ToolCalibDistortionWindow() = default;
 
-void CalibDistortionToolWindow::buildUi()
+void ToolCalibDistortionWindow::buildUi()
 {
     auto* central = new QWidget(this);
     setCentralWidget(central);
@@ -139,48 +139,48 @@ void CalibDistortionToolWindow::buildUi()
     // 状态栏提示
     statusBar()->showMessage(QStringLiteral("就绪"));
 
-    connect(setExposureBtn, &QPushButton::clicked, this, &CalibDistortionToolWindow::onSetExposure);
-    connect(setGainBtn, &QPushButton::clicked, this, &CalibDistortionToolWindow::onSetGain);
+    connect(setExposureBtn, &QPushButton::clicked, this, &ToolCalibDistortionWindow::onSetExposure);
+    connect(setGainBtn, &QPushButton::clicked, this, &ToolCalibDistortionWindow::onSetGain);
 }
 
-void CalibDistortionToolWindow::buildConnections()
+void ToolCalibDistortionWindow::buildConnections()
 {
-    connect(startStopBtn_, &QPushButton::clicked, this, &CalibDistortionToolWindow::onStartStop);
-    connect(undistortBtn_, &QPushButton::toggled, this, &CalibDistortionToolWindow::onToggleUndistort);
+    connect(startStopBtn_, &QPushButton::clicked, this, &ToolCalibDistortionWindow::onStartStop);
+    connect(undistortBtn_, &QPushButton::toggled, this, &ToolCalibDistortionWindow::onToggleUndistort);
     connect(cameraSelect_, QOverload<int>::of(&QComboBox::currentIndexChanged),
-        this, &CalibDistortionToolWindow::onCameraSelected);
+        this, &ToolCalibDistortionWindow::onCameraSelected);
 
-    connect(loadCalibImagesBtn_, &QPushButton::clicked, this, &CalibDistortionToolWindow::onLoadCalibrationImages);
-    connect(saveFrameBtn_, &QPushButton::clicked, this, &CalibDistortionToolWindow::onSaveCurrentFrame);
-    connect(calibrateBtn_, &QPushButton::clicked, this, &CalibDistortionToolWindow::onCalibrate);
-    connect(saveParamsBtn_, &QPushButton::clicked, this, &CalibDistortionToolWindow::onSaveParams);
-    connect(loadParamsBtn_, &QPushButton::clicked, this, &CalibDistortionToolWindow::onLoadParams);
-    connect(previewCornersBtn_, &QPushButton::clicked, this, &CalibDistortionToolWindow::onPreviewCorners);
+    connect(loadCalibImagesBtn_, &QPushButton::clicked, this, &ToolCalibDistortionWindow::onLoadCalibrationImages);
+    connect(saveFrameBtn_, &QPushButton::clicked, this, &ToolCalibDistortionWindow::onSaveCurrentFrame);
+    connect(calibrateBtn_, &QPushButton::clicked, this, &ToolCalibDistortionWindow::onCalibrate);
+    connect(saveParamsBtn_, &QPushButton::clicked, this, &ToolCalibDistortionWindow::onSaveParams);
+    connect(loadParamsBtn_, &QPushButton::clicked, this, &ToolCalibDistortionWindow::onLoadParams);
+    connect(previewCornersBtn_, &QPushButton::clicked, this, &ToolCalibDistortionWindow::onPreviewCorners);
 
     // 相机回调使用 DirectConnection，在采集线程中处理图像并排队到 UI 线程显示
     if (inf_.camera_module_)
     {
         connect(inf_.camera_module_.get(), &inf::CameraModule::callBackFunc,
-            this, &CalibDistortionToolWindow::onCameraFrame, Qt::DirectConnection);
+            this, &ToolCalibDistortionWindow::onCameraFrame, Qt::DirectConnection);
         connect(inf_.camera_module_.get(), &inf::CameraModule::cameraConnectionStateChanged,
-            this, &CalibDistortionToolWindow::onConnectionChanged, Qt::QueuedConnection);
+            this, &ToolCalibDistortionWindow::onConnectionChanged, Qt::QueuedConnection);
     }
 
     // 显示信号排队到 UI 线程
-    connect(this, &CalibDistortionToolWindow::originalFrameReady,
-        this, &CalibDistortionToolWindow::onOriginalDisplayFrame, Qt::QueuedConnection);
-    connect(this, &CalibDistortionToolWindow::undistortedFrameReady,
-        this, &CalibDistortionToolWindow::onUndistortedDisplayFrame, Qt::QueuedConnection);
+    connect(this, &ToolCalibDistortionWindow::originalFrameReady,
+        this, &ToolCalibDistortionWindow::onOriginalDisplayFrame, Qt::QueuedConnection);
+    connect(this, &ToolCalibDistortionWindow::undistortedFrameReady,
+        this, &ToolCalibDistortionWindow::onUndistortedDisplayFrame, Qt::QueuedConnection);
 }
 
-void CalibDistortionToolWindow::resizeEvent(QResizeEvent* event)
+void ToolCalibDistortionWindow::resizeEvent(QResizeEvent* event)
 {
     QMainWindow::resizeEvent(event);
     refreshOriginalView();
     refreshUndistortedView();
 }
 
-void CalibDistortionToolWindow::closeEvent(QCloseEvent* event)
+void ToolCalibDistortionWindow::closeEvent(QCloseEvent* event)
 {
     if (isRunning_.load())
     {
@@ -191,7 +191,7 @@ void CalibDistortionToolWindow::closeEvent(QCloseEvent* event)
     event->accept();
 }
 
-void CalibDistortionToolWindow::onCameraFrame(rw::hoec::MatInfo matInfo, global::CameraIndex cameraIndex)
+void ToolCalibDistortionWindow::onCameraFrame(rw::hoec::MatInfo matInfo, global::CameraIndex cameraIndex)
 {
     if (cameraIndex != selectedCamera_.load(std::memory_order_acquire))
         return;
@@ -217,7 +217,7 @@ void CalibDistortionToolWindow::onCameraFrame(rw::hoec::MatInfo matInfo, global:
     }
 }
 
-void CalibDistortionToolWindow::onOriginalDisplayFrame(QImage image)
+void ToolCalibDistortionWindow::onOriginalDisplayFrame(QImage image)
 {
     if (image.isNull())
         return;
@@ -226,7 +226,7 @@ void CalibDistortionToolWindow::onOriginalDisplayFrame(QImage image)
     refreshOriginalView();
 }
 
-void CalibDistortionToolWindow::onUndistortedDisplayFrame(QImage image)
+void ToolCalibDistortionWindow::onUndistortedDisplayFrame(QImage image)
 {
     if (image.isNull())
         return;
@@ -235,7 +235,7 @@ void CalibDistortionToolWindow::onUndistortedDisplayFrame(QImage image)
     refreshUndistortedView();
 }
 
-void CalibDistortionToolWindow::refreshOriginalView()
+void ToolCalibDistortionWindow::refreshOriginalView()
 {
     if (lastOriginalImage_.isNull() || !originalView_)
         return;
@@ -247,7 +247,7 @@ void CalibDistortionToolWindow::refreshOriginalView()
         originalView_->setPixmap(QPixmap::fromImage(lastOriginalImage_));
 }
 
-void CalibDistortionToolWindow::refreshUndistortedView()
+void ToolCalibDistortionWindow::refreshUndistortedView()
 {
     if (lastUndistortedImage_.isNull() || !undistortedView_)
         return;
@@ -259,7 +259,7 @@ void CalibDistortionToolWindow::refreshUndistortedView()
         undistortedView_->setPixmap(QPixmap::fromImage(lastUndistortedImage_));
 }
 
-void CalibDistortionToolWindow::onConnectionChanged(global::CameraIndex idx, bool connected, QString reason)
+void ToolCalibDistortionWindow::onConnectionChanged(global::CameraIndex idx, bool connected, QString reason)
 {
     (void)idx;
     (void)connected;
@@ -267,7 +267,7 @@ void CalibDistortionToolWindow::onConnectionChanged(global::CameraIndex idx, boo
     updateConnectionStatus();
 }
 
-void CalibDistortionToolWindow::onSetExposure()
+void ToolCalibDistortionWindow::onSetExposure()
 {
     if (!inf_.camera_module_)
         return;
@@ -284,7 +284,7 @@ void CalibDistortionToolWindow::onSetExposure()
             QStringLiteral("无法设置 %1 曝光").arg(cameraDisplayName(idx)));
 }
 
-void CalibDistortionToolWindow::onSetGain()
+void ToolCalibDistortionWindow::onSetGain()
 {
     if (!inf_.camera_module_)
         return;
@@ -301,14 +301,14 @@ void CalibDistortionToolWindow::onSetGain()
             QStringLiteral("无法设置 %1 增益").arg(cameraDisplayName(idx)));
 }
 
-void CalibDistortionToolWindow::onToggleUndistort(bool checked)
+void ToolCalibDistortionWindow::onToggleUndistort(bool checked)
 {
     undistortEnabled_.store(checked, std::memory_order_release);
     undistortBtn_->setText(checked ? QStringLiteral("关闭畸变矫正") : QStringLiteral("畸变矫正"));
     statusBar()->showMessage(checked ? QStringLiteral("畸变矫正已开启") : QStringLiteral("畸变矫正已关闭"));
 }
 
-void CalibDistortionToolWindow::onStartStop()
+void ToolCalibDistortionWindow::onStartStop()
 {
     if (!inf_.camera_module_)
         return;
@@ -329,14 +329,14 @@ void CalibDistortionToolWindow::onStartStop()
     }
 }
 
-void CalibDistortionToolWindow::onCameraSelected(int index)
+void ToolCalibDistortionWindow::onCameraSelected(int index)
 {
     const global::CameraIndex idx = cameraIndexFromCombo(index);
     selectedCamera_.store(idx, std::memory_order_release);
     statusBar()->showMessage(QStringLiteral("当前操作/显示已切换到 %1").arg(cameraDisplayName(idx)));
 }
 
-void CalibDistortionToolWindow::onLoadCalibrationImages()
+void ToolCalibDistortionWindow::onLoadCalibrationImages()
 {
     const QString dir = lastCalibDir_.isEmpty()
         ? QDir::currentPath()
@@ -376,7 +376,7 @@ void CalibDistortionToolWindow::onLoadCalibrationImages()
             .arg(successCount).arg(failCount).arg(calibrator_->calibrationImageCount()));
 }
 
-void CalibDistortionToolWindow::onSaveCurrentFrame()
+void ToolCalibDistortionWindow::onSaveCurrentFrame()
 {
     if (lastRawMat_.empty())
     {
@@ -409,7 +409,7 @@ void CalibDistortionToolWindow::onSaveCurrentFrame()
     }
 }
 
-void CalibDistortionToolWindow::onCalibrate()
+void ToolCalibDistortionWindow::onCalibrate()
 {
     if (calibrator_->calibrationImageCount() < 3)
     {
@@ -433,7 +433,7 @@ void CalibDistortionToolWindow::onCalibrate()
         QStringLiteral("RMS 重投影误差：%1 px\n已可开启“畸变矫正”预览。").arg(rms, 0, 'f', 4));
 }
 
-void CalibDistortionToolWindow::onSaveParams()
+void ToolCalibDistortionWindow::onSaveParams()
 {
     if (!calibrator_->isCalibrated())
     {
@@ -465,7 +465,7 @@ void CalibDistortionToolWindow::onSaveParams()
     }
 }
 
-void CalibDistortionToolWindow::onLoadParams()
+void ToolCalibDistortionWindow::onLoadParams()
 {
     const QString dir = lastCalibDir_.isEmpty()
         ? QDir::currentPath()
@@ -493,7 +493,7 @@ void CalibDistortionToolWindow::onLoadParams()
     }
 }
 
-void CalibDistortionToolWindow::onPreviewCorners()
+void ToolCalibDistortionWindow::onPreviewCorners()
 {
     if (calibrator_->cornerImageCount() == 0)
     {
@@ -506,7 +506,7 @@ void CalibDistortionToolWindow::onPreviewCorners()
     dlg.exec();
 }
 
-void CalibDistortionToolWindow::updateConnectionStatus()
+void ToolCalibDistortionWindow::updateConnectionStatus()
 {
     if (!inf_.camera_module_)
     {
@@ -525,12 +525,12 @@ void CalibDistortionToolWindow::updateConnectionStatus()
     statusBar()->showMessage(msg);
 }
 
-global::CameraIndex CalibDistortionToolWindow::cameraIndexFromCombo(int index)
+global::CameraIndex ToolCalibDistortionWindow::cameraIndexFromCombo(int index)
 {
     return (index == 1) ? global::CameraIndex::Camera2 : global::CameraIndex::Camera1;
 }
 
-QString CalibDistortionToolWindow::cameraDisplayName(global::CameraIndex idx)
+QString ToolCalibDistortionWindow::cameraDisplayName(global::CameraIndex idx)
 {
     return (idx == global::CameraIndex::Camera1)
         ? QStringLiteral("相机1") : QStringLiteral("相机2");
@@ -574,7 +574,7 @@ static QImage cvMatToQImage(const cv::Mat& mat)
     }
 }
 
-void CalibDistortionToolWindow::applyDefaultCameraParams()
+void ToolCalibDistortionWindow::applyDefaultCameraParams()
 {
     if (!inf_.camera_module_)
         return;
