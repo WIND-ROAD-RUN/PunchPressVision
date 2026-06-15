@@ -7,13 +7,13 @@ namespace infTool
 	{
 		two_camera_splice_bun = std::make_unique<TwoCameraSpliceBun>(inf_);
 		nine_point_bun = std::make_unique<NinePointBun>(inf_);
-		camera_bun = std::make_unique<CameraBun>(inf_);
+		calib_bun = std::make_unique<CalibBun>(inf_);
 	}
 
 	infTool::~infTool()
 	{
 		// 构造逆序显式 reset，确保依赖关系正确析构
-		camera_bun.reset();
+		calib_bun.reset();
 		nine_point_bun.reset();
 		two_camera_splice_bun.reset();
 	}
@@ -22,12 +22,12 @@ namespace infTool
 	{
 		if (two_camera_splice_bun) two_camera_splice_bun->build();
 		if (nine_point_bun) nine_point_bun->build();
-		if (camera_bun) camera_bun->build();
+		if (calib_bun) calib_bun->build();
 	}
 
 	void infTool::destroy()
 	{
-		if (camera_bun) camera_bun->destroy();
+		if (calib_bun) calib_bun->destroy();
 		if (nine_point_bun) nine_point_bun->destroy();
 		if (two_camera_splice_bun) two_camera_splice_bun->destroy();
 	}
@@ -36,12 +36,12 @@ namespace infTool
 	{
 		if (two_camera_splice_bun) two_camera_splice_bun->start();
 		if (nine_point_bun) nine_point_bun->start();
-		if (camera_bun) camera_bun->start();
+		if (calib_bun) calib_bun->start();
 	}
 
 	void infTool::stop()
 	{
-		if (camera_bun) camera_bun->stop();
+		if (calib_bun) calib_bun->stop();
 		if (nine_point_bun) nine_point_bun->stop();
 		if (two_camera_splice_bun) two_camera_splice_bun->stop();
 	}

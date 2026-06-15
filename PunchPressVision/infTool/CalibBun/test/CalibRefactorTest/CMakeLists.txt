@@ -1,4 +1,4 @@
-set(Bun_TARGET Test_infTool_CameraBun)
+set(Bun_TARGET Test_infTool_CalibRefactor)
 
 file(GLOB_RECURSE INCLUDE_LIST CONFIGURE_DEPENDS
 	"${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp"
@@ -18,7 +18,5 @@ target_include_directories(${Bun_TARGET}
 )
 
 target_link_libraries(${Bun_TARGET} PRIVATE
-    infTool::CameraBun
+    ${OpenCV_LIBS}
 )
-
-add_windeployqt(${Bun_TARGET})

@@ -11,9 +11,9 @@
 
 #include "halconcpp/HalconCpp.h"
 
-namespace infTool
+namespace bun
 {
-	// 相机工具：原始帧 → 格式转换 → 畸变矫正 →（双相机拼接）→ 信号
+	// 相机业务编排：原始帧 → 格式转换 → 畸变矫正 → 九点变换 →（双相机拼接）→ 信号
 	class CameraBun
 		: public QObject, public global::IBusiness
 	{

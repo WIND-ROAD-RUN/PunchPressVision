@@ -5,7 +5,7 @@
 #include "ui_Dlg_jibianjiaozheng.h"
 
 #include "app/PunchPressApp.hpp"
-#include "Business/CalibBun/CalibBun.hpp"
+#include "infTool/CalibBun/CalibBun.hpp"
 
 // 取消 Win32 MessageBox 宏
 #ifdef MessageBox

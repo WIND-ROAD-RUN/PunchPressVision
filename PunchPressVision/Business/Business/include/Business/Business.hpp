@@ -1,14 +1,14 @@
 #pragma once
 
 #include "infTool/infTool.hpp"
-#include "Business/CalibBun/CalibBun.hpp"
+#include "Business/CameraBun/CameraBun.hpp"
 #include "Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp"
 #include "Business/LightControlBun/LightControlBun.hpp"
 
 namespace bun
 {
 	// 保持旧命名空间别名，减少 App/UI 改动
-	using CameraBun = infTool::CameraBun;
+	using CalibBun = infTool::CalibBun;
 	using NinePointBun = infTool::NinePointBun;
 	using TwoCameraSpliceBun = infTool::TwoCameraSpliceBun;
 	using Point2D = infTool::Point2D;
@@ -36,8 +36,8 @@ namespace bun
 		infTool::infTool& infTool() { return *infTool_; }
 		const infTool::infTool& infTool() const { return *infTool_; }
 	public:
-		infTool::CameraBun* camera_bun{ nullptr };
-		std::unique_ptr<CalibBun> calib_bun;
+		std::unique_ptr<CameraBun> camera_bun;
+		infTool::CalibBun* calib_bun{ nullptr };
 		infTool::NinePointBun* nine_point_bun{ nullptr };
 		std::unique_ptr<ShapeModeManagerBun> shape_mode_manager_bun;
 		infTool::TwoCameraSpliceBun* two_camera_splice_bun{ nullptr };

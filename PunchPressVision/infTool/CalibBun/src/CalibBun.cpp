@@ -1,8 +1,8 @@
-#include "Business/CalibBun/CalibBun.hpp"
+#include "infTool/CalibBun/CalibBun.hpp"
 
 #include <algorithm>
 
-namespace bun
+namespace infTool
 {
 	CalibBun::CalibBun(inf::infrastructure& inf)
 		: inf_(inf)

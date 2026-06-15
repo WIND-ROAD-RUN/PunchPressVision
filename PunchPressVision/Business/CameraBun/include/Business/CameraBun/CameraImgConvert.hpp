@@ -3,7 +3,7 @@
 #include "halconcpp/HalconCpp.h"
 #include "opencv2/core/mat.hpp"
 
-namespace infTool
+namespace bun
 {
 	struct CameraImgConvert
 	{

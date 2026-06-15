@@ -6,7 +6,7 @@
 #include "halconcpp/HalconCpp.h"
 #include <vector>
 
-namespace bun
+namespace infTool
 {
 	class CalibBun
 		: public global::IBusiness

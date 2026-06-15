@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "infTool/CameraBun/CameraBun.hpp"
+#include "infTool/CalibBun/CalibBun.hpp"
 #include "infTool/NinePointBun/NinePointBun.hpp"
 #include "infTool/TwoCameraSpliceBun/TwoCameraSpliceBun.hpp"
 #include "infrastructure/infrastructure.hpp"
@@ -21,7 +21,7 @@ namespace infTool
 		void stop();
 
 	public:
-		std::unique_ptr<CameraBun> camera_bun;
+		std::unique_ptr<CalibBun> calib_bun;
 		std::unique_ptr<NinePointBun> nine_point_bun;
 		std::unique_ptr<TwoCameraSpliceBun> two_camera_splice_bun;
 

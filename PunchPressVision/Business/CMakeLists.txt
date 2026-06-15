@@ -1,4 +1,4 @@
-add_subdirectory(CalibBun)
+add_subdirectory(CameraBun)
 add_subdirectory(ShapeModeManagerBun)
 add_subdirectory(LightControlBun)
 add_subdirectory(Business)

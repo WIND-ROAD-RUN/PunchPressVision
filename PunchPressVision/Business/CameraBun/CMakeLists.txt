@@ -1,4 +1,4 @@
-set(Bun_TARGET CalibBun)
+set(Bun_TARGET CameraBun)
 
 file(GLOB_RECURSE INCLUDE_LIST CONFIGURE_DEPENDS
 	"${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp"

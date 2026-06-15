@@ -1,9 +1,9 @@
-#include "infTool/CameraBun/CameraImgConvert.hpp"
+#include "Business/CameraBun/CameraImgConvert.hpp"
 
 #include <stdexcept>
 #include <cstring>
 
-namespace infTool
+namespace bun
 {
 	HalconCpp::HImage CameraImgConvert::cvMatToHImage(const cv::Mat& mat)
 	{

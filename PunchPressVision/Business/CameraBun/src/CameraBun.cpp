@@ -1,8 +1,8 @@
-#include "infTool/CameraBun/CameraBun.hpp"
+#include "Business/CameraBun/CameraBun.hpp"
 
-#include "infTool/CameraBun/CameraImgConvert.hpp"
+#include "Business/CameraBun/CameraImgConvert.hpp"
 
-namespace infTool
+namespace bun
 {
 	CameraBun::CameraBun(inf::infrastructure& inf)
 		: inf_(inf)

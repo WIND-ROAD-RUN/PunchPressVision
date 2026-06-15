@@ -19,7 +19,7 @@ target_link_libraries(${Bun_TARGET}
 target_link_libraries(${Bun_TARGET}
 	PUBLIC
 		infTool::infTool
-		bun::CalibBun
+		bun::CameraBun
 		bun::ShapeModeManagerBun
 		bun::LightControlBun
 )

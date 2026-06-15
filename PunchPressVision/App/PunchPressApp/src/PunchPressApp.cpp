@@ -23,9 +23,9 @@ namespace app
 		// 将相机业务的成像信号桥接到 App 层（DirectConnection 保持低延迟）
 		if (business_.camera_bun)
 		{
-			QObject::connect(business_.camera_bun, &infTool::CameraBun::callBackFunWithCalib,
+			QObject::connect(business_.camera_bun.get(), &bun::CameraBun::callBackFunWithCalib,
 				this, &PunchPressApp::onFrameReady, Qt::DirectConnection);
-			QObject::connect(business_.camera_bun, &infTool::CameraBun::cameraConnectionStateChanged,
+			QObject::connect(business_.camera_bun.get(), &bun::CameraBun::cameraConnectionStateChanged,
 				this, &PunchPressApp::onCameraConnectionChanged, Qt::QueuedConnection);
 		}
 	}
@@ -33,7 +33,7 @@ namespace app
 	void PunchPressApp::destroy()
 	{
 		if (business_.camera_bun)
-		QObject::disconnect(business_.camera_bun, nullptr, this, nullptr);
+		QObject::disconnect(business_.camera_bun.get(), nullptr, this, nullptr);
 	}
 
 	void PunchPressApp::start()

@@ -1,4 +1,4 @@
-set(Bun_TARGET Test_bun_CalibBun)
+set(Bun_TARGET Test_infTool_CalibBun)
 
 file(GLOB_RECURSE INCLUDE_LIST CONFIGURE_DEPENDS
 	"${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp"

@@ -54,8 +54,8 @@ global/           → 共享类型和接口（IInfrastructure、IBusiness）
 
 - **global**：定义 `global::IInfrastructure`（`build`/`destroy`）和 `global::IBusiness`（`build`/`destroy`/`start`/`stop`）。最小化的共享类型，如 `global::CameraIndex`。
 - **infrastructure**：各模块（如 `CameraModule`、`ConfigModule`、`CalibConfigModule`、`NinePointModule`、`TwoCameraSpliceModule`、`ShapeModelManagerModule`）均继承 `global::IInfrastructure`。聚合类 `inf::infrastructure` 持有每个模块的 `unique_ptr`，并统一编排 `build()`/`destroy()`。
-- **infTool**：基于 infrastructure 的可复用视觉算法工具层。当前包含 `infTool::CameraBun`（帧格式转换/畸变矫正）、`infTool::NinePointBun`（九点标定）、`infTool::TwoCameraSpliceBun`（双相机拼接标定）。聚合类 `infTool::infTool` 持有这三个工具的 `unique_ptr`，并统一编排生命周期。`Business` 层通过该聚合访问这些工具。
-- **Business**：各 Bundle（如 `CalibBun`、`ShapeModeManagerBun`、`LightControlBun`）均继承 `global::IBusiness`。聚合类 `bun::Business` 持有 `infTool::infTool` 的 `unique_ptr` 以及其余 Bundle，并接收 `inf::infrastructure` 的引用。Bundle 负责将基础设施与 infTool 能力桥接到应用业务流。
+- **infTool**：基于 infrastructure 的可复用视觉算法工具层。当前包含 `infTool::CalibBun`（Halcon 畸变标定）、`infTool::NinePointBun`（九点标定）、`infTool::TwoCameraSpliceBun`（双相机拼接标定）。聚合类 `infTool::infTool` 持有这三个工具的 `unique_ptr`，并统一编排生命周期。`Business` 层通过该聚合访问这些工具。
+- **Business**：各 Bundle（如 `CameraBun`、`ShapeModeManagerBun`、`LightControlBun`）均继承 `global::IBusiness`。聚合类 `bun::Business` 持有 `infTool::infTool` 的 `unique_ptr` 以及其余 Bundle，并接收 `inf::infrastructure` 的引用。Bundle 负责将基础设施与 infTool 能力桥接到应用业务流。
 - **UI**：基于 Qt 的 UI 层。`PunchPress` 是主窗口类（目前包含大量未激活功能的 `#if 0` 块）。`UIModule` 构建为静态库，最终链接到 `PunchPressVision` 可执行文件。
 
 ### 模块规范
@@ -73,7 +73,7 @@ ModuleName/
     src/ModuleName.t.cpp
 ```
 
-- 目标为静态库，带命名空间别名：`inf::CameraModule`、`infTool::CameraBun`、`bun::CalibBun`、`global::global`、`UI::UIModule`。
+- 目标为静态库，带命名空间别名：`inf::CameraModule`、`infTool::CalibBun`、`bun::CameraBun`、`global::global`、`UI::UIModule`。
 - Debug 库通过后缀 `d` 区分（`DEBUG_POSTFIX` 设置）。
 - 头文件搜索路径使用 `$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>`。
 - 每个模块的 `test/` 子目录生成独立测试可执行文件，命名格式为 `Test_inf_<Module>`、`Test_infTool_<Module>` 或 `Test_bun_<Bundle>`。
@@ -89,8 +89,8 @@ ModuleName/
 
 - `CameraModule` 管理以 `global::CameraIndex`（Camera1、Camera2）为键的 `rw::rqwc::MVSCameraPassive` 实例。
 - 相机回调发射 Qt 信号（`callBackFunc`、`cameraConnectionStateChanged`），使用 `Qt::DirectConnection` 连接。
-- `infTool::CameraBun` 通过 `CameraImgConvert` 将 OpenCV 的 `cv::Mat` 转换为 Halcon 的 `HImage`，并转发已校准的图像。
-- `CalibBun` 封装 Halcon 标定 API（`CreateCalibData`、`CalibrateCameras`、`FindCalibObject`），用于畸变校正和标定板标记检测。
+- `bun::CameraBun` 通过 `CameraImgConvert` 将 OpenCV 的 `cv::Mat` 转换为 Halcon 的 `HImage`，并转发已校准的图像。
+- `infTool::CalibBun` 封装 Halcon 标定 API（`CreateCalibData`、`CalibrateCameras`、`FindCalibObject`），用于畸变校正和标定板标记检测。
 - `infTool::TwoCameraSpliceBun` 处理双相机图像拼接标定。
 - `infTool::NinePointBun` 实现九点标定，用于像素坐标到世界坐标的转换。
 
