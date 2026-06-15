@@ -5,6 +5,7 @@
 #include <vector>
 
 #include <QMainWindow>
+#include <QWidget>
 
 #include "halconcpp/HalconCpp.h"
 #include "global/GlobalType.hpp"
@@ -28,18 +29,18 @@ public:
     ~ToolCalibDistortionWindow() override;
 
 protected:
+    void showEvent(QShowEvent* event) override;
     void resizeEvent(QResizeEvent* event) override;
     void closeEvent(QCloseEvent* event) override;
+    bool eventFilter(QObject* watched, QEvent* event) override;
 
 private slots:
     void onCameraFrame(rw::hoec::MatInfo matInfo, global::CameraIndex cameraIndex);
     void onOriginalDisplayFrame(HalconCpp::HImage image);
-    void onUndistortedDisplayFrame(HalconCpp::HImage image);
     void onConnectionChanged(global::CameraIndex idx, bool connected, QString reason);
 
     void onSetExposure();
     void onSetGain();
-    void onToggleUndistort(bool checked);
     void onStartStop();
     void onCameraSelected(int index);
 
@@ -53,13 +54,14 @@ private slots:
 
 signals:
     void originalFrameReady(HalconCpp::HImage image);
-    void undistortedFrameReady(HalconCpp::HImage image);
 
 private:
+    void buildUi();
     void buildConnections();
     void initBoardDescrPath();
     void updateConnectionStatus();
     void applyDefaultCameraParams();
+    void refreshMarkedView();
     static global::CameraIndex cameraIndexFromCombo(int index);
     static QString cameraDisplayName(global::CameraIndex idx);
 
@@ -68,14 +70,20 @@ private:
     std::unique_ptr<infTool::CalibInfTool> calibInfTool_;
     Ui::ToolCalibDistortionWindowClass* ui = nullptr;
 
+    QWidget* originalHost_ = nullptr;
+    QWidget* undistortedHost_ = nullptr;
+
     DisplayView originalView_;
     DisplayView undistortedView_;
 
     // Halcon 标定图像缓存
     std::vector<HalconCpp::HImage> capturedImages_;
 
+    // drawCalibMarks 结果缓存（用于 resize 重绘）
+    HalconCpp::HImage  lastMarkedImage_;
+    HalconCpp::HObject lastMarksXld_;
+
     std::atomic<global::CameraIndex> selectedCamera_{ global::CameraIndex::Camera1 };
-    std::atomic_bool undistortEnabled_{ false };
     std::atomic_bool isRunning_{ false };
 
     cv::Mat lastRawMat_;

@@ -7,10 +7,12 @@
 
 #include <QApplication>
 #include <QCloseEvent>
+#include <QEvent>
 #include <QComboBox>
 #include <QDateTime>
 #include <QDir>
 #include <QFileDialog>
+#include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QResizeEvent>
@@ -64,9 +66,8 @@ ToolCalibDistortionWindow::ToolCalibDistortionWindow(inf::infrastructure& inf, Q
     // 初始化 Halcon 标定引擎
     calibInfTool_->build();
 
-    // 打开 Halcon 显示窗口，嵌入到 QWidget 占位控件上
-    originalView_.ensure(ui->originalView);
-    undistortedView_.ensure(ui->undistortedView);
+    // 将 .ui 中的 QLabel 占位符替换为 native QWidget，承载 Halcon 窗口
+    buildUi();
 
     buildConnections();
     initBoardDescrPath();
@@ -83,14 +84,47 @@ ToolCalibDistortionWindow::~ToolCalibDistortionWindow()
 }
 
 // ===================================================================
+// 将 .ui 中的 QLabel 占位符替换为 native QWidget（承载 Halcon 窗口）
+// ===================================================================
+void ToolCalibDistortionWindow::buildUi()
+{
+    auto replaceLabel = [this](QLabel* old) -> QWidget*
+    {
+        auto* host = new QWidget(old->parentWidget());
+        host->setObjectName(old->objectName());
+        host->setStyleSheet(old->styleSheet());
+        host->setSizePolicy(old->sizePolicy());
+        host->setMinimumSize(old->minimumSize());
+        host->setMaximumSize(old->maximumSize());
+
+        // 确保 Halcon OpenWindow 能拿到有效的 native 句柄
+        host->setAttribute(Qt::WA_NativeWindow, true);
+
+        // 宿主 resize 时立即同步 Halcon 窗体
+        host->installEventFilter(this);
+
+        if (auto* lay = old->parentWidget() ? old->parentWidget()->layout() : nullptr)
+            lay->replaceWidget(old, host);
+        else
+            host->setGeometry(old->geometry());
+
+        host->show();
+        old->hide();
+        old->deleteLater();
+        return host;
+    };
+
+    originalHost_   = replaceLabel(ui->originalView);
+    undistortedHost_ = replaceLabel(ui->undistortedView);
+}
+
+// ===================================================================
 // UI 连接
 // ===================================================================
 void ToolCalibDistortionWindow::buildConnections()
 {
     connect(ui->startStopBtn, &QPushButton::clicked,
         this, &ToolCalibDistortionWindow::onStartStop);
-    connect(ui->undistortBtn, &QPushButton::toggled,
-        this, &ToolCalibDistortionWindow::onToggleUndistort);
     connect(ui->cameraSelect, QOverload<int>::of(&QComboBox::currentIndexChanged),
         this, &ToolCalibDistortionWindow::onCameraSelected);
 
@@ -126,18 +160,38 @@ void ToolCalibDistortionWindow::buildConnections()
     // 显示信号排队到 UI 线程
     connect(this, &ToolCalibDistortionWindow::originalFrameReady,
         this, &ToolCalibDistortionWindow::onOriginalDisplayFrame, Qt::QueuedConnection);
-    connect(this, &ToolCalibDistortionWindow::undistortedFrameReady,
-        this, &ToolCalibDistortionWindow::onUndistortedDisplayFrame, Qt::QueuedConnection);
 }
 
 // ===================================================================
 // 窗口事件
 // ===================================================================
+void ToolCalibDistortionWindow::showEvent(QShowEvent* event)
+{
+    QMainWindow::showEvent(event);
+    // 首次显示时布局已计算完毕，宿主尺寸有效，打开 Halcon 窗口
+    originalView_.ensure(originalHost_);
+    undistortedView_.ensure(undistortedHost_);
+    originalView_.resizeToHost();
+    refreshMarkedView();
+}
+
+bool ToolCalibDistortionWindow::eventFilter(QObject* watched, QEvent* event)
+{
+    if (event->type() == QEvent::Resize)
+    {
+        if (watched == originalHost_)
+            originalView_.resizeToHost();
+        else if (watched == undistortedHost_)
+            refreshMarkedView();
+    }
+    return QMainWindow::eventFilter(watched, event);
+}
+
 void ToolCalibDistortionWindow::resizeEvent(QResizeEvent* event)
 {
     QMainWindow::resizeEvent(event);
     originalView_.resizeToHost();
-    undistortedView_.resizeToHost();
+    refreshMarkedView();
 }
 
 void ToolCalibDistortionWindow::closeEvent(QCloseEvent* event)
@@ -164,17 +218,8 @@ void ToolCalibDistortionWindow::onCameraFrame(rw::hoec::MatInfo matInfo, global:
         // 缓存当前原始帧（cv::Mat 用于保存文件）
         lastRawMat_ = matInfo.mat.clone();
 
-        // 转 HImage
-        HalconCpp::HImage hSrc = cvMatToHImage(matInfo.mat);
-
-        // 左侧：畸变矫正后的图像
-        HalconCpp::HImage hUndistorted = hSrc;
-        if (undistortEnabled_.load(std::memory_order_acquire))
-            hUndistorted = calibInfTool_->undistortImage(hSrc);
-
-        emit undistortedFrameReady(hUndistorted);
-        // 右侧：原始图像
-        emit originalFrameReady(hSrc);
+        // 左侧：原始图像
+        emit originalFrameReady(cvMatToHImage(matInfo.mat));
     }
     catch (...)
     {
@@ -190,9 +235,17 @@ void ToolCalibDistortionWindow::onOriginalDisplayFrame(HalconCpp::HImage image)
     originalView_.display(image);
 }
 
-void ToolCalibDistortionWindow::onUndistortedDisplayFrame(HalconCpp::HImage image)
+// ===================================================================
+// 右侧 XLD 标记视图 — 仅在 saveFrame 后刷新，resize 时重绘
+// ===================================================================
+void ToolCalibDistortionWindow::refreshMarkedView()
 {
-    undistortedView_.display(image);
+    if (!lastMarkedImage_.IsInitialized())
+        return;
+
+    undistortedView_.display(lastMarkedImage_);
+    if (lastMarksXld_.IsInitialized())
+        undistortedView_.overlayXld(lastMarksXld_);
 }
 
 // ===================================================================
@@ -246,25 +299,6 @@ void ToolCalibDistortionWindow::onSetGain()
 // ===================================================================
 // 采集控制
 // ===================================================================
-void ToolCalibDistortionWindow::onToggleUndistort(bool checked)
-{
-    // 检查是否已标定
-    auto& cfg = inf_.calib_config_module_->calibConfig;
-    if (checked && cfg.cameraParameters.Length() == 0)
-    {
-        QMessageBox::information(this, QStringLiteral("未标定"),
-            QStringLiteral("尚未执行标定或未加载标定参数，无法开启畸变矫正。"));
-        ui->undistortBtn->setChecked(false);
-        return;
-    }
-
-    undistortEnabled_.store(checked, std::memory_order_release);
-    ui->undistortBtn->setText(checked
-        ? QStringLiteral("关闭畸变矫正") : QStringLiteral("畸变矫正"));
-    statusBar()->showMessage(checked
-        ? QStringLiteral("Halcon 畸变矫正已开启") : QStringLiteral("畸变矫正已关闭"));
-}
-
 void ToolCalibDistortionWindow::onStartStop()
 {
     if (!inf_.camera_module_)
@@ -416,8 +450,28 @@ void ToolCalibDistortionWindow::onSaveCurrentFrame()
     if (cv::imwrite(path.toStdString(), lastRawMat_))
     {
         lastCalibDir_ = QFileInfo(path).absolutePath();
-        // 同时加入标定图集（转为 HImage）
-        capturedImages_.push_back(cvMatToHImage(lastRawMat_));
+
+        // 转为 HImage 并加入标定图集
+        HalconCpp::HImage hImg = cvMatToHImage(lastRawMat_);
+        capturedImages_.push_back(hImg);
+
+        // 右侧：使用 drawCalibMarks 绘制 XLD 标记
+        auto& cfg = inf_.calib_config_module_->calibConfig;
+        if (!cfg.calibBoardDescrPath.empty())
+        {
+            bool isOk = false;
+            HalconCpp::HObject marksXld, marksRegion;
+            std::string err;
+            calibInfTool_->drawCalibMarks(hImg, cfg, isOk, marksXld, marksRegion, &err);
+
+            lastMarkedImage_ = hImg;
+            lastMarksXld_   = marksXld;
+
+            undistortedView_.display(lastMarkedImage_);
+            if (isOk)
+                undistortedView_.overlayXld(lastMarksXld_);
+        }
+
         statusBar()->showMessage(
             QStringLiteral("已保存：%1（已加入标定图集，共 %2 张）")
                 .arg(path).arg(capturedImages_.size()));

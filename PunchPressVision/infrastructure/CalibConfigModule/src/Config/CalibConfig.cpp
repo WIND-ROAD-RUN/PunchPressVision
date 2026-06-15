@@ -55,7 +55,7 @@ namespace Config
 			return true;
 		}
 
-		void writeSettingsSafe(const fs::path& filePath, double exposure, double gain)
+		void writeSettingsSafe(const fs::path& filePath, double exposure, double gain, const std::string& boardDescrPath)
 		{
 			fs::create_directories(filePath.parent_path());
 			fs::path tmp = filePath;
@@ -65,11 +65,13 @@ namespace Config
 				return;
 			ofs << "cameraExposure=" << exposure << '\n';
 			ofs << "cameraGain=" << gain << '\n';
+			if (!boardDescrPath.empty())
+				ofs << "calibBoardDescrPath=" << boardDescrPath << '\n';
 			ofs.close();
 			replaceFile(tmp, filePath);
 		}
 
-		bool readSettingsSafe(const fs::path& filePath, double& exposure, double& gain)
+		bool readSettingsSafe(const fs::path& filePath, double& exposure, double& gain, std::string& boardDescrPath)
 		{
 			if (!fs::exists(filePath))
 				return false;
@@ -93,6 +95,8 @@ namespace Config
 						exposure = std::stod(value);
 					else if (key == "cameraGain")
 						gain = std::stod(value);
+					else if (key == "calibBoardDescrPath")
+						boardDescrPath = value;
 				}
 				catch (...)
 				{
@@ -110,7 +114,7 @@ namespace Config
 			const fs::path dir(dirPath);
 			writeTupleSafe(dir / kCameraParametersFile, cameraParameters);
 			writeTupleSafe(dir / kCameraPoseFile, cameraPose);
-			writeSettingsSafe(dir / kSettingsFile, cameraExposure, cameraGain);
+			writeSettingsSafe(dir / kSettingsFile, cameraExposure, cameraGain, calibBoardDescrPath);
 		}
 		catch (...)
 		{
@@ -125,9 +129,10 @@ namespace Config
 			const fs::path dir(dirPath);
 			cameraExposure = 10000.0;
 			cameraGain = 5.0;
+			calibBoardDescrPath.clear();
 			readTupleSafe(dir / kCameraParametersFile, cameraParameters);
 			readTupleSafe(dir / kCameraPoseFile, cameraPose);
-			readSettingsSafe(dir / kSettingsFile, cameraExposure, cameraGain);
+			readSettingsSafe(dir / kSettingsFile, cameraExposure, cameraGain, calibBoardDescrPath);
 		}
 		catch (...)
 		{
