@@ -3,18 +3,17 @@
 #include <atomic>
 #include <memory>
 
-#include <QComboBox>
-#include <QLabel>
 #include <QMainWindow>
-#include <QPushButton>
-#include <QSpinBox>
-#include <QWidget>
 
 #include "global/GlobalType.hpp"
 #include "infrastructure/infrastructure.hpp"
 #include "rwul/hoecm/hoec_m.hpp"
 
 class OpenCvCalibrator;
+
+QT_BEGIN_NAMESPACE
+namespace Ui { class ToolCalibDistortionWindowClass; }
+QT_END_NAMESPACE
 
 class ToolCalibDistortionWindow : public QMainWindow
 {
@@ -53,7 +52,6 @@ signals:
     void undistortedFrameReady(QImage image);
 
 private:
-    void buildUi();
     void buildConnections();
     void updateConnectionStatus();
     void refreshOriginalView();
@@ -65,20 +63,7 @@ private:
 private:
     inf::infrastructure& inf_;
     std::unique_ptr<OpenCvCalibrator> calibrator_;
-
-    QLabel* originalView_ = nullptr;
-    QLabel* undistortedView_ = nullptr;
-    QPushButton* startStopBtn_ = nullptr;
-    QPushButton* undistortBtn_ = nullptr;
-    QPushButton* loadCalibImagesBtn_ = nullptr;
-    QPushButton* saveFrameBtn_ = nullptr;
-    QPushButton* calibrateBtn_ = nullptr;
-    QPushButton* saveParamsBtn_ = nullptr;
-    QPushButton* loadParamsBtn_ = nullptr;
-    QPushButton* previewCornersBtn_ = nullptr;
-    QSpinBox* exposureSpin_ = nullptr;
-    QSpinBox* gainSpin_ = nullptr;
-    QComboBox* cameraSelect_ = nullptr;
+    Ui::ToolCalibDistortionWindowClass* ui = nullptr;
 
     std::atomic<global::CameraIndex> selectedCamera_{ global::CameraIndex::Camera1 };
     std::atomic_bool undistortEnabled_{ false };
