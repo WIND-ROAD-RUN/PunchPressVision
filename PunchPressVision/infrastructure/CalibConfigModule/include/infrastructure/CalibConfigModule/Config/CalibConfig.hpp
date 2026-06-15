@@ -12,8 +12,6 @@ namespace Config
 		// Extrinsic camera pose for distortion correction
 		HalconCpp::HTuple cameraPose;
 
-		// Calibration board description file path
-		std::string calibBoardDescrPath{ "" };
 
 		// Camera exposure
 		double cameraExposure{ 10000 };

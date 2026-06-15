@@ -45,11 +45,8 @@ private slots:
     void onCameraSelected(int index);
 
     // Halcon 标定相关槽函数
-    void onLoadCalibrationImages();
     void onSaveCurrentFrame();
     void onCalibrate();
-    void onSaveParams();
-    void onLoadParams();
     void onPreviewCorners();
 
 signals:
@@ -59,6 +56,7 @@ private:
     void buildUi();
     void buildConnections();
     void initBoardDescrPath();
+    void cleanCalibImageDirs();
     void updateConnectionStatus();
     void applyDefaultCameraParams();
     void refreshMarkedView();
