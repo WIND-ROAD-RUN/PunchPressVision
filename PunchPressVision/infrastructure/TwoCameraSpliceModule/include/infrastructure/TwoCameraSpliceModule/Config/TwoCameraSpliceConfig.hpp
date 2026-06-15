@@ -10,6 +10,9 @@ namespace Config
 		HalconCpp::HObject camera1Piccture; // calibration image from camera 1
 		HalconCpp::HObject camera2Piccture; // calibration image from camera 2
 
+		
+
+
 		// Calibration related parameters
 		std::string caltabDescrPath;  // calibration plate description file path (.descr)
 		double DiffHeight{ 0 };       // height difference between plate and caliper

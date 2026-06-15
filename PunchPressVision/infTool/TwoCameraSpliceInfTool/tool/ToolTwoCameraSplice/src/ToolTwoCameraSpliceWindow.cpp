@@ -425,43 +425,26 @@ void ToolTwoCameraSpliceWindow::onDisplayFrame()
 // ===================================================================
 void ToolTwoCameraSpliceWindow::btn_takePicture_clicked()
 {
-	if (!inf_.camera_module_)
+	// 直接从相机回调缓存中取当前帧，存入 TwoCameraSpliceCfg 供后续标定使用
+	if (!cam1Ready_ && !cam2Ready_)
 	{
-		QMessageBox::warning(this, QStringLiteral("提示"), QStringLiteral("相机模块未初始化"));
+		QMessageBox::warning(this, QStringLiteral("提示"), QStringLiteral("相机图像未就绪，请确认相机正在采集"));
 		return;
 	}
 
-	rw::hoec::MatInfo frame1, frame2;
-	const bool ok1 = inf_.camera_module_->captureSingleFrame(global::CameraIndex::Camera1, frame1);
-	const bool ok2 = inf_.camera_module_->captureSingleFrame(global::CameraIndex::Camera2, frame2);
+	if (!inf_.two_camera_splice_module_)
+		return;
 
-	if (ok1)
-	{
-		rawMat1_   = frame1.mat.clone();
-		cam1Image_ = cvMatToHImage(frame1.mat);
-		cam1Ready_ = true;
-		winCam1_.lastImage = cam1Image_;
-	}
+	auto& spliceCfg = inf_.two_camera_splice_module_->twoCameraSpliceConfig;
 
-	if (ok2)
-	{
-		rawMat2_   = frame2.mat.clone();
-		cam2Image_ = cvMatToHImage(frame2.mat);
-		cam2Ready_ = true;
-		winCam2_.lastImage = cam2Image_;
-	}
-
-	// 将拍照图像存入 TwoCameraSpliceCfg，供后续测试/标定使用
-	if (inf_.two_camera_splice_module_)
-	{
-		auto& spliceCfg = inf_.two_camera_splice_module_->twoCameraSpliceConfig;
-		if (ok1) spliceCfg.camera1Piccture = static_cast<HalconCpp::HObject>(cam1Image_);
-		if (ok2) spliceCfg.camera2Piccture = static_cast<HalconCpp::HObject>(cam2Image_);
-	}
+	if (cam1Ready_)
+		spliceCfg.camera1Piccture = static_cast<HalconCpp::HObject>(cam1Image_);
+	if (cam2Ready_)
+		spliceCfg.camera2Piccture = static_cast<HalconCpp::HObject>(cam2Image_);
 
 	statusBar()->showMessage(
-		ok1 && ok2 ? QStringLiteral("拍照完成")
-				   : QStringLiteral("拍照完成（部分相机未就绪）"));
+		cam1Ready_ && cam2Ready_ ? QStringLiteral("拍照完成")
+								 : QStringLiteral("拍照完成（部分相机未就绪）"));
 }
 
 // ===================================================================
@@ -711,7 +694,6 @@ void ToolTwoCameraSpliceWindow::btn_test_clicked()
 	if (ensureHalconWindow(DisplayWindow::Stitched))
 		redrawDisplay(DisplayWindow::Stitched);
 
-	inf_.two_camera_splice_module_->save();
 
 	ui->lb_realPosition->setText(
 		QStringLiteral("拼接完成 | 矫正尺寸: %1 × %2 px")
@@ -722,5 +704,24 @@ void ToolTwoCameraSpliceWindow::btn_test_clicked()
 // ===================================================================
 void ToolTwoCameraSpliceWindow::btn_exit_clicked()
 {
+	// 若标定已成功（MapSingle1/MapSingle2 已生成），提示是否保存
+	if (inf_.two_camera_splice_module_)
+	{
+		auto& spliceCfg = inf_.two_camera_splice_module_->twoCameraSpliceConfig;
+		if (spliceCfg.MapSingle1.IsInitialized() && spliceCfg.MapSingle2.IsInitialized())
+		{
+			const auto btn = QMessageBox::question(
+				this,
+				QStringLiteral("保存标定结果"),
+				QStringLiteral("标定已成功，是否保存拼接配置？\n保存路径: TwoCameraSpliceModule"),
+				QMessageBox::Yes | QMessageBox::No,
+				QMessageBox::Yes);
+			if (btn == QMessageBox::Yes)
+			{
+				inf_.two_camera_splice_module_->save();
+				statusBar()->showMessage(QStringLiteral("拼接配置已保存"), 3000);
+			}
+		}
+	}
 	close();
 }
