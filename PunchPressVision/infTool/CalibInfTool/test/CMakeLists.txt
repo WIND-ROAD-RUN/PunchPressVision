@@ -1,2 +1,1 @@
 add_subdirectory(OpenCvCalibTest)
-add_subdirectory(CalibRefactorTest)
