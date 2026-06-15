@@ -2,14 +2,18 @@
 
 #include <atomic>
 #include <memory>
+#include <vector>
 
 #include <QMainWindow>
 
+#include "halconcpp/HalconCpp.h"
 #include "global/GlobalType.hpp"
 #include "infrastructure/infrastructure.hpp"
 #include "rwul/hoecm/hoec_m.hpp"
 
-class OpenCvCalibrator;
+#include "DisplayView.hpp"
+
+namespace infTool { class CalibInfTool; }
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class ToolCalibDistortionWindowClass; }
@@ -29,8 +33,8 @@ protected:
 
 private slots:
     void onCameraFrame(rw::hoec::MatInfo matInfo, global::CameraIndex cameraIndex);
-    void onOriginalDisplayFrame(QImage image);
-    void onUndistortedDisplayFrame(QImage image);
+    void onOriginalDisplayFrame(HalconCpp::HImage image);
+    void onUndistortedDisplayFrame(HalconCpp::HImage image);
     void onConnectionChanged(global::CameraIndex idx, bool connected, QString reason);
 
     void onSetExposure();
@@ -39,7 +43,7 @@ private slots:
     void onStartStop();
     void onCameraSelected(int index);
 
-    // OpenCV 标定相关槽函数
+    // Halcon 标定相关槽函数
     void onLoadCalibrationImages();
     void onSaveCurrentFrame();
     void onCalibrate();
@@ -48,29 +52,32 @@ private slots:
     void onPreviewCorners();
 
 signals:
-    void originalFrameReady(QImage image);
-    void undistortedFrameReady(QImage image);
+    void originalFrameReady(HalconCpp::HImage image);
+    void undistortedFrameReady(HalconCpp::HImage image);
 
 private:
     void buildConnections();
+    void initBoardDescrPath();
     void updateConnectionStatus();
-    void refreshOriginalView();
-    void refreshUndistortedView();
     void applyDefaultCameraParams();
     static global::CameraIndex cameraIndexFromCombo(int index);
     static QString cameraDisplayName(global::CameraIndex idx);
 
 private:
     inf::infrastructure& inf_;
-    std::unique_ptr<OpenCvCalibrator> calibrator_;
+    std::unique_ptr<infTool::CalibInfTool> calibInfTool_;
     Ui::ToolCalibDistortionWindowClass* ui = nullptr;
+
+    DisplayView originalView_;
+    DisplayView undistortedView_;
+
+    // Halcon 标定图像缓存
+    std::vector<HalconCpp::HImage> capturedImages_;
 
     std::atomic<global::CameraIndex> selectedCamera_{ global::CameraIndex::Camera1 };
     std::atomic_bool undistortEnabled_{ false };
     std::atomic_bool isRunning_{ false };
 
-    QImage lastOriginalImage_;
-    QImage lastUndistortedImage_;
     cv::Mat lastRawMat_;
     QString lastCalibDir_;
 };
