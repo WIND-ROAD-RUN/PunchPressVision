@@ -20,10 +20,10 @@ target_include_directories(${Bun_TARGET}
 )
 
 target_link_libraries(${Bun_TARGET} PRIVATE
-    bun::CalibBun
     bun::CameraBun
     Qt6::Core
     Qt6::Widgets
+    ${OpenCV_LIBS}
 )
 
 add_windeployqt(${Bun_TARGET})

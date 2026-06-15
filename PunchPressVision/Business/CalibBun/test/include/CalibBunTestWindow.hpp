@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+#include <memory>
 
 #include <QComboBox>
 #include <QLabel>
@@ -9,11 +10,12 @@
 #include <QSpinBox>
 #include <QWidget>
 
-#include "Business/CalibBun/CalibBun.hpp"
 #include "UI/HalconView.h"
 #include "global/GlobalType.hpp"
 #include "infrastructure/infrastructure.hpp"
 #include "rwul/hoecm/hoec_m.hpp"
+
+class OpenCvCalibrator;
 
 #include <QMetaType>
 
@@ -44,6 +46,13 @@ private slots:
     void onStartStop();
     void onCameraSelected(int index);
 
+    // OpenCV 标定相关槽函数
+    void onLoadCalibrationImages();
+    void onSaveCurrentFrame();
+    void onCalibrate();
+    void onSaveParams();
+    void onLoadParams();
+
 signals:
     void frameReady(HalconCpp::HImage image);
     void matFrameReady(QImage image);
@@ -59,13 +68,18 @@ private:
 
 private:
     inf::infrastructure& inf_;
-    bun::CalibBun calibBun_;
+    std::unique_ptr<OpenCvCalibrator> calibrator_;
     ui::HalconView halconView_;
 
     QWidget* halconHost_ = nullptr;
     QLabel* matView_ = nullptr;
     QPushButton* startStopBtn_ = nullptr;
     QPushButton* undistortBtn_ = nullptr;
+    QPushButton* loadCalibImagesBtn_ = nullptr;
+    QPushButton* saveFrameBtn_ = nullptr;
+    QPushButton* calibrateBtn_ = nullptr;
+    QPushButton* saveParamsBtn_ = nullptr;
+    QPushButton* loadParamsBtn_ = nullptr;
     QSpinBox* exposureSpin_ = nullptr;
     QSpinBox* gainSpin_ = nullptr;
     QComboBox* cameraSelect_ = nullptr;
@@ -75,4 +89,6 @@ private:
     std::atomic_bool isRunning_{ false };
     bool halconWindowEnsured_ = false;
     QImage lastMatImage_;
+    cv::Mat lastRawMat_;
+    QString lastCalibDir_;
 };
