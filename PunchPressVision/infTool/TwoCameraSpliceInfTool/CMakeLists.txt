@@ -14,6 +14,7 @@ add_library(${Bun_TARGET} STATIC ${SRC_LIST} )
 target_link_libraries(${Bun_TARGET}
 	PUBLIC
 		inf::infrastructure
+		infTool::CalibInfTool
 )
 
 set_target_properties(${Bun_TARGET} PROPERTIES
@@ -30,4 +31,5 @@ target_include_directories(${Bun_TARGET}
 
 add_library(infTool::${Bun_TARGET} ALIAS ${Bun_TARGET})
 
+add_subdirectory(./tool/ToolTwoCameraSplice)
 add_subdirectory(./test)

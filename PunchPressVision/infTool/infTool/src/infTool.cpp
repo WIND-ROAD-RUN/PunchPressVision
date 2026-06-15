@@ -5,9 +5,9 @@ namespace infTool
 	infTool::infTool(inf::infrastructure& inf)
 		: inf_(inf)
 	{
-		two_camera_splice_bun = std::make_unique<TwoCameraSpliceInfTool>(inf_);
-		nine_point_bun = std::make_unique<NinePointInfTool>(inf_);
 		calib_bun = std::make_unique<CalibInfTool>(inf_);
+		nine_point_bun = std::make_unique<NinePointInfTool>(inf_);
+		two_camera_splice_bun = std::make_unique<TwoCameraSpliceInfTool>(inf_, *calib_bun);
 	}
 
 	infTool::~infTool()

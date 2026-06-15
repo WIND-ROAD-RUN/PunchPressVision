@@ -2,8 +2,9 @@
 
 namespace infTool
 {
-	TwoCameraSpliceInfTool::TwoCameraSpliceInfTool(inf::infrastructure& inf)
+	TwoCameraSpliceInfTool::TwoCameraSpliceInfTool(inf::infrastructure& inf, CalibInfTool& calibTool)
 		: inf_(inf)
+		, calib_tool_(calibTool)
 	{
 	}
 
@@ -296,12 +297,57 @@ namespace infTool
 		}
 	}
 
+	void TwoCameraSpliceInfTool::onCalibFrame(HalconCpp::HImage img, global::CameraIndex cameraIndex)
+	{
+		//TODO:这里补充拼接逻辑
+
+		// 按相机索引缓存矫正后的图像
+		switch (cameraIndex)
+		{
+		case global::CameraIndex::Camera1:
+			cam1_image_ = img;
+			break;
+		case global::CameraIndex::Camera2:
+			cam2_image_ = img;
+			break;
+		}
+
+		// 双路图像就绪时执行拼接
+		if (cam1_image_.IsInitialized() && cam2_image_.IsInitialized())
+		{
+			auto& spliceCfg = inf_.two_camera_splice_module_->twoCameraSpliceConfig;
+			if (spliceCfg.MapSingle1.IsInitialized() && spliceCfg.MapSingle2.IsInitialized())
+			{
+				try
+				{
+					HalconCpp::HObject ho1 = static_cast<HalconCpp::HObject>(cam1_image_);
+					HalconCpp::HObject ho2 = static_cast<HalconCpp::HObject>(cam2_image_);
+					HalconCpp::HObject stitched;
+
+					if (pinjieImage(ho1, ho2, spliceCfg, stitched) && stitched.IsInitialized())
+					{
+						emit callBackFunc(HalconCpp::HImage(stitched));
+					}
+				}
+				catch (const HalconCpp::HException&)
+				{
+					// 拼接失败时静默丢弃本帧
+				}
+			}
+		}
+	}
+
 	void TwoCameraSpliceInfTool::build()
 	{
+		// 接收 CalibInfTool 矫正后的双相机图像，驱动拼接流程
+		connect(&calib_tool_, &CalibInfTool::callBackFunc,
+			this, &TwoCameraSpliceInfTool::onCalibFrame, Qt::DirectConnection);
 	}
 
 	void TwoCameraSpliceInfTool::destroy()
 	{
+		disconnect(&calib_tool_, &CalibInfTool::callBackFunc,
+			this, &TwoCameraSpliceInfTool::onCalibFrame);
 	}
 
 	void TwoCameraSpliceInfTool::start()

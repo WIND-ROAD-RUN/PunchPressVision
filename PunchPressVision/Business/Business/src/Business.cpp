@@ -16,9 +16,9 @@ namespace bun
 		nine_point_bun = infTool_->nine_point_bun.get();
 		two_camera_splice_bun = infTool_->two_camera_splice_bun.get();
 
-		camera_bun = std::make_unique<CameraBun>(inf_);
-		shape_mode_manager_bun = std::make_unique<ShapeModeManagerBun>(inf_);
-		light_control_bun = std::make_unique<LightControlBun>(inf_);
+		camera_bun = std::make_unique<CameraBun>(inf_, *infTool_);
+		shape_mode_manager_bun = std::make_unique<ShapeModeManagerBun>(inf_, *infTool_);
+		light_control_bun = std::make_unique<LightControlBun>(inf_, *infTool_);
 
 		camera_bun->build();
 		shape_mode_manager_bun->build();
