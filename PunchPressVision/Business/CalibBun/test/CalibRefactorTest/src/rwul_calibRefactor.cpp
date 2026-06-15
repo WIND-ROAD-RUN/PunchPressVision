@@ -10,22 +10,42 @@
 namespace rwul
 {
 
+    void showCvMatDebugWindow(const cv::Mat & mat,const std::string & windowName,cv::Size size)
+    {
+        cv::namedWindow(windowName, cv::WINDOW_NORMAL);
+        cv::resizeWindow(windowName, size.width, size.height);
+        cv::imshow(windowName, mat);
+        cv::waitKey(0);
+    }
+
 	void calibMask(const cv::Mat& mat)
 	{
-        // 对称/非对称圆点：findCirclesGrid 内部会自动处理灰度转换
         const int flags = cv::CALIB_CB_SYMMETRIC_GRID;
 
         cv::Size boardSize_{7,7};
+        
+        cv::Mat gray;
+        if (mat.channels() == 1)
+        {
+            gray = mat.clone();
+        }
+        else
+        {
+            cv::cvtColor(mat, gray, cv::COLOR_BGR2GRAY);
+        }
+
+        cv::Mat blurred;
+        cv::GaussianBlur(gray, blurred, cv::Size(5, 5), 0);
+
+        cv::Mat binary;
 
 
         std::vector<cv::Point2f> corners;
 
-        // 1. 先尝试 OpenCV 默认 blob 检测器
         auto found = cv::findCirclesGrid(
             mat, boardSize_, corners,
             flags | cv::CALIB_CB_CLUSTERING);
 
-        // 2. 失败后使用 SimpleBlobDetector 重试（分别尝试黑圆、白圆）
         if (!found)
         {
             cv::SimpleBlobDetector::Params params;
@@ -39,13 +59,11 @@ namespace rwul
             params.filterByInertia = true;
             params.minInertiaRatio = 0.4f;
 
-            // 尝试黑圆（白底黑圆标定板）
             params.blobColor = 0;
             cv::Ptr<cv::SimpleBlobDetector> detector = cv::SimpleBlobDetector::create(params);
             found = cv::findCirclesGrid(mat, boardSize_, corners,
                 flags | cv::CALIB_CB_CLUSTERING, detector);
 
-            // 尝试白圆（黑底白圆标定板）
             if (!found)
             {
                 params.blobColor = 255;
@@ -55,7 +73,6 @@ namespace rwul
             }
         }
 
-        // 调试：如果全部失败，保存 SimpleBlobDetector 找到的 blobs
         if (!found)
         {
             cv::SimpleBlobDetector::Params debugParams;
@@ -80,8 +97,7 @@ namespace rwul
             cv::drawKeypoints(display, keypoints, display, cv::Scalar(0, 0, 255),
                 cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 
-            cv::imshow("test", display);
-            cv::waitKey(0);
+            showCvMatDebugWindow(display,"test",{1920,1080});
         }
 	}
 }
