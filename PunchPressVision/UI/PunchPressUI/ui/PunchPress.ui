@@ -814,57 +814,15 @@ QGroupBox::title {
         </property>
         <layout class="QVBoxLayout" name="vLayout_tools">
          <item>
-          <widget class="QTabWidget" name="tabWidget">
+          <widget class="QPushButton" name="pbtn_saveAll">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="styleSheet">
-            <string notr="true">QTabWidget::pane {
-    border: 1px solid #DDD;
-    border-radius: 4px;
-    background-color: rgb(157, 157, 157);
-    top: -1px;
-}
-QTabWidget::tab-bar {
-    left: 10px;
-}
-QTabBar::tab {
-    background-color: #BEBEBE;
-    border: 1px solid #DDD;
-    border-bottom: none;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
-    min-width: 80px;
-    padding: 5px 10px;
-    font: bold 14px;
-    color: #666;
-}
-QTabBar::tab:selected {
-    background-color: rgb(157, 157, 157);
-    color: #333;
-}
-QTabBar::tab:hover {
-    background-color: #D0D0D0;
-}
-QTabBar::tab:!selected {
-    margin-top: 2px;
-}</string>
-           </property>
-           <property name="currentIndex">
-            <number>0</number>
-           </property>
-           <widget class="QWidget" name="tab_function">
-            <attribute name="title">
-             <string>功能</string>
-            </attribute>
-            <layout class="QVBoxLayout" name="vLayout_tabFunction">
-             <item>
-              <widget class="QPushButton" name="pbtn_saveAll">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">QPushButton {
+            <string notr="true">QPushButton {
     padding: 6px 14px;
     border: 2px solid #CCC;
     border-radius: 4px;
@@ -880,29 +838,22 @@ QPushButton:pressed {
     border-color: #777;
     background-color: #EEE;
 }</string>
-               </property>
-               <property name="text">
-                <string>保存所有参数</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-           <widget class="QWidget" name="tab_template">
-            <attribute name="title">
-             <string>模板</string>
-            </attribute>
-             <layout class="QVBoxLayout" name="vLayout_tabTemplate">
-             <item>
-              <widget class="QPushButton" name="pbtn_modelManager">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">QPushButton {
+           </property>
+           <property name="text">
+            <string>保存所有参数</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pbtn_modelManager">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QPushButton {
     padding: 6px 14px;
     border: 2px solid #CCC;
     border-radius: 4px;
@@ -918,37 +869,37 @@ QPushButton:pressed {
     border-color: #777;
     background-color: #EEE;
 }</string>
-               </property>
-               <property name="text">
-                <string>模型管理</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <layout class="QHBoxLayout" name="hLayout_evenOddCrop" stretch="1,1,1">
-               <item>
-                <spacer name="horizontalSpacer">
-                 <property name="orientation">
-                  <enum>Qt::Orientation::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="cbox_jioucaiqie">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="styleSheet">
-                  <string notr="true">QCheckBox {
+           </property>
+           <property name="text">
+            <string>模型管理</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="hLayout_evenOddCrop" stretch="1,1,1">
+           <item>
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="cbox_jioucaiqie">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QCheckBox {
     spacing: 8px;
     font-size: 18px;
     color: #333;
@@ -990,30 +941,26 @@ QCheckBox::indicator:pressed {
         stop:1 transparent
     );
 }</string>
-                 </property>
-                 <property name="text">
-                  <string>奇偶裁切</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <spacer name="horizontalSpacer_2">
-                 <property name="orientation">
-                  <enum>Qt::Orientation::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-              </layout>
-             </item>
-            </layout>
-           </widget>
-          </widget>
+             </property>
+             <property name="text">
+              <string>奇偶裁切</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </item>
         </layout>
        </widget>
