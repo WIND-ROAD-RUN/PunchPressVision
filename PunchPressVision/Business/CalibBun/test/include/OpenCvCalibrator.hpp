@@ -5,11 +5,21 @@
 #include <vector>
 
 /**
- * @brief 基于 OpenCV 棋盘格的独立标定器。
+ * @brief 标定板图案类型。
+ */
+enum class CalibrationPattern
+{
+    Chessboard,
+    SymmetricCircles,
+    AsymmetricCircles
+};
+
+/**
+ * @brief 基于 OpenCV 圆点/棋盘格的独立标定器。
  *
  * 该类不依赖 CalibBun、CalibConfigModule 或任何 Halcon 标定流程，
- * 仅使用 OpenCV 的 findChessboardCorners / calibrateCamera / remap 完成：
- *   - 从图像中提取棋盘格角点
+ * 仅使用 OpenCV 的 findCirclesGrid / findChessboardCorners / calibrateCamera / remap 完成：
+ *   - 从图像中提取标定板特征点
  *   - 相机内参、畸变系数求解
  *   - 标定参数 YAML 序列化
  *   - 图像畸变矫正
@@ -20,35 +30,36 @@ public:
     OpenCvCalibrator();
 
     /**
-     * @brief 设置棋盘格参数。
-     * @param boardSize  内角点数量（列 x 行）。
-     * @param squareSize 单个方格边长，单位 mm。
+     * @brief 设置标定板参数。
+     * @param boardSize  内角点/圆心数量（列 x 行）。
+     * @param squareSize 相邻圆心间距，单位 mm。
+     * @param pattern    标定板图案类型，默认对称圆点。
      */
-    void setBoardSize(const cv::Size& boardSize, double squareSize);
+    void setBoardSize(const cv::Size& boardSize, double squareSize, CalibrationPattern pattern = CalibrationPattern::SymmetricCircles);
 
     /**
-     * @brief 添加一张标定图像，自动检测角点。
+     * @brief 添加一张标定图像，自动检测特征点。
      * @param image 输入图像，任意通道。
-     * @return 是否成功检测到角点。
+     * @return 是否成功检测到特征点。
      */
     bool addCalibrationImage(const cv::Mat& image);
 
-    /** @brief 清空已缓存的标定图像和角点。 */
+    /** @brief 清空已缓存的标定图像和特征点。 */
     void clearCalibrationImages();
 
     /** @brief 当前已缓存的有效标定图像数量。 */
     size_t calibrationImageCount() const;
 
     /**
-     * @brief 获取绘制了角点的预览图数量。
-     * @note 仅包含成功检测到角点的图像。
+     * @brief 获取绘制了特征点的预览图数量。
+     * @note 仅包含成功检测到特征点的图像。
      */
     size_t cornerImageCount() const;
 
     /**
-     * @brief 获取指定索引的角点预览图。
-     * @param index 成功检测到角点的图像索引（0 ~ cornerImageCount()-1）。
-     * @return 绘制了棋盘格角点的 BGR 图像。索引无效时返回空 Mat。
+     * @brief 获取指定索引的特征点预览图。
+     * @param index 成功检测到特征点的图像索引（0 ~ cornerImageCount()-1）。
+     * @return 绘制了特征点的 BGR 图像。索引无效时返回空 Mat。
      */
     cv::Mat getCornerImage(size_t index) const;
 
@@ -93,6 +104,7 @@ private:
 private:
     cv::Size boardSize_;
     double squareSize_ = 20.0;
+    CalibrationPattern pattern_ = CalibrationPattern::SymmetricCircles;
     cv::Size imageSize_;
 
     std::vector<std::vector<cv::Point3f>> objectPoints_;

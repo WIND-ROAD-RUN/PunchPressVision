@@ -6,16 +6,18 @@
 #include <opencv2/core/persistence.hpp>
 
 OpenCvCalibrator::OpenCvCalibrator()
-    : boardSize_(9, 6)
+    : boardSize_(7, 7)
     , squareSize_(20.0)
+    , pattern_(CalibrationPattern::SymmetricCircles)
 {
     cameraMatrix_ = cv::Mat::eye(3, 3, CV_64F);
 }
 
-void OpenCvCalibrator::setBoardSize(const cv::Size& boardSize, double squareSize)
+void OpenCvCalibrator::setBoardSize(const cv::Size& boardSize, double squareSize, CalibrationPattern pattern)
 {
     boardSize_ = boardSize;
     squareSize_ = squareSize;
+    pattern_ = pattern;
     clearCalibrationImages();
 }
 
@@ -23,16 +25,35 @@ std::vector<cv::Point3f> OpenCvCalibrator::generateObjectPoints() const
 {
     std::vector<cv::Point3f> points;
     points.reserve(static_cast<size_t>(boardSize_.width) * boardSize_.height);
-    for (int i = 0; i < boardSize_.height; ++i)
+
+    if (pattern_ == CalibrationPattern::AsymmetricCircles)
     {
-        for (int j = 0; j < boardSize_.width; ++j)
+        for (int i = 0; i < boardSize_.height; ++i)
         {
-            points.emplace_back(
-                static_cast<float>(j * squareSize_),
-                static_cast<float>(i * squareSize_),
-                0.0f);
+            for (int j = 0; j < boardSize_.width; ++j)
+            {
+                points.emplace_back(
+                    static_cast<float>(j * squareSize_),
+                    static_cast<float>((2 * i + j % 2) * squareSize_),
+                    0.0f);
+            }
         }
     }
+    else
+    {
+        // 棋盘格与对称圆点：规则网格
+        for (int i = 0; i < boardSize_.height; ++i)
+        {
+            for (int j = 0; j < boardSize_.width; ++j)
+            {
+                points.emplace_back(
+                    static_cast<float>(j * squareSize_),
+                    static_cast<float>(i * squareSize_),
+                    0.0f);
+            }
+        }
+    }
+
     return points;
 }
 
@@ -43,39 +64,59 @@ bool OpenCvCalibrator::addCalibrationImage(const cv::Mat& image)
 
     imageSize_ = image.size();
 
-    cv::Mat gray;
-    if (image.channels() == 1)
-        gray = image;
-    else
-        cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
-
     std::vector<cv::Point2f> corners;
-    const bool found = cv::findChessboardCorners(
-        gray, boardSize_, corners,
-        cv::CALIB_CB_ADAPTIVE_THRESH |
-        cv::CALIB_CB_NORMALIZE_IMAGE |
-        cv::CALIB_CB_FAST_CHECK);
+    bool found = false;
+
+    if (pattern_ == CalibrationPattern::Chessboard)
+    {
+        cv::Mat gray;
+        if (image.channels() == 1)
+            gray = image;
+        else
+            cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
+
+        found = cv::findChessboardCorners(
+            gray, boardSize_, corners,
+            cv::CALIB_CB_ADAPTIVE_THRESH |
+            cv::CALIB_CB_NORMALIZE_IMAGE |
+            cv::CALIB_CB_FAST_CHECK);
+
+        if (found)
+        {
+            cv::cornerSubPix(
+                gray, corners,
+                cv::Size(11, 11),
+                cv::Size(-1, -1),
+                cv::TermCriteria(
+                    cv::TermCriteria::EPS + cv::TermCriteria::MAX_ITER,
+                    30, 0.001));
+        }
+    }
+    else
+    {
+        // 对称/非对称圆点：findCirclesGrid 内部会自动处理灰度转换
+        const int flags = (pattern_ == CalibrationPattern::SymmetricCircles)
+            ? cv::CALIB_CB_SYMMETRIC_GRID
+            : cv::CALIB_CB_ASYMMETRIC_GRID;
+
+        found = cv::findCirclesGrid(
+            image, boardSize_, corners,
+            flags | cv::CALIB_CB_CLUSTERING);
+    }
 
     if (!found)
         return false;
 
-    cv::cornerSubPix(
-        gray, corners,
-        cv::Size(11, 11),
-        cv::Size(-1, -1),
-        cv::TermCriteria(
-            cv::TermCriteria::EPS + cv::TermCriteria::MAX_ITER,
-            30, 0.001));
-
     objectPoints_.push_back(generateObjectPoints());
     imagePoints_.push_back(std::move(corners));
 
-    // 保存带角点标记的预览图
+    // 保存带特征点标记的预览图
     cv::Mat display;
     if (image.channels() == 1)
         cv::cvtColor(image, display, cv::COLOR_GRAY2BGR);
     else
         display = image.clone();
+
     cv::drawChessboardCorners(display, boardSize_, imagePoints_.back(), true);
     cornerImages_.push_back(std::move(display));
 
