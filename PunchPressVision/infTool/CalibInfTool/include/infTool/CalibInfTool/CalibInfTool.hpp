@@ -11,7 +11,7 @@
 namespace infTool
 {
 	class CalibInfTool
-		:public QObject, public global::IInfTool
+		:public global::IInfTool
 	{
 		Q_OBJECT
 
