@@ -10,11 +10,7 @@
 #include <QStatusBar>
 
 #include "app/PunchPressApp.hpp"
-#include "UI/DistortionCalibDialog.h"
-#include "UI/NinePointCalibDialog.h"
-#include "UI/SpliceDialog.h"
 #include "UI/ModelManagerDialog.h"
-#include "UI/ModelEditorDialog.h"
 
 // 取消 Win32 MessageBox 宏，使用 rw::rqwu::MessageBox。
 #ifdef MessageBox
@@ -67,15 +63,10 @@ namespace ui
 
 		// UI 控件 → 槽
 		connect(ui->rbtn_debug, &QRadioButton::toggled, this, &PunchPress::onDebugToggled);
-		connect(ui->rbtn_removeFunc, &QRadioButton::toggled, this, &PunchPress::onProductionToggled);
+		connect(ui->rbtn_work, &QRadioButton::toggled, this, &PunchPress::onProductionToggled);
 		connect(ui->rbtn_upLight, &QRadioButton::clicked, this, &PunchPress::onUpperLightClicked);
 		connect(ui->rbtn_downLight, &QRadioButton::clicked, this, &PunchPress::onLowerLightClicked);
-		connect(ui->btn_jibianjiaozheng, &QPushButton::clicked, this, &PunchPress::onDistortionCalib);
-		connect(ui->btn_jiudianbiaoding, &QPushButton::clicked, this, &PunchPress::onNinePointCalib);
-		connect(ui->btn_imageStitching, &QPushButton::clicked, this, &PunchPress::onImageStitching);
-		connect(ui->btn_createModel, &QPushButton::clicked, this, &PunchPress::onCreateModel);
-		connect(ui->btn_changeModel, &QPushButton::clicked, this, &PunchPress::onChangeModel);
-		connect(ui->btn_loadModel, &QPushButton::clicked, this, &PunchPress::onLoadModel);
+		connect(ui->pbtn_modelManager, &QPushButton::clicked, this, &PunchPress::onModelManager);
 		connect(ui->pbtn_exit, &QPushButton::clicked, this, &PunchPress::onExit);
 	}
 
@@ -87,7 +78,7 @@ namespace ui
 		try
 		{
 			// 将 Halcon 窗口嵌入图像显示标签
-			QWidget* host = ui->label_imgDisplay_1;
+			QWidget* host = ui->label_imgDisplay;
 			if (!host)
 				return false;
 			halconHost_ = host;
@@ -185,40 +176,7 @@ namespace ui
 			biz.light_control_bun->setLowerLight(ui->rbtn_downLight->isChecked());
 	}
 
-	void PunchPress::onDistortionCalib()
-	{
-		app_.switchToMode(global::RunMode::CalibDistortion);
-		DistortionCalibDialog dlg(app_, this);
-		dlg.exec();
-	}
-
-	void PunchPress::onNinePointCalib()
-	{
-		app_.switchToMode(global::RunMode::CalibNinePoint);
-		NinePointCalibDialog dlg(app_, this);
-		dlg.exec();
-	}
-
-	void PunchPress::onImageStitching()
-	{
-		app_.switchToMode(global::RunMode::Splice);
-		SpliceDialog dlg(app_, this);
-		dlg.exec();
-	}
-
-	void PunchPress::onCreateModel()
-	{
-		ModelEditorDialog dlg(app_, this);
-		dlg.exec();
-	}
-
-	void PunchPress::onChangeModel()
-	{
-		ModelManagerDialog dlg(app_, this);
-		dlg.exec();
-	}
-
-	void PunchPress::onLoadModel()
+	void PunchPress::onModelManager()
 	{
 		ModelManagerDialog dlg(app_, this);
 		dlg.exec();
