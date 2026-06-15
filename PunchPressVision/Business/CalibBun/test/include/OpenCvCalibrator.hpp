@@ -40,6 +40,19 @@ public:
     size_t calibrationImageCount() const;
 
     /**
+     * @brief 获取绘制了角点的预览图数量。
+     * @note 仅包含成功检测到角点的图像。
+     */
+    size_t cornerImageCount() const;
+
+    /**
+     * @brief 获取指定索引的角点预览图。
+     * @param index 成功检测到角点的图像索引（0 ~ cornerImageCount()-1）。
+     * @return 绘制了棋盘格角点的 BGR 图像。索引无效时返回空 Mat。
+     */
+    cv::Mat getCornerImage(size_t index) const;
+
+    /**
      * @brief 执行相机标定。
      * @return RMS 重投影误差（像素）。失败返回负值。
      */
@@ -84,6 +97,7 @@ private:
 
     std::vector<std::vector<cv::Point3f>> objectPoints_;
     std::vector<std::vector<cv::Point2f>> imagePoints_;
+    std::vector<cv::Mat> cornerImages_;
 
     cv::Mat cameraMatrix_;
     cv::Mat distCoeffs_;

@@ -69,6 +69,16 @@ bool OpenCvCalibrator::addCalibrationImage(const cv::Mat& image)
 
     objectPoints_.push_back(generateObjectPoints());
     imagePoints_.push_back(std::move(corners));
+
+    // 保存带角点标记的预览图
+    cv::Mat display;
+    if (image.channels() == 1)
+        cv::cvtColor(image, display, cv::COLOR_GRAY2BGR);
+    else
+        display = image.clone();
+    cv::drawChessboardCorners(display, boardSize_, imagePoints_.back(), true);
+    cornerImages_.push_back(std::move(display));
+
     return true;
 }
 
@@ -76,6 +86,7 @@ void OpenCvCalibrator::clearCalibrationImages()
 {
     objectPoints_.clear();
     imagePoints_.clear();
+    cornerImages_.clear();
     isCalibrated_ = false;
     rms_ = -1.0;
     cameraMatrix_ = cv::Mat::eye(3, 3, CV_64F);
@@ -87,6 +98,19 @@ void OpenCvCalibrator::clearCalibrationImages()
 size_t OpenCvCalibrator::calibrationImageCount() const
 {
     return imagePoints_.size();
+}
+
+size_t OpenCvCalibrator::cornerImageCount() const
+{
+    return cornerImages_.size();
+}
+
+cv::Mat OpenCvCalibrator::getCornerImage(size_t index) const
+{
+    if (index >= cornerImages_.size())
+        return cv::Mat();
+
+    return cornerImages_[index].clone();
 }
 
 double OpenCvCalibrator::calibrate()

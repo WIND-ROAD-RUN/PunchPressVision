@@ -1,5 +1,6 @@
 #include "CalibBunTestWindow.hpp"
 
+#include "CornerPreviewDialog.hpp"
 #include "OpenCvCalibrator.hpp"
 
 #include <QApplication>
@@ -72,6 +73,9 @@ void CalibBunTestWindow::buildUi()
 
     loadParamsBtn_ = new QPushButton(QStringLiteral("加载参数"), this);
     controlLayout->addWidget(loadParamsBtn_);
+
+    previewCornersBtn_ = new QPushButton(QStringLiteral("查看角点"), this);
+    controlLayout->addWidget(previewCornersBtn_);
 
     controlLayout->addWidget(new QLabel(QStringLiteral("当前相机:"), this));
     cameraSelect_ = new QComboBox(this);
@@ -150,6 +154,7 @@ void CalibBunTestWindow::buildConnections()
     connect(calibrateBtn_, &QPushButton::clicked, this, &CalibBunTestWindow::onCalibrate);
     connect(saveParamsBtn_, &QPushButton::clicked, this, &CalibBunTestWindow::onSaveParams);
     connect(loadParamsBtn_, &QPushButton::clicked, this, &CalibBunTestWindow::onLoadParams);
+    connect(previewCornersBtn_, &QPushButton::clicked, this, &CalibBunTestWindow::onPreviewCorners);
 
     // 相机回调使用 DirectConnection，在采集线程中处理图像并排队到 UI 线程显示
     if (inf_.camera_module_)
@@ -485,6 +490,19 @@ void CalibBunTestWindow::onLoadParams()
     {
         QMessageBox::warning(this, QStringLiteral("加载失败"), QStringLiteral("无法读取：%1").arg(path));
     }
+}
+
+void CalibBunTestWindow::onPreviewCorners()
+{
+    if (calibrator_->cornerImageCount() == 0)
+    {
+        QMessageBox::information(this, QStringLiteral("角点预览"),
+            QStringLiteral("当前没有成功检测到角点的图像。\n请先“加载标定图”或采集并保存带棋盘格的图像。"));
+        return;
+    }
+
+    CornerPreviewDialog dlg(*calibrator_, this);
+    dlg.exec();
 }
 
 void CalibBunTestWindow::updateConnectionStatus()

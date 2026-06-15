@@ -46,6 +46,7 @@ private slots:
     void onCalibrate();
     void onSaveParams();
     void onLoadParams();
+    void onPreviewCorners();
 
 signals:
     void originalFrameReady(QImage image);
@@ -74,6 +75,7 @@ private:
     QPushButton* calibrateBtn_ = nullptr;
     QPushButton* saveParamsBtn_ = nullptr;
     QPushButton* loadParamsBtn_ = nullptr;
+    QPushButton* previewCornersBtn_ = nullptr;
     QSpinBox* exposureSpin_ = nullptr;
     QSpinBox* gainSpin_ = nullptr;
     QComboBox* cameraSelect_ = nullptr;
