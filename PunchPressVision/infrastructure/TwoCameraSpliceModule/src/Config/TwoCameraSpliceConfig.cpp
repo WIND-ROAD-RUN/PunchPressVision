@@ -95,6 +95,8 @@ namespace Config
 
 		void writeParamsSafe(const fs::path& filePath,
 			const std::string& caltabPath,
+			double cam1Gain, double cam1Exposure,
+			double cam2Gain, double cam2Exposure,
 			double diffHeight, double overlapPercent,
 			double borderPercent, double distancePlates,
 			double pixToWorld,
@@ -102,11 +104,15 @@ namespace Config
 		{
 			fs::create_directories(filePath.parent_path());
 			fs::path tmp = filePath;
-			
+			tmp += ".tmp";
 			std::ofstream ofs(tmp);
 			if (!ofs)
 				return;
 			ofs << "caltabDescrPath=" << caltabPath << '\n';
+			ofs << "camera1Gain=" << cam1Gain << '\n';
+			ofs << "camera1Exposure=" << cam1Exposure << '\n';
+			ofs << "camera2Gain=" << cam2Gain << '\n';
+			ofs << "camera2Exposure=" << cam2Exposure << '\n';
 			ofs << "DiffHeight=" << diffHeight << '\n';
 			ofs << "OverlapInPercent=" << overlapPercent << '\n';
 			ofs << "BorderInPercent=" << borderPercent << '\n';
@@ -119,6 +125,8 @@ namespace Config
 
 		bool readParamsSafe(const fs::path& filePath,
 			std::string& caltabPath,
+			double& cam1Gain, double& cam1Exposure,
+			double& cam2Gain, double& cam2Exposure,
 			double& diffHeight, double& overlapPercent,
 			double& borderPercent, double& distancePlates,
 			double& pixToWorld,
@@ -144,6 +152,14 @@ namespace Config
 				{
 					if (key == "caltabDescrPath")
 						caltabPath = value;
+					else if (key == "camera1Gain")
+						cam1Gain = std::stod(value);
+					else if (key == "camera1Exposure")
+						cam1Exposure = std::stod(value);
+					else if (key == "camera2Gain")
+						cam2Gain = std::stod(value);
+					else if (key == "camera2Exposure")
+						cam2Exposure = std::stod(value);
 					else if (key == "DiffHeight")
 						diffHeight = std::stod(value);
 					else if (key == "OverlapInPercent")
@@ -175,9 +191,12 @@ namespace Config
 			const fs::path dir(dirPath);
 			writeImageSafe(camera1Piccture, dir / kCamera1ImageFile, kCameraImageFormat);
 			writeImageSafe(camera2Piccture, dir / kCamera2ImageFile, kCameraImageFormat);
-			
+			writeObjectSafe(MapSingle1,     dir / kMapSingle1File);
+			writeObjectSafe(MapSingle2,     dir / kMapSingle2File);
 			writeParamsSafe(dir / kParamsFile,
 				caltabDescrPath,
+				camera1Gain, camera1Exposure,
+				camera2Gain, camera2Exposure,
 				DiffHeight, OverlapInPercent, BorderInPercent, DistancePlates,
 				pixTowWorld,
 				rectifiedWidth, rectifiedHeight);
@@ -194,6 +213,10 @@ namespace Config
 		{
 			const fs::path dir(dirPath);
 			caltabDescrPath.clear();
+			camera1Gain = 0.0;
+			camera1Exposure = 0.0;
+			camera2Gain = 0.0;
+			camera2Exposure = 0.0;
 			DiffHeight = 0.0;
 			OverlapInPercent = 0.0;
 			BorderInPercent = 0.0;
@@ -203,9 +226,12 @@ namespace Config
 			rectifiedHeight = 0;
 			readImageSafe(dir / kCamera1ImageFile, camera1Piccture);
 			readImageSafe(dir / kCamera2ImageFile, camera2Piccture);
-		
+			readObjectSafe(dir / kMapSingle1File,  MapSingle1);
+			readObjectSafe(dir / kMapSingle2File,  MapSingle2);
 			readParamsSafe(dir / kParamsFile,
 				caltabDescrPath,
+				camera1Gain, camera1Exposure,
+				camera2Gain, camera2Exposure,
 				DiffHeight, OverlapInPercent, BorderInPercent, DistancePlates,
 				pixTowWorld,
 				rectifiedWidth, rectifiedHeight);

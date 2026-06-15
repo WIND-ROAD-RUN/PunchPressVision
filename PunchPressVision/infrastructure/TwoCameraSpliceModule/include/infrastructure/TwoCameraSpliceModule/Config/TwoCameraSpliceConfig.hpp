@@ -15,6 +15,10 @@ namespace Config
 
 		// Calibration related parameters
 		std::string caltabDescrPath;  // calibration plate description file path (.descr)
+		double camera1Gain{ 0 };      // camera 1 gain
+		double camera1Exposure{ 0 };  // camera 1 exposure time (us)
+		double camera2Gain{ 0 };      // camera 2 gain
+		double camera2Exposure{ 0 };  // camera 2 exposure time (us)
 		double DiffHeight{ 0 };       // height difference between plate and caliper
 		double OverlapInPercent{ 0 }; // overlap cropping percentage (default 70)
 		double BorderInPercent{ 0 };  // border percentage (default 7)

@@ -218,30 +218,28 @@ void ToolTwoCameraSpliceWindow::syncConfigToUi()
 }
 
 // ===================================================================
-// 从 CalibConfig 加载曝光/增益到 UI 并生效到相机
+// 从 TwoCameraSpliceCfg 加载曝光/增益到 UI 并生效到相机
 // ===================================================================
 void ToolTwoCameraSpliceWindow::applyCalibParams()
 {
-	if (!inf_.calib_config_module_)
+	if (!inf_.two_camera_splice_module_)
 		return;
 
-	auto& calib = inf_.calib_config_module_->calibConfig;
-	const auto& item1 = calib.item(global::CameraIndex::Camera1);
-	const auto& item2 = calib.item(global::CameraIndex::Camera2);
+	const auto& spliceCfg = inf_.two_camera_splice_module_->twoCameraSpliceConfig;
 
 	// 同步到 UI
-	ui->btn_zengyi1->setText(QString::number(item1.cameraGain, 'f', 0));
-	ui->btn_baoguang1->setText(QString::number(item1.cameraExposure, 'f', 0));
-	ui->btn_zengyi2->setText(QString::number(item2.cameraGain, 'f', 0));
-	ui->btn_baoguang2->setText(QString::number(item2.cameraExposure, 'f', 0));
+	ui->btn_zengyi1->setText(QString::number(spliceCfg.camera1Gain, 'f', 0));
+	ui->btn_baoguang1->setText(QString::number(spliceCfg.camera1Exposure, 'f', 0));
+	ui->btn_zengyi2->setText(QString::number(spliceCfg.camera2Gain, 'f', 0));
+	ui->btn_baoguang2->setText(QString::number(spliceCfg.camera2Exposure, 'f', 0));
 
 	// 生效到相机
 	if (inf_.camera_module_)
 	{
-		inf_.camera_module_->setGain(global::CameraIndex::Camera1, item1.cameraGain);
-		inf_.camera_module_->setExposure(global::CameraIndex::Camera1, item1.cameraExposure);
-		inf_.camera_module_->setGain(global::CameraIndex::Camera2, item2.cameraGain);
-		inf_.camera_module_->setExposure(global::CameraIndex::Camera2, item2.cameraExposure);
+		inf_.camera_module_->setGain(global::CameraIndex::Camera1, spliceCfg.camera1Gain);
+		inf_.camera_module_->setExposure(global::CameraIndex::Camera1, spliceCfg.camera1Exposure);
+		inf_.camera_module_->setGain(global::CameraIndex::Camera2, spliceCfg.camera2Gain);
+		inf_.camera_module_->setExposure(global::CameraIndex::Camera2, spliceCfg.camera2Exposure);
 	}
 }
 
@@ -460,10 +458,10 @@ void ToolTwoCameraSpliceWindow::btn_zengyi1_clicked()
 	ui->btn_zengyi1->setText(QString::number(v));
 	if (inf_.camera_module_)
 		inf_.camera_module_->setGain(global::CameraIndex::Camera1, v);
-	if (inf_.calib_config_module_)
+	if (inf_.two_camera_splice_module_)
 	{
-		inf_.calib_config_module_->calibConfig.item(global::CameraIndex::Camera1).cameraGain = v;
-		inf_.calib_config_module_->calibConfig.saveInDir(inf::CalibConfigModulePath.RootPath);
+		inf_.two_camera_splice_module_->twoCameraSpliceConfig.camera1Gain = v;
+		inf_.two_camera_splice_module_->save();
 	}
 }
 
@@ -477,10 +475,10 @@ void ToolTwoCameraSpliceWindow::btn_baoguang1_clicked()
 	ui->btn_baoguang1->setText(QString::number(v));
 	if (inf_.camera_module_)
 		inf_.camera_module_->setExposure(global::CameraIndex::Camera1, v);
-	if (inf_.calib_config_module_)
+	if (inf_.two_camera_splice_module_)
 	{
-		inf_.calib_config_module_->calibConfig.item(global::CameraIndex::Camera1).cameraExposure = v;
-		inf_.calib_config_module_->calibConfig.saveInDir(inf::CalibConfigModulePath.RootPath);
+		inf_.two_camera_splice_module_->twoCameraSpliceConfig.camera1Exposure = v;
+		inf_.two_camera_splice_module_->save();
 	}
 }
 
@@ -494,10 +492,10 @@ void ToolTwoCameraSpliceWindow::btn_zengyi2_clicked()
 	ui->btn_zengyi2->setText(QString::number(v));
 	if (inf_.camera_module_)
 		inf_.camera_module_->setGain(global::CameraIndex::Camera2, v);
-	if (inf_.calib_config_module_)
+	if (inf_.two_camera_splice_module_)
 	{
-		inf_.calib_config_module_->calibConfig.item(global::CameraIndex::Camera2).cameraGain = v;
-		inf_.calib_config_module_->calibConfig.saveInDir(inf::CalibConfigModulePath.RootPath);
+		inf_.two_camera_splice_module_->twoCameraSpliceConfig.camera2Gain = v;
+		inf_.two_camera_splice_module_->save();
 	}
 }
 
@@ -511,10 +509,10 @@ void ToolTwoCameraSpliceWindow::btn_baoguang2_clicked()
 	ui->btn_baoguang2->setText(QString::number(v));
 	if (inf_.camera_module_)
 		inf_.camera_module_->setExposure(global::CameraIndex::Camera2, v);
-	if (inf_.calib_config_module_)
+	if (inf_.two_camera_splice_module_)
 	{
-		inf_.calib_config_module_->calibConfig.item(global::CameraIndex::Camera2).cameraExposure = v;
-		inf_.calib_config_module_->calibConfig.saveInDir(inf::CalibConfigModulePath.RootPath);
+		inf_.two_camera_splice_module_->twoCameraSpliceConfig.camera2Exposure = v;
+		inf_.two_camera_splice_module_->save();
 	}
 }
 
