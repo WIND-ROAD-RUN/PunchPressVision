@@ -1,4 +1,5 @@
 #include "ToolCalibDistortionWindow.hpp"
+#include "ui_ToolCalibDistortionWindow.h"
 
 #include "CornerPreviewDialog.hpp"
 #include "OpenCvCalibrator.hpp"
@@ -30,132 +31,36 @@ ToolCalibDistortionWindow::ToolCalibDistortionWindow(inf::infrastructure& inf, Q
     : QMainWindow(parent)
     , inf_(inf)
     , calibrator_(std::make_unique<OpenCvCalibrator>())
+    , ui(new Ui::ToolCalibDistortionWindowClass())
 {
     calibrator_->setBoardSize(cv::Size(7, 7), 10, CalibrationPattern::SymmetricCircles);
-    buildUi();
+    ui->setupUi(this);
     buildConnections();
     updateConnectionStatus();
     applyDefaultCameraParams();
 }
 
-ToolCalibDistortionWindow::~ToolCalibDistortionWindow() = default;
-
-void ToolCalibDistortionWindow::buildUi()
+ToolCalibDistortionWindow::~ToolCalibDistortionWindow()
 {
-    auto* central = new QWidget(this);
-    setCentralWidget(central);
-
-    auto* rootLayout = new QVBoxLayout(central);
-    rootLayout->setContentsMargins(8, 8, 8, 8);
-    rootLayout->setSpacing(8);
-
-    // 控制栏
-    auto* controlLayout = new QHBoxLayout();
-    controlLayout->setSpacing(8);
-
-    startStopBtn_ = new QPushButton(QStringLiteral("开始采集"), this);
-    controlLayout->addWidget(startStopBtn_);
-
-    undistortBtn_ = new QPushButton(QStringLiteral("畸变矫正"), this);
-    undistortBtn_->setCheckable(true);
-    controlLayout->addWidget(undistortBtn_);
-
-    loadCalibImagesBtn_ = new QPushButton(QStringLiteral("加载标定图"), this);
-    controlLayout->addWidget(loadCalibImagesBtn_);
-
-    saveFrameBtn_ = new QPushButton(QStringLiteral("保存当前帧"), this);
-    controlLayout->addWidget(saveFrameBtn_);
-
-    calibrateBtn_ = new QPushButton(QStringLiteral("执行标定"), this);
-    controlLayout->addWidget(calibrateBtn_);
-
-    saveParamsBtn_ = new QPushButton(QStringLiteral("保存参数"), this);
-    controlLayout->addWidget(saveParamsBtn_);
-
-    loadParamsBtn_ = new QPushButton(QStringLiteral("加载参数"), this);
-    controlLayout->addWidget(loadParamsBtn_);
-
-    previewCornersBtn_ = new QPushButton(QStringLiteral("查看角点"), this);
-    controlLayout->addWidget(previewCornersBtn_);
-
-    controlLayout->addWidget(new QLabel(QStringLiteral("当前相机:"), this));
-    cameraSelect_ = new QComboBox(this);
-    cameraSelect_->addItem(QStringLiteral("相机1"), static_cast<int>(global::CameraIndex::Camera1));
-    cameraSelect_->addItem(QStringLiteral("相机2"), static_cast<int>(global::CameraIndex::Camera2));
-    cameraSelect_->setCurrentIndex(0);
-    controlLayout->addWidget(cameraSelect_);
-
-    controlLayout->addStretch();
-
-    controlLayout->addWidget(new QLabel(QStringLiteral("曝光(us):"), this));
-    exposureSpin_ = new QSpinBox(this);
-    exposureSpin_->setRange(1, 500000);
-    exposureSpin_->setValue(10000);
-    exposureSpin_->setSingleStep(100);
-    controlLayout->addWidget(exposureSpin_);
-
-    auto* setExposureBtn = new QPushButton(QStringLiteral("设置曝光"), this);
-    controlLayout->addWidget(setExposureBtn);
-
-    controlLayout->addWidget(new QLabel(QStringLiteral("增益:"), this));
-    gainSpin_ = new QSpinBox(this);
-    gainSpin_->setRange(0, 255);
-    gainSpin_->setValue(1);
-    controlLayout->addWidget(gainSpin_);
-
-    auto* setGainBtn = new QPushButton(QStringLiteral("设置增益"), this);
-    controlLayout->addWidget(setGainBtn);
-
-    rootLayout->addLayout(controlLayout);
-
-    // 图像显示区：左矫正后，右原始
-    auto* imageLayout = new QHBoxLayout();
-    imageLayout->setSpacing(8);
-
-    auto* undistortedPanel = new QVBoxLayout();
-    undistortedPanel->setSpacing(4);
-    undistortedPanel->addWidget(new QLabel(QStringLiteral("OpenCV 矫正后"), this));
-    undistortedView_ = new QLabel(this);
-    undistortedView_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    undistortedView_->setMinimumSize(320, 240);
-    undistortedView_->setAlignment(Qt::AlignCenter);
-    undistortedView_->setStyleSheet(QStringLiteral("background-color: #333;"));
-    undistortedPanel->addWidget(undistortedView_, 1);
-    imageLayout->addLayout(undistortedPanel, 1);
-
-    auto* originalPanel = new QVBoxLayout();
-    originalPanel->setSpacing(4);
-    originalPanel->addWidget(new QLabel(QStringLiteral("原始图像"), this));
-    originalView_ = new QLabel(this);
-    originalView_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    originalView_->setMinimumSize(320, 240);
-    originalView_->setAlignment(Qt::AlignCenter);
-    originalView_->setStyleSheet(QStringLiteral("background-color: #333;"));
-    originalPanel->addWidget(originalView_, 1);
-    imageLayout->addLayout(originalPanel, 1);
-
-    rootLayout->addLayout(imageLayout, 1);
-
-    // 状态栏提示
-    statusBar()->showMessage(QStringLiteral("就绪"));
-
-    connect(setExposureBtn, &QPushButton::clicked, this, &ToolCalibDistortionWindow::onSetExposure);
-    connect(setGainBtn, &QPushButton::clicked, this, &ToolCalibDistortionWindow::onSetGain);
+    delete ui;
 }
 
 void ToolCalibDistortionWindow::buildConnections()
 {
-    connect(startStopBtn_, &QPushButton::clicked, this, &ToolCalibDistortionWindow::onStartStop);
-    connect(undistortBtn_, &QPushButton::toggled, this, &ToolCalibDistortionWindow::onToggleUndistort);
-    connect(cameraSelect_, QOverload<int>::of(&QComboBox::currentIndexChanged),
+    connect(ui->startStopBtn, &QPushButton::clicked, this, &ToolCalibDistortionWindow::onStartStop);
+    connect(ui->undistortBtn, &QPushButton::toggled, this, &ToolCalibDistortionWindow::onToggleUndistort);
+    connect(ui->cameraSelect, QOverload<int>::of(&QComboBox::currentIndexChanged),
         this, &ToolCalibDistortionWindow::onCameraSelected);
 
-    connect(loadCalibImagesBtn_, &QPushButton::clicked, this, &ToolCalibDistortionWindow::onLoadCalibrationImages);
-    connect(saveFrameBtn_, &QPushButton::clicked, this, &ToolCalibDistortionWindow::onSaveCurrentFrame);
-    connect(calibrateBtn_, &QPushButton::clicked, this, &ToolCalibDistortionWindow::onCalibrate);
-    connect(saveParamsBtn_, &QPushButton::clicked, this, &ToolCalibDistortionWindow::onSaveParams);
-    connect(loadParamsBtn_, &QPushButton::clicked, this, &ToolCalibDistortionWindow::onLoadParams);
-    connect(previewCornersBtn_, &QPushButton::clicked, this, &ToolCalibDistortionWindow::onPreviewCorners);
+    connect(ui->loadCalibImagesBtn, &QPushButton::clicked, this, &ToolCalibDistortionWindow::onLoadCalibrationImages);
+    connect(ui->saveFrameBtn, &QPushButton::clicked, this, &ToolCalibDistortionWindow::onSaveCurrentFrame);
+    connect(ui->calibrateBtn, &QPushButton::clicked, this, &ToolCalibDistortionWindow::onCalibrate);
+    connect(ui->saveParamsBtn, &QPushButton::clicked, this, &ToolCalibDistortionWindow::onSaveParams);
+    connect(ui->loadParamsBtn, &QPushButton::clicked, this, &ToolCalibDistortionWindow::onLoadParams);
+    connect(ui->previewCornersBtn, &QPushButton::clicked, this, &ToolCalibDistortionWindow::onPreviewCorners);
+
+    connect(ui->setExposureBtn, &QPushButton::clicked, this, &ToolCalibDistortionWindow::onSetExposure);
+    connect(ui->setGainBtn, &QPushButton::clicked, this, &ToolCalibDistortionWindow::onSetGain);
 
     // 相机回调使用 DirectConnection，在采集线程中处理图像并排队到 UI 线程显示
     if (inf_.camera_module_)
@@ -237,26 +142,26 @@ void ToolCalibDistortionWindow::onUndistortedDisplayFrame(QImage image)
 
 void ToolCalibDistortionWindow::refreshOriginalView()
 {
-    if (lastOriginalImage_.isNull() || !originalView_)
+    if (lastOriginalImage_.isNull() || !ui->originalView)
         return;
 
-    const QSize viewSize = originalView_->size();
+    const QSize viewSize = ui->originalView->size();
     if (viewSize.width() > 0 && viewSize.height() > 0)
-        originalView_->setPixmap(QPixmap::fromImage(lastOriginalImage_).scaled(viewSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        ui->originalView->setPixmap(QPixmap::fromImage(lastOriginalImage_).scaled(viewSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     else
-        originalView_->setPixmap(QPixmap::fromImage(lastOriginalImage_));
+        ui->originalView->setPixmap(QPixmap::fromImage(lastOriginalImage_));
 }
 
 void ToolCalibDistortionWindow::refreshUndistortedView()
 {
-    if (lastUndistortedImage_.isNull() || !undistortedView_)
+    if (lastUndistortedImage_.isNull() || !ui->undistortedView)
         return;
 
-    const QSize viewSize = undistortedView_->size();
+    const QSize viewSize = ui->undistortedView->size();
     if (viewSize.width() > 0 && viewSize.height() > 0)
-        undistortedView_->setPixmap(QPixmap::fromImage(lastUndistortedImage_).scaled(viewSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        ui->undistortedView->setPixmap(QPixmap::fromImage(lastUndistortedImage_).scaled(viewSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     else
-        undistortedView_->setPixmap(QPixmap::fromImage(lastUndistortedImage_));
+        ui->undistortedView->setPixmap(QPixmap::fromImage(lastUndistortedImage_));
 }
 
 void ToolCalibDistortionWindow::onConnectionChanged(global::CameraIndex idx, bool connected, QString reason)
@@ -272,8 +177,8 @@ void ToolCalibDistortionWindow::onSetExposure()
     if (!inf_.camera_module_)
         return;
 
-    const int value = exposureSpin_->value();
-    const global::CameraIndex idx = cameraIndexFromCombo(cameraSelect_->currentIndex());
+    const int value = ui->exposureSpin->value();
+    const global::CameraIndex idx = cameraIndexFromCombo(ui->cameraSelect->currentIndex());
     const bool ok = inf_.camera_module_->setExposure(idx, value);
 
     if (ok)
@@ -289,8 +194,8 @@ void ToolCalibDistortionWindow::onSetGain()
     if (!inf_.camera_module_)
         return;
 
-    const int value = gainSpin_->value();
-    const global::CameraIndex idx = cameraIndexFromCombo(cameraSelect_->currentIndex());
+    const int value = ui->gainSpin->value();
+    const global::CameraIndex idx = cameraIndexFromCombo(ui->cameraSelect->currentIndex());
     const bool ok = inf_.camera_module_->setGain(idx, value);
 
     if (ok)
@@ -304,7 +209,7 @@ void ToolCalibDistortionWindow::onSetGain()
 void ToolCalibDistortionWindow::onToggleUndistort(bool checked)
 {
     undistortEnabled_.store(checked, std::memory_order_release);
-    undistortBtn_->setText(checked ? QStringLiteral("关闭畸变矫正") : QStringLiteral("畸变矫正"));
+    ui->undistortBtn->setText(checked ? QStringLiteral("关闭畸变矫正") : QStringLiteral("畸变矫正"));
     statusBar()->showMessage(checked ? QStringLiteral("畸变矫正已开启") : QStringLiteral("畸变矫正已关闭"));
 }
 
@@ -317,14 +222,14 @@ void ToolCalibDistortionWindow::onStartStop()
     {
         inf_.camera_module_->stopMonitor();
         isRunning_.store(false, std::memory_order_release);
-        startStopBtn_->setText(QStringLiteral("开始采集"));
+        ui->startStopBtn->setText(QStringLiteral("开始采集"));
         statusBar()->showMessage(QStringLiteral("采集已停止"));
     }
     else
     {
         inf_.camera_module_->startMonitor();
         isRunning_.store(true, std::memory_order_release);
-        startStopBtn_->setText(QStringLiteral("停止采集"));
+        ui->startStopBtn->setText(QStringLiteral("停止采集"));
         statusBar()->showMessage(QStringLiteral("采集中..."));
     }
 }
@@ -579,8 +484,8 @@ void ToolCalibDistortionWindow::applyDefaultCameraParams()
     if (!inf_.camera_module_)
         return;
 
-    const int exposure = exposureSpin_->value();
-    const int gain = gainSpin_->value();
+    const int exposure = ui->exposureSpin->value();
+    const int gain = ui->gainSpin->value();
 
     bool ok = true;
     ok &= inf_.camera_module_->setExposure(global::CameraIndex::Camera1, exposure);

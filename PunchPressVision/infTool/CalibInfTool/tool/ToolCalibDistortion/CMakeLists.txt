@@ -1,20 +1,25 @@
 set(Bun_TARGET ToolCalibDistortion)
 
 file(GLOB_RECURSE INCLUDE_LIST CONFIGURE_DEPENDS
-	"${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/include/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h"
 )
 file(GLOB_RECURSE SRC_LIST CONFIGURE_DEPENDS
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 )
 
-list(APPEND SRC_LIST ${INCLUDE_LIST})
+# .ui 文件用 UIC 编译为 ui_*.h
+file(GLOB UI_FILES "${CMAKE_CURRENT_SOURCE_DIR}/ui/*.ui")
+qt_wrap_ui(GENERATED_UI_HEADERS ${UI_FILES})
+
+list(APPEND SRC_LIST ${INCLUDE_LIST} ${GENERATED_UI_HEADERS})
 
 add_executable(${Bun_TARGET} ${SRC_LIST})
 
 target_include_directories(${Bun_TARGET}
-	PUBLIC
-		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 target_link_libraries(${Bun_TARGET} PRIVATE

@@ -359,6 +359,10 @@ namespace infTool
 			// TODO:
 			
 			auto hImage = PRIVATE::cvMatToHImage(matInfo.mat);
+
+
+
+
 			emit callBackFunc(hImage, cameraIndex);
 		}
 

@@ -16,13 +16,11 @@ int main(int argc, char* argv[])
     // 自定义枚举/类需要注册，才能在跨线程信号中传递
     qRegisterMetaType<HalconCpp::HImage>("HalconCpp::HImage");
     qRegisterMetaType<global::CameraIndex>("global::CameraIndex");
-
+    
     inf::infrastructure inf;
     inf.build();
 
     ToolCalibDistortionWindow wnd(inf);
-    wnd.setWindowTitle(QStringLiteral("ToolCalibDistortion 畸变矫正工具"));
-    wnd.resize(1024, 768);
     wnd.show();
 
     const int rc = app.exec();
