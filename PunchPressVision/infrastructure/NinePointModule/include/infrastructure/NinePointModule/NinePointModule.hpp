@@ -10,6 +10,7 @@ namespace inf
 	{
 	public:
 		Config::NinePointCfg ninePointConfig;
+		bool skipSaveOnDestroy = false;
 	public:
 		void build() override;
 		void destroy() override;

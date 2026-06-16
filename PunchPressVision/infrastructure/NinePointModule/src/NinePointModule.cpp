@@ -11,7 +11,8 @@ namespace inf
 
 	void NinePointModule::destroy()
 	{
-		save();
+		if (!skipSaveOnDestroy)
+			save();
 	}
 
 	void NinePointModule::save()

@@ -1,11 +1,14 @@
 #include "ToolNinePointWindow.hpp"
 #include "ui_ToolNinePointWindow.h"
 
+#include "global/GlobalPath.hpp"
 #include "infTool/NinePointInfTool/NinePointInfTool.hpp"
 #include "infrastructure/infrastructure.hpp"
 #include "infrastructure/NinePointModule/Config/NinePointConfig.hpp"
 #include "infrastructure/NinePointModule/NinePointModule.hpp"
 #include "rwul/hoecm/hoec_m.hpp"
+
+#include <filesystem>
 
 #include <QCloseEvent>
 #include <QEvent>
@@ -474,6 +477,17 @@ void ToolNinePointWindow::resizeEvent(QResizeEvent* event)
 
 void ToolNinePointWindow::closeEvent(QCloseEvent* event)
 {
+	if (inf_.nine_point_module_)
+	{
+		const auto btn = QMessageBox::question(this,
+			QStringLiteral("保存"),
+			QStringLiteral("是否保存九点标定配置？"),
+			QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+		if (btn == QMessageBox::Yes)
+			inf_.nine_point_module_->save();
+		else
+			inf_.nine_point_module_->skipSaveOnDestroy = true;
+	}
 	if (inf_.camera_module_)
 		inf_.camera_module_->stopMonitor();
 	closeHalconWindow();
@@ -571,28 +585,39 @@ void ToolNinePointWindow::onDisplayFrame()
 // ===================================================================
 void ToolNinePointWindow::btn_readImage_clicked()
 {
-	const QString filePath = QFileDialog::getOpenFileName(
-		this,
-		QStringLiteral("选择图片"),
-		QString(),
-		QStringLiteral("Image Files (*.jpg *.jpeg *.png *.bmp)"));
+	const std::string configDir = global::path::configDir();
+	static const char* kExtensions[] = { ".bmp", ".png", ".jpg", ".jpeg" };
 
-	if (filePath.isEmpty())
-		return;
-
-	QFile f(filePath);
-	if (!f.open(QIODevice::ReadOnly))
+	std::string filePath;
+	for (const auto* ext : kExtensions)
 	{
-		QMessageBox::warning(this, QStringLiteral("提示"), QStringLiteral("图片打开失败！"));
+		const auto candidate = configDir + "/model" + ext;
+		if (std::filesystem::exists(candidate))
+		{
+			filePath = candidate;
+			break;
+		}
+	}
+
+	if (filePath.empty())
+	{
+		// 目标路径下没有 model 图片 → 保存当前图像
+		if (!halconLastImage_.IsInitialized())
+		{
+			QMessageBox::warning(this, QStringLiteral("提示"),
+				QStringLiteral("config 目录下未找到 model 图片，且当前无图像可保存。"));
+			return;
+		}
+
+		const std::string savePath = configDir + "/model.bmp";
+		std::filesystem::create_directories(configDir);
+		halconLastImage_.WriteImage("bmp", 0, savePath.c_str());
+		QMessageBox::information(this, QStringLiteral("提示"),
+			QStringLiteral("已将当前图像保存为 model 图片。"));
 		return;
 	}
 
-	const QByteArray bytes = f.readAll();
-	f.close();
-
-	cv::Mat buf(1, static_cast<int>(bytes.size()), CV_8U, const_cast<char*>(bytes.data()));
-	cv::Mat bgr = cv::imdecode(buf, cv::IMREAD_COLOR);
-
+	cv::Mat bgr = cv::imread(filePath, cv::IMREAD_COLOR);
 	if (bgr.empty())
 	{
 		QMessageBox::warning(this, QStringLiteral("提示"), QStringLiteral("图片解码失败！"));
@@ -1044,16 +1069,7 @@ void ToolNinePointWindow::btn_completeCalibration_clicked()
 
 void ToolNinePointWindow::btn_exit_clicked()
 {
-	if (inf_.nine_point_module_)
-	{
-		const auto btn = QMessageBox::question(this,
-			QStringLiteral("保存"),
-			QStringLiteral("是否保存九点标定配置？"),
-			QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-		if (btn == QMessageBox::Yes)
-			inf_.nine_point_module_->save();
-	}
-	close();
+	close();  // closeEvent 中统一处理保存询问
 }
 
 // ===================================================================
@@ -1070,10 +1086,7 @@ void ToolNinePointWindow::btn_baoguang1_clicked()
 	if (inf_.camera_module_)
 		inf_.camera_module_->setExposure(global::CameraIndex::Camera1, v);
 	if (inf_.nine_point_module_)
-	{
 		inf_.nine_point_module_->ninePointConfig.camera1Exposure = v;
-		inf_.nine_point_module_->save();
-	}
 }
 
 void ToolNinePointWindow::btn_zengyi1_clicked()
@@ -1086,10 +1099,7 @@ void ToolNinePointWindow::btn_zengyi1_clicked()
 	if (inf_.camera_module_)
 		inf_.camera_module_->setGain(global::CameraIndex::Camera1, v);
 	if (inf_.nine_point_module_)
-	{
 		inf_.nine_point_module_->ninePointConfig.camera1Gain = v;
-		inf_.nine_point_module_->save();
-	}
 }
 
 void ToolNinePointWindow::btn_baoguang2_clicked()
@@ -1103,10 +1113,7 @@ void ToolNinePointWindow::btn_baoguang2_clicked()
 	if (inf_.camera_module_)
 		inf_.camera_module_->setExposure(global::CameraIndex::Camera2, v);
 	if (inf_.nine_point_module_)
-	{
 		inf_.nine_point_module_->ninePointConfig.camera2Exposure = v;
-		inf_.nine_point_module_->save();
-	}
 }
 
 void ToolNinePointWindow::btn_zengyi2_clicked()
@@ -1119,10 +1126,7 @@ void ToolNinePointWindow::btn_zengyi2_clicked()
 	if (inf_.camera_module_)
 		inf_.camera_module_->setGain(global::CameraIndex::Camera2, v);
 	if (inf_.nine_point_module_)
-	{
 		inf_.nine_point_module_->ninePointConfig.camera2Gain = v;
-		inf_.nine_point_module_->save();
-	}
 }
 
 // ===================================================================

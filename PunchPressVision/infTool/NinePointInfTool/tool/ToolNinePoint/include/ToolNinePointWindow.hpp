@@ -75,6 +75,7 @@ private:
 	void buildConnections();
 	void syncConfigToUi();
 	void applyCalibParams();
+	void readImage();
 
 	// Halcon 窗口管理
 	bool ensureHalconWindow();
