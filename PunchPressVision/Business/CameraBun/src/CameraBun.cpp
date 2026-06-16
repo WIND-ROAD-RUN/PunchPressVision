@@ -8,11 +8,7 @@ namespace bun
 		: inf_(inf)
 		, inf_tool_(infTool)
 	{
-	}
-
-	void CameraBun::build()
-	{
-		// 将相机网关的信号桥接到本编排单元（DirectConnection 减少帧延迟）
+		// 构造阶段连接信号（确保 infrastructure.build() 中 CameraModule 发射状态时已就绪）
 		if (inf_.camera_module_)
 		{
 			QObject::connect(inf_.camera_module_.get(), &inf::CameraModule::callBackFunc,
@@ -20,6 +16,10 @@ namespace bun
 			QObject::connect(inf_.camera_module_.get(), &inf::CameraModule::cameraConnectionStateChanged,
 				this, &CameraBun::cameraConnectionStateChanged, Qt::QueuedConnection);
 		}
+	}
+
+	void CameraBun::build()
+	{
 	}
 
 	void CameraBun::destroy()

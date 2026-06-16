@@ -11,6 +11,14 @@ namespace app
 		: QObject(parent)
 		, business_(business)
 	{
+		// 构造阶段连接信号（确保 business 层信号在 build/start 期间即可被接收）
+		if (business_.camera_bun)
+		{
+			QObject::connect(business_.camera_bun.get(), &bun::CameraBun::callBackFunWithCalib,
+				this, &PunchPressApp::onFrameReady, Qt::DirectConnection);
+			QObject::connect(business_.camera_bun.get(), &bun::CameraBun::cameraConnectionStateChanged,
+				this, &PunchPressApp::onCameraConnectionChanged, Qt::QueuedConnection);
+		}
 	}
 
 	PunchPressApp::~PunchPressApp()
@@ -20,14 +28,6 @@ namespace app
 
 	void PunchPressApp::build()
 	{
-		// 将相机业务的成像信号桥接到 App 层（DirectConnection 保持低延迟）
-		if (business_.camera_bun)
-		{
-			QObject::connect(business_.camera_bun.get(), &bun::CameraBun::callBackFunWithCalib,
-				this, &PunchPressApp::onFrameReady, Qt::DirectConnection);
-			QObject::connect(business_.camera_bun.get(), &bun::CameraBun::cameraConnectionStateChanged,
-				this, &PunchPressApp::onCameraConnectionChanged, Qt::QueuedConnection);
-		}
 	}
 
 	void PunchPressApp::destroy()
