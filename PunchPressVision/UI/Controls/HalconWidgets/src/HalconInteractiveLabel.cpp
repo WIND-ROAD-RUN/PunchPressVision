@@ -97,6 +97,12 @@ namespace ui
 		return QPointF(imgCol, imgRow);
 	}
 
+	void HalconInteractiveLabel::installOverlayEventFilter(QObject* filterObj)
+	{
+		if (overlay_)
+			overlay_->installEventFilter(filterObj);
+	}
+
 	// ---- Qt 事件 ----------------------------------------------------------------
 
 	void HalconInteractiveLabel::showEvent(QShowEvent* e)

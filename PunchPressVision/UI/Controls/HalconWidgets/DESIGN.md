@@ -108,7 +108,7 @@ private:
 
 ---
 
-## L3: ImageViewer（后续阶段）
+## L3: ImageViewer（已实现）
 
 **路径**: `include/UI/ImageViewer.h`
 

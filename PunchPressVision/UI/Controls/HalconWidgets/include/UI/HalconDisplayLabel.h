@@ -37,6 +37,9 @@ namespace ui
 		/// 获取最后显示的图像
 		HalconCpp::HImage lastImage() const { return lastImage_; }
 
+		/// Halcon 窗口句柄（供外部 Halcon 操作使用，如截图等）
+		HalconCpp::HTuple halconHandle() const { return handle_; }
+
 		/// Halcon 窗口是否已初始化（showEvent 后为 true）
 		bool isReady() const { return windowCreated_; }
 

@@ -39,6 +39,10 @@ namespace ui
 		/// 控件坐标 → 图像坐标 (col, row)
 		QPointF imagePosAt(const QPointF& widgetPos) const;
 
+		/// 允许外部（如 ImageViewer）在内部覆盖层上安装额外的事件过滤器，
+		/// 用于跟踪鼠标坐标、拦截特定模式下的鼠标事件等。
+		void installOverlayEventFilter(QObject* filterObj);
+
 		/// 显示 Halcon 图像（首次自动 fit，后续保持用户视图）
 		void displayImage(const HalconCpp::HImage& image) override;
 
