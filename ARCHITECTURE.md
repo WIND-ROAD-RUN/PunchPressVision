@@ -390,7 +390,7 @@ UI/Controls/ControlName/
 - 无需 `global::IBusiness`/`IInfrastructure` 接口
 - CMake 目标为轻量级静态库，仅链接 `Halcon` + `Qt6::Widgets`
 
-**CMake 目标命名**：`UI::ControlName`（如 `UI::HalconDisplayLabel`）
+**CMake 目标命名**：`UI::ControlName`（如 `UI::HalconWidgets`）
 
 **设计意图**：
 - 独立编译、独立测试、可下沉到通用 UI 组件库
@@ -401,7 +401,7 @@ UI/Controls/ControlName/
 
 | 控件 | 路径 | 说明 |
 |------|------|------|
-| `HalconDisplayLabel` | `UI/Controls/HalconDisplayLabel/` | 自包含的 Halcon 图像显示 QLabel 子类。内部管理 Halcon 窗口生命周期（showEvent 懒创建 + resizeEvent 自动同步尺寸 + 析构自动关闭），支持 Contain（完整显示留白）和 Cover（裁切填满不留白）两种 FillMode |
+| `HalconWidgets` | `UI/Controls/HalconWidgets/` | Halcon Qt 控件集。当前包含 `HalconDisplayLabel`（自包含的 Halcon 图像显示 QLabel 子类，内部管理 Halcon 窗口生命周期，支持 Contain/Cover FillMode）。后续将扩展 `HalconInteractiveLabel`（滚轮缩放+拖拽平移+视图操纵）和 `ImageViewer`（复合控件，ROI 框选+测距+叠加层管理） |
 
 ---
 

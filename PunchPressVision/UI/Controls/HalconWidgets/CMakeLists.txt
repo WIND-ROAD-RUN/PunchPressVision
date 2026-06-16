@@ -1,6 +1,6 @@
-set(CTL_TARGET HalconDisplayLabel)
+set(CTL_TARGET HalconWidgets)
 
-# 收集源文件与头文件
+# 收集源文件与头文件（GLOB 自动包含所有新增控件）
 file(GLOB SRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 file(GLOB INCLUDE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/UI/*.h")
 
