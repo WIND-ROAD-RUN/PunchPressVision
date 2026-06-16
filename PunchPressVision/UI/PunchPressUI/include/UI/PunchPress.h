@@ -17,7 +17,7 @@ class QButtonGroup;
 
 namespace ui
 {
-	class HalconDisplayLabel;
+	class HalconInteractiveLabel;
 
 	// 主窗口：承载模式切换、图像显示、状态指示。
 	// 通过 app::PunchPressApp& 注入，UI 不直接触碰 Business/Infrastructure。
@@ -67,6 +67,6 @@ namespace ui
 		QButtonGroup* lightGroup_{ nullptr };
 
 		// 图像显示控件（替换 ui->label_imgDisplay 的 QLabel 占位）
-		HalconDisplayLabel* imageView_{ nullptr };
+		HalconInteractiveLabel* imageView_{ nullptr };
 	};
 }

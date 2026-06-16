@@ -39,6 +39,9 @@ namespace ui
 		/// 控件坐标 → 图像坐标 (col, row)
 		QPointF imagePosAt(const QPointF& widgetPos) const;
 
+		/// 显示 Halcon 图像（首次自动 fit，后续保持用户视图）
+		void displayImage(const HalconCpp::HImage& image) override;
+
 	signals:
 		/// 缩放比例变化时发射
 		void zoomChanged(double zoom);
@@ -49,7 +52,6 @@ namespace ui
 	protected:
 		void showEvent(QShowEvent* e) override;
 		void resizeEvent(QResizeEvent* e) override;
-		void displayImage(const HalconCpp::HImage& image) override;
 		bool eventFilter(QObject* obj, QEvent* e) override;
 
 	private:

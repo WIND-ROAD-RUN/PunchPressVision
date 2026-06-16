@@ -13,7 +13,7 @@
 #include <QStatusBar>
 
 #include "app/PunchPressApp.hpp"
-#include "UI/HalconDisplayLabel.h"
+#include "UI/HalconInteractiveLabel.h"
 #include "UI/ModelManagerDialog.h"
 
 // 取消 Win32 MessageBox 宏，使用 rw::rqwu::MessageBox。
@@ -89,7 +89,7 @@ namespace ui
 	void PunchPress::setupImageView()
 	{
 		// 用 HalconDisplayLabel 替换 ui 中的占位 QLabel
-		imageView_ = new HalconDisplayLabel(this);
+		imageView_ = new HalconInteractiveLabel(this);
 
 		auto* oldLabel = ui->label_imgDisplay;
 		if (auto* parentWidget = oldLabel->parentWidget())
