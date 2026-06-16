@@ -4,6 +4,7 @@
 #include <QStringList>
 
 #include "infrastructure/ControlModule/ControlModule.hpp"
+#include "Business/HealthMonitorBun/HealthMonitorBun.hpp"
 
 namespace app
 {
@@ -27,6 +28,15 @@ namespace app
 			QObject::connect(inf.control_module_.get(), &inf::ControlModule::connectionStateChanged,
 				this, &PunchPressApp::plcConnectionChanged, Qt::QueuedConnection);
 		}
+
+		// 健康监控：HealthMonitorBun（工作线程轮询）→ App 信号
+		if (business_.health_monitor_bun)
+		{
+			QObject::connect(business_.health_monitor_bun.get(), &bun::HealthMonitorBun::cameraConnectionStateChanged,
+				this, &PunchPressApp::cameraConnectionChanged, Qt::QueuedConnection);
+			QObject::connect(business_.health_monitor_bun.get(), &bun::HealthMonitorBun::plcConnectionChanged,
+				this, &PunchPressApp::plcConnectionChanged, Qt::QueuedConnection);
+		}
 	}
 
 	PunchPressApp::~PunchPressApp()
@@ -42,6 +52,8 @@ namespace app
 	{
 		if (business_.camera_bun)
 			QObject::disconnect(business_.camera_bun.get(), nullptr, this, nullptr);
+		if (business_.health_monitor_bun)
+			QObject::disconnect(business_.health_monitor_bun.get(), nullptr, this, nullptr);
 		auto& inf = business_.infrastructure();
 		if (inf.control_module_)
 			QObject::disconnect(inf.control_module_.get(), nullptr, this, nullptr);

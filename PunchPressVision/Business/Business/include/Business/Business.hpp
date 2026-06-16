@@ -4,6 +4,7 @@
 #include "Business/CameraBun/CameraBun.hpp"
 #include "Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp"
 #include "Business/LightControlBun/LightControlBun.hpp"
+#include "Business/HealthMonitorBun/HealthMonitorBun.hpp"
 
 namespace bun
 {
@@ -42,5 +43,6 @@ namespace bun
 		std::unique_ptr<ShapeModeManagerBun> shape_mode_manager_bun;
 		infTool::TwoCameraSpliceInfTool* two_camera_splice_bun{ nullptr };
 		std::unique_ptr<LightControlBun> light_control_bun;
+		std::unique_ptr<HealthMonitorBun> health_monitor_bun;
 	};
 }

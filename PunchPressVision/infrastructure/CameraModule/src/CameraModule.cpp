@@ -200,16 +200,15 @@ namespace inf
 		auto* cam = camera(idx);
 		if (!cam)
 			return false;
-		bool isGet = false;
-		bool state = false;
 		try
 		{
-			state = cam->getConnectState(isGet);
+			bool isGet = false;
+			// 物理断线时 getConnectState 返回 false，直接反映物理可达性
+			return cam->getConnectState(isGet);
 		}
 		catch (...)
 		{
 			return false;
 		}
-		return isGet && state;
 	}
 }

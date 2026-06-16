@@ -1,4 +1,4 @@
-set(Bun_TARGET Business)
+set(Bun_TARGET HealthMonitorBun)
 
 file(GLOB_RECURSE INCLUDE_LIST CONFIGURE_DEPENDS
 	"${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp"
@@ -14,15 +14,7 @@ add_library(${Bun_TARGET} STATIC ${SRC_LIST} )
 target_link_libraries(${Bun_TARGET}
 	PUBLIC
 		inf::infrastructure
-)
-
-target_link_libraries(${Bun_TARGET}
-	PUBLIC
-		infTool::infTool
-		bun::CameraBun
-		bun::ShapeModeManagerBun
-		bun::LightControlBun
-		bun::HealthMonitorBun
+		Qt6::Core
 )
 
 set_target_properties(${Bun_TARGET} PROPERTIES
@@ -33,10 +25,6 @@ set_target_properties(${Bun_TARGET} PROPERTIES
 target_include_directories(${Bun_TARGET}
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-	PRIVATE
-		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/private/include>
 )
 
 add_library(bun::${Bun_TARGET} ALIAS ${Bun_TARGET})
-
-add_subdirectory(./test)

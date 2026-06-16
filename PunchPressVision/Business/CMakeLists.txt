@@ -1,4 +1,5 @@
 add_subdirectory(CameraBun)
 add_subdirectory(ShapeModeManagerBun)
 add_subdirectory(LightControlBun)
+add_subdirectory(HealthMonitorBun)
 add_subdirectory(Business)
