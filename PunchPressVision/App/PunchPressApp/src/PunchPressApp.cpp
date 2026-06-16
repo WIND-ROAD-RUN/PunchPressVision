@@ -189,12 +189,12 @@ namespace app
 
 	bool PunchPressApp::configureCameraForDebug()
 	{
-		// 自由运行模式，5fps（FR-005）
+		// 自由运行模式，1fps（测试用，FR-005）
 		auto& inf = business_.infrastructure();
 		if (!inf.camera_module_)
 			return false;
-		bool ok = inf.camera_module_->setFreeRunMode(global::CameraIndex::Camera1, 5.0);
-		ok = inf.camera_module_->setFreeRunMode(global::CameraIndex::Camera2, 5.0) && ok;
+		bool ok = inf.camera_module_->setFreeRunMode(global::CameraIndex::Camera1, 1.0);
+		ok = inf.camera_module_->setFreeRunMode(global::CameraIndex::Camera2, 1.0) && ok;
 		return ok;
 	}
 
@@ -213,7 +213,7 @@ namespace app
 
 	bool PunchPressApp::configureCameraForCalibration()
 	{
-		// 自由运行模式，5fps（FR-011）
+		// 自由运行模式，1fps（测试用，FR-011）
 		return configureCameraForDebug();
 	}
 
