@@ -17,6 +17,8 @@ class QButtonGroup;
 
 namespace ui
 {
+	class HalconDisplayLabel;
+
 	// 主窗口：承载模式切换、图像显示、状态指示。
 	// 通过 app::PunchPressApp& 注入，UI 不直接触碰 Business/Infrastructure。
 	class PunchPress : public QMainWindow
@@ -55,9 +57,7 @@ namespace ui
 
 	private:
 		void buildConnections();
-		bool ensureHalconWindow();
-		void closeHalconWindow();
-		void displayImage(const HalconCpp::HImage& image);
+		void setupImageView();
 
 		Ui::PunchPressClass* ui;
 		app::PunchPressApp& app_;
@@ -66,8 +66,7 @@ namespace ui
 		QButtonGroup* modeGroup_{ nullptr };
 		QButtonGroup* lightGroup_{ nullptr };
 
-		QWidget* halconHost_ = nullptr;
-		HalconCpp::HTuple halconWindowHandle_;
-		HalconCpp::HImage lastImage_;
+		// 图像显示控件（替换 ui->label_imgDisplay 的 QLabel 占位）
+		HalconDisplayLabel* imageView_{ nullptr };
 	};
 }

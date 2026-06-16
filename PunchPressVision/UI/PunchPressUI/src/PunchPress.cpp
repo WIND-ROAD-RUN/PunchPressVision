@@ -7,11 +7,13 @@
 
 #include <QButtonGroup>
 #include <QLabel>
+#include <QLayout>
 #include <QShowEvent>
 #include <QResizeEvent>
 #include <QStatusBar>
 
 #include "app/PunchPressApp.hpp"
+#include "UI/HalconDisplayLabel.h"
 #include "UI/ModelManagerDialog.h"
 
 // 取消 Win32 MessageBox 宏，使用 rw::rqwu::MessageBox。
@@ -39,7 +41,7 @@ namespace ui
 		lightGroup_->addButton(ui->rbtn_downLight);
 
 		buildConnections();
-		ensureHalconWindow();
+		setupImageView();
 
 		// 启动检查（FR-001 ~ FR-004）
 		QString startupError;
@@ -56,7 +58,6 @@ namespace ui
 
 	PunchPress::~PunchPress()
 	{
-		closeHalconWindow();
 		delete ui;
 	}
 
@@ -85,137 +86,32 @@ namespace ui
 		connect(ui->pbtn_exit, &QPushButton::clicked, this, &PunchPress::onExit);
 	}
 
-	bool PunchPress::ensureHalconWindow()
+	void PunchPress::setupImageView()
 	{
-		using namespace HalconCpp;
-		if (halconWindowHandle_.Length() > 0)
-			return true;
-		try
-		{
-			// 将 Halcon 窗口嵌入图像显示标签
-			QWidget* host = ui->label_imgDisplay;
-			if (!host)
-				return false;
-			halconHost_ = host;
-			const Hlong winId = static_cast<Hlong>(host->winId());
-			OpenWindow(0, 0, host->width(), host->height(), winId, "visible", "", &halconWindowHandle_);
-			SetWindowAttr("background_color", "gray");
-			return true;
-		}
-		catch (...)
-		{
-			return false;
-		}
-	}
+		// 用 HalconDisplayLabel 替换 ui 中的占位 QLabel
+		imageView_ = new HalconDisplayLabel(this);
 
-	void PunchPress::closeHalconWindow()
-	{
-		using namespace HalconCpp;
-		if (halconWindowHandle_.Length() == 0)
-			return;
-		try { CloseWindow(halconWindowHandle_); }
-		catch (...) {}
-		halconWindowHandle_ = HTuple();
-	}
-
-	void PunchPress::displayImage(const HalconCpp::HImage& image)
-	{
-		using namespace HalconCpp;
-		if (!image.IsInitialized() || halconWindowHandle_.Length() == 0)
-			return;
-		try
+		auto* oldLabel = ui->label_imgDisplay;
+		if (auto* parentWidget = oldLabel->parentWidget())
 		{
-			// 确保 Halcon 窗口与宿主 label 等大
-			int lw = 640, lh = 480;
-			if (halconHost_)
+			if (auto* layout = parentWidget->layout())
 			{
-				lw = halconHost_->width();
-				lh = halconHost_->height();
-				SetWindowExtents(halconWindowHandle_, 0, 0, lw, lh);
+				layout->replaceWidget(oldLabel, imageView_);
 			}
-
-			HTuple iw, ih;
-			image.GetImageSize(&iw, &ih);
-			const double imgW = static_cast<double>(iw[0].I());
-			const double imgH = static_cast<double>(ih[0].I());
-
-			if (lw <= 0 || lh <= 0)
-			{
-				// 兜底：显示完整图像
-				SetPart(halconWindowHandle_, 0, 0, imgH - 1, imgW - 1);
-			}
-			else
-			{
-				// 填满模式：裁剪图像边缘以匹配 label 宽高比，不留空白
-				const double imgAspect = imgW / imgH;
-				const double labelAspect = static_cast<double>(lw) / lh;
-
-				int row1, col1, row2, col2;
-				if (imgAspect > labelAspect)
-				{
-					// 图像比 label 更宽 → 高度填满，左右裁切
-					const double dispH = imgH;
-					const double dispW = imgH * labelAspect;
-					const int colOff = static_cast<int>((imgW - dispW) / 2.0);
-					row1 = 0;
-					col1 = colOff;
-					row2 = static_cast<int>(dispH) - 1;
-					col2 = colOff + static_cast<int>(dispH * labelAspect) - 1;
-				}
-				else
-				{
-					// 图像比 label 更高或等宽 → 宽度填满，上下裁切
-					const double dispW = imgW;
-					const double dispH = imgW / labelAspect;
-					const int rowOff = static_cast<int>((imgH - dispH) / 2.0);
-					row1 = rowOff;
-					col1 = 0;
-					row2 = rowOff + static_cast<int>(dispW / labelAspect) - 1;
-					col2 = static_cast<int>(dispW) - 1;
-				}
-
-				SetPart(halconWindowHandle_, row1, col1, row2, col2);
-			}
-
-			ClearWindow(halconWindowHandle_);
-			DispObj(image, halconWindowHandle_);
-			lastImage_ = image;
 		}
-		catch (...)
-		{
-		}
+		oldLabel->deleteLater();
 	}
 
 	void PunchPress::showEvent(QShowEvent* e)
 	{
 		QMainWindow::showEvent(e);
-		ensureHalconWindow();
-		// 窗口首次显示后，label 已完成布局，同步 Halcon 窗口尺寸
-		if (halconWindowHandle_.Length() > 0 && halconHost_)
-		{
-			try
-			{
-				HalconCpp::SetWindowExtents(halconWindowHandle_, 0, 0,
-					halconHost_->width(), halconHost_->height());
-			}
-			catch (...) {}
-		}
+		// HalconDisplayLabel 在首次 showEvent 时自动懒创建 Halcon 窗口
 	}
 
 	void PunchPress::resizeEvent(QResizeEvent* e)
 	{
 		QMainWindow::resizeEvent(e);
-		if (halconWindowHandle_.Length() > 0 && halconHost_)
-		{
-			try
-			{
-				HalconCpp::SetWindowExtents(halconWindowHandle_, 0, 0,
-					halconHost_->width(), halconHost_->height());
-				if (lastImage_.IsInitialized())
-					displayImage(lastImage_);
-			}
-			catch (...) {}
-		}
+		// HalconDisplayLabel 在自有 resizeEvent 中自动同步尺寸
 	}
 
 	// ===== 槽实现 =====
@@ -263,7 +159,8 @@ namespace ui
 
 	void PunchPress::onFrameReady(HalconCpp::HImage image)
 	{
-		displayImage(image);
+		if (imageView_)
+			imageView_->displayImage(image);
 	}
 
 	void PunchPress::onPositionResult(global::PositionResult result)
