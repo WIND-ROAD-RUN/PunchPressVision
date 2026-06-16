@@ -370,6 +370,39 @@ add_subdirectory(UI)
 | Halcon | 自定义 `INTERFACE IMPORTED` 目标 | 手动指定 include/lib/bin 路径 |
 | RWUL | `find_package` + `list(APPEND CMAKE_PREFIX_PATH)` | 自定义 Find 模块或 Config 文件 |
 
+### 4.5 可复用 UI 控件模块 (Controls)
+
+UI 层中不耦合具体业务的可复用控件（如 Halcon 图像显示、自定义图表、标尺控件等）应抽取为独立的 **Controls 子模块**，遵循与 Infrastructure/Business 模块类似的结构，但更精简：
+
+```
+UI/Controls/ControlName/
+├── CMakeLists.txt
+├── include/
+│   └── UI/
+│       └── ControlName.h          ← 公共头文件
+└── src/
+    └── ControlName.cpp            ← 实现
+```
+
+**与标准模块的区别**：
+- 无 `test/` 子目录（控件通过主应用验证）
+- 无 `private/` 子目录（实现细节在 `.cpp` 中）
+- 无需 `global::IBusiness`/`IInfrastructure` 接口
+- CMake 目标为轻量级静态库，仅链接 `Halcon` + `Qt6::Widgets`
+
+**CMake 目标命名**：`UI::ControlName`（如 `UI::HalconDisplayLabel`）
+
+**设计意图**：
+- 独立编译、独立测试、可下沉到通用 UI 组件库
+- 父模块通过 `target_link_libraries(... UI::ControlName)` 引用
+- 不与特定业务逻辑耦合，便于跨项目复用
+
+**当前 Controls**：
+
+| 控件 | 路径 | 说明 |
+|------|------|------|
+| `HalconDisplayLabel` | `UI/Controls/HalconDisplayLabel/` | 自包含的 Halcon 图像显示 QLabel 子类。内部管理 Halcon 窗口生命周期（showEvent 懒创建 + resizeEvent 自动同步尺寸 + 析构自动关闭），支持 Contain（完整显示留白）和 Cover（裁切填满不留白）两种 FillMode |
+
 ---
 
 ## 5. 配置与持久化

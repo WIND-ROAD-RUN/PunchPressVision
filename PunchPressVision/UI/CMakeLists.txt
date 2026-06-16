@@ -4,6 +4,8 @@ set(PPV_TARGET_NAME "PunchPressVision")
 #add_subdirectory(UIModule)
 # 新 UI 模块（复用旧 .ui，接入 App 层）
 add_subdirectory(PunchPressUI)
+# 可复用 UI 控件库
+add_subdirectory(Controls/HalconDisplayLabel)
 
 file(GLOB INCLUDE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h)
 file(GLOB SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)

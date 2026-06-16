@@ -28,6 +28,7 @@ target_include_directories(${UI_TARGET}
 target_link_libraries(${UI_TARGET}
 	PUBLIC
 		app::PunchPressApp
+		UI::HalconDisplayLabel
 		Halcon
 		Qt6::Core Qt6::Widgets Qt6::Concurrent
 		RWUL::rqwu
