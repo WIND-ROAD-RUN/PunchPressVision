@@ -14,15 +14,16 @@ namespace infTool
 		// 复用已实现的 calibImage 计算拼接映射，结果写入拼接配置模块并持久化。
 		Config::TwoCameraSpliceCfg result = inf_.two_camera_splice_module_->twoCameraSpliceConfig;
 
-		// 双相机标定参数：当前以同一相机标定配置为基准（单相机标定数据）。
-		// TODO: 若两相机各自独立标定，应分别传入对应的 CalibConfig。
-		Config::CalibConfig calib = inf_.calib_config_module_->calibConfig;
+		// 双相机标定参数：各相机独立标定数据。
+		auto& calib = inf_.calib_config_module_->calibConfig;
 
 		std::string err;
 		const bool ok = calibImage(
 			static_cast<HalconCpp::HObject>(himage1),
 			static_cast<HalconCpp::HObject>(himage2),
-			calib, calib, result, &err);
+			calib.item(global::CameraIndex::Camera1),
+			calib.item(global::CameraIndex::Camera2),
+			result, &err);
 
 		if (ok)
 		{
@@ -32,7 +33,7 @@ namespace infTool
 	}
 
 	bool TwoCameraSpliceInfTool::calibImage(HalconCpp::HObject image1, HalconCpp::HObject image2,
-		Config::CalibConfig cam1Calib, Config::CalibConfig cam2Calib,
+		const Config::CalibConfigItem& cam1Calib, const Config::CalibConfigItem& cam2Calib,
 		Config::TwoCameraSpliceCfg& spliceCfg,
 		std::string* errorMsg)
 	{

@@ -43,16 +43,6 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="undistortBtn">
-        <property name="text">
-         <string>畸变矫正</string>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QPushButton" name="loadCalibImagesBtn">
         <property name="text">
          <string>加载标定图</string>
@@ -272,19 +262,19 @@
        <number>8</number>
       </property>
       <item>
-       <layout class="QVBoxLayout" name="undistortedPanel">
+       <layout class="QVBoxLayout" name="originalPanel">
         <property name="spacing">
          <number>4</number>
         </property>
         <item>
-         <widget class="QLabel" name="labelUndistortedTitle">
+         <widget class="QLabel" name="labelOriginalTitle">
           <property name="text">
-           <string>OpenCV 矫正后</string>
+           <string>原始图像</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QWidget" name="undistortedView" native="true">
+         <widget class="QLabel" name="originalView">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>0</horstretch>
@@ -305,19 +295,19 @@
        </layout>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="originalPanel">
+       <layout class="QVBoxLayout" name="undistortedPanel">
         <property name="spacing">
          <number>4</number>
         </property>
         <item>
-         <widget class="QLabel" name="labelOriginalTitle">
+         <widget class="QLabel" name="labelUndistortedTitle">
           <property name="text">
-           <string>原始图像</string>
+           <string>XLD 标记预览</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QWidget" name="originalView" native="true">
+         <widget class="QLabel" name="undistortedView">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>0</horstretch>

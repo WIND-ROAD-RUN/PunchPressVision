@@ -7,10 +7,12 @@
 
 #include <QApplication>
 #include <QCloseEvent>
+#include <QEvent>
 #include <QComboBox>
 #include <QDateTime>
 #include <QDir>
 #include <QFileDialog>
+#include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QResizeEvent>
@@ -64,12 +66,12 @@ ToolCalibDistortionWindow::ToolCalibDistortionWindow(inf::infrastructure& inf, Q
     // 初始化 Halcon 标定引擎
     calibInfTool_->build();
 
-    // 打开 Halcon 显示窗口，嵌入到 QWidget 占位控件上
-    originalView_.ensure(ui->originalView);
-    undistortedView_.ensure(ui->undistortedView);
+    // 将 .ui 中的 QLabel 占位符替换为 native QWidget，承载 Halcon 窗口
+    buildUi();
 
     buildConnections();
     initBoardDescrPath();
+    cleanCalibImageDirs();
     updateConnectionStatus();
     applyDefaultCameraParams();
 }
@@ -83,30 +85,62 @@ ToolCalibDistortionWindow::~ToolCalibDistortionWindow()
 }
 
 // ===================================================================
+// 将 .ui 中的 QLabel 占位符替换为 native QWidget（承载 Halcon 窗口）
+// ===================================================================
+void ToolCalibDistortionWindow::buildUi()
+{
+    auto replaceLabel = [this](QLabel* old) -> QWidget*
+    {
+        auto* host = new QWidget(old->parentWidget());
+        host->setObjectName(old->objectName());
+        host->setStyleSheet(old->styleSheet());
+        host->setSizePolicy(old->sizePolicy());
+        host->setMinimumSize(old->minimumSize());
+        host->setMaximumSize(old->maximumSize());
+
+        // 确保 Halcon OpenWindow 能拿到有效的 native 句柄
+        host->setAttribute(Qt::WA_NativeWindow, true);
+
+        // 宿主 resize 时立即同步 Halcon 窗体
+        host->installEventFilter(this);
+
+        if (auto* lay = old->parentWidget() ? old->parentWidget()->layout() : nullptr)
+            lay->replaceWidget(old, host);
+        else
+            host->setGeometry(old->geometry());
+
+        host->show();
+        old->hide();
+        old->deleteLater();
+        return host;
+    };
+
+    originalHost_   = replaceLabel(ui->originalView);
+    undistortedHost_ = replaceLabel(ui->undistortedView);
+}
+
+// ===================================================================
 // UI 连接
 // ===================================================================
 void ToolCalibDistortionWindow::buildConnections()
 {
     connect(ui->startStopBtn, &QPushButton::clicked,
         this, &ToolCalibDistortionWindow::onStartStop);
-    connect(ui->undistortBtn, &QPushButton::toggled,
-        this, &ToolCalibDistortionWindow::onToggleUndistort);
     connect(ui->cameraSelect, QOverload<int>::of(&QComboBox::currentIndexChanged),
         this, &ToolCalibDistortionWindow::onCameraSelected);
 
     // 标定流程
-    connect(ui->loadCalibImagesBtn, &QPushButton::clicked,
-        this, &ToolCalibDistortionWindow::onLoadCalibrationImages);
     connect(ui->saveFrameBtn, &QPushButton::clicked,
         this, &ToolCalibDistortionWindow::onSaveCurrentFrame);
     connect(ui->calibrateBtn, &QPushButton::clicked,
         this, &ToolCalibDistortionWindow::onCalibrate);
-    connect(ui->saveParamsBtn, &QPushButton::clicked,
-        this, &ToolCalibDistortionWindow::onSaveParams);
-    connect(ui->loadParamsBtn, &QPushButton::clicked,
-        this, &ToolCalibDistortionWindow::onLoadParams);
     connect(ui->previewCornersBtn, &QPushButton::clicked,
         this, &ToolCalibDistortionWindow::onPreviewCorners);
+
+    // 隐藏已废弃的按钮
+    ui->saveParamsBtn->hide();
+    ui->loadParamsBtn->hide();
+    ui->loadCalibImagesBtn->hide();
 
     // 曝光 / 增益
     connect(ui->setExposureBtn, &QPushButton::clicked,
@@ -126,18 +160,38 @@ void ToolCalibDistortionWindow::buildConnections()
     // 显示信号排队到 UI 线程
     connect(this, &ToolCalibDistortionWindow::originalFrameReady,
         this, &ToolCalibDistortionWindow::onOriginalDisplayFrame, Qt::QueuedConnection);
-    connect(this, &ToolCalibDistortionWindow::undistortedFrameReady,
-        this, &ToolCalibDistortionWindow::onUndistortedDisplayFrame, Qt::QueuedConnection);
 }
 
 // ===================================================================
 // 窗口事件
 // ===================================================================
+void ToolCalibDistortionWindow::showEvent(QShowEvent* event)
+{
+    QMainWindow::showEvent(event);
+    // 首次显示时布局已计算完毕，宿主尺寸有效，打开 Halcon 窗口
+    originalView_.ensure(originalHost_);
+    undistortedView_.ensure(undistortedHost_);
+    originalView_.resizeToHost();
+    refreshMarkedView();
+}
+
+bool ToolCalibDistortionWindow::eventFilter(QObject* watched, QEvent* event)
+{
+    if (event->type() == QEvent::Resize)
+    {
+        if (watched == originalHost_)
+            originalView_.resizeToHost();
+        else if (watched == undistortedHost_)
+            refreshMarkedView();
+    }
+    return QMainWindow::eventFilter(watched, event);
+}
+
 void ToolCalibDistortionWindow::resizeEvent(QResizeEvent* event)
 {
     QMainWindow::resizeEvent(event);
     originalView_.resizeToHost();
-    undistortedView_.resizeToHost();
+    refreshMarkedView();
 }
 
 void ToolCalibDistortionWindow::closeEvent(QCloseEvent* event)
@@ -164,17 +218,8 @@ void ToolCalibDistortionWindow::onCameraFrame(rw::hoec::MatInfo matInfo, global:
         // 缓存当前原始帧（cv::Mat 用于保存文件）
         lastRawMat_ = matInfo.mat.clone();
 
-        // 转 HImage
-        HalconCpp::HImage hSrc = cvMatToHImage(matInfo.mat);
-
-        // 左侧：畸变矫正后的图像
-        HalconCpp::HImage hUndistorted = hSrc;
-        if (undistortEnabled_.load(std::memory_order_acquire))
-            hUndistorted = calibInfTool_->undistortImage(hSrc);
-
-        emit undistortedFrameReady(hUndistorted);
-        // 右侧：原始图像
-        emit originalFrameReady(hSrc);
+        // 左侧：原始图像
+        emit originalFrameReady(cvMatToHImage(matInfo.mat));
     }
     catch (...)
     {
@@ -190,9 +235,17 @@ void ToolCalibDistortionWindow::onOriginalDisplayFrame(HalconCpp::HImage image)
     originalView_.display(image);
 }
 
-void ToolCalibDistortionWindow::onUndistortedDisplayFrame(HalconCpp::HImage image)
+// ===================================================================
+// 右侧 XLD 标记视图 — 仅在 saveFrame 后刷新，resize 时重绘
+// ===================================================================
+void ToolCalibDistortionWindow::refreshMarkedView()
 {
-    undistortedView_.display(image);
+    if (!lastMarkedImage_.IsInitialized())
+        return;
+
+    undistortedView_.display(lastMarkedImage_);
+    if (lastMarksXld_.IsInitialized())
+        undistortedView_.overlayXld(lastMarksXld_);
 }
 
 // ===================================================================
@@ -246,25 +299,6 @@ void ToolCalibDistortionWindow::onSetGain()
 // ===================================================================
 // 采集控制
 // ===================================================================
-void ToolCalibDistortionWindow::onToggleUndistort(bool checked)
-{
-    // 检查是否已标定
-    auto& cfg = inf_.calib_config_module_->calibConfig;
-    if (checked && cfg.cameraParameters.Length() == 0)
-    {
-        QMessageBox::information(this, QStringLiteral("未标定"),
-            QStringLiteral("尚未执行标定或未加载标定参数，无法开启畸变矫正。"));
-        ui->undistortBtn->setChecked(false);
-        return;
-    }
-
-    undistortEnabled_.store(checked, std::memory_order_release);
-    ui->undistortBtn->setText(checked
-        ? QStringLiteral("关闭畸变矫正") : QStringLiteral("畸变矫正"));
-    statusBar()->showMessage(checked
-        ? QStringLiteral("Halcon 畸变矫正已开启") : QStringLiteral("畸变矫正已关闭"));
-}
-
 void ToolCalibDistortionWindow::onStartStop()
 {
     if (!inf_.camera_module_)
@@ -322,16 +356,18 @@ void ToolCalibDistortionWindow::initBoardDescrPath()
 
     if (!foundPath.empty())
     {
-        cfg.calibBoardDescrPath = foundPath;
+        // 为两个相机都设置标定板描述文件路径
+        cfg.item(global::CameraIndex::Camera1).calibBoardDescrPath = foundPath;
+        cfg.item(global::CameraIndex::Camera2).calibBoardDescrPath = foundPath;
         ui->calibBoardPathEdit->setText(QString::fromStdString(foundPath));
         statusBar()->showMessage(
             QStringLiteral("标定板描述文件: %1").arg(QString::fromStdString(foundPath)));
     }
-    else if (!cfg.calibBoardDescrPath.empty())
+    else if (!cfg.item(global::CameraIndex::Camera1).calibBoardDescrPath.empty())
     {
         // config 中未找到 .descr 但已有旧路径则沿用
         ui->calibBoardPathEdit->setText(
-            QString::fromStdString(cfg.calibBoardDescrPath));
+            QString::fromStdString(cfg.item(global::CameraIndex::Camera1).calibBoardDescrPath));
     }
     else
     {
@@ -342,54 +378,38 @@ void ToolCalibDistortionWindow::initBoardDescrPath()
 }
 
 // ===================================================================
-// Halcon 标定流程
+// 启动时自动清理 Camera1 / Camera2 目录下的旧标定图
 // ===================================================================
-void ToolCalibDistortionWindow::onLoadCalibrationImages()
+void ToolCalibDistortionWindow::cleanCalibImageDirs()
 {
-    const QString dir = lastCalibDir_.isEmpty()
-        ? QDir::currentPath()
-        : lastCalibDir_;
+    namespace fs = std::filesystem;
+    const std::string baseDir = inf::CalibConfigModulePath.RootPath;
 
-    const QStringList files = QFileDialog::getOpenFileNames(
-        this,
-        QStringLiteral("选择标定图像"),
-        dir,
-        QStringLiteral("图像文件 (*.bmp *.png *.jpg *.jpeg *.tif *.tiff);;所有文件 (*.*)"));
-
-    if (files.isEmpty())
-        return;
-
-    lastCalibDir_ = QFileInfo(files.first()).absolutePath();
-    capturedImages_.clear();
-
-    int successCount = 0;
-    int failCount = 0;
-    for (const QString& file : files)
+    auto cleanDir = [&](const std::string& subDir)
     {
-        try
+        const std::string dirPath = global::joinPath(baseDir, subDir);
+        std::error_code ec;
+        if (fs::exists(dirPath, ec) && fs::is_directory(dirPath, ec))
         {
-            HalconCpp::HImage img(file.toStdString().c_str());
-            if (img.IsInitialized())
+            for (const auto& entry : fs::directory_iterator(dirPath, ec))
             {
-                capturedImages_.push_back(img);
-                ++successCount;
-            }
-            else
-            {
-                ++failCount;
+                if (entry.is_regular_file(ec))
+                    fs::remove(entry.path(), ec);
             }
         }
-        catch (...)
+        else
         {
-            ++failCount;
+            fs::create_directories(dirPath, ec);
         }
-    }
+    };
 
-    statusBar()->showMessage(
-        QStringLiteral("Halcon 加载完成：成功 %1 张，失败 %2 张，当前共 %3 张")
-            .arg(successCount).arg(failCount).arg(capturedImages_.size()));
+    cleanDir("Camera1");
+    cleanDir("Camera2");
 }
 
+// ===================================================================
+// Halcon 标定流程
+// ===================================================================
 void ToolCalibDistortionWindow::onSaveCurrentFrame()
 {
     if (lastRawMat_.empty())
@@ -399,25 +419,63 @@ void ToolCalibDistortionWindow::onSaveCurrentFrame()
         return;
     }
 
-    const QString dir = lastCalibDir_.isEmpty()
-        ? QDir::currentPath()
-        : lastCalibDir_;
+    // 根据当前选中相机确定保存子目录
+    const global::CameraIndex camIdx = selectedCamera_.load(std::memory_order_acquire);
+    const QString camName = (camIdx == global::CameraIndex::Camera1)
+        ? QStringLiteral("Camera1") : QStringLiteral("Camera2");
 
-    const QString path = QFileDialog::getSaveFileName(
-        this,
-        QStringLiteral("保存当前帧为标定图"),
-        dir + QStringLiteral("/calib_%1.png")
-            .arg(QDateTime::currentDateTime().toString(QStringLiteral("yyyyMMdd_hhmmss_zzz"))),
-        QStringLiteral("PNG 图像 (*.png);;BMP 图像 (*.bmp);;JPEG 图像 (*.jpg)"));
+    const std::string saveDir = global::joinPath(
+        inf::CalibConfigModulePath.RootPath, camName.toStdString());
 
-    if (path.isEmpty())
+    std::error_code ec;
+    std::filesystem::create_directories(saveDir, ec);
+
+    // 先转为 HImage 并通过 drawCalibMarks 校验标定板是否可识别
+    HalconCpp::HImage hImg = cvMatToHImage(lastRawMat_);
+    if (!hImg.IsInitialized())
+    {
+        QMessageBox::warning(this, QStringLiteral("保存失败"),
+            QStringLiteral("图像转换失败"));
         return;
+    }
+
+    auto& item = inf_.calib_config_module_->calibConfig.item(camIdx);
+    if (item.calibBoardDescrPath.empty())
+    {
+        QMessageBox::warning(this, QStringLiteral("保存失败"),
+            QStringLiteral("未设置标定板描述文件（.descr），无法校验图像"));
+        return;
+    }
+
+    bool isOk = false;
+    HalconCpp::HObject marksXld, marksRegion;
+    std::string err;
+    calibInfTool_->drawCalibMarks(hImg, item, isOk, marksXld, marksRegion, &err);
+
+    if (!isOk)
+    {
+        QMessageBox::warning(this, QStringLiteral("保存失败"),
+            QStringLiteral("当前帧未检测到完整标定板标记，不符合标定图要求，不予保存。\n\n详细信息：%1")
+                .arg(QString::fromStdString(err)));
+        return;
+    }
+
+    // 校验通过，保存到相机专属目录
+    const QString filename = QStringLiteral("calib_%1.png")
+        .arg(QDateTime::currentDateTime().toString(QStringLiteral("yyyyMMdd_hhmmss_zzz")));
+    const QString path = QDir(QString::fromStdString(saveDir)).filePath(filename);
 
     if (cv::imwrite(path.toStdString(), lastRawMat_))
     {
-        lastCalibDir_ = QFileInfo(path).absolutePath();
-        // 同时加入标定图集（转为 HImage）
-        capturedImages_.push_back(cvMatToHImage(lastRawMat_));
+        capturedImages_.push_back(hImg);
+
+        // 右侧：显示 XLD 标记
+        lastMarkedImage_ = hImg;
+        lastMarksXld_   = marksXld;
+
+        undistortedView_.display(lastMarkedImage_);
+        undistortedView_.overlayXld(lastMarksXld_);
+
         statusBar()->showMessage(
             QStringLiteral("已保存：%1（已加入标定图集，共 %2 张）")
                 .arg(path).arg(capturedImages_.size()));
@@ -431,9 +489,10 @@ void ToolCalibDistortionWindow::onSaveCurrentFrame()
 
 void ToolCalibDistortionWindow::onCalibrate()
 {
-    auto& cfg = inf_.calib_config_module_->calibConfig;
+    const global::CameraIndex camIdx = selectedCamera_.load(std::memory_order_acquire);
+    auto& item = inf_.calib_config_module_->calibConfig.item(camIdx);
 
-    if (cfg.calibBoardDescrPath.empty())
+    if (item.calibBoardDescrPath.empty())
     {
         QMessageBox::warning(this, QStringLiteral("标定失败"),
             QStringLiteral("请先选择标定板描述文件（.descr）"));
@@ -456,7 +515,7 @@ void ToolCalibDistortionWindow::onCalibrate()
 
     std::string err;
     const bool ok = calibInfTool_->calibrateFromImages(
-        capturedImages_, focalLength, plateThickness, /*referenceIndex*/ 0, &err);
+        capturedImages_, focalLength, plateThickness, item, /*referenceIndex*/ 0, &err);
 
     if (!ok)
     {
@@ -465,81 +524,100 @@ void ToolCalibDistortionWindow::onCalibrate()
         return;
     }
 
-    // 读取标定误差
-    QString rmsStr;
-    if (cfg.calibrationErrors.Length() > 0)
-        rmsStr = QString::number(cfg.calibrationErrors[0].D(), 'f', 4);
-
-    statusBar()->showMessage(
-        QStringLiteral("Halcon 标定完成，RMS = %1 px").arg(rmsStr));
-    QMessageBox::information(this, QStringLiteral("标定完成"),
-        QStringLiteral("Halcon 标定完成。\n"
-            "RMS 重投影误差：%1 px\n"
-            "已可开启“畸变矫正”预览。").arg(rmsStr));
-}
-
-void ToolCalibDistortionWindow::onSaveParams()
-{
-    auto& cfg = inf_.calib_config_module_->calibConfig;
-    if (cfg.cameraParameters.Length() == 0)
-    {
-        QMessageBox::warning(this, QStringLiteral("保存失败"),
-            QStringLiteral("尚未完成标定，无参数可保存"));
-        return;
-    }
-
-    const QString dir = QFileDialog::getExistingDirectory(
-        this,
-        QStringLiteral("选择参数保存目录"),
-        lastCalibDir_.isEmpty() ? QDir::currentPath() : lastCalibDir_);
-
-    if (dir.isEmpty())
-        return;
-
+    // 标定成功 → 自动保存参数到 CalibConfigModulePath.RootPath
+    const std::string configDir = inf::CalibConfigModulePath.RootPath;
     try
     {
-        cfg.saveInDir(dir.toStdString());
-        lastCalibDir_ = dir;
+        inf_.calib_config_module_->calibConfig.saveInDir(configDir);
         statusBar()->showMessage(
-            QStringLiteral("Halcon 标定参数已保存至：%1").arg(dir));
+            QStringLiteral("标定参数已自动保存至：%1")
+                .arg(QString::fromStdString(configDir)));
     }
     catch (...)
     {
-        QMessageBox::warning(this, QStringLiteral("保存失败"),
-            QStringLiteral("写入标定参数时发生异常：%1").arg(dir));
-    }
-}
-
-void ToolCalibDistortionWindow::onLoadParams()
-{
-    const QString dir = QFileDialog::getExistingDirectory(
-        this,
-        QStringLiteral("选择参数加载目录"),
-        lastCalibDir_.isEmpty() ? QDir::currentPath() : lastCalibDir_);
-
-    if (dir.isEmpty())
-        return;
-
-    auto& cfg = inf_.calib_config_module_->calibConfig;
-    try
-    {
-        cfg.loadInDir(dir.toStdString());
-        lastCalibDir_ = dir;
-
-        const int paramLen = cfg.cameraParameters.Length();
-        QString rmsStr;
-        if (cfg.calibrationErrors.Length() > 0)
-            rmsStr = QString::number(cfg.calibrationErrors[0].D(), 'f', 4);
-
         statusBar()->showMessage(
-            QStringLiteral("Halcon 参数已加载：%1，相机参数项 %2，RMS = %3 px")
-                .arg(dir).arg(paramLen).arg(rmsStr));
+            QStringLiteral("标定完成但参数保存失败：%1")
+                .arg(QString::fromStdString(configDir)));
     }
-    catch (...)
+
+    // 构建详细标定信息
+    const auto& cp = item.cameraParameters;  // area_scan_polynomial: 13 elements
+    const auto& pose = item.cameraPose;      // [tx, ty, tz, rx, ry, rz, type]
+
+    // RMS
+    QString rmsStr = QStringLiteral("N/A");
+    if (item.calibrationErrors.Length() > 0)
+        rmsStr = QString::number(item.calibrationErrors[0].D(), 'f', 4);
+
+    // 焦距
+    QString focusStr = QStringLiteral("N/A");
+    if (cp.Length() > 1)
+        focusStr = QString::number(cp[1].D() * 1000.0, 'f', 3) + QStringLiteral(" mm");
+
+    // 像素尺寸（传感器物理属性，固定值）
+    constexpr double kPixelSizeM = 2.4e-06;  // 2.4 μm
+    const QString sxStr = QStringLiteral("2.400 μm");
+    const QString syStr = QStringLiteral("2.400 μm");
+
+    // 主点
+    QString cxStr = QStringLiteral("N/A"), cyStr = QStringLiteral("N/A");
+    if (cp.Length() > 10)
     {
-        QMessageBox::warning(this, QStringLiteral("加载失败"),
-            QStringLiteral("读取标定参数时发生异常：%1").arg(dir));
+        cxStr = QString::number(cp[9].D(), 'f', 1) + QStringLiteral(" px");
+        cyStr = QString::number(cp[10].D(), 'f', 1) + QStringLiteral(" px");
     }
+
+    // 畸变系数 K1/K2/K3/P1/P2
+    QString k1Str = QStringLiteral("N/A"), k2Str = QStringLiteral("N/A"), k3Str = QStringLiteral("N/A");
+    QString p1Str = QStringLiteral("N/A"), p2Str = QStringLiteral("N/A");
+    if (cp.Length() > 6)
+    {
+        k1Str = QString::number(cp[2].D(), 'e', 4);
+        k2Str = QString::number(cp[3].D(), 'e', 4);
+        k3Str = QString::number(cp[4].D(), 'e', 4);
+        p1Str = QString::number(cp[5].D(), 'e', 4);
+        p2Str = QString::number(cp[6].D(), 'e', 4);
+    }
+
+    // 工作距离（标定板到相机的 Z 方向距离）
+    QString wdStr = QStringLiteral("N/A");
+    if (pose.Length() >= 3)
+        wdStr = QString::number(std::abs(pose[2].D()) * 1000.0, 'f', 1) + QStringLiteral(" mm");
+
+    // 像素当量（在标定板工作平面处）: kPixelSizeM * tz / Focus
+    QString pixelEquivStr = QStringLiteral("N/A");
+    if (pose.Length() >= 3 && cp.Length() > 1 && cp[1].D() != 0.0)
+    {
+        const double pe = kPixelSizeM * std::abs(pose[2].D()) / cp[1].D() * 1000.0;  // mm/px
+        pixelEquivStr = QString::number(pe, 'f', 5) + QStringLiteral(" mm/px");
+    }
+
+    const QString camDisplayName = cameraDisplayName(camIdx);
+    const QString info = QStringLiteral(
+        "%15 Halcon 标定完成\n\n"
+        "━━━━ 相机内参 ━━━━\n"
+        "  类型: area_scan_polynomial\n"
+        "  焦距: %1\n"
+        "  像素尺寸: Sx = %2, Sy = %3\n"
+        "  主点: Cx = %4, Cy = %5\n"
+        "  径向畸变 K1: %6\n"
+        "  径向畸变 K2: %7\n"
+        "  径向畸变 K3: %8\n"
+        "  切向畸变 P1: %9\n"
+        "  切向畸变 P2: %10\n\n"
+        "━━━━ 相机外参（参考帧）━━━━\n"
+        "  工作距离: %11\n"
+        "  像素当量: %12\n\n"
+        "━━━━ 标定精度 ━━━━\n"
+        "  重投影误差 RMS: %13 px\n\n"
+        "参数已自动保存至:\n%14")
+        .arg(focusStr, sxStr, syStr, cxStr, cyStr,
+             k1Str, k2Str, k3Str, p1Str, p2Str,
+             wdStr, pixelEquivStr, rmsStr,
+             QString::fromStdString(configDir),
+             camDisplayName);
+
+    QMessageBox::information(this, QStringLiteral("标定完成 — %1").arg(camDisplayName), info);
 }
 
 void ToolCalibDistortionWindow::onPreviewCorners()
@@ -551,15 +629,16 @@ void ToolCalibDistortionWindow::onPreviewCorners()
         return;
     }
 
-    auto& cfg = inf_.calib_config_module_->calibConfig;
-    if (cfg.calibBoardDescrPath.empty())
+    const global::CameraIndex camIdx = selectedCamera_.load(std::memory_order_acquire);
+    auto& item = inf_.calib_config_module_->calibConfig.item(camIdx);
+    if (item.calibBoardDescrPath.empty())
     {
         QMessageBox::warning(this, QStringLiteral("角点预览"),
             QStringLiteral("请先选择标定板描述文件（.descr）"));
         return;
     }
 
-    CornerPreviewDialog dlg(*calibInfTool_, cfg, capturedImages_, this);
+    CornerPreviewDialog dlg(*calibInfTool_, item, capturedImages_, this);
     dlg.exec();
 }
 

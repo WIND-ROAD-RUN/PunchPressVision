@@ -9,8 +9,10 @@ namespace Config
 	{
 		namespace fs = std::filesystem;
 
-		constexpr const char* kCamera1ImageFile = "camera1_picture.bmp";
-		constexpr const char* kCamera2ImageFile = "camera2_picture.bmp";
+		constexpr const char* kCamera1ImageFile = "camera1_picture";
+		constexpr const char* kCamera2ImageFile = "camera2_picture";
+		constexpr const char* kMapSingle1File   = "map_single1";
+		constexpr const char* kMapSingle2File   = "map_single2";
 		constexpr const char* kParamsFile = "two_camera_splice_params.txt";
 		constexpr const char* kCameraImageFormat = "bmp";
 
@@ -21,15 +23,7 @@ namespace Config
 			return s;
 		}
 
-		void replaceFile(const fs::path& tmp, const fs::path& target)
-		{
-			if (fs::exists(target))
-			{
-				try { fs::remove(target); }
-				catch (...) {}
-			}
-			fs::rename(tmp, target);
-		}
+	
 
 		void writeImageSafe(const HalconCpp::HObject& image, const fs::path& filePath, const char* format)
 		{
@@ -45,9 +39,8 @@ namespace Config
 				return;
 			}
 			fs::path tmp = filePath;
-			tmp += ".tmp";
+			
 			HalconCpp::HImage(image).WriteImage(format, 0, tmp.string().c_str());
-			replaceFile(tmp, filePath);
 		}
 
 		bool readImageSafe(const fs::path& filePath, HalconCpp::HObject& image)
@@ -67,8 +60,43 @@ namespace Config
 			return true;
 		}
 
+		// Map 对象（多通道映射图）不能走 WriteImage/ReadImage（BMP 通道数不足），
+		// 必须用 Halcon 原生 WriteObject/ReadObject 序列化。
+		void writeObjectSafe(const HalconCpp::HObject& obj, const fs::path& filePath)
+		{
+			fs::create_directories(filePath.parent_path());
+			if (!obj.IsInitialized())
+			{
+				try { if (fs::exists(filePath)) fs::remove(filePath); }
+				catch (...) {}
+				return;
+			}
+			fs::path tmp = filePath;
+			
+			HalconCpp::WriteObject(obj, tmp.string().c_str());
+		}
+
+		bool readObjectSafe(const fs::path& filePath, HalconCpp::HObject& obj)
+		{
+			if (!fs::exists(filePath))
+				return false;
+			try
+			{
+				HalconCpp::HObject tmpObj;
+				HalconCpp::ReadObject(&tmpObj, filePath.string().c_str());
+				obj = tmpObj;
+			}
+			catch (...)
+			{
+				return false;
+			}
+			return true;
+		}
+
 		void writeParamsSafe(const fs::path& filePath,
 			const std::string& caltabPath,
+			double cam1Gain, double cam1Exposure,
+			double cam2Gain, double cam2Exposure,
 			double diffHeight, double overlapPercent,
 			double borderPercent, double distancePlates,
 			double pixToWorld,
@@ -81,6 +109,10 @@ namespace Config
 			if (!ofs)
 				return;
 			ofs << "caltabDescrPath=" << caltabPath << '\n';
+			ofs << "camera1Gain=" << cam1Gain << '\n';
+			ofs << "camera1Exposure=" << cam1Exposure << '\n';
+			ofs << "camera2Gain=" << cam2Gain << '\n';
+			ofs << "camera2Exposure=" << cam2Exposure << '\n';
 			ofs << "DiffHeight=" << diffHeight << '\n';
 			ofs << "OverlapInPercent=" << overlapPercent << '\n';
 			ofs << "BorderInPercent=" << borderPercent << '\n';
@@ -89,11 +121,12 @@ namespace Config
 			ofs << "rectifiedWidth=" << rectWidth << '\n';
 			ofs << "rectifiedHeight=" << rectHeight << '\n';
 			ofs.close();
-			replaceFile(tmp, filePath);
 		}
 
 		bool readParamsSafe(const fs::path& filePath,
 			std::string& caltabPath,
+			double& cam1Gain, double& cam1Exposure,
+			double& cam2Gain, double& cam2Exposure,
 			double& diffHeight, double& overlapPercent,
 			double& borderPercent, double& distancePlates,
 			double& pixToWorld,
@@ -119,6 +152,14 @@ namespace Config
 				{
 					if (key == "caltabDescrPath")
 						caltabPath = value;
+					else if (key == "camera1Gain")
+						cam1Gain = std::stod(value);
+					else if (key == "camera1Exposure")
+						cam1Exposure = std::stod(value);
+					else if (key == "camera2Gain")
+						cam2Gain = std::stod(value);
+					else if (key == "camera2Exposure")
+						cam2Exposure = std::stod(value);
 					else if (key == "DiffHeight")
 						diffHeight = std::stod(value);
 					else if (key == "OverlapInPercent")
@@ -150,8 +191,12 @@ namespace Config
 			const fs::path dir(dirPath);
 			writeImageSafe(camera1Piccture, dir / kCamera1ImageFile, kCameraImageFormat);
 			writeImageSafe(camera2Piccture, dir / kCamera2ImageFile, kCameraImageFormat);
+			writeObjectSafe(MapSingle1,     dir / kMapSingle1File);
+			writeObjectSafe(MapSingle2,     dir / kMapSingle2File);
 			writeParamsSafe(dir / kParamsFile,
 				caltabDescrPath,
+				camera1Gain, camera1Exposure,
+				camera2Gain, camera2Exposure,
 				DiffHeight, OverlapInPercent, BorderInPercent, DistancePlates,
 				pixTowWorld,
 				rectifiedWidth, rectifiedHeight);
@@ -168,6 +213,10 @@ namespace Config
 		{
 			const fs::path dir(dirPath);
 			caltabDescrPath.clear();
+			camera1Gain = 0.0;
+			camera1Exposure = 0.0;
+			camera2Gain = 0.0;
+			camera2Exposure = 0.0;
 			DiffHeight = 0.0;
 			OverlapInPercent = 0.0;
 			BorderInPercent = 0.0;
@@ -177,8 +226,12 @@ namespace Config
 			rectifiedHeight = 0;
 			readImageSafe(dir / kCamera1ImageFile, camera1Piccture);
 			readImageSafe(dir / kCamera2ImageFile, camera2Piccture);
+			readObjectSafe(dir / kMapSingle1File,  MapSingle1);
+			readObjectSafe(dir / kMapSingle2File,  MapSingle2);
 			readParamsSafe(dir / kParamsFile,
 				caltabDescrPath,
+				camera1Gain, camera1Exposure,
+				camera2Gain, camera2Exposure,
 				DiffHeight, OverlapInPercent, BorderInPercent, DistancePlates,
 				pixTowWorld,
 				rectifiedWidth, rectifiedHeight);

@@ -41,23 +41,23 @@ namespace bun
 		spliceEnabled_.store(enabled, std::memory_order_release);
 	}
 
-	HalconCpp::HImage CameraBun::applyUndistort(const HalconCpp::HImage& image)
+	HalconCpp::HImage CameraBun::applyUndistort(const HalconCpp::HImage& image, global::CameraIndex cameraIndex)
 	{
 		using namespace HalconCpp;
 		try
 		{
 			if (!inf_.calib_config_module_)
 				return image;
-			const auto& cfg = inf_.calib_config_module_->calibConfig;
-			if (cfg.cameraParameters.Length() == 0)
+			const auto& item = inf_.calib_config_module_->calibConfig.item(cameraIndex);
+			if (item.cameraParameters.Length() == 0)
 				return image; // 未标定，原样返回
 
 			HTuple camParRectified;
-			ChangeRadialDistortionCamPar("fixed", cfg.cameraParameters, 0, &camParRectified);
+			ChangeRadialDistortionCamPar("fixed", item.cameraParameters, 0, &camParRectified);
 
 			HObject rectified;
 			ChangeRadialDistortionImage(image, HObject(), &rectified,
-				cfg.cameraParameters, camParRectified);
+				item.cameraParameters, camParRectified);
 			return HImage(rectified);
 		}
 		catch (...)
@@ -82,7 +82,7 @@ namespace bun
 			HalconCpp::HImage hImage = CameraImgConvert::cvMatToHImage(matInfo.mat);
 
 			// Step 2: 畸变矫正
-			HalconCpp::HImage rectified = applyUndistort(hImage);
+			HalconCpp::HImage rectified = applyUndistort(hImage, cameraIndex);
 
 			// Step 3: 九点标定变换（坐标语义，图像保持）
 			HalconCpp::HImage worldImage = applyNinePointTransform(rectified);

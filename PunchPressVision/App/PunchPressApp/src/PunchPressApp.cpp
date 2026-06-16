@@ -161,7 +161,7 @@ namespace app
 
 		// 畸变矫正就绪：相机内参非空
 		if (inf.calib_config_module_)
-			r.distortionReady = inf.calib_config_module_->calibConfig.cameraParameters.Length() > 0;
+			r.distortionReady = inf.calib_config_module_->calibConfig.item(global::CameraIndex::Camera1).cameraParameters.Length() > 0;
 
 		// 九点标定就绪：变换矩阵长度 >= 6
 		if (inf.nine_point_module_)
