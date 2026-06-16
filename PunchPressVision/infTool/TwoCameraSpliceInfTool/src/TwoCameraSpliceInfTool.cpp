@@ -274,7 +274,7 @@ namespace infTool
 
 	void TwoCameraSpliceInfTool::onCalibFrame(HalconCpp::HImage img, global::CameraIndex cameraIndex)
 	{
-		// 1. 缓存当前相机帧
+		// 1. 缓存当前相机帧（覆盖旧帧，保证始终是最新帧）
 		switch (cameraIndex)
 		{
 		case global::CameraIndex::Camera1:
@@ -287,16 +287,15 @@ namespace infTool
 			break;
 		}
 
-		// 2. 连接感知：检查另一相机是否在线
+		// 2. 检查另一相机是否物理在线
 		const auto otherIdx = (cameraIndex == global::CameraIndex::Camera1)
 			? global::CameraIndex::Camera2 : global::CameraIndex::Camera1;
-
 		const bool otherOnline = inf_.camera_module_
 			&& inf_.camera_module_->isConnected(otherIdx);
 
+		// 3. 另一相机离线 → 直通当前帧（不等、不拼）
 		if (!otherOnline)
 		{
-			// 另一相机离线 → 停止超时定时器，直通当前帧
 			stitchTimeout_->stop();
 			cam1_ready_ = false;
 			cam2_ready_ = false;
@@ -304,25 +303,23 @@ namespace infTool
 			return;
 		}
 
-		// 3. 另一相机在线：尝试双路拼接
+		// 4. 双路均在线，且帧均已就绪 → 拼接
 		if (cam1_ready_ && cam2_ready_)
 		{
 			stitchTimeout_->stop();
 			cam1_ready_ = false;
 			cam2_ready_ = false;
 			tryStitchAndEmit();
+			return;
 		}
-		else
-		{
-			// 等待配对帧 → 启动 500ms 超时兜底
-			if (!stitchTimeout_->isActive())
-				stitchTimeout_->start(500);
-		}
+
+		// 5. 等待配对帧：每收到新帧都重置超时，保证从最新帧算起等足 500ms
+		stitchTimeout_->start(500);
 	}
 
 	void TwoCameraSpliceInfTool::onStitchTimeout()
 	{
-		// 超时：发射已缓存的最新单路帧（优先相机1）
+		// 超时：另一相机在线但帧未到达 → 直通已缓存单路帧
 		if (cam1_ready_)
 		{
 			cam1_ready_ = false;

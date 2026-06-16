@@ -80,7 +80,7 @@ namespace inf
 				? cameraCfg.gain1 : cameraCfg.gain2;
 			cam->setExposureTime(static_cast<rw::hoec::UInt>(exposure));
 			cam->setGain(static_cast<rw::hoec::UInt>(gain));
-			cam->setFrameRate(1.0f);
+			cam->setFrameRate(3.0f);
 			cam->setHeartbeatTime(500);
 			(void)cam->registerCallBackFunc();
 
