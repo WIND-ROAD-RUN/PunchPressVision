@@ -5,6 +5,7 @@
 #include "UI/PunchPress.h"
 #include "ui_PunchPress.h"
 
+#include <QButtonGroup>
 #include <QLabel>
 #include <QShowEvent>
 #include <QResizeEvent>
@@ -26,6 +27,17 @@ namespace ui
 		, app_(app)
 	{
 		ui->setupUi(this);
+
+		// 按钮分组：隔离模式和光源两组 RadioButton 的互斥作用域
+		modeGroup_ = new QButtonGroup(this);
+		modeGroup_->addButton(ui->rbtn_debug);
+		modeGroup_->addButton(ui->rbtn_work);
+
+		lightGroup_ = new QButtonGroup(this);
+		lightGroup_->setExclusive(false); // 上下光源可独立开关
+		lightGroup_->addButton(ui->rbtn_upLight);
+		lightGroup_->addButton(ui->rbtn_downLight);
+
 		buildConnections();
 		ensureHalconWindow();
 

@@ -13,6 +13,7 @@ namespace Ui { class PunchPressClass; }
 QT_END_NAMESPACE
 
 namespace app { class PunchPressApp; }
+class QButtonGroup;
 
 namespace ui
 {
@@ -60,6 +61,10 @@ namespace ui
 
 		Ui::PunchPressClass* ui;
 		app::PunchPressApp& app_;
+
+		// 按钮分组：隔离模式和光源两组 RadioButton 的互斥作用域
+		QButtonGroup* modeGroup_{ nullptr };
+		QButtonGroup* lightGroup_{ nullptr };
 
 		QWidget* halconHost_ = nullptr;
 		HalconCpp::HTuple halconWindowHandle_;
