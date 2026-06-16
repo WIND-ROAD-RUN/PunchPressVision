@@ -375,8 +375,45 @@ namespace infTool
 		// 接收 CalibInfTool 矫正后的双相机图像，驱动拼接流程
 		connect(&calib_tool_, &CalibInfTool::callBackFunc,
 			this, &TwoCameraSpliceInfTool::onCalibFrame, Qt::DirectConnection);
-	}
 
+		// 启动时尝试用已有的标定图像/参数计算一次拼接配置（如果已有标定图像）
+		try
+		{
+			// 访问全局拼接配置和相机标定配置
+			auto& spliceCfg = inf_.two_camera_splice_module_->twoCameraSpliceConfig;
+			if (!spliceCfg.camera1Piccture.IsInitialized() || !spliceCfg.camera2Piccture.IsInitialized())
+				return;
+
+			if (!inf_.calib_config_module_)
+				return;
+
+			auto& calib = inf_.calib_config_module_->calibConfig;
+
+			std::string err;
+			const bool ok = calibImage(
+				static_cast<HalconCpp::HObject>(spliceCfg.camera1Piccture),
+				static_cast<HalconCpp::HObject>(spliceCfg.camera2Piccture),
+				calib.item(global::CameraIndex::Camera1),
+				calib.item(global::CameraIndex::Camera2),
+				spliceCfg, &err);
+
+			if (ok)
+			{
+				// 保存计算结果到模块并持久化
+				inf_.two_camera_splice_module_->twoCameraSpliceConfig = spliceCfg;
+				inf_.two_camera_splice_module_->save();
+			}
+			else
+			{
+				// 若需要错误信息处理可在此扩展（当前忽略）
+				(void)err;
+			}
+		}
+		catch (...)
+		{
+			// 忽略初始化阶段的异常，避免影响程序启动
+		}
+	}
 	void TwoCameraSpliceInfTool::destroy()
 	{
 		stitchTimeout_->stop();

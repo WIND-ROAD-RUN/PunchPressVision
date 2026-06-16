@@ -9,10 +9,10 @@ namespace Config
 	{
 		namespace fs = std::filesystem;
 
-		constexpr const char* kCamera1ImageFile = "camera1_picture";
-		constexpr const char* kCamera2ImageFile = "camera2_picture";
-		constexpr const char* kMapSingle1File   = "map_single1";
-		constexpr const char* kMapSingle2File   = "map_single2";
+		constexpr const char* kCamera1ImageFile = "camera1_picture.bmp";
+		constexpr const char* kCamera2ImageFile = "camera2_picture.bmp";
+		constexpr const char* kMapSingle1File   = "map_single1.hobj";
+		constexpr const char* kMapSingle2File   = "map_single2.hobj";
 		constexpr const char* kParamsFile = "two_camera_splice_params.txt";
 		constexpr const char* kCameraImageFormat = "bmp";
 
