@@ -3,9 +3,12 @@
 
 #include "global/GlobalPath.hpp"
 #include "infTool/NinePointInfTool/NinePointInfTool.hpp"
+#include "infTool/TwoCameraSpliceInfTool/TwoCameraSpliceInfTool.hpp"
+#include "infTool/CalibInfTool/CalibInfTool.hpp"
 #include "infrastructure/infrastructure.hpp"
 #include "infrastructure/NinePointModule/Config/NinePointConfig.hpp"
 #include "infrastructure/NinePointModule/NinePointModule.hpp"
+#include "infrastructure/TwoCameraSpliceModule/TwoCameraSpliceModulePath.hpp"
 #include "rwul/hoecm/hoec_m.hpp"
 
 #include <filesystem>
@@ -80,11 +83,15 @@ ToolNinePointWindow::ToolNinePointWindow(inf::infrastructure& inf, QWidget* pare
 	: QMainWindow(parent)
 	, inf_(inf)
 	, ninePointTool_(std::make_unique<infTool::NinePointInfTool>(inf_))
+	, calibTool_(std::make_unique<infTool::CalibInfTool>(inf_))
+	, spliceTool_(std::make_unique<infTool::TwoCameraSpliceInfTool>(inf_, *calibTool_))
 	, ui(new Ui::ToolNinePointWindowClass())
 {
 	ui->setupUi(this);
 
 	ninePointTool_->build();
+	calibTool_->build();
+	spliceTool_->build();
 
 	buildUi();
 	buildConnections();
@@ -94,6 +101,8 @@ ToolNinePointWindow::ToolNinePointWindow(inf::infrastructure& inf, QWidget* pare
 
 ToolNinePointWindow::~ToolNinePointWindow()
 {
+	spliceTool_->destroy();
+	calibTool_->destroy();
 	ninePointTool_->destroy();
 	closeHalconWindow();
 
@@ -457,6 +466,10 @@ void ToolNinePointWindow::showEvent(QShowEvent* event)
 	QMainWindow::showEvent(event);
 	ensureHalconWindow();
 
+	// 软件打开时加载双相机拼接配置（MapSingle1/MapSingle2 等）
+	if (inf_.two_camera_splice_module_)
+		inf_.two_camera_splice_module_->twoCameraSpliceConfig.loadInDir(inf::TwoCameraSpliceModulePath.RootPath);
+
 	if (inf_.camera_module_)
 		inf_.camera_module_->startMonitor();
 }
@@ -521,62 +534,98 @@ void ToolNinePointWindow::onCameraFrame(rw::hoec::MatInfo matInfo, global::Camer
 
 void ToolNinePointWindow::onDisplayFrame()
 {
-	// 用相机1的帧作为显示（九点标定主要用相机1）
-	if (cam1Ready_)
+	// 等待双相机帧均就绪后才拼接显示
+	if (!cam1Ready_ || !cam2Ready_)
+		return;
+
+	HalconCpp::HObject displayImage;
+	bool haveImage = false;
+
+	// 使用 TwoCameraSpliceInfTool 的 pinjieImage 进行拼接
+	auto& spliceCfg = inf_.two_camera_splice_module_->twoCameraSpliceConfig;
+
 	{
-		halconLastImage_ = cam1Image_;
-		if (ensureHalconWindow())
+		HalconCpp::HObject ho1 = static_cast<HalconCpp::HObject>(cam1Image_);
+		HalconCpp::HObject ho2 = static_cast<HalconCpp::HObject>(cam2Image_);
+		HalconCpp::HObject stitched;
+		if (spliceTool_->pinjieImage(ho1, ho2, spliceCfg, stitched))
 		{
-			redrawHalconView(true);
+			displayImage = stitched;
+			haveImage = true;
+		}
+	}
 
-			// 九点标定模式下自动检测矩形
-			if (isJiuDianBiaoDing_)
+	// 降级：无 Map 则原图左右硬拼接
+	if (!haveImage)
+	{
+		try
+		{
+			HalconCpp::HObject concat;
+			HalconCpp::ConcatObj(cam1Image_, cam2Image_, &concat);
+			HalconCpp::TileImages(concat, &displayImage, 2, "horizontal");
+			haveImage = displayImage.IsInitialized();
+		}
+		catch (const HalconCpp::HException&) { haveImage = false; }
+	}
+
+	cam1Ready_ = false;
+	cam2Ready_ = false;
+
+	if (!haveImage)
+		return;
+
+	halconLastImage_ = HalconCpp::HImage(displayImage);
+
+	if (ensureHalconWindow())
+	{
+		redrawHalconView(true);
+
+		// 九点标定模式下自动检测矩形（始终基于相机1）
+		if (isJiuDianBiaoDing_ && cam1Image_.IsInitialized())
+		{
+			QVector<RectangleResult> results;
+			const bool found = findRectangle(cam1Image_, results, true, 3);
+
+			if (found && !results.isEmpty())
 			{
-				QVector<RectangleResult> results;
-				const bool found = findRectangle(cam1Image_, results, true, 3);
-
-				if (found && !results.isEmpty())
+				for (const auto& rect : results)
 				{
-					for (const auto& rect : results)
+					// 计算实际坐标（3x3网格）
+					const int idx = static_cast<int>(pixPoints_.size());
+					double realX = 0.0, realY = 0.0;
+
+					if (inf_.nine_point_module_)
 					{
-						// 计算实际坐标（3x3网格）
-						const int idx = static_cast<int>(pixPoints_.size());
-						double realX = 0.0, realY = 0.0;
-
-						if (inf_.nine_point_module_)
-						{
-							const auto& cfg = inf_.nine_point_module_->ninePointConfig;
-							realX = static_cast<double>(cfg.xdiantance * (idx % 3));
-							realY = static_cast<double>(cfg.ydistance * (idx / 3));
-						}
-
-						infTool::Point2D pix{ rect.x, rect.y };
-						infTool::Point2D world{ realX, realY };
-
-						pixPoints_.push_back(pix);
-						worldPoints_.push_back(world);
-
-						addNewItemToListView(rect.x, rect.y, realX, realY);
+						const auto& cfg = inf_.nine_point_module_->ninePointConfig;
+						realX = static_cast<double>(cfg.xdiantance * (idx % 3));
+						realY = static_cast<double>(cfg.ydistance * (idx / 3));
 					}
 
-					if (pixPoints_.size() >= 9)
-					{
-						ui->btn_ninePointCalibration->setEnabled(true);
-						isJiuDianBiaoDing_ = false;
-						QMessageBox::information(this,
-							QStringLiteral("提示"),
-							QStringLiteral("已完成9个标定点采集，可以进行九点标定了！"));
-					}
+					infTool::Point2D pix{ rect.x, rect.y };
+					infTool::Point2D world{ realX, realY };
 
-					for (auto& r : results)
-					{
-						delete r.contour;
-						r.contour = nullptr;
-					}
+					pixPoints_.push_back(pix);
+					worldPoints_.push_back(world);
+
+					addNewItemToListView(rect.x, rect.y, realX, realY);
+				}
+
+				if (pixPoints_.size() >= 9)
+				{
+					ui->btn_ninePointCalibration->setEnabled(true);
+					isJiuDianBiaoDing_ = false;
+					QMessageBox::information(this,
+						QStringLiteral("提示"),
+						QStringLiteral("已完成9个标定点采集，可以进行九点标定了！"));
+				}
+
+				for (auto& r : results)
+				{
+					delete r.contour;
+					r.contour = nullptr;
 				}
 			}
 		}
-		cam1Ready_ = false;
 	}
 }
 
@@ -1187,26 +1236,26 @@ void ToolNinePointWindow::btn_startCamera1_clicked()
 {
 	isJiuDianBiaoDing_ = false;
 	if (inf_.camera_module_)
-		inf_.camera_module_->setFreeRunMode(global::CameraIndex::Camera1, 10.0);
+		inf_.camera_module_->setFreeRunMode(global::CameraIndex::Camera1, 2.0);
 }
 
 void ToolNinePointWindow::btn_stopCamera1_clicked()
 {
 	if (inf_.camera_module_)
-		inf_.camera_module_->setTriggerMode(global::CameraIndex::Camera1, global::TriggerSource::Line0, 10.0);
+		inf_.camera_module_->setTriggerMode(global::CameraIndex::Camera1, global::TriggerSource::Line0, 2.0);
 }
 
 void ToolNinePointWindow::btn_startCamera2_clicked()
 {
 	isJiuDianBiaoDing_ = false;
 	if (inf_.camera_module_)
-		inf_.camera_module_->setFreeRunMode(global::CameraIndex::Camera2, 10.0);
+		inf_.camera_module_->setFreeRunMode(global::CameraIndex::Camera2, 2.0);
 }
 
 void ToolNinePointWindow::btn_stopCamera2_clicked()
 {
 	if (inf_.camera_module_)
-		inf_.camera_module_->setTriggerMode(global::CameraIndex::Camera2, global::TriggerSource::Line0, 10.0);
+		inf_.camera_module_->setTriggerMode(global::CameraIndex::Camera2, global::TriggerSource::Line0, 2.0);
 }
 
 // ===================================================================

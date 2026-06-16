@@ -24,6 +24,8 @@ target_include_directories(${Bun_TARGET}
 
 target_link_libraries(${Bun_TARGET} PRIVATE
     infTool::NinePointInfTool
+    infTool::TwoCameraSpliceInfTool
+    infTool::CalibInfTool
     inf::infrastructure
     Halcon
     Qt6::Core

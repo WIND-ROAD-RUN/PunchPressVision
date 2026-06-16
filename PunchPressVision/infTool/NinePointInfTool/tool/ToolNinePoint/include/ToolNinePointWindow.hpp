@@ -12,7 +12,7 @@
 #include "infTool/NinePointInfTool/NinePointInfTool.hpp"
 
 namespace inf { class infrastructure; }
-namespace infTool { class NinePointInfTool; }
+namespace infTool { class NinePointInfTool; class CalibInfTool; class TwoCameraSpliceInfTool; }
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class ToolNinePointWindowClass; }
@@ -124,6 +124,8 @@ private:
 private:
 	inf::infrastructure& inf_;
 	std::unique_ptr<infTool::NinePointInfTool> ninePointTool_;
+	std::unique_ptr<infTool::CalibInfTool> calibTool_;
+	std::unique_ptr<infTool::TwoCameraSpliceInfTool> spliceTool_;
 
 	Ui::ToolNinePointWindowClass* ui = nullptr;
 
