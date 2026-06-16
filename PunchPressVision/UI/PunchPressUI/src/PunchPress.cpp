@@ -125,9 +125,58 @@ namespace ui
 			return;
 		try
 		{
-			HTuple w, h;
-			image.GetImageSize(&w, &h);
-			SetPart(halconWindowHandle_, 0, 0, h[0].I() - 1, w[0].I() - 1);
+			// 确保 Halcon 窗口与宿主 label 等大
+			int lw = 640, lh = 480;
+			if (halconHost_)
+			{
+				lw = halconHost_->width();
+				lh = halconHost_->height();
+				SetWindowExtents(halconWindowHandle_, 0, 0, lw, lh);
+			}
+
+			HTuple iw, ih;
+			image.GetImageSize(&iw, &ih);
+			const double imgW = static_cast<double>(iw[0].I());
+			const double imgH = static_cast<double>(ih[0].I());
+
+			if (lw <= 0 || lh <= 0)
+			{
+				// 兜底：显示完整图像
+				SetPart(halconWindowHandle_, 0, 0, imgH - 1, imgW - 1);
+			}
+			else
+			{
+				// 填满模式：裁剪图像边缘以匹配 label 宽高比，不留空白
+				const double imgAspect = imgW / imgH;
+				const double labelAspect = static_cast<double>(lw) / lh;
+
+				int row1, col1, row2, col2;
+				if (imgAspect > labelAspect)
+				{
+					// 图像比 label 更宽 → 高度填满，左右裁切
+					const double dispH = imgH;
+					const double dispW = imgH * labelAspect;
+					const int colOff = static_cast<int>((imgW - dispW) / 2.0);
+					row1 = 0;
+					col1 = colOff;
+					row2 = static_cast<int>(dispH) - 1;
+					col2 = colOff + static_cast<int>(dispH * labelAspect) - 1;
+				}
+				else
+				{
+					// 图像比 label 更高或等宽 → 宽度填满，上下裁切
+					const double dispW = imgW;
+					const double dispH = imgW / labelAspect;
+					const int rowOff = static_cast<int>((imgH - dispH) / 2.0);
+					row1 = rowOff;
+					col1 = 0;
+					row2 = rowOff + static_cast<int>(dispW / labelAspect) - 1;
+					col2 = static_cast<int>(dispW) - 1;
+				}
+
+				SetPart(halconWindowHandle_, row1, col1, row2, col2);
+			}
+
 			ClearWindow(halconWindowHandle_);
 			DispObj(image, halconWindowHandle_);
 			lastImage_ = image;
@@ -141,6 +190,16 @@ namespace ui
 	{
 		QMainWindow::showEvent(e);
 		ensureHalconWindow();
+		// 窗口首次显示后，label 已完成布局，同步 Halcon 窗口尺寸
+		if (halconWindowHandle_.Length() > 0 && halconHost_)
+		{
+			try
+			{
+				HalconCpp::SetWindowExtents(halconWindowHandle_, 0, 0,
+					halconHost_->width(), halconHost_->height());
+			}
+			catch (...) {}
+		}
 	}
 
 	void PunchPress::resizeEvent(QResizeEvent* e)
