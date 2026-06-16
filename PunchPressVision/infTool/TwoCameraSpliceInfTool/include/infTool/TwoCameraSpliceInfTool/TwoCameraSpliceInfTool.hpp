@@ -7,6 +7,8 @@
 
 #include "halconcpp/HalconCpp.h"
 
+class QTimer;
+
 namespace infTool
 {
 	class TwoCameraSpliceInfTool
@@ -30,18 +32,26 @@ namespace infTool
 
 	signals:
 		/// 拼接/平铺后的输出图像。双相机均就绪时发射。
+		/// 单相机在线时直通该相机帧（连接感知 + 500ms 超时兜底）。
 		void callBackFunc(HalconCpp::HImage img);
 
 	private slots:
-		/// 接收 CalibInfTool 矫正后的单相机图像，按相机索引缓存。
-		/// 双路就绪时执行拼接 (pinjieImage) 或硬拼接 (TileImages) 降级。
+		/// 接收 CalibInfTool 矫正后的单相机图像。
+		/// 连接感知：另一相机离线 → 直通；双路在线 → 拼接；
+		/// 配对帧未及时到达 → 500ms 超时后直通已缓存帧。
 		void onCalibFrame(HalconCpp::HImage img, global::CameraIndex cameraIndex);
+		/// 超时兜底：发射已缓存的单路帧，避免永久等待
+		void onStitchTimeout();
 
 	private:
+		void tryStitchAndEmit();
+
 		HalconCpp::HImage cam1_image_;
 		HalconCpp::HImage cam2_image_;
 		bool cam1_ready_{ false };
 		bool cam2_ready_{ false };
+
+		QTimer* stitchTimeout_{ nullptr };
 
 	public:
 		void build() override;

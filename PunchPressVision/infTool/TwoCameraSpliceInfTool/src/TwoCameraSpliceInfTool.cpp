@@ -1,11 +1,18 @@
 #include "infTool/TwoCameraSpliceInfTool/TwoCameraSpliceInfTool.hpp"
 
+#include <QTimer>
+
 namespace infTool
 {
 	TwoCameraSpliceInfTool::TwoCameraSpliceInfTool(inf::infrastructure& inf, CalibInfTool& calibTool)
 		: inf_(inf)
 		, calib_tool_(calibTool)
 	{
+		// 超时定时器：单次触发，500ms 内未收到配对帧则直通
+		stitchTimeout_ = new QTimer(this);
+		stitchTimeout_->setSingleShot(true);
+		QObject::connect(stitchTimeout_, &QTimer::timeout,
+			this, &TwoCameraSpliceInfTool::onStitchTimeout);
 	}
 
 	void TwoCameraSpliceInfTool::calculateTwoCameraSpliceConfig(const HalconCpp::HImage& himage1,
@@ -267,7 +274,7 @@ namespace infTool
 
 	void TwoCameraSpliceInfTool::onCalibFrame(HalconCpp::HImage img, global::CameraIndex cameraIndex)
 	{
-		// 按相机索引缓存帧
+		// 1. 缓存当前相机帧
 		switch (cameraIndex)
 		{
 		case global::CameraIndex::Camera1:
@@ -280,47 +287,90 @@ namespace infTool
 			break;
 		}
 
-		// 双路图像均就绪时执行拼接
-		if (cam1_ready_ && cam2_ready_)
+		// 2. 连接感知：检查另一相机是否在线
+		const auto otherIdx = (cameraIndex == global::CameraIndex::Camera1)
+			? global::CameraIndex::Camera2 : global::CameraIndex::Camera1;
+
+		const bool otherOnline = inf_.camera_module_
+			&& inf_.camera_module_->isConnected(otherIdx);
+
+		if (!otherOnline)
 		{
+			// 另一相机离线 → 停止超时定时器，直通当前帧
+			stitchTimeout_->stop();
 			cam1_ready_ = false;
 			cam2_ready_ = false;
-
-			auto& spliceCfg = inf_.two_camera_splice_module_->twoCameraSpliceConfig;
-			const bool hasSpliceConfig = spliceCfg.MapSingle1.IsInitialized()
-				&& spliceCfg.MapSingle2.IsInitialized();
-
-			HalconCpp::HObject outImage;
-			bool ok = false;
-
-			// 优先几何拼接，失败则降级为硬拼接（TileImages）
-			if (hasSpliceConfig)
-			{
-				try
-				{
-					HalconCpp::HObject ho1 = static_cast<HalconCpp::HObject>(cam1_image_);
-					HalconCpp::HObject ho2 = static_cast<HalconCpp::HObject>(cam2_image_);
-					ok = pinjieImage(ho1, ho2, spliceCfg, outImage);
-				}
-				catch (const HalconCpp::HException&) { ok = false; }
-			}
-
-			// 降级：硬拼接 — 两张原图左右平铺
-			if (!ok)
-			{
-				try
-				{
-					HalconCpp::HObject hoConcat;
-					HalconCpp::ConcatObj(cam1_image_, cam2_image_, &hoConcat);
-					HalconCpp::TileImages(hoConcat, &outImage, 2, "horizontal");
-					ok = outImage.IsInitialized();
-				}
-				catch (const HalconCpp::HException&) { ok = false; }
-			}
-
-			if (ok)
-				emit callBackFunc(HalconCpp::HImage(outImage));
+			emit callBackFunc(img);
+			return;
 		}
+
+		// 3. 另一相机在线：尝试双路拼接
+		if (cam1_ready_ && cam2_ready_)
+		{
+			stitchTimeout_->stop();
+			cam1_ready_ = false;
+			cam2_ready_ = false;
+			tryStitchAndEmit();
+		}
+		else
+		{
+			// 等待配对帧 → 启动 500ms 超时兜底
+			if (!stitchTimeout_->isActive())
+				stitchTimeout_->start(500);
+		}
+	}
+
+	void TwoCameraSpliceInfTool::onStitchTimeout()
+	{
+		// 超时：发射已缓存的最新单路帧（优先相机1）
+		if (cam1_ready_)
+		{
+			cam1_ready_ = false;
+			emit callBackFunc(cam1_image_);
+		}
+		else if (cam2_ready_)
+		{
+			cam2_ready_ = false;
+			emit callBackFunc(cam2_image_);
+		}
+	}
+
+	void TwoCameraSpliceInfTool::tryStitchAndEmit()
+	{
+		auto& spliceCfg = inf_.two_camera_splice_module_->twoCameraSpliceConfig;
+		const bool hasSpliceConfig = spliceCfg.MapSingle1.IsInitialized()
+			&& spliceCfg.MapSingle2.IsInitialized();
+
+		HalconCpp::HObject outImage;
+		bool ok = false;
+
+		// 优先几何拼接
+		if (hasSpliceConfig)
+		{
+			try
+			{
+				HalconCpp::HObject ho1 = static_cast<HalconCpp::HObject>(cam1_image_);
+				HalconCpp::HObject ho2 = static_cast<HalconCpp::HObject>(cam2_image_);
+				ok = pinjieImage(ho1, ho2, spliceCfg, outImage);
+			}
+			catch (const HalconCpp::HException&) { ok = false; }
+		}
+
+		// 降级：硬拼接 — 两张原图左右平铺
+		if (!ok)
+		{
+			try
+			{
+				HalconCpp::HObject hoConcat;
+				HalconCpp::ConcatObj(cam1_image_, cam2_image_, &hoConcat);
+				HalconCpp::TileImages(hoConcat, &outImage, 2, "horizontal");
+				ok = outImage.IsInitialized();
+			}
+			catch (const HalconCpp::HException&) { ok = false; }
+		}
+
+		if (ok)
+			emit callBackFunc(HalconCpp::HImage(outImage));
 	}
 
 	void TwoCameraSpliceInfTool::build()
@@ -332,6 +382,7 @@ namespace infTool
 
 	void TwoCameraSpliceInfTool::destroy()
 	{
+		stitchTimeout_->stop();
 		disconnect(&calib_tool_, &CalibInfTool::callBackFunc,
 			this, &TwoCameraSpliceInfTool::onCalibFrame);
 	}
@@ -342,5 +393,8 @@ namespace infTool
 
 	void TwoCameraSpliceInfTool::stop()
 	{
+		stitchTimeout_->stop();
+		cam1_ready_ = false;
+		cam2_ready_ = false;
 	}
 }
