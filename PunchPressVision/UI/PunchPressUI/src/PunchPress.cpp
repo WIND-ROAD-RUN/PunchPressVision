@@ -202,7 +202,7 @@ namespace ui
 		close();
 	}
 
-	void PunchPress::onFrameReady(HalconCpp::HImage image, global::CameraIndex /*camIdx*/)
+	void PunchPress::onFrameReady(HalconCpp::HImage image)
 	{
 		displayImage(image);
 	}

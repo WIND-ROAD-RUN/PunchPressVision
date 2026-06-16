@@ -52,13 +52,13 @@ namespace app
 	signals:
 		void modeChanged(global::RunMode newMode);
 		void startupCheckFailed(const QString& reason);
-		void frameReady(HalconCpp::HImage image, global::CameraIndex camIdx);
+		void frameReady(HalconCpp::HImage image);
 		void positionResultReady(global::PositionResult result);
 		void cameraConnectionChanged(global::CameraIndex idx, bool connected, QString reason);
 		void plcConnectionChanged(bool connected);
 
 	private slots:
-		void onFrameReady(HalconCpp::HImage image, global::CameraIndex camIdx);
+		void onFrameReady(HalconCpp::HImage image);
 		void onCameraConnectionChanged(global::CameraIndex idx, bool connected, QString reason);
 
 	private:

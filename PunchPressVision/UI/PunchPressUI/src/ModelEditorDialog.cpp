@@ -38,7 +38,7 @@ namespace ui
 		connect(ui->btn_exit, &QPushButton::clicked, this, &QDialog::accept);
 	}
 
-	void ModelEditorDialog::onFrameReady(HalconCpp::HImage image, global::CameraIndex /*camIdx*/)
+	void ModelEditorDialog::onFrameReady(HalconCpp::HImage image)
 	{
 		lastFrame_ = image;
 		view_.ensure(ui->label_imgDisplay);

@@ -46,7 +46,7 @@ namespace ui
 		void onExit();
 
 		// 来自 App 层的信号
-		void onFrameReady(HalconCpp::HImage image, global::CameraIndex camIdx);
+		void onFrameReady(HalconCpp::HImage image);
 		void onPositionResult(global::PositionResult result);
 		void onModeChanged(global::RunMode mode);
 		void onCameraConnectionChanged(global::CameraIndex idx, bool connected, QString reason);

@@ -29,9 +29,8 @@ namespace infTool
 			HalconCpp::HObject& stitchedImage);
 
 	signals:
-		/// 拼接/平铺后的输出图像。双相机均就绪时发射，
-		/// cameraIndex 标识图像来源（合并图为 Camera1）。
-		void callBackFunc(HalconCpp::HImage img, global::CameraIndex cameraIndex);
+		/// 拼接/平铺后的输出图像。双相机均就绪时发射。
+		void callBackFunc(HalconCpp::HImage img);
 
 	private slots:
 		/// 接收 CalibInfTool 矫正后的单相机图像，按相机索引缓存。

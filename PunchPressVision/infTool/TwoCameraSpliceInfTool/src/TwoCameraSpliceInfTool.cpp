@@ -319,7 +319,7 @@ namespace infTool
 			}
 
 			if (ok)
-				emit callBackFunc(HalconCpp::HImage(outImage), global::CameraIndex::Camera1);
+				emit callBackFunc(HalconCpp::HImage(outImage));
 		}
 	}
 

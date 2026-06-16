@@ -29,12 +29,12 @@ namespace bun
 
 	public slots:
 		/// 接收 TwoCameraSpliceInfTool 输出的已处理图像（已矫正 + 已拼接/平铺）
-		void onSplicedFrame(HalconCpp::HImage img, global::CameraIndex cameraIndex);
+		void onSplicedFrame(HalconCpp::HImage img);
 
 	signals:
 		void cameraConnectionStateChanged(global::CameraIndex cameraIndex, bool connected, QString reason);
 		/// 已处理图像流，下游（App → UI）通过此信号接收帧
-		void callBackFunWithCalib(HalconCpp::HImage img, global::CameraIndex cameraIndex);
+		void callBackFunWithCalib(HalconCpp::HImage img);
 
 	private:
 		inf::infrastructure& inf_;

@@ -281,10 +281,10 @@ namespace app
 
 	// ===== 帧处理 =====
 
-	void PunchPressApp::onFrameReady(HalconCpp::HImage image, global::CameraIndex camIdx)
+	void PunchPressApp::onFrameReady(HalconCpp::HImage image)
 	{
 		// 转发给 UI 显示（跨线程由接收方用 QueuedConnection 处理）
-		emit frameReady(image, camIdx);
+		emit frameReady(image);
 
 		// 工作模式下执行定位流水线
 		if (currentMode_.load(std::memory_order_acquire) == global::RunMode::Production)

@@ -46,10 +46,10 @@ namespace bun
 			inf_.camera_module_->stopMonitor();
 	}
 
-	void CameraBun::onSplicedFrame(HalconCpp::HImage img, global::CameraIndex cameraIndex)
+	void CameraBun::onSplicedFrame(HalconCpp::HImage img)
 	{
 		// 纯转发：图像处理已在 infTool 层（CalibInfTool → TwoCameraSpliceInfTool）完成
 		if (img.IsInitialized())
-			emit callBackFunWithCalib(img, cameraIndex);
+			emit callBackFunWithCalib(img);
 	}
 }

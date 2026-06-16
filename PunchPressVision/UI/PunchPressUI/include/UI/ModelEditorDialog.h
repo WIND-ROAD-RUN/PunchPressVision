@@ -23,7 +23,7 @@ namespace ui
 		~ModelEditorDialog() override;
 
 	private slots:
-		void onFrameReady(HalconCpp::HImage image, global::CameraIndex camIdx);
+		void onFrameReady(HalconCpp::HImage image);
 
 	private:
 		void buildConnections();
