@@ -273,9 +273,7 @@ namespace app
 		default: break;
 		}
 
-		// 拼接模式下启用 CameraBun 的拼接流水线
-		if (business_.camera_bun)
-			business_.camera_bun->setSpliceEnabled(mode == global::RunMode::Splice);
+		// 拼接/平铺已下沉至 TwoCameraSpliceInfTool，CameraBun 始终从该层接收处理后帧
 
 		emit modeChanged(mode);
 		return true;

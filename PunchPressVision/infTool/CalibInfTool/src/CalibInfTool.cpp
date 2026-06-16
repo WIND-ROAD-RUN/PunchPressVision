@@ -357,16 +357,14 @@ namespace infTool
 	{
 		if (!matInfo.mat.empty())
 		{
-			// TODO:
-			
+			// cv::Mat → HImage
 			auto hImage = PRIVATE::cvMatToHImage(matInfo.mat);
 
+			// 畸变矫正（有标定参数则矫正，否则透传原图）
+			auto rectified = undistortImage(hImage, cameraIndex);
 
-
-
-			emit callBackFunc(hImage, cameraIndex);
+			emit callBackFunc(rectified, cameraIndex);
 		}
-
 	}
 
 	void CalibInfTool::build()

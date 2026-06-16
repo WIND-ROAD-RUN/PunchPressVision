@@ -29,22 +29,20 @@ namespace infTool
 			HalconCpp::HObject& stitchedImage);
 
 	signals:
-		/// <summary>
-		/// 拼接完成后的输出图像信号。
-		/// 下游消费者应使用 Qt::QueuedConnection 以确保线程安全。
-		/// </summary>
-		void callBackFunc(HalconCpp::HImage img);
+		/// 拼接/平铺后的输出图像。双相机均就绪时发射，
+		/// cameraIndex 标识图像来源（合并图为 Camera1）。
+		void callBackFunc(HalconCpp::HImage img, global::CameraIndex cameraIndex);
 
 	private slots:
-		/// <summary>
 		/// 接收 CalibInfTool 矫正后的单相机图像，按相机索引缓存。
-		/// 当双路图像就绪时执行拼接并通过 callBackFunc 发送结果。
-		/// </summary>
+		/// 双路就绪时执行拼接 (pinjieImage) 或硬拼接 (TileImages) 降级。
 		void onCalibFrame(HalconCpp::HImage img, global::CameraIndex cameraIndex);
 
 	private:
 		HalconCpp::HImage cam1_image_;
 		HalconCpp::HImage cam2_image_;
+		bool cam1_ready_{ false };
+		bool cam2_ready_{ false };
 
 	public:
 		void build() override;

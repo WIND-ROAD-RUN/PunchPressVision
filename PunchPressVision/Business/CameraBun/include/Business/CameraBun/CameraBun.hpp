@@ -1,8 +1,5 @@
 #pragma once
 
-#include <atomic>
-#include <mutex>
-
 #include <QObject>
 
 #include "global/GlobalInterface.hpp"
@@ -14,7 +11,10 @@
 
 namespace bun
 {
-	// 相机业务编排：原始帧 → 格式转换 → 畸变矫正 → 九点变换 →（双相机拼接）→ 信号
+	// 相机业务编排：桥接 infTool 层已完成图像处理的帧流到 App 层。
+	// 图像处理（畸变矫正 + 双相机拼接/平铺）已下沉到
+	//   CalibInfTool → TwoCameraSpliceInfTool 流水线，
+	// CameraBun 不再做图像处理，只负责信号转发和相机监控启停。
 	class CameraBun
 		: public QObject, public global::IBusiness
 	{
@@ -27,30 +27,17 @@ namespace bun
 		void start() override;
 		void stop() override;
 
-		// 是否在流水线中启用拼接（仅双相机参数就绪时有效）
-		void setSpliceEnabled(bool enabled);
-
 	public slots:
-		void callBackFunc(rw::hoec::MatInfo matInfo, global::CameraIndex cameraIndex);
+		/// 接收 TwoCameraSpliceInfTool 输出的已处理图像（已矫正 + 已拼接/平铺）
+		void onSplicedFrame(HalconCpp::HImage img, global::CameraIndex cameraIndex);
 
 	signals:
 		void cameraConnectionStateChanged(global::CameraIndex cameraIndex, bool connected, QString reason);
-		void callBackFunWithCalib(HalconCpp::HImage matInfo, global::CameraIndex cameraIndex);
+		/// 已处理图像流，下游（App → UI）通过此信号接收帧
+		void callBackFunWithCalib(HalconCpp::HImage img, global::CameraIndex cameraIndex);
 
 	private:
 		inf::infrastructure& inf_;
 		infTool::infTool& inf_tool_;
-
-		// 图像处理流水线
-		HalconCpp::HImage applyUndistort(const HalconCpp::HImage& image, global::CameraIndex cameraIndex);
-		HalconCpp::HImage applyNinePointTransform(const HalconCpp::HImage& image);
-
-		// 双相机拼接缓存
-		std::mutex stitchMutex_;
-		HalconCpp::HImage cam1Buffer_;
-		HalconCpp::HImage cam2Buffer_;
-		std::atomic_bool cam1Ready_{ false };
-		std::atomic_bool cam2Ready_{ false };
-		std::atomic_bool spliceEnabled_{ false };
 	};
 }

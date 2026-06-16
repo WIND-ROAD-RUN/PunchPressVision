@@ -85,8 +85,6 @@ namespace infTool
 		{
 			if (camParam.TupleLength() < 13)
 				return false;
-			// [0]=camera_type, [1]=focus(m), [2]=k1, [3]=k2, [4]=k3, [5]=p1, [6]=p2,
-			// [7]=sx(m/px), [8]=sy(m/px), [9]=cx(px), [10]=cy(px), [11]=width(px), [12]=height(px)
 			hv_Focus = camParam[1];
 			hv_K1 = camParam[2];
 			hv_K2 = camParam[3];
@@ -142,22 +140,18 @@ namespace infTool
 
 		try
 		{
-			// 生成相机参数（如有需要可在此修改参数值）
 			HalconCpp::HTuple hv_CamParam1, hv_CamParam2;
 			genCamParAreaScanPolynomial(hv_Focus1, hv_K11, hv_K21, hv_K31, hv_P11, hv_P21, hv_Sx1, hv_Sy1, hv_Cx1, hv_Cy1, hv_ImageWidth1, hv_ImageHeight1, &hv_CamParam1);
 			genCamParAreaScanPolynomial(hv_Focus2, hv_K12, hv_K22, hv_K32, hv_P12, hv_P22, hv_Sx2, hv_Sy2, hv_Cx2, hv_Cy2, hv_ImageWidth2, hv_ImageHeight2, &hv_CamParam2);
 
-			// 使用解析出的图像尺寸
 			hv_Width = hv_ImageWidth1;
 			hv_Height = hv_ImageHeight1;
 
-			//========== 1. 准备相机标定数据 ==========
 			HalconCpp::CreateCalibData("calibration_object", 2, 1, &hv_CalibDataID);
 			HalconCpp::SetCalibDataCalibObject(hv_CalibDataID, 0, HalconCpp::HTuple(spliceCfg.caltabDescrPath.c_str()));
 			HalconCpp::SetCalibDataCamParam(hv_CalibDataID, 0, HalconCpp::HTuple(), hv_CamParam1);
 			HalconCpp::SetCalibDataCamParam(hv_CalibDataID, 1, HalconCpp::HTuple(), hv_CamParam2);
 
-			//========== 2. 在图像1中查找标定板 ==========
 			try
 			{
 				HalconCpp::FindCalibObject(image1, hv_CalibDataID, 0, 0, 0, HalconCpp::HTuple(), HalconCpp::HTuple());
@@ -171,7 +165,6 @@ namespace infTool
 				return false;
 			}
 
-			//========== 3. 在图像2中查找标定板 ==========
 			try
 			{
 				HalconCpp::FindCalibObject(image2, hv_CalibDataID, 1, 0, 0, HalconCpp::HTuple(), HalconCpp::HTuple());
@@ -185,70 +178,52 @@ namespace infTool
 				return false;
 			}
 
-			//========== 4. 清理标定数据 ==========
 			HalconCpp::ClearCalibData(hv_CalibDataID);
 
-			//========== 5. 计算矫正图像的尺寸 ==========
 			HalconCpp::GetImageSize(image1, &hv_WidthImage1, &hv_HeightImage1);
 
-			// 计算左上角的图像坐标
 			hv_UpperRow = (hv_HeightImage1 * spliceCfg.BorderInPercent) / 100.0;
 			hv_LeftColumn = (hv_WidthImage1 * spliceCfg.BorderInPercent) / 100.0;
 
-			// 将左上角点转换到世界坐标系
 			HalconCpp::ImagePointsToWorldPlane(hv_CamParam1, hv_Pose1, hv_UpperRow, hv_LeftColumn, "m",
 				&hv_LeftX, &hv_UpperY);
 
-			// 计算左下角的图像坐标并转换到世界坐标系
 			hv_LowerRow = (hv_HeightImage1 * (100.0 - spliceCfg.BorderInPercent)) / 100.0;
 			HalconCpp::ImagePointsToWorldPlane(hv_CamParam1, hv_Pose1, hv_LowerRow, hv_LeftColumn, "m",
 				&hv_X1, &hv_LowerY);
 
-			// 计算矫正后的图像高度（像素）
 			hv_HeightRect = ((hv_LowerY - hv_UpperY) / spliceCfg.pixTowWorld).TupleInt();
 
-			// 计算右侧列坐标（考虑重叠区域）
 			hv_RightColumn = (hv_WidthImage1 * (100.0 - (spliceCfg.OverlapInPercent / 2.0))) / 100.0;
 			HalconCpp::ImagePointsToWorldPlane(hv_CamParam1, hv_Pose1, hv_UpperRow, hv_RightColumn, "m",
 				&hv_RightX, &hv_Y1);
 
-			// 计算矫正后的图像宽度（像素）
 			hv_WidthRect = ((hv_RightX - hv_LeftX) / spliceCfg.pixTowWorld).TupleInt();
 
-			// 保存矫正后的图像尺寸
 			spliceCfg.rectifiedWidth = hv_WidthRect.I();
 			spliceCfg.rectifiedHeight = hv_HeightRect.I();
 
-			//========== 6. 生成相机1的映射图 ==========
 			HalconCpp::SetOriginPose(hv_Pose1, hv_LeftX, hv_UpperY, spliceCfg.DiffHeight, &hv_PoseNewOrigin1);
 			HalconCpp::GenImageToWorldPlaneMap(&ho_Map1, hv_CamParam1, hv_PoseNewOrigin1,
 				hv_Width, hv_Height, hv_WidthRect, hv_HeightRect, spliceCfg.pixTowWorld, "bilinear");
 
-			//========== 7. 生成相机2的映射图 ==========
-			// 创建单位矩阵
 			HalconCpp::HomMat3dIdentity(&hv_HomMat3DIdentity);
 
-			// 计算从第一个标定板坐标系到右上角点的变换
 			HalconCpp::HomMat3dTranslateLocal(hv_HomMat3DIdentity,
 				hv_LeftX + (spliceCfg.pixTowWorld * hv_WidthRect), hv_UpperY, spliceCfg.DiffHeight, &hv_cp1Hur1);
 
-			// 计算两个标定板之间的变换
 			HalconCpp::HomMat3dTranslateLocal(hv_HomMat3DIdentity, spliceCfg.DistancePlates, 0, 0, &hv_cp1Hcp2);
 
-			// 计算第二个图像的位姿变换
 			HalconCpp::HomMat3dInvert(hv_cp1Hcp2, &hv_cp2Hcp1);
 			HalconCpp::HomMat3dCompose(hv_cp2Hcp1, hv_cp1Hur1, &hv_cp2Hul2);
 
-			// 计算相机2的新位姿
 			HalconCpp::PoseToHomMat3d(hv_Pose2, &hv_cam2Hcp2);
 			HalconCpp::HomMat3dCompose(hv_cam2Hcp2, hv_cp2Hul2, &hv_cam2Hul2);
 			HalconCpp::HomMat3dToPose(hv_cam2Hul2, &hv_PoseNewOrigin2);
 
-			// 生成相机2的映射图
 			HalconCpp::GenImageToWorldPlaneMap(&ho_Map2, hv_CamParam2, hv_PoseNewOrigin2,
 				hv_Width, hv_Height, hv_WidthRect, hv_HeightRect, spliceCfg.pixTowWorld, "bilinear");
 
-			//========== 8. 设置输出 ==========
 			spliceCfg.MapSingle1 = ho_Map1;
 			spliceCfg.MapSingle2 = ho_Map2;
 
@@ -256,7 +231,6 @@ namespace infTool
 		}
 		catch (HalconCpp::HException& except)
 		{
-			// 异常处理：清理资源
 			if (hv_CalibDataID.TupleLength() > 0)
 			{
 				try { HalconCpp::ClearCalibData(hv_CalibDataID); } catch (...) {}
@@ -270,29 +244,22 @@ namespace infTool
 		Config::TwoCameraSpliceCfg& spliceCfg,
 		HalconCpp::HObject& stitchedImage)
 	{
-		// 检查映射图是否已经生成
 		if (!spliceCfg.MapSingle1.IsInitialized() || !spliceCfg.MapSingle2.IsInitialized())
-		{
 			return false;
-		}
 
 		try
 		{
 			HalconCpp::HObject ho_RectifiedImage1, ho_RectifiedImage2, ho_Concat;
 
-			//========== 1. 使用映射图矫正两张图片 ==========
 			HalconCpp::MapImage(image1, spliceCfg.MapSingle1, &ho_RectifiedImage1);
 			HalconCpp::MapImage(image2, spliceCfg.MapSingle2, &ho_RectifiedImage2);
 
-			//========== 2. 将两张矫正后的图片合并到对象数组 ==========
 			HalconCpp::ConcatObj(ho_RectifiedImage1, ho_RectifiedImage2, &ho_Concat);
-
-			//========== 3. 将两张图片平铺成一张大图（2列，水平排列） ==========
 			HalconCpp::TileImages(ho_Concat, &stitchedImage, 2, "horizontal");
 
 			return stitchedImage.IsInitialized();
 		}
-		catch (HalconCpp::HException& except)
+		catch (HalconCpp::HException&)
 		{
 			return false;
 		}
@@ -300,41 +267,59 @@ namespace infTool
 
 	void TwoCameraSpliceInfTool::onCalibFrame(HalconCpp::HImage img, global::CameraIndex cameraIndex)
 	{
-		//TODO:这里补充拼接逻辑
-
-		// 按相机索引缓存矫正后的图像
+		// 按相机索引缓存帧
 		switch (cameraIndex)
 		{
 		case global::CameraIndex::Camera1:
 			cam1_image_ = img;
+			cam1_ready_ = true;
 			break;
 		case global::CameraIndex::Camera2:
 			cam2_image_ = img;
+			cam2_ready_ = true;
 			break;
 		}
 
-		// 双路图像就绪时执行拼接
-		if (cam1_image_.IsInitialized() && cam2_image_.IsInitialized())
+		// 双路图像均就绪时执行拼接
+		if (cam1_ready_ && cam2_ready_)
 		{
+			cam1_ready_ = false;
+			cam2_ready_ = false;
+
 			auto& spliceCfg = inf_.two_camera_splice_module_->twoCameraSpliceConfig;
-			if (spliceCfg.MapSingle1.IsInitialized() && spliceCfg.MapSingle2.IsInitialized())
+			const bool hasSpliceConfig = spliceCfg.MapSingle1.IsInitialized()
+				&& spliceCfg.MapSingle2.IsInitialized();
+
+			HalconCpp::HObject outImage;
+			bool ok = false;
+
+			// 优先几何拼接，失败则降级为硬拼接（TileImages）
+			if (hasSpliceConfig)
 			{
 				try
 				{
 					HalconCpp::HObject ho1 = static_cast<HalconCpp::HObject>(cam1_image_);
 					HalconCpp::HObject ho2 = static_cast<HalconCpp::HObject>(cam2_image_);
-					HalconCpp::HObject stitched;
-
-					if (pinjieImage(ho1, ho2, spliceCfg, stitched) && stitched.IsInitialized())
-					{
-						emit callBackFunc(HalconCpp::HImage(stitched));
-					}
+					ok = pinjieImage(ho1, ho2, spliceCfg, outImage);
 				}
-				catch (const HalconCpp::HException&)
-				{
-					// 拼接失败时静默丢弃本帧
-				}
+				catch (const HalconCpp::HException&) { ok = false; }
 			}
+
+			// 降级：硬拼接 — 两张原图左右平铺
+			if (!ok)
+			{
+				try
+				{
+					HalconCpp::HObject hoConcat;
+					HalconCpp::ConcatObj(cam1_image_, cam2_image_, &hoConcat);
+					HalconCpp::TileImages(hoConcat, &outImage, 2, "horizontal");
+					ok = outImage.IsInitialized();
+				}
+				catch (const HalconCpp::HException&) { ok = false; }
+			}
+
+			if (ok)
+				emit callBackFunc(HalconCpp::HImage(outImage), global::CameraIndex::Camera1);
 		}
 	}
 

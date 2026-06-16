@@ -1,20 +1,23 @@
 #include "Business/CameraBun/CameraBun.hpp"
 
-#include "Business/CameraBun/CameraImgConvert.hpp"
-
 namespace bun
 {
 	CameraBun::CameraBun(inf::infrastructure& inf, infTool::infTool& infTool)
 		: inf_(inf)
 		, inf_tool_(infTool)
 	{
-		// 构造阶段连接信号（确保 infrastructure.build() 中 CameraModule 发射状态时已就绪）
+		// 构造阶段连接信号（确保 build 阶段 CameraModule 发射状态时已就绪）
 		if (inf_.camera_module_)
 		{
-			QObject::connect(inf_.camera_module_.get(), &inf::CameraModule::callBackFunc,
-				this, &CameraBun::callBackFunc, Qt::DirectConnection);
 			QObject::connect(inf_.camera_module_.get(), &inf::CameraModule::cameraConnectionStateChanged,
 				this, &CameraBun::cameraConnectionStateChanged, Qt::QueuedConnection);
+		}
+
+		// 从 TwoCameraSpliceInfTool 接收已处理的图像流（畸变矫正 + 拼接/平铺 已完成）
+		if (inf_tool_.two_camera_splice_bun)
+		{
+			QObject::connect(inf_tool_.two_camera_splice_bun.get(), &infTool::TwoCameraSpliceInfTool::callBackFunc,
+				this, &CameraBun::onSplicedFrame, Qt::QueuedConnection);
 		}
 	}
 
@@ -26,107 +29,27 @@ namespace bun
 	{
 		if (inf_.camera_module_)
 			QObject::disconnect(inf_.camera_module_.get(), nullptr, this, nullptr);
+		if (inf_tool_.two_camera_splice_bun)
+			QObject::disconnect(inf_tool_.two_camera_splice_bun.get(), nullptr, this, nullptr);
 	}
 
 	void CameraBun::start()
 	{
+		// 启动相机取流（帧经 infTool 流水线处理后由 onSplicedFrame 接收）
+		if (inf_.camera_module_)
+			inf_.camera_module_->startMonitor();
 	}
 
 	void CameraBun::stop()
 	{
+		if (inf_.camera_module_)
+			inf_.camera_module_->stopMonitor();
 	}
 
-	void CameraBun::setSpliceEnabled(bool enabled)
+	void CameraBun::onSplicedFrame(HalconCpp::HImage img, global::CameraIndex cameraIndex)
 	{
-		spliceEnabled_.store(enabled, std::memory_order_release);
-	}
-
-	HalconCpp::HImage CameraBun::applyUndistort(const HalconCpp::HImage& image, global::CameraIndex cameraIndex)
-	{
-		using namespace HalconCpp;
-		try
-		{
-			if (!inf_.calib_config_module_)
-				return image;
-			const auto& item = inf_.calib_config_module_->calibConfig.item(cameraIndex);
-			if (item.cameraParameters.Length() == 0)
-				return image; // 未标定，原样返回
-
-			HTuple camParRectified;
-			ChangeRadialDistortionCamPar("fixed", item.cameraParameters, 0, &camParRectified);
-
-			HObject rectified;
-			ChangeRadialDistortionImage(image, HObject(), &rectified,
-				item.cameraParameters, camParRectified);
-			return HImage(rectified);
-		}
-		catch (...)
-		{
-			return image;
-		}
-	}
-
-	HalconCpp::HImage CameraBun::applyNinePointTransform(const HalconCpp::HImage& image)
-	{
-		// 九点标定矩阵用于像素↔世界坐标转换，通常在结果坐标上应用，
-		// 不对显示图像做整体仿射变换；此处保持图像不变，
-		// 由定位环节使用 NinePointBun::pixToWorld 完成坐标换算。
-		return image;
-	}
-
-	void CameraBun::callBackFunc(rw::hoec::MatInfo matInfo, global::CameraIndex cameraIndex)
-	{
-		try
-		{
-			// Step 1: cv::Mat → HImage
-			HalconCpp::HImage hImage = CameraImgConvert::cvMatToHImage(matInfo.mat);
-
-			// Step 2: 畸变矫正
-			HalconCpp::HImage rectified = applyUndistort(hImage, cameraIndex);
-
-			// Step 3: 九点标定变换（坐标语义，图像保持）
-			HalconCpp::HImage worldImage = applyNinePointTransform(rectified);
-
-			// Step 4: 双相机拼接（仅当启用且两帧都就绪）
-			if (spliceEnabled_.load(std::memory_order_acquire))
-			{
-				std::lock_guard<std::mutex> lk(stitchMutex_);
-				if (cameraIndex == global::CameraIndex::Camera1)
-				{
-					cam1Buffer_ = worldImage;
-					cam1Ready_.store(true, std::memory_order_release);
-				}
-				else
-				{
-					cam2Buffer_ = worldImage;
-					cam2Ready_.store(true, std::memory_order_release);
-				}
-
-				if (cam1Ready_.load(std::memory_order_acquire) &&
-					cam2Ready_.load(std::memory_order_acquire))
-				{
-					HalconCpp::HObject stitched;
-					HalconCpp::HObject img1 = cam1Buffer_;
-					HalconCpp::HObject img2 = cam2Buffer_;
-					if (inf_.two_camera_splice_module_ &&
-						inf_.two_camera_splice_module_->twoCameraSpliceConfig.MapSingle1.IsInitialized())
-					{
-						// 复用拼接配置进行融合（拼接逻辑在 TwoCameraSpliceBun 中实现）
-						// 这里仅在配置就绪时尝试，失败回退到单帧
-					}
-					cam1Ready_.store(false, std::memory_order_release);
-					cam2Ready_.store(false, std::memory_order_release);
-					emit callBackFunWithCalib(worldImage, cameraIndex);
-					return;
-				}
-			}
-
-			// 单相机：直接发射
-			emit callBackFunWithCalib(worldImage, cameraIndex);
-		}
-		catch (...)
-		{
-			// 静默失败，不中断帧流
-		}
+		// 纯转发：图像处理已在 infTool 层（CalibInfTool → TwoCameraSpliceInfTool）完成
+		if (img.IsInitialized())
+			emit callBackFunWithCalib(img, cameraIndex);
 	}
 }
