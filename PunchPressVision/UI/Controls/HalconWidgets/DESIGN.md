@@ -42,7 +42,7 @@ HalconDisplayLabel                  ← L1: 纯显示
 
 ---
 
-## L2: HalconInteractiveLabel（下一阶段）
+## L2: HalconInteractiveLabel（已实现）
 
 **路径**: `include/UI/HalconInteractiveLabel.h`
 
@@ -186,7 +186,7 @@ UI/Controls/HalconWidgets/
 ├── CMakeLists.txt                     ← 目标 UI::HalconWidgets
 ├── include/UI/
 │   ├── HalconDisplayLabel.h           ← L1 已实现
-│   ├── HalconInteractiveLabel.h       ← L2 待实现
+│   ├── HalconInteractiveLabel.h       ← L2 已实现
 │   ├── ImageViewer.h                  ← L3 待实现
 │   └── OverlayWidget.h                ← 叠加绘制层 待实现
 └── src/

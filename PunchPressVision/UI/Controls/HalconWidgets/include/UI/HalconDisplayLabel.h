@@ -23,10 +23,10 @@ namespace ui
 		~HalconDisplayLabel() override;
 
 		/// 显示 Halcon 图像（自动同步控件尺寸）
-		void displayImage(const HalconCpp::HImage& image);
+		virtual void displayImage(const HalconCpp::HImage& image);
 
 		/// 清空显示内容
-		void clear();
+		virtual void clear();
 
 		/// 设置填充模式
 		void setFillMode(FillMode mode) { fillMode_ = mode; }
@@ -48,7 +48,6 @@ namespace ui
 		void showEvent(QShowEvent* e) override;
 		void resizeEvent(QResizeEvent* e) override;
 
-	private:
 		void ensureWindow();
 		void closeWindow();
 		void syncWindowSize();
