@@ -18,7 +18,7 @@ namespace bun
 	{
 	public:
 		explicit Business(inf::infrastructure& inf);
-		~Business()=default;
+		~Business();
 	private:
 		inf::infrastructure& inf_;
 		std::unique_ptr<infTool::infTool> infTool_;
