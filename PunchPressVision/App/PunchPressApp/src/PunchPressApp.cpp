@@ -19,6 +19,14 @@ namespace app
 			QObject::connect(business_.camera_bun.get(), &bun::CameraBun::cameraConnectionStateChanged,
 				this, &PunchPressApp::onCameraConnectionChanged, Qt::QueuedConnection);
 		}
+
+		// PLC 连接状态：ControlModule 信号 → App 信号（信号直连，无需中间槽）
+		auto& inf = business_.infrastructure();
+		if (inf.control_module_)
+		{
+			QObject::connect(inf.control_module_.get(), &inf::ControlModule::connectionStateChanged,
+				this, &PunchPressApp::plcConnectionChanged, Qt::QueuedConnection);
+		}
 	}
 
 	PunchPressApp::~PunchPressApp()
@@ -33,7 +41,10 @@ namespace app
 	void PunchPressApp::destroy()
 	{
 		if (business_.camera_bun)
-		QObject::disconnect(business_.camera_bun.get(), nullptr, this, nullptr);
+			QObject::disconnect(business_.camera_bun.get(), nullptr, this, nullptr);
+		auto& inf = business_.infrastructure();
+		if (inf.control_module_)
+			QObject::disconnect(inf.control_module_.get(), nullptr, this, nullptr);
 	}
 
 	void PunchPressApp::start()

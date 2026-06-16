@@ -5,6 +5,7 @@
 #include "UI/PunchPress.h"
 #include "ui_PunchPress.h"
 
+#include <QLabel>
 #include <QShowEvent>
 #include <QResizeEvent>
 #include <QStatusBar>
@@ -58,6 +59,8 @@ namespace ui
 			this, &PunchPress::onModeChanged, Qt::QueuedConnection);
 		connect(&app_, &app::PunchPressApp::cameraConnectionChanged,
 			this, &PunchPress::onCameraConnectionChanged, Qt::QueuedConnection);
+		connect(&app_, &app::PunchPressApp::plcConnectionChanged,
+			this, &PunchPress::onPlcConnectionChanged, Qt::QueuedConnection);
 		connect(&app_, &app::PunchPressApp::startupCheckFailed,
 			this, &PunchPress::onStartupCheckFailed, Qt::QueuedConnection);
 
@@ -208,9 +211,58 @@ namespace ui
 
 	void PunchPress::onCameraConnectionChanged(global::CameraIndex idx, bool connected, QString reason)
 	{
-		const QString cam = (idx == global::CameraIndex::Camera1) ? QStringLiteral("相机1") : QStringLiteral("相机2");
-		statusBar()->showMessage(QStringLiteral("%1 %2 %3")
-			.arg(cam, connected ? QStringLiteral("已连接") : QStringLiteral("断开"), reason));
+		QLabel* label = nullptr;
+		QString camName;
+		if (idx == global::CameraIndex::Camera1)
+		{
+			label = ui->label_camera1State;
+			camName = QStringLiteral("相机1");
+		}
+		else
+		{
+			label = ui->label_camera2State;
+			camName = QStringLiteral("相机2");
+		}
+
+		if (!label)
+			return;
+
+		if (connected)
+		{
+			label->setStyleSheet(QStringLiteral(
+				"color: #4CAF50;"
+				"font-size: 14px;"
+				"font-weight: bold;"));
+			label->setText(camName + QStringLiteral(" ● 已连接"));
+		}
+		else
+		{
+			label->setStyleSheet(QStringLiteral(
+				"color: #F44336;"
+				"font-size: 14px;"
+				"font-weight: bold;"));
+			label->setText(camName + QStringLiteral(" ● 断开: ") + reason);
+		}
+	}
+
+	void PunchPress::onPlcConnectionChanged(bool connected)
+	{
+		if (connected)
+		{
+			ui->label_PlcState->setStyleSheet(QStringLiteral(
+				"color: #4CAF50;"
+				"font-size: 14px;"
+				"font-weight: bold;"));
+			ui->label_PlcState->setText(QStringLiteral("PLC ● 已连接"));
+		}
+		else
+		{
+			ui->label_PlcState->setStyleSheet(QStringLiteral(
+				"color: #F44336;"
+				"font-size: 14px;"
+				"font-weight: bold;"));
+			ui->label_PlcState->setText(QStringLiteral("PLC ● 断开"));
+		}
 	}
 
 	void PunchPress::onStartupCheckFailed(const QString& reason)

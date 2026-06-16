@@ -49,6 +49,7 @@ namespace ui
 		void onPositionResult(global::PositionResult result);
 		void onModeChanged(global::RunMode mode);
 		void onCameraConnectionChanged(global::CameraIndex idx, bool connected, QString reason);
+		void onPlcConnectionChanged(bool connected);
 		void onStartupCheckFailed(const QString& reason);
 
 	private:
