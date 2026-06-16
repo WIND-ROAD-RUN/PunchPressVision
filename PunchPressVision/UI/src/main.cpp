@@ -5,37 +5,53 @@
 #include "app/PunchPressApp.hpp"
 #include "UI/PunchPress.h"
 
-// PunchPressVision 启动时序（见 HLD 第 9 节）：
-//   infrastructure.build() → Business.build()/start()
-//   → PunchPressApp.build()/start() → PunchPress 主窗口
+// PunchPressVision 启动时序：
+//   Phase 1: 构造所有对象（构造 ≠ 初始化）
+//   Phase 2: infrastructure.build() → business.build() → app.build()
+//   Phase 3: business.start() → app.start()
+//   Phase 4: w.show() → a.exec()
 int main(int argc, char* argv[])
 {
 	QApplication a(argc, argv);
 
-	// 1. 基础设施层
+	// ======================================================
+	// Phase 1: 构造 — 只创建对象/共享指针，不执行初始化逻辑
+	// ======================================================
 	inf::infrastructure infrastructure;
-	infrastructure.build();
-
-	// 2. 业务层
 	bun::Business business(infrastructure);
-	business.build();
-	business.start();
-
-	// 3. 应用层
 	app::PunchPressApp app(business);
+	ui::PunchPress w(app);
+
+	// ======================================================
+	// Phase 2: build — 连接信号、打开资源、子组件初始化
+	// ======================================================
+	infrastructure.build();
+	business.build();
 	app.build();
+
+	// ======================================================
+	// Phase 3: start — 启动运行（开始帧流等）
+	// ======================================================
+	business.start();
 	app.start();
 
-	// 4. UI 层（主窗口在构造中执行启动检查）
-	ui::PunchPress w(app);
+	// ======================================================
+	// Phase 4: UI 显示
+	// ======================================================
 	w.show();
 
 	const int code = a.exec();
 
-	// 逆序清理
+	// ======================================================
+	// Phase 5: stop — 逆序停止运行
+	// ======================================================
 	app.stop();
-	app.destroy();
 	business.stop();
+
+	// ======================================================
+	// Phase 6: destroy — 逆序销毁（断开信号、释放资源）
+	// ======================================================
+	app.destroy();
 	business.destroy();
 	infrastructure.destroy();
 
