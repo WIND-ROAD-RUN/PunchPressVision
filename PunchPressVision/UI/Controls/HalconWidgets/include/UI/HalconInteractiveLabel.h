@@ -70,6 +70,9 @@ namespace ui
 		/// 当前可见图像区域尺寸 (col, row)
 		QPointF visibleImageSize() const;
 
+		/// 在当前视图上绘制选框（Halcon 原生绘制，每帧先 applyView 擦除旧框再画新框）
+		void drawSelectionBox(const QPoint& startWidget, const QPoint& endWidget);
+
 		// 覆盖层（透明 QWidget，捕获 Halcon 原生窗口无法传递的 Qt 鼠标事件）
 		QWidget* overlay_{ nullptr };
 
@@ -84,7 +87,6 @@ namespace ui
 		// Ctrl+左键 选框放大状态
 		bool isSelecting_{ false };
 		QPoint selStartPos_;
-		QRect selRect_;
 
 		/// 是否已经过用户交互（首次图像到来时自动 fit）
 		bool viewInitialized_{ false };

@@ -1,7 +1,6 @@
 #include "UI/HalconInteractiveLabel.h"
 
 #include <QMouseEvent>
-#include <QPainter>
 #include <QResizeEvent>
 #include <QShowEvent>
 #include <QWheelEvent>
@@ -11,32 +10,17 @@
 namespace
 {
 	/// 透明覆盖层控件，置于 Halcon 原生窗口之上以捕获 Qt 鼠标/键盘事件。
-	/// 在 Ctrl+左键选框放大时绘制半透明选框。
+	/// 必须设置 WA_NativeWindow 创建独立 HWND，方可 z-order 到 Halcon 原生窗口之上。
+	/// 本身不做任何绘制（选区矩形由 Halcon 原生绘制，见 drawSelectionBox）。
 	class OverlayWidget : public QWidget
 	{
 	public:
-		using QWidget::QWidget;
-
-		void setSelectionRect(const QRect& r)
+		explicit OverlayWidget(QWidget* parent)
+			: QWidget(parent)
 		{
-			selRect_ = r;
-			update();
+			setAttribute(Qt::WA_NativeWindow, true);
+			setAutoFillBackground(false);
 		}
-
-	protected:
-		void paintEvent(QPaintEvent*) override
-		{
-			if (selRect_.isValid() && !selRect_.isEmpty())
-			{
-				QPainter p(this);
-				p.setPen(QPen(QColor(0, 120, 215), 1.5));
-				p.setBrush(QColor(0, 120, 215, 40));
-				p.drawRect(selRect_);
-			}
-		}
-
-	private:
-		QRect selRect_;
 	};
 } // namespace
 
@@ -46,7 +30,6 @@ namespace ui
 		: HalconDisplayLabel(parent)
 	{
 		auto* ow = new OverlayWidget(this);
-		ow->setAttribute(Qt::WA_TransparentForMouseEvents, false);
 		ow->setMouseTracking(true);
 		ow->setFocusPolicy(Qt::StrongFocus);
 		ow->installEventFilter(this);
@@ -129,8 +112,6 @@ namespace ui
 	void HalconInteractiveLabel::resizeEvent(QResizeEvent* e)
 	{
 		HalconDisplayLabel::resizeEvent(e);
-		// 基类 resizeEvent 已通过虚函数 dispatch 调用 displayImage 处理视图更新。
-		// 此处仅同步覆盖层尺寸与 z-order。
 		if (overlay_)
 		{
 			overlay_->resize(e->size());
@@ -151,11 +132,9 @@ namespace ui
 
 		syncWindowSize();
 
-		// 提升覆盖层至 Halcon 原生窗口之上
 		if (overlay_)
 			overlay_->raise();
 
-		// 检测是否为新图像（尺寸变化视为新图像）
 		bool isNewImage = !lastImage_.IsInitialized();
 		if (!isNewImage)
 		{
@@ -169,7 +148,6 @@ namespace ui
 
 		if (isNewImage || !viewInitialized_)
 		{
-			// 新图像首次到达 → 适应窗口
 			const double prevZoom = zoomLevel_;
 			zoomLevel_ = fitZoomLevel();
 			HTuple iw, ih;
@@ -237,7 +215,6 @@ namespace ui
 					// Ctrl+左键 → 选框放大
 					isSelecting_ = true;
 					selStartPos_ = me->pos();
-					selRect_ = QRect();
 					overlay_->setCursor(Qt::CrossCursor);
 				}
 				else
@@ -277,12 +254,10 @@ namespace ui
 			}
 			else if (isSelecting_)
 			{
-				selRect_ = QRect(selStartPos_, me->pos()).normalized();
-				static_cast<OverlayWidget*>(overlay_)->setSelectionRect(selRect_);
+				drawSelectionBox(selStartPos_, me->pos());
 			}
 			else
 			{
-				// 悬停时根据缩放状态更新光标
 				const double fit = fitZoomLevel();
 				overlay_->setCursor(zoomLevel_ > fit + 0.001
 				                        ? Qt::OpenHandCursor
@@ -298,37 +273,55 @@ namespace ui
 
 			if (me->button() == Qt::LeftButton)
 			{
-				if (isSelecting_ && selRect_.isValid()
-				    && selRect_.width() > 5 && selRect_.height() > 5)
+				if (isSelecting_)
 				{
-					// 选框局部放大
-					const QPointF topLeft = imagePosAt(selRect_.topLeft());
-					const QPointF bottomRight = imagePosAt(selRect_.bottomRight());
-					const double selW = std::abs(bottomRight.x() - topLeft.x());
-					const double selH = std::abs(bottomRight.y() - topLeft.y());
-
-					if (selW > 0 && selH > 0)
+					const QRect sel = QRect(selStartPos_, me->pos()).normalized();
+					if (sel.width() > 5 && sel.height() > 5)
 					{
-						const double zoomW = width() / selW;
-						const double zoomH = height() / selH;
-						const double newZoom = qBound(fitZoomLevel(),
-						                              qMin(zoomW, zoomH), 32.0);
-						viewCenter_ = QPointF(
-							(topLeft.x() + bottomRight.x()) / 2.0,
-							(topLeft.y() + bottomRight.y()) / 2.0);
-						zoomLevel_ = newZoom;
-						clampViewCenter();
-						applyView();
-						emit zoomChanged(zoomLevel_);
-						emit viewChanged();
+						// 选框局部放大
+						const QPointF topLeft = imagePosAt(QPointF(sel.topLeft()));
+						const QPointF bottomRight = imagePosAt(QPointF(sel.bottomRight()));
+						const double selW = std::abs(bottomRight.x() - topLeft.x());
+						const double selH = std::abs(bottomRight.y() - topLeft.y());
+
+						if (selW > 0 && selH > 0)
+						{
+							const double zoomW = width() / selW;
+							const double zoomH = height() / selH;
+							const double newZoom = qBound(fitZoomLevel(),
+							                              qMin(zoomW, zoomH), 32.0);
+							viewCenter_ = QPointF(
+								(topLeft.x() + bottomRight.x()) / 2.0,
+								(topLeft.y() + bottomRight.y()) / 2.0);
+							zoomLevel_ = newZoom;
+							clampViewCenter();
+							applyView();
+							emit zoomChanged(zoomLevel_);
+							emit viewChanged();
+							// applyView 已清除选框，跳过末尾的 applyView
+							isSelecting_ = false;
+							isPanning_ = false;
+
+							const double fit = fitZoomLevel();
+							overlay_->setCursor(zoomLevel_ > fit + 0.001
+							                        ? Qt::OpenHandCursor
+							                        : Qt::ArrowCursor);
+							return true;
+						}
 					}
+
+					// 选框太小或无效 → 仅清除选框，恢复干净图像
+					isSelecting_ = false;
+					applyView();
+
+					const double fit = fitZoomLevel();
+					overlay_->setCursor(zoomLevel_ > fit + 0.001
+					                        ? Qt::OpenHandCursor
+					                        : Qt::ArrowCursor);
+					return true;
 				}
 
-				isSelecting_ = false;
 				isPanning_ = false;
-				static_cast<OverlayWidget*>(overlay_)->setSelectionRect(QRect());
-				selRect_ = QRect();
-
 				const double fit = fitZoomLevel();
 				overlay_->setCursor(zoomLevel_ > fit + 0.001
 				                        ? Qt::OpenHandCursor
@@ -395,6 +388,44 @@ namespace ui
 			DispObj(lastImage_, handle_);
 		}
 		catch (...) {}
+
+		if (overlay_)
+			overlay_->raise();
+	}
+
+	void HalconInteractiveLabel::drawSelectionBox(const QPoint& startWidget,
+	                                               const QPoint& endWidget)
+	{
+		using namespace HalconCpp;
+
+		if (!windowCreated_ || !lastImage_.IsInitialized())
+			return;
+
+		// 将控件坐标转为图像坐标
+		const QPointF imgStart = imagePosAt(QPointF(startWidget));
+		const QPointF imgEnd   = imagePosAt(QPointF(endWidget));
+
+		const double row1 = qMin(imgStart.y(), imgEnd.y());
+		const double col1 = qMin(imgStart.x(), imgEnd.x());
+		const double row2 = qMax(imgStart.y(), imgEnd.y());
+		const double col2 = qMax(imgStart.x(), imgEnd.x());
+
+		// 先重绘干净图像（擦除上一帧的选框）
+		applyView();
+
+		// 在 Halcon 窗口上直接绘制选框
+		try
+		{
+			SetColor(handle_, "#0078D7");
+			SetDraw(handle_, "margin");
+			SetLineWidth(handle_, 2);
+			DispRectangle1(handle_, row1, col1, row2, col2);
+		}
+		catch (...) {}
+
+		// 保持覆盖层在 Halcon 窗口之上
+		if (overlay_)
+			overlay_->raise();
 	}
 
 	void HalconInteractiveLabel::setZoomLevel(double zoom, const QPointF& anchorImagePos)
@@ -405,8 +436,6 @@ namespace ui
 		if (qFuzzyCompare(oldZoom, zoomLevel_))
 			return;
 
-		// 保持锚点（图像坐标）在控件中的位置不变:
-		//   newCenter = anchor + (oldCenter - anchor) * (oldZoom / newZoom)
 		const double ratio = oldZoom / zoomLevel_;
 		viewCenter_.setX(anchorImagePos.x() + (viewCenter_.x() - anchorImagePos.x()) * ratio);
 		viewCenter_.setY(anchorImagePos.y() + (viewCenter_.y() - anchorImagePos.y()) * ratio);
@@ -447,7 +476,6 @@ namespace ui
 		const double halfVisW = visSize.x() / 2.0;
 		const double halfVisH = visSize.y() / 2.0;
 
-		// 可见区域超出图像时居中；否则约束边界
 		if (halfVisW * 2.0 >= imgW)
 			viewCenter_.setX(imgW / 2.0);
 		else
