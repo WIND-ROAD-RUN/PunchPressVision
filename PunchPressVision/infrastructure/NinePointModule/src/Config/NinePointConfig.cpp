@@ -57,6 +57,8 @@ namespace Config
 		void writeParamsSafe(const fs::path& filePath,
 			double measureLength1, double measureLength2,
 			double measureThreshold, double numMeasure,
+			double cam1Exposure, double cam1Gain,
+			double cam2Exposure, double cam2Gain,
 			int xNumber, int yNumber, double distanceVal, double scaleVal,
 			int xDiantance, int yDistance)
 		{
@@ -70,6 +72,10 @@ namespace Config
 			ofs << "MeasureLength2=" << measureLength2 << '\n';
 			ofs << "MeasureThreshold=" << measureThreshold << '\n';
 			ofs << "num_Measure=" << numMeasure << '\n';
+			ofs << "camera1Exposure=" << cam1Exposure << '\n';
+			ofs << "camera1Gain=" << cam1Gain << '\n';
+			ofs << "camera2Exposure=" << cam2Exposure << '\n';
+			ofs << "camera2Gain=" << cam2Gain << '\n';
 			ofs << "xnumber=" << xNumber << '\n';
 			ofs << "ynumber=" << yNumber << '\n';
 			ofs << "distance=" << distanceVal << '\n';
@@ -83,6 +89,8 @@ namespace Config
 		bool readParamsSafe(const fs::path& filePath,
 			double& measureLength1, double& measureLength2,
 			double& measureThreshold, double& numMeasure,
+			double& cam1Exposure, double& cam1Gain,
+			double& cam2Exposure, double& cam2Gain,
 			int& xNumber, int& yNumber, double& distanceVal, double& scaleVal,
 			int& xDiantance, int& yDistance)
 		{
@@ -112,6 +120,14 @@ namespace Config
 						measureThreshold = std::stod(value);
 					else if (key == "num_Measure")
 						numMeasure = std::stod(value);
+					else if (key == "camera1Exposure")
+						cam1Exposure = std::stod(value);
+					else if (key == "camera1Gain")
+						cam1Gain = std::stod(value);
+					else if (key == "camera2Exposure")
+						cam2Exposure = std::stod(value);
+					else if (key == "camera2Gain")
+						cam2Gain = std::stod(value);
 					else if (key == "xnumber")
 						xNumber = std::stoi(value);
 					else if (key == "ynumber")
@@ -142,6 +158,8 @@ namespace Config
 			writeTupleSafe(dir / kHomMat2DFile, outHomMat2D);
 			writeParamsSafe(dir / kParamsFile,
 				MeasureLength1, MeasureLength2, MeasureThreshold, num_Measure,
+				camera1Exposure, camera1Gain,
+				camera2Exposure, camera2Gain,
 				xnumber, ynumber, distance, scale,
 				xdiantance, ydistance);
 		}
@@ -160,6 +178,10 @@ namespace Config
 			MeasureLength2 = 50.0;
 			MeasureThreshold = 1.0;
 			num_Measure = 5.0;
+			camera1Exposure = 5000.0;
+			camera1Gain = 1.0;
+			camera2Exposure = 5000.0;
+			camera2Gain = 1.0;
 			xnumber = 7;
 			ynumber = 7;
 			distance = 0.007;
@@ -169,6 +191,8 @@ namespace Config
 			readTupleSafe(dir / kHomMat2DFile, outHomMat2D);
 			readParamsSafe(dir / kParamsFile,
 				MeasureLength1, MeasureLength2, MeasureThreshold, num_Measure,
+				camera1Exposure, camera1Gain,
+				camera2Exposure, camera2Gain,
 				xnumber, ynumber, distance, scale,
 				xdiantance, ydistance);
 		}

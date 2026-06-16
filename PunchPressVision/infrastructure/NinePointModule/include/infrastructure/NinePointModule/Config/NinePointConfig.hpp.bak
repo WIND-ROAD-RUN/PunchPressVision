@@ -12,14 +12,6 @@ namespace Config
 		double MeasureThreshold = 1;
 		double num_Measure = 5;
 
-		// Camera 1 exposure/gain
-		double camera1Exposure = 5000;
-		double camera1Gain = 1;
-
-		// Camera 2 exposure/gain
-		double camera2Exposure = 5000;
-		double camera2Gain = 1;
-
 		// Homography matrix from nine-point calibration
 		HalconCpp::HTuple outHomMat2D;
 
