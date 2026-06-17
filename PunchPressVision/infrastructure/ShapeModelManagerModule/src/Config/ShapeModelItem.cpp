@@ -168,10 +168,7 @@ namespace Config
 			double centerX, double centerY,
 			double findCenterX, double findCenterY,
 			double offsetX, double offsetY, double offsetAngle,
-			bool isSelectXLDToCreateModel,
-			double xldMinLength, double xldMin, double xldMax,
 			int findNumber, double rotateAngle,
-			bool enabled,
 			double createModelExposureTime, double createModelGain,
 			int createModelPreProcessType,
 			bool createModelUseOpening, int createModelOpeningRadius,
@@ -198,13 +195,8 @@ namespace Config
 			ofs << "offsetX=" << offsetX << '\n';
 			ofs << "offsetY=" << offsetY << '\n';
 			ofs << "offsetAngle=" << offsetAngle << '\n';
-			ofs << "isSelectXLDToCreateModel=" << (isSelectXLDToCreateModel ? 1 : 0) << '\n';
-			ofs << "xld_Minlength=" << xldMinLength << '\n';
-			ofs << "xld_min=" << xldMin << '\n';
-			ofs << "xld_max=" << xldMax << '\n';
 			ofs << "findnumber=" << findNumber << '\n';
 			ofs << "rotateAngle=" << rotateAngle << '\n';
-			ofs << "enabled=" << (enabled ? 1 : 0) << '\n';
 			ofs << "createModelExposureTime=" << createModelExposureTime << '\n';
 			ofs << "createModelGain=" << createModelGain << '\n';
 			ofs << "createModelPreProcessType=" << createModelPreProcessType << '\n';
@@ -240,10 +232,7 @@ namespace Config
 			double& centerX, double& centerY,
 			double& findCenterX, double& findCenterY,
 			double& offsetX, double& offsetY, double& offsetAngle,
-			bool& isSelectXLDToCreateModel,
-			double& xldMinLength, double& xldMin, double& xldMax,
 			int& findNumber, double& rotateAngle,
-			bool& enabled,
 			double& createModelExposureTime, double& createModelGain,
 			int& createModelPreProcessType,
 			bool& createModelUseOpening, int& createModelOpeningRadius,
@@ -290,20 +279,10 @@ namespace Config
 						offsetY = std::stod(value);
 					else if (key == "offsetAngle")
 						offsetAngle = std::stod(value);
-					else if (key == "isSelectXLDToCreateModel")
-						isSelectXLDToCreateModel = std::stoi(value) != 0;
-					else if (key == "xld_Minlength")
-						xldMinLength = std::stod(value);
-					else if (key == "xld_min")
-						xldMin = std::stod(value);
-					else if (key == "xld_max")
-						xldMax = std::stod(value);
 					else if (key == "findnumber")
 						findNumber = std::stoi(value);
 					else if (key == "rotateAngle")
 						rotateAngle = std::stod(value);
-					else if (key == "enabled")
-						enabled = std::stoi(value) != 0;
 					else if (key == "createModelExposureTime")
 						createModelExposureTime = std::stod(value);
 					else if (key == "createModelGain")
@@ -364,10 +343,7 @@ namespace Config
 				centerX, centerY,
 				findCenterX, findCenterY,
 				offsetX, offsetY, offsetAngle,
-				isSelectXLDToCreateModel,
-				xld_Minlength, xld_min, xld_max,
 				findnumber, rotateAngle,
-				enabled,
 				_createModelExposureTime, _createModelGain,
 				_createModelPreProcessType,
 				_createModelUseOpening, _createModelOpeningRadius,
@@ -444,10 +420,7 @@ namespace Config
 				centerX, centerY,
 				findCenterX, findCenterY,
 				offsetX, offsetY, offsetAngle,
-				isSelectXLDToCreateModel,
-				xld_Minlength, xld_min, xld_max,
 				findnumber, rotateAngle,
-				enabled,
 				_createModelExposureTime, _createModelGain,
 				_createModelPreProcessType,
 				_createModelUseOpening, _createModelOpeningRadius,
