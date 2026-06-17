@@ -11,9 +11,8 @@ namespace bun
 	{
 	}
 
-	bool ShapeModeManagerBun::createModel(const CreateModelRequest& req,
-		Config::ShapeModelInfo& outInfo,
-		std::string* errorMsg)
+	bool ShapeModeManagerBun::createModelInternal(const CreateModelRequest& req,
+		Config::ShapeModelData& outData, std::string* errorMsg)
 	{
 		using namespace HalconCpp;
 		try
@@ -70,25 +69,9 @@ namespace bun
 				"auto",
 				"auto",
 				&modelID);
-		
-
-			//// 调试：将模板图保存到桌面
-			//try
-			//{
-			//	const char* userProfile = std::getenv("USERPROFILE");
-			//	if (userProfile)
-			//	{
-			//		std::filesystem::path desktopPath(userProfile);
-			//		desktopPath /= "Desktop";
-			//		desktopPath /= "template_image.jpg";
-			//		HalconCpp::HImage(templateImage).WriteImage("jpeg", 0, desktopPath.string().c_str());
-			//	}
-			//}
-			//catch (...) {}
 
 			// 3. 使用刚创建的模板在原图上验证匹配，作为创建成功的依据
 			HTuple matchRow, matchCol, matchAngle, matchScore;
-			
 			FindShapeModel(templateImage,
 				modelID,
 				HTuple(req.angleStart),
@@ -113,41 +96,40 @@ namespace bun
 			centerY = matchRow[0].D();
 
 			// 4. 准备模型数据
-			Config::ShapeModelData data;
-			data._templateMatImage = templateImage;
-			data._originalImage = req.trainingImage;
-			data.hv_ModelID = modelID;
-			data._createModelExposureTime = req.exposure;
-			data._createModelGain = req.gain;
-			data.upperLight = req.upperLight;
-			data.lowerLight = req.lowerLight;
-			data.centerX = centerX;
-			data.centerY = centerY;
+			outData._templateMatImage = templateImage;
+			outData._originalImage = req.trainingImage;
+			outData.hv_ModelID = modelID;
+			outData._createModelExposureTime = req.exposure;
+			outData._createModelGain = req.gain;
+			outData.upperLight = req.upperLight;
+			outData.lowerLight = req.lowerLight;
+			outData.centerX = centerX;
+			outData.centerY = centerY;
 
 			// 图像预处理参数
-			data._createModelPreProcessType = req.imageChannelType;
-			data._createModelUseOpening = req.useOpening;
-			data._createModelOpeningRadius = req.openingSize;
-			data._createModelUseClosing = req.useClosing;
-			data._createModelClosingRadius = req.closingSize;
-			data._createModelUseMean = req.useMean;
-			data._createModelMeanRadius = req.meanSize;
+			outData._createModelPreProcessType = req.imageChannelType;
+			outData._createModelUseOpening = req.useOpening;
+			outData._createModelOpeningRadius = req.openingSize;
+			outData._createModelUseClosing = req.useClosing;
+			outData._createModelClosingRadius = req.closingSize;
+			outData._createModelUseMean = req.useMean;
+			outData._createModelMeanRadius = req.meanSize;
 
 			// 训练参数
-			data.numLevels = req.numLevels;
-			data.angleStart = req.angleStart;
-			data.angleExtent = req.angleExtent;
-			data.angleStep = req.angleStep;
-			data.optimization = req.optimization.toStdString();
-			data.metric = req.metric.toStdString();
-			data.contrast = req.contrast;
-			data.minContrast = req.minContrast;
+			outData.numLevels = req.numLevels;
+			outData.angleStart = req.angleStart;
+			outData.angleExtent = req.angleExtent;
+			outData.angleStep = req.angleStep;
+			outData.optimization = req.optimization.toStdString();
+			outData.metric = req.metric.toStdString();
+			outData.contrast = req.contrast;
+			outData.minContrast = req.minContrast;
 
 			// ROI 列表（逐个保存为 HObject，支持回撤）
-			data._paintCreateRoiList = req._paintCreateRoiList;
+			outData._paintCreateRoiList = req._paintCreateRoiList;
 
 			// Mask 列表（逐个保存为 HObject，支持回撤）
-			data._paintShieldRoiList = req._paintShieldRoiList;
+			outData._paintShieldRoiList = req._paintShieldRoiList;
 
 			// 生成标注图：在原始图像上叠加 ROI（白线）和 Mask（黑线）
 			if (!req._paintCreateRoiList.empty() || !req._paintShieldRoiList.empty())
@@ -165,7 +147,7 @@ namespace bun
 					if (obj.IsInitialized())
 						OverpaintRegion(annotated, obj, 0, "margin");
 				}
-				data._annotatedImage = annotated;
+				outData._annotatedImage = annotated;
 			}
 
 			// 5. 提取模型轮廓并变换到匹配位置，供 UI 显示
@@ -180,21 +162,11 @@ namespace bun
 				HObject transformedContours;
 				AffineTransContourXld(modelContours, &transformedContours, homMat2D);
 
-				data._findCreateXldObj = transformedContours;
+				outData._findCreateXldObj = transformedContours;
 				emit modelContoursFound(transformedContours);
 			}
 			catch (...) {}
 
-			// 6. 元数据
-			Config::ShapeModelInfo::BaseInfo baseInfo;
-			baseInfo.name = req.name.isEmpty()
-				? inf_.shape_model_manager_module_->getCurrentTime_yyMMddHHmmsszzz()
-				: req.name.toStdString();
-
-			// 7. 存储（生成 id/时间戳目录并落盘）
-			outInfo = inf_.shape_model_manager_module_->addShapeModelItem(data, baseInfo);
-
-			emit modelListChanged();
 			return true;
 		}
 		catch (const HException& e)
@@ -208,6 +180,39 @@ namespace bun
 			if (errorMsg) *errorMsg = "创建模型发生未知错误";
 			return false;
 		}
+	}
+
+	bool ShapeModeManagerBun::createModel(const CreateModelRequest& req,
+		Config::ShapeModelInfo& outInfo, std::string* errorMsg)
+	{
+		Config::ShapeModelData data;
+		if (!createModelInternal(req, data, errorMsg))
+			return false;
+
+		// 元数据
+		Config::ShapeModelInfo::BaseInfo baseInfo;
+		baseInfo.name = req.name.isEmpty()
+			? inf_.shape_model_manager_module_->getCurrentTime_yyMMddHHmmsszzz()
+			: req.name.toStdString();
+
+		// 存储（生成 id/时间戳目录并落盘）
+		outInfo = inf_.shape_model_manager_module_->addShapeModelItem(data, baseInfo);
+
+		emit modelListChanged();
+		return true;
+	}
+
+	bool ShapeModeManagerBun::updateModel(const std::string& id,
+		const CreateModelRequest& req, std::string* errorMsg)
+	{
+		Config::ShapeModelData data;
+		if (!createModelInternal(req, data, errorMsg))
+			return false;
+
+		inf_.shape_model_manager_module_->changeShapeModelItem(id, data);
+
+		emit modelListChanged();
+		return true;
 	}
 
 	bool ShapeModeManagerBun::deleteModel(const std::string& id, std::string* errorMsg)

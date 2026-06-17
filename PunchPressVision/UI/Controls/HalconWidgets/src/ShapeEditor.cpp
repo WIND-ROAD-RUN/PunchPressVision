@@ -93,6 +93,40 @@ namespace ui
 		return mergeObjects(maskObjects_);
 	}
 
+	void ShapeEditor::setRoiObjects(const std::vector<HalconCpp::HObject>& objects)
+	{
+		roiObjects_ = objects;
+		actionHistory_.erase(
+			std::remove(actionHistory_.begin(), actionHistory_.end(), ActionType::ROI),
+			actionHistory_.end());
+		for (size_t i = 0; i < objects.size(); ++i)
+			actionHistory_.append(ActionType::ROI);
+		drawing_ = false;
+		refreshOverlay();
+		emit roiChanged();
+	}
+
+	void ShapeEditor::setMaskObjects(const std::vector<HalconCpp::HObject>& objects)
+	{
+		maskObjects_ = objects;
+		actionHistory_.erase(
+			std::remove(actionHistory_.begin(), actionHistory_.end(), ActionType::Mask),
+			actionHistory_.end());
+		for (size_t i = 0; i < objects.size(); ++i)
+			actionHistory_.append(ActionType::Mask);
+		drawing_ = false;
+		refreshOverlay();
+		emit maskChanged();
+	}
+
+	void ShapeEditor::setCenterPoint(const QPointF& point)
+	{
+		centerPoint_ = point;
+		hasCenterPoint_ = true;
+		refreshOverlay();
+		emit centerPointChanged();
+	}
+
 	// === 工具切换 ===
 
 	void ShapeEditor::setTool(Tool tool)

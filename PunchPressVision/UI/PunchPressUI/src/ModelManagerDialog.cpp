@@ -421,7 +421,7 @@ namespace ui
 
 	void ModelManagerDialog::onCreateModel()
 	{
-		ModelEditorDialog dlg(app_, this);
+		ModelEditorDialog dlg(app_, false, {}, this);
 		if (dlg.exec() == QDialog::Accepted)
 		{
 			refreshModelList();
@@ -437,8 +437,7 @@ namespace ui
 				QStringLiteral("提示"), QStringLiteral("请先选择一个模型"));
 			return;
 		}
-		// TODO: ModelEditorDialog 接受模型 ID 进入编辑模式
-		ModelEditorDialog dlg(app_, this);
+		ModelEditorDialog dlg(app_, true, id, this);
 		if (dlg.exec() == QDialog::Accepted)
 		{
 			refreshModelList();

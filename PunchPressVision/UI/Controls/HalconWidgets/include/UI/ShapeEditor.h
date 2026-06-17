@@ -53,6 +53,8 @@ namespace ui
 		HalconCpp::HObject roi() const;
 		/// ROI 区域对象列表（逐个保存，支持回撤）
 		std::vector<HalconCpp::HObject> roiObjects() const { return roiObjects_; }
+		/// 批量设置 ROI 区域对象（修改模式时从已有模型恢复）
+		void setRoiObjects(const std::vector<HalconCpp::HObject>& objects);
 		int roiCount() const { return static_cast<int>(roiObjects_.size()); }
 		bool hasROI() const { return !roiObjects_.empty(); }
 
@@ -62,12 +64,16 @@ namespace ui
 		HalconCpp::HObject mask() const;
 		/// Mask 区域对象列表（逐个保存，支持回撤）
 		std::vector<HalconCpp::HObject> maskObjects() const { return maskObjects_; }
+		/// 批量设置 Mask 区域对象（修改模式时从已有模型恢复）
+		void setMaskObjects(const std::vector<HalconCpp::HObject>& objects);
 		int maskCount() const { return static_cast<int>(maskObjects_.size()); }
 		bool hasMask() const { return !maskObjects_.empty(); }
 
 		// === 中心点 ===
 
 		QPointF centerPoint() const { return centerPoint_; }
+		/// 设置手动中心点（修改模式时从已有模型恢复）
+		void setCenterPoint(const QPointF& point);
 		bool hasCenterPoint() const { return hasCenterPoint_; }
 
 		// === 编辑操作 ===

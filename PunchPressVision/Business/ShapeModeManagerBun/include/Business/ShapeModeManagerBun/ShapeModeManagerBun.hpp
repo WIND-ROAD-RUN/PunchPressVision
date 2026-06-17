@@ -78,6 +78,8 @@ namespace bun
 		bool createModel(const CreateModelRequest& req,
 			Config::ShapeModelInfo& outInfo,
 			std::string* errorMsg = nullptr);
+		bool updateModel(const std::string& id, const CreateModelRequest& req,
+			std::string* errorMsg = nullptr);
 		bool deleteModel(const std::string& id, std::string* errorMsg = nullptr);
 		bool renameModel(const std::string& id, const QString& newName,
 			std::string* errorMsg = nullptr);
@@ -114,6 +116,10 @@ namespace bun
 	private:
 		inf::infrastructure& inf_;
 		infTool::infTool& inf_tool_;
+
+		// 创建/更新模型共用的数据生成逻辑
+		bool createModelInternal(const CreateModelRequest& req,
+			Config::ShapeModelData& outData, std::string* errorMsg);
 
 		// 当前加载的模型缓存
 		std::string currentModelId_;
