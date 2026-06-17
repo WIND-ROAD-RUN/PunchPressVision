@@ -1,6 +1,7 @@
 // 必须最先包含：rqwu_MessageBox.h 要在 windows.h(经 Halcon 引入) 定义
 // MessageBox 宏之前解析，否则类名会被宏改写为 MessageBoxW。
 #include <rwul/rqwu/rqwu_MessageBox.h>
+#include <rwul/rqwu/Keyboard/rqwu_NumberKeyboard.h>
 
 #include "UI/PunchPress.h"
 #include "ui_PunchPress.h"
@@ -101,6 +102,10 @@ namespace ui
 		connect(ui->rbtn_work, &QRadioButton::clicked, this, &PunchPress::onWorkClicked);
 		connect(ui->rbtn_upLight, &QRadioButton::clicked, this, &PunchPress::onUpperLightClicked);
 		connect(ui->rbtn_downLight, &QRadioButton::clicked, this, &PunchPress::onLowerLightClicked);
+		connect(ui->pbtn_exposure1, &QPushButton::clicked, this, &PunchPress::onExposure1Clicked);
+		connect(ui->pbtn_gain1, &QPushButton::clicked, this, &PunchPress::onGain1Clicked);
+		connect(ui->pbtn_exposure2, &QPushButton::clicked, this, &PunchPress::onExposure2Clicked);
+		connect(ui->pbtn_gain2, &QPushButton::clicked, this, &PunchPress::onGain2Clicked);
 		connect(ui->pbtn_modelManager, &QPushButton::clicked, this, &PunchPress::onModelManager);
 		connect(ui->pbtn_exit, &QPushButton::clicked, this, &PunchPress::onExit);
 	}
@@ -143,6 +148,106 @@ namespace ui
 		ui->pbtn_gain1->setText(QString::number(cameraCfg_.gain1));
 		ui->pbtn_exposure2->setText(QString::number(cameraCfg_.exposureTime2));
 		ui->pbtn_gain2->setText(QString::number(cameraCfg_.gain2));
+	}
+
+	bool PunchPress::inputIntegerParam(QPushButton* button, int& value, int min, int max)
+	{
+		QString input = QString::number(value);
+
+		rw::rqwu::NumberKeyboard::InputDataConfig cfg;
+		cfg.isUsingMin = true;
+		cfg.isUsingMax = true;
+		cfg.min = static_cast<double>(min);
+		cfg.max = static_cast<double>(max);
+
+		const auto result = rw::rqwu::NumberKeyboard::inputDataOnQPushButton(button, input, cfg);
+		if (result != rw::rqwu::NumberKeyboard::Accept)
+			return false;
+
+		bool ok = false;
+		const int newValue = input.toInt(&ok);
+		if (!ok)
+			return false;
+
+		value = newValue;
+		button->setText(QString::number(newValue));
+		return true;
+	}
+
+	void PunchPress::applyExposure(global::CameraIndex idx, int value, int Config::cameraCfg::* member)
+	{
+		cameraCfg_.*member = value;
+
+		auto& inf = app_.business().infrastructure();
+		if (inf.camera_module_)
+		{
+			inf.camera_module_->cameraCfg.*member = value;
+			if (!inf.camera_module_->setExposure(idx, static_cast<double>(value)))
+			{
+				rw::rqwu::MessageBox::warning(this, QStringLiteral("设置失败"),
+					QStringLiteral("无法设置 %1 曝光").arg(idx == global::CameraIndex::Camera1
+						? QStringLiteral("相机1") : QStringLiteral("相机2")));
+			}
+		}
+
+		if (inf.config_module_)
+		{
+			inf.config_module_->cameraCfg.*member = value;
+			inf.config_module_->save();
+		}
+	}
+
+	void PunchPress::applyGain(global::CameraIndex idx, int value, int Config::cameraCfg::* member)
+	{
+		cameraCfg_.*member = value;
+
+		auto& inf = app_.business().infrastructure();
+		if (inf.camera_module_)
+		{
+			inf.camera_module_->cameraCfg.*member = value;
+			if (!inf.camera_module_->setGain(idx, static_cast<double>(value)))
+			{
+				rw::rqwu::MessageBox::warning(this, QStringLiteral("设置失败"),
+					QStringLiteral("无法设置 %1 增益").arg(idx == global::CameraIndex::Camera1
+						? QStringLiteral("相机1") : QStringLiteral("相机2")));
+			}
+		}
+
+		if (inf.config_module_)
+		{
+			inf.config_module_->cameraCfg.*member = value;
+			inf.config_module_->save();
+		}
+	}
+
+	void PunchPress::onExposure1Clicked()
+	{
+		if (!inputIntegerParam(ui->pbtn_exposure1, cameraCfg_.exposureTime1, 1, 10000000))
+			return;
+		applyExposure(global::CameraIndex::Camera1, cameraCfg_.exposureTime1,
+			&Config::cameraCfg::exposureTime1);
+	}
+
+	void PunchPress::onGain1Clicked()
+	{
+		if (!inputIntegerParam(ui->pbtn_gain1, cameraCfg_.gain1, 0, 100))
+			return;
+		applyGain(global::CameraIndex::Camera1, cameraCfg_.gain1, &Config::cameraCfg::gain1);
+	}
+
+	void PunchPress::onExposure2Clicked()
+	{
+		if (!inputIntegerParam(ui->pbtn_exposure2, cameraCfg_.exposureTime2, 1, 10000000))
+			return;
+		applyExposure(global::CameraIndex::Camera2, cameraCfg_.exposureTime2,
+			&Config::cameraCfg::exposureTime2);
+	}
+
+	void PunchPress::onGain2Clicked()
+	{
+		if (!inputIntegerParam(ui->pbtn_gain2, cameraCfg_.gain2, 0, 100))
+			return;
+		applyGain(global::CameraIndex::Camera2, cameraCfg_.gain2, &Config::cameraCfg::gain2);
 	}
 
 	void PunchPress::showEvent(QShowEvent* e)

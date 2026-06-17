@@ -15,6 +15,7 @@ QT_END_NAMESPACE
 
 namespace app { class PunchPressApp; }
 class QButtonGroup;
+class QPushButton;
 
 namespace ui
 {
@@ -50,6 +51,12 @@ namespace ui
 		// 模型管理
 		void onModelManager();
 
+		// 相机参数（曝光/增益）
+		void onExposure1Clicked();
+		void onGain1Clicked();
+		void onExposure2Clicked();
+		void onGain2Clicked();
+
 		// 系统
 		void onExit();
 
@@ -69,6 +76,13 @@ namespace ui
 		void loadConfigs();
 		void loadCameraConfig();
 		void updateCameraParamButtons();
+
+		// 弹出数字键盘编辑整数参数（带范围校验）
+		bool inputIntegerParam(QPushButton* button, int& value, int min, int max);
+
+		// 将曝光/增益数值同步到相机与配置并持久化
+		void applyExposure(global::CameraIndex idx, int value, int Config::cameraCfg::* member);
+		void applyGain(global::CameraIndex idx, int value, int Config::cameraCfg::* member);
 
 		Ui::PunchPressClass* ui;
 		app::PunchPressApp& app_;
