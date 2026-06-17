@@ -95,6 +95,8 @@ namespace ui
 	void ModelManagerDialog::showEvent(QShowEvent* event)
 	{
 		QDialog::showEvent(event);
+		if (parentWidget())
+			resize(parentWidget()->size());
 		refreshModelList();
 
 		// 初始选中第一项

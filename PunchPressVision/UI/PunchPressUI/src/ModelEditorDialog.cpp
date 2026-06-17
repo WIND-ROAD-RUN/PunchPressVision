@@ -7,6 +7,7 @@
 
 #include <QFileDialog>
 #include <QLayout>
+#include <QShowEvent>
 
 #include "app/PunchPressApp.hpp"
 #include "Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp"
@@ -51,6 +52,13 @@ namespace ui
 	{
 		app_.switchToMode(global::RunMode::Idle);
 		delete ui;
+	}
+
+	void ModelEditorDialog::showEvent(QShowEvent* e)
+	{
+		QDialog::showEvent(e);
+		if (parentWidget())
+			resize(parentWidget()->size());
 	}
 
 	// ===== 信号连接 ============================================================

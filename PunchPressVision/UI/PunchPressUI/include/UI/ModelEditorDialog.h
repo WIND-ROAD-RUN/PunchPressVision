@@ -24,6 +24,9 @@ namespace ui
 		explicit ModelEditorDialog(app::PunchPressApp& app, QWidget* parent = nullptr);
 		~ModelEditorDialog() override;
 
+	protected:
+		void showEvent(QShowEvent* e) override;
+
 	private slots:
 		void onFrameReady(HalconCpp::HImage image);
 		void onToolChanged(ShapeEditor::Tool tool);
