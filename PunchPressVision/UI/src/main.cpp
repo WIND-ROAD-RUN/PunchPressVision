@@ -7,9 +7,11 @@
 
 // PunchPressVision 启动时序：
 //   Phase 1: 构造所有对象（构造 ≠ 初始化）
-//   Phase 2: infrastructure.build() → business.build() → app.build()
+//   Phase 2: infrastructure.build() → business.build() → app.build() → w.build()
 //   Phase 3: business.start() → app.start()
 //   Phase 4: w.show() → a.exec()
+//   Phase 5: app.stop() → business.stop()
+//   Phase 6: w.destroy() → app.destroy() → business.destroy() → infrastructure.destroy()
 int main(int argc, char* argv[])
 {
 	QApplication a(argc, argv);
@@ -28,6 +30,7 @@ int main(int argc, char* argv[])
 	infrastructure.build();
 	business.build();
 	app.build();
+	w.build();
 
 	// ======================================================
 	// Phase 3: start — 启动运行（开始帧流等）
@@ -51,6 +54,7 @@ int main(int argc, char* argv[])
 	// ======================================================
 	// Phase 6: destroy — 逆序销毁（断开信号、释放资源）
 	// ======================================================
+	w.destroy();
 	app.destroy();
 	business.destroy();
 	infrastructure.destroy();

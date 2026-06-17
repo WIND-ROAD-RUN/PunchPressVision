@@ -28,6 +28,11 @@ namespace ui
 		explicit PunchPress(app::PunchPressApp& app, QWidget* parent = nullptr);
 		~PunchPress() override;
 
+		// UI 层生命周期：build 在 infrastructure/business/app build 之后调用，
+		// 此时配置已加载，可安全读取曝光/增益等参数。
+		void build();
+		void destroy();
+
 	protected:
 		void showEvent(QShowEvent* e) override;
 		void resizeEvent(QResizeEvent* e) override;
@@ -58,6 +63,7 @@ namespace ui
 	private:
 		void buildConnections();
 		void setupImageView();
+		void updateCameraParamButtons();
 
 		Ui::PunchPressClass* ui;
 		app::PunchPressApp& app_;

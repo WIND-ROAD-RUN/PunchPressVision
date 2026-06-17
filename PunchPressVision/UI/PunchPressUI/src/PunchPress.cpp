@@ -45,8 +45,20 @@ namespace ui
 		lightGroup_->addButton(ui->rbtn_upLight);
 		lightGroup_->addButton(ui->rbtn_downLight);
 
-		buildConnections();
 		setupImageView();
+	}
+
+	PunchPress::~PunchPress()
+	{
+		delete ui;
+	}
+
+	void PunchPress::build()
+	{
+		// 连接信号、读取已加载配置、执行启动检查。
+		// 必须在 infrastructure/business/app build 之后调用。
+		buildConnections();
+		updateCameraParamButtons();
 
 		// 启动检查（FR-001 ~ FR-004）
 		QString startupError;
@@ -61,9 +73,10 @@ namespace ui
 		}
 	}
 
-	PunchPress::~PunchPress()
+	void PunchPress::destroy()
 	{
-		delete ui;
+		// 断开与 App 层的所有信号连接，避免 destroy 阶段收到回调
+		QObject::disconnect(&app_, nullptr, this, nullptr);
 	}
 
 	void PunchPress::buildConnections()
@@ -105,6 +118,20 @@ namespace ui
 			}
 		}
 		oldLabel->deleteLater();
+	}
+
+	void PunchPress::updateCameraParamButtons()
+	{
+		// 从基础设施的相机配置中读取曝光/增益，刷新主界面显示
+		const auto& inf = app_.business().infrastructure();
+		if (!inf.camera_module_)
+			return;
+
+		const auto& cfg = inf.camera_module_->cameraCfg;
+		ui->pbtn_exposure1->setText(QString::number(cfg.exposureTime1));
+		ui->pbtn_gain1->setText(QString::number(cfg.gain1));
+		ui->pbtn_exposure2->setText(QString::number(cfg.exposureTime2));
+		ui->pbtn_gain2->setText(QString::number(cfg.gain2));
 	}
 
 	void PunchPress::showEvent(QShowEvent* e)
