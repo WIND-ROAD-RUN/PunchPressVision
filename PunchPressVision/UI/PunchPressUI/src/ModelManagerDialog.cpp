@@ -15,6 +15,7 @@
 
 #include "app/PunchPressApp.hpp"
 #include "Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp"
+#include "infrastructure/ShapeModelManagerModule/Config/ShapeModelItem.hpp"
 #include "UI/ModelEditorDialog.h"
 
 #ifdef MessageBox
@@ -157,6 +158,36 @@ namespace ui
 		ui->tableWidget_modelInfo->setRowCount(0);
 	}
 
+	static const char* kChannelNames[] = {
+		"灰度", "红", "绿", "蓝", "H", "S", "V"
+	};
+
+	static QString channelName(int idx)
+	{
+		if (idx < 0 || idx > 6) return QString::number(idx);
+		return QString::fromUtf8(kChannelNames[idx]);
+	}
+
+	static QString preprocessSummary(const Config::ShapeModelData& d)
+	{
+		QStringList parts;
+		if (d._createModelUseOpening)
+			parts.append(QStringLiteral("开运算(%1)").arg(d._createModelOpeningRadius));
+		if (d._createModelUseClosing)
+			parts.append(QStringLiteral("闭运算(%1)").arg(d._createModelClosingRadius));
+		if (d._createModelUseMean)
+			parts.append(QStringLiteral("均值(%1)").arg(d._createModelMeanRadius));
+		return parts.isEmpty() ? QStringLiteral("无") : parts.join(QStringLiteral(" + "));
+	}
+
+	static QString contrastSummary(const Config::ShapeModelData& d)
+	{
+		// maxContrast==0  or (maxContrast==5 && minContrast==3) → auto default
+		if (d.maxContrast == 0)
+			return QStringLiteral("自动");
+		return QStringLiteral("手动 %1 / %2").arg(d.maxContrast).arg(d.minContrast);
+	}
+
 	void ModelManagerDialog::refreshModelDetail(int row)
 	{
 		if (row < 0 || row >= allModels_.size())
@@ -167,8 +198,12 @@ namespace ui
 
 		const auto& info = allModels_.at(row);
 
-		// 填充元信息表格
-		ui->tableWidget_modelInfo->setRowCount(6);
+		// 从磁盘加载训练参数
+		Config::ShapeModelData data;
+		data.loadInDir(info.getFolderPath());
+
+		constexpr int kRowCount = 9;
+		ui->tableWidget_modelInfo->setRowCount(kRowCount);
 		ui->tableWidget_modelInfo->setColumnCount(2);
 		ui->tableWidget_modelInfo->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 		ui->tableWidget_modelInfo->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
@@ -184,24 +219,33 @@ namespace ui
 			ui->tableWidget_modelInfo->setItem(r, 1, valItem);
 		};
 
-		setRow(0, QStringLiteral("名称"), QString::fromStdString(info.base_info.name));
-		setRow(1, QStringLiteral("ID"),   QString::fromStdString(info.getId()));
-		setRow(2, QStringLiteral("创建时间"), QString::fromStdString(info.getCreateTime()));
-		setRow(3, QStringLiteral("更新时间"), QString::fromStdString(info.getUpdateTime()));
-		setRow(4, QStringLiteral("文件夹"),  QString::fromStdString(info.getFolderPath()));
-		setRow(5, QStringLiteral("数量"),    QString::number(allModels_.size()));
+		int r = 0;
+		setRow(r++, QStringLiteral("名称"),     QString::fromStdString(info.base_info.name));
+		setRow(r++, QStringLiteral("图像通道"), channelName(data._SingleChannelType));
+		setRow(r++, QStringLiteral("预处理"),   preprocessSummary(data));
+		setRow(r++, QStringLiteral("对比度"),   contrastSummary(data));
+		setRow(r++, QStringLiteral("ROI / 屏蔽"),
+			QStringLiteral("%1 / %2")
+				.arg(static_cast<int>(data._paintCreateRoiList.size()))
+				.arg(static_cast<int>(data._paintShieldRoiList.size())));
+		setRow(r++, QStringLiteral("曝光 / 增益"),
+			QStringLiteral("%1 / %2")
+				.arg(data._createModelExposureTime, 0, 'f', 0)
+				.arg(data._createModelGain, 0, 'f', 0));
+		setRow(r++, QStringLiteral("创建时间"), QString::fromStdString(info.getCreateTime()));
+		setRow(r++, QStringLiteral("更新时间"), QString::fromStdString(info.getUpdateTime()));
+		setRow(r++, QStringLiteral("文件夹"),   QString::fromStdString(info.getFolderPath()));
 
-		// 模板预览
+		// 模板预览：尝试显示标注图
 		previewView_.ensure(ui->label_imgPreview);
-		auto& bun = app_.business().shape_mode_manager_bun;
-		if (bun)
+		if (data._annotatedImage.IsInitialized())
 		{
-			// 尝试加载并预览模板图像（不改变当前加载的模型）
-			try
-			{
-				auto item = bun->getAllModels(); // 仅用于获取文件夹路径
-				// TODO: 从文件夹加载模板预览图
-			}
+			try { previewView_.display(data._annotatedImage); }
+			catch (...) {}
+		}
+		else if (data._originalImage.IsInitialized())
+		{
+			try { previewView_.display(data._originalImage); }
 			catch (...) {}
 		}
 	}
