@@ -28,9 +28,7 @@ namespace ui
 		previousMode_ = app_.currentMode();
 		app_.switchToMode(global::RunMode::CreateModel);
 
-		buildConnections();
-
-		// 用 ShapeEditor 替换 ui 中的占位 QLabel
+		// 先创建 ShapeEditor，后续 buildConnections 需连接其信号
 		shapeEditor_ = new ShapeEditor(this);
 		auto* oldLabel = ui->label_imgDisplay;
 		if (auto* parentWidget = oldLabel->parentWidget())
@@ -42,6 +40,8 @@ namespace ui
 		}
 		oldLabel->deleteLater();
 		shapeEditor_->setGeometry(0, 0, oldLabel->width(), oldLabel->height());
+
+		buildConnections();
 	}
 
 	ModelEditorDialog::~ModelEditorDialog()
@@ -55,6 +55,10 @@ namespace ui
 	{
 		connect(&app_, &app::PunchPressApp::frameReady,
 			this, &ModelEditorDialog::onFrameReady, Qt::QueuedConnection);
+
+		// ShapeEditor 工具切换 → 更新按钮文字
+		connect(shapeEditor_, &ShapeEditor::toolChanged,
+			this, &ModelEditorDialog::onToolChanged);
 
 		connect(ui->btn_paintRegion, &QPushButton::clicked,
 			this, &ModelEditorDialog::onPaintRegion);
@@ -83,7 +87,12 @@ namespace ui
 
 	void ModelEditorDialog::onPaintRegion()
 	{
-		if (shapeEditor_)
+		if (!shapeEditor_)
+			return;
+		// Toggle: 已在 RectangleROI 模式则切回 View，否则进入 RectangleROI
+		if (shapeEditor_->tool() == ShapeEditor::Tool::RectangleROI)
+			shapeEditor_->setTool(ShapeEditor::Tool::View);
+		else
 			shapeEditor_->setTool(ShapeEditor::Tool::RectangleROI);
 	}
 
@@ -98,7 +107,12 @@ namespace ui
 
 	void ModelEditorDialog::onPaintCenterPoint()
 	{
-		if (shapeEditor_)
+		if (!shapeEditor_)
+			return;
+		// Toggle: 已在 CenterPoint 模式则切回 View，否则进入 CenterPoint
+		if (shapeEditor_->tool() == ShapeEditor::Tool::CenterPoint)
+			shapeEditor_->setTool(ShapeEditor::Tool::View);
+		else
 			shapeEditor_->setTool(ShapeEditor::Tool::CenterPoint);
 	}
 
@@ -173,5 +187,24 @@ namespace ui
 			rw::rqwu::MessageBox::warning(this,
 				QStringLiteral("读取失败"), QStringLiteral("无法打开图片"));
 		}
+	}
+
+	void ModelEditorDialog::onToolChanged(ShapeEditor::Tool tool)
+	{
+		updateToolButtons(tool);
+	}
+
+	void ModelEditorDialog::updateToolButtons(ShapeEditor::Tool tool)
+	{
+		// 根据当前工具更新按钮文字：选中时显示"退出…"，未选中时显示原标题
+		ui->btn_paintRegion->setText(
+			tool == ShapeEditor::Tool::RectangleROI
+				? QStringLiteral("退出绘制")
+				: QStringLiteral("绘制感兴趣区域"));
+
+		ui->btn_paintCenterPoint->setText(
+			tool == ShapeEditor::Tool::CenterPoint
+				? QStringLiteral("退出定义")
+				: QStringLiteral("定义中心点"));
 	}
 } // namespace ui

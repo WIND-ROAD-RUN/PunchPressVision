@@ -2,6 +2,7 @@
 
 #include "UI/HalconInteractiveLabel.h"
 
+#include <QKeyEvent>
 #include <QMouseEvent>
 #include <QResizeEvent>
 
@@ -158,6 +159,23 @@ namespace ui
 				}
 
 				refreshOverlay();
+				return true;
+			}
+			break;
+		}
+
+		case QEvent::KeyPress:
+		{
+			auto* ke = static_cast<QKeyEvent*>(e);
+			if (ke->key() == Qt::Key_Escape)
+			{
+				// 取消当前绘制操作，回到 View 模式
+				if (roiDrawing_)
+				{
+					roiDrawing_ = false;
+					refreshOverlay();
+				}
+				setTool(Tool::View);
 				return true;
 			}
 			break;

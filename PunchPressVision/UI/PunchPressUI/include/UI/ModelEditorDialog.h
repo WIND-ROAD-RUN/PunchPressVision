@@ -31,11 +31,13 @@ namespace ui
 		void onUndo();
 		void onCreateModel();
 		void onReadImage();
+		void onToolChanged(ShapeEditor::Tool tool);
 
 	private:
 		void buildConnections();
 		// 执行模型训练（供按钮调用）
 		bool doCreateModel();
+		void updateToolButtons(ShapeEditor::Tool tool);
 
 		Ui::Dlg_createshapemodelClass* ui;
 		app::PunchPressApp& app_;
