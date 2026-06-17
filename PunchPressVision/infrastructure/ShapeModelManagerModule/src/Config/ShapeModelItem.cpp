@@ -12,8 +12,8 @@ namespace Config
 
 		constexpr const char* kModelInfoFile = "model_info.json";
 		constexpr const char* kParamsFile = "model_params.txt";
-		constexpr const char* kTemplateImageFile = "template_image.bmp";
-		constexpr const char* kOriginalImageFile = "original_image.bmp";
+		constexpr const char* kTemplateImageFile = "template_image.jpg";
+		constexpr const char* kOriginalImageFile = "original_image.jpg";
 		constexpr const char* kModelFile = "model.shm";
 		constexpr const char* kMetrologyFile = "metrology.mmc";
 		constexpr const char* kPaintCreateRoiPrefix = "paint_create_roi_";
@@ -21,7 +21,8 @@ namespace Config
 		constexpr const char* kRoiExtension = ".hobj";
 		constexpr const char* kFindCreateXldFile = "find_create_xld.hobj";
 		constexpr const char* kFindCreateXldSecondaryFile = "find_create_xld_secondary.hobj";
-		constexpr const char* kImageFormat = "bmp";
+		constexpr const char* kJpegFormat = "jpeg";
+		constexpr int kJpegQuality = 90;
 
 		void replaceFile(const fs::path& tmp, const fs::path& target)
 		{
@@ -76,7 +77,8 @@ namespace Config
 			fs::create_directories(filePath.parent_path());
 			fs::path tmp = filePath;
 			tmp += ".tmp";
-			HalconCpp::HImage(image).WriteImage(kImageFormat, 0, tmp.string().c_str());
+			HalconCpp::SetSystem("jpeg_quality", kJpegQuality);
+		HalconCpp::HImage(image).WriteImage(kJpegFormat, 0, tmp.string().c_str());
 			replaceFile(tmp, filePath);
 		}
 
