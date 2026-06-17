@@ -22,11 +22,6 @@ namespace ui
 
 	void ShapeEditor::displayImage(const HalconCpp::HImage& image)
 	{
-		// 底图渲染由 HalconInteractiveLabel 完成。
-		// 设重入哨兵阻止 viewChanged → refreshOverlay → displayImage 同步嵌套
-		// 导致 Halcon 渲染栈溢出（DispObj 内调 DispObj）。
-		// 覆盖层由末尾 drawROI/drawCenterPoint 绘制，refreshOverlay 仅在
-		// 缩放/平移等交互触发的 viewChanged 时工作。
 		displaying_ = true;
 		imageLabel_->displayImage(image);
 		displaying_ = false;
@@ -34,12 +29,28 @@ namespace ui
 		drawCenterPoint();
 	}
 
+	HalconCpp::HObject ShapeEditor::roi() const
+	{
+		HalconCpp::HObject obj;
+		if (hasROI_)
+		{
+			try
+			{
+				HalconCpp::GenRectangle1(&obj,
+					roiRect_.top(), roiRect_.left(),
+					roiRect_.bottom(), roiRect_.right());
+			}
+			catch (...) {}
+		}
+		return obj;
+	}
+
 	void ShapeEditor::setTool(Tool tool)
 	{
 		if (tool_ == tool)
 			return;
 
-		// 切换工具时取消未完成的 ROI 绘制
+		// 切换工具时取消未完成的 ROI 绘制（橡皮筋）
 		if (roiDrawing_)
 		{
 			roiDrawing_ = false;
@@ -61,7 +72,8 @@ namespace ui
 
 	void ShapeEditor::clearROI()
 	{
-		roi_ = HalconCpp::HObject();
+		hasROI_ = false;
+		roiRect_ = QRectF();
 		roiDrawing_ = false;
 		refreshOverlay();
 		emit roiChanged();
@@ -76,7 +88,8 @@ namespace ui
 
 	void ShapeEditor::clearAll()
 	{
-		roi_ = HalconCpp::HObject();
+		hasROI_ = false;
+		roiRect_ = QRectF();
 		roiDrawing_ = false;
 		hasCenterPoint_ = false;
 		refreshOverlay();
@@ -93,9 +106,6 @@ namespace ui
 
 	bool ShapeEditor::eventFilter(QObject* /*obj*/, QEvent* e)
 	{
-		// 本过滤器通过 installOverlayEventFilter 安装在 HalconInteractiveLabel 的内部覆盖层上，
-		// 因此到达此处的事件均来自该覆盖层。
-
 		switch (e->type())
 		{
 		case QEvent::MouseButtonPress:
@@ -106,11 +116,14 @@ namespace ui
 			{
 				if (tool_ == Tool::RectangleROI)
 				{
+					// 开始新的 ROI 拖拽前清除旧 ROI（单 ROI 模式）
+					hasROI_ = false;
+					roiRect_ = QRectF();
 					roiDrawing_ = true;
 					roiStartWidget_ = me->pos();
 					roiEndWidget_ = me->pos();
 					refreshOverlay();
-					return true; // 消费，阻止 L2 平移
+					return true;
 				}
 				else if (tool_ == Tool::CenterPoint)
 				{
@@ -152,9 +165,8 @@ namespace ui
 
 				if (rect.width() > 1.0 && rect.height() > 1.0)
 				{
-					using namespace HalconCpp;
-					GenRectangle1(&roi_,
-						rect.top(), rect.left(), rect.bottom(), rect.right());
+					roiRect_ = rect;
+					hasROI_ = true;
 					emit roiChanged();
 				}
 
@@ -169,7 +181,6 @@ namespace ui
 			auto* ke = static_cast<QKeyEvent*>(e);
 			if (ke->key() == Qt::Key_Escape)
 			{
-				// 取消当前绘制操作，回到 View 模式
 				if (roiDrawing_)
 				{
 					roiDrawing_ = false;
@@ -191,12 +202,10 @@ namespace ui
 
 	void ShapeEditor::refreshOverlay()
 	{
-		// displayImage 正在执行中 → 覆盖层由 displayImage 末尾直接绘制，
-		// 无需通过 viewChanged 信号重入（避免 DispObj 嵌套导致栈溢出）。
 		if (!imageLabel_ || !imageLabel_->isReady() || displaying_)
 			return;
 
-		// 缩放/平移等交互触发 → 重绘底图 + 叠加 ROI / 中心点
+		// 重绘底图 + 叠加 ROI / 中心点
 		imageLabel_->displayImage(imageLabel_->lastImage());
 		drawROI();
 		drawCenterPoint();
@@ -209,15 +218,17 @@ namespace ui
 
 		using namespace HalconCpp;
 
-		// 绘制已确认的 ROI
-		if (roi_.IsInitialized())
+		// 绘制已确认的 ROI（与橡皮筋使用同样的 DispRectangle1 API）
+		if (hasROI_)
 		{
 			try
 			{
 				SetColor(imageLabel_->halconHandle(), "green");
 				SetDraw(imageLabel_->halconHandle(), "margin");
 				SetLineWidth(imageLabel_->halconHandle(), 2);
-				DispObj(roi_, imageLabel_->halconHandle());
+				DispRectangle1(imageLabel_->halconHandle(),
+					roiRect_.top(), roiRect_.left(),
+					roiRect_.bottom(), roiRect_.right());
 			}
 			catch (...) {}
 		}

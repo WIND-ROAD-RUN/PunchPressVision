@@ -36,8 +36,12 @@ namespace ui
 		void setTool(Tool tool);
 		Tool tool() const { return tool_; }
 
-		/// 当前 ROI（图像坐标），未绘制时返回未初始化对象
-		HalconCpp::HObject roi() const { return roi_; }
+		/// 当前 ROI（图像坐标 Halcon 区域对象），未绘制时返回未初始化对象
+		HalconCpp::HObject roi() const;
+
+		/// 当前 ROI 矩形（图像坐标），未绘制时返回 null 矩形
+		QRectF roiRect() const { return hasROI_ ? roiRect_ : QRectF(); }
+		bool hasROI() const { return hasROI_; }
 
 		/// 当前中心点（图像坐标）
 		QPointF centerPoint() const { return centerPoint_; }
@@ -66,7 +70,7 @@ namespace ui
 
 	private:
 		void refreshOverlay();        ///< 重新绘制 ROI / 中心点
-		void drawROI();               ///< 在 Halcon 窗口上绘制 ROI
+		void drawROI();               ///< 在 Halcon 窗口上绘制 ROI（使用 DispRectangle1）
 		void drawCenterPoint();       ///< 在 Halcon 窗口上绘制中心点
 
 		QPointF widgetToImage(const QPoint& widgetPos) const;
@@ -79,7 +83,8 @@ namespace ui
 		bool roiDrawing_{ false };
 		QPoint roiStartWidget_;       // 拖拽起点（控件坐标）
 		QPoint roiEndWidget_;         // 拖拽终点（控件坐标）
-		HalconCpp::HObject roi_;      // 已确认的 ROI（图像坐标）
+		QRectF roiRect_;              // 已确认的 ROI（图像坐标）
+		bool hasROI_{ false };
 
 		// 中心点
 		QPointF centerPoint_;         // 图像坐标
