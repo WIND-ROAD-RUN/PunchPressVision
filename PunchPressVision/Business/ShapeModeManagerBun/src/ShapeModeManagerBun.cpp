@@ -80,6 +80,36 @@ namespace bun
 			data.maxContrast = req.contrast;
 			data.minContrast = req.minContrast;
 
+			// 图像预处理参数
+			data._SingleChannelType = req.imageChannelType;
+			data._createModelPreProcessType = req.imageChannelType;
+			data._createModelUseOpening = req.useOpening;
+			data._createModelOpeningRadius = req.openingSize;
+			data._createModelUseClosing = req.useClosing;
+			data._createModelClosingRadius = req.closingSize;
+			data._createModelUseMean = req.useMean;
+			data._createModelMeanRadius = req.meanSize;
+
+			// ROI 矩形列表（逐个保存为 HObject，支持回撤）
+			data._paintCreateRoiList.clear();
+			for (const auto& r : req.roiRects)
+			{
+				HalconCpp::HObject obj;
+				HalconCpp::GenRectangle1(&obj,
+					r.top(), r.left(), r.bottom(), r.right());
+				data._paintCreateRoiList.push_back(obj);
+			}
+
+			// Mask 矩形列表（逐个保存为 HObject，支持回撤）
+			data._paintShieldRoiList.clear();
+			for (const auto& r : req.maskRects)
+			{
+				HalconCpp::HObject obj;
+				HalconCpp::GenRectangle1(&obj,
+					r.top(), r.left(), r.bottom(), r.right());
+				data._paintShieldRoiList.push_back(obj);
+			}
+
 			// 4. 元数据
 			Config::ShapeModelInfo::BaseInfo baseInfo;
 			baseInfo.name = req.name.isEmpty()

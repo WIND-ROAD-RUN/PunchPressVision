@@ -8,6 +8,8 @@
 #include <QObject>
 #include <QString>
 #include <QPointF>
+#include <QRectF>
+#include <QVector>
 
 #include "global/GlobalInterface.hpp"
 #include "infrastructure/infrastructure.hpp"
@@ -21,8 +23,10 @@ namespace bun
 	struct CreateModelRequest
 	{
 		HalconCpp::HImage trainingImage;
-		HalconCpp::HObject roi;              // ROI 区域
-		HalconCpp::HObject mask;             // 屏蔽区域（可选）
+		HalconCpp::HObject roi;              // ROI 区域（合并后的 HObject）
+		HalconCpp::HObject mask;             // 屏蔽区域（合并后的 HObject）
+		QVector<QRectF> roiRects;            // ROI 矩形列表（逐个保存，支持回撤）
+		QVector<QRectF> maskRects;           // Mask 矩形列表（逐个保存，支持回撤）
 		QPointF centerPoint;                 // 手动指定的中心点（可选）
 		bool hasCenterPoint{ false };        // 是否使用手动中心点
 		QString name;                        // 模型名称（空则用时间戳）
@@ -30,6 +34,15 @@ namespace bun
 		double gain{ 0.0 };
 		bool upperLight{ false };
 		bool lowerLight{ false };
+
+		// 图像预处理参数
+		int imageChannelType{ 0 };           // comboBox_ImageType index
+		bool useOpening{ false };
+		int openingSize{ 5 };
+		bool useClosing{ false };
+		int closingSize{ 5 };
+		bool useMean{ false };
+		int meanSize{ 5 };
 
 		// 训练参数
 		int numLevels{ 4 };

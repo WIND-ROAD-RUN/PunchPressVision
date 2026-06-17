@@ -390,6 +390,10 @@ namespace ui
 		req.trainingImage = lastFrame_;
 		if (shapeEditor_)
 		{
+			// ROI/Mask 矩形列表（逐个保存，支持回撤查看）
+			req.roiRects = shapeEditor_->roiRects();
+			req.maskRects = shapeEditor_->maskRects();
+			// 合并后的区域（用于模型训练裁剪）
 			if (shapeEditor_->hasROI())
 				req.roi = shapeEditor_->roi();
 			if (shapeEditor_->hasMask())
@@ -409,6 +413,15 @@ namespace ui
 		}
 		req.exposure = static_cast<double>(cameraCfg_.exposureTime1);
 		req.gain = static_cast<double>(cameraCfg_.gain1);
+
+		// 图像预处理参数
+		req.imageChannelType = ui->comboBox_ImageType->currentIndex();
+		req.useOpening = ui->ckb_opening->isChecked();
+		req.openingSize = openingSize_;
+		req.useClosing = ui->ckb_closing->isChecked();
+		req.closingSize = closingSize_;
+		req.useMean = ui->ckb_mean->isChecked();
+		req.meanSize = meanSize_;
 
 		// 模型训练参数
 		req.contrast = contrastAuto_ ? 0 : contrast_;
