@@ -164,17 +164,19 @@ namespace Config
 		}
 
 		void writeParamsSafe(const fs::path& filePath,
-			int singleChannelType,
+			int createModelPreProcessType,
 			double centerX, double centerY,
 			double findCenterX, double findCenterY,
 			double offsetX, double offsetY, double offsetAngle,
-			int findNumber, double rotateAngle,
+			int findNumber,
 			double createModelExposureTime, double createModelGain,
-			int createModelPreProcessType,
+			bool upperLight, bool lowerLight,
 			bool createModelUseOpening, int createModelOpeningRadius,
 			bool createModelUseClosing, int createModelClosingRadius,
 			bool createModelUseMean, int createModelMeanRadius,
-			int maxContrast, int minContrast,
+			int numLevels, double angleStart, double angleExtent, double angleStep,
+			const std::string& optimization, const std::string& metric,
+			int contrast, int minContrast,
 			const std::string& modelPath)
 		{
 			fs::create_directories(filePath.parent_path());
@@ -183,7 +185,7 @@ namespace Config
 			std::ofstream ofs(tmp);
 			if (!ofs)
 				return;
-			ofs << "SingleChannelType=" << singleChannelType << '\n';
+			ofs << "createModelPreProcessType=" << createModelPreProcessType << '\n';
 			ofs << "centerX=" << centerX << '\n';
 			ofs << "centerY=" << centerY << '\n';
 			ofs << "findCenterX=" << findCenterX << '\n';
@@ -192,17 +194,23 @@ namespace Config
 			ofs << "offsetY=" << offsetY << '\n';
 			ofs << "offsetAngle=" << offsetAngle << '\n';
 			ofs << "findnumber=" << findNumber << '\n';
-			ofs << "rotateAngle=" << rotateAngle << '\n';
 			ofs << "createModelExposureTime=" << createModelExposureTime << '\n';
 			ofs << "createModelGain=" << createModelGain << '\n';
-			ofs << "createModelPreProcessType=" << createModelPreProcessType << '\n';
+			ofs << "upperLight=" << (upperLight ? 1 : 0) << '\n';
+			ofs << "lowerLight=" << (lowerLight ? 1 : 0) << '\n';
 			ofs << "createModelUseOpening=" << (createModelUseOpening ? 1 : 0) << '\n';
 			ofs << "createModelOpeningRadius=" << createModelOpeningRadius << '\n';
 			ofs << "createModelUseClosing=" << (createModelUseClosing ? 1 : 0) << '\n';
 			ofs << "createModelClosingRadius=" << createModelClosingRadius << '\n';
 			ofs << "createModelUseMean=" << (createModelUseMean ? 1 : 0) << '\n';
 			ofs << "createModelMeanRadius=" << createModelMeanRadius << '\n';
-			ofs << "maxContrast=" << maxContrast << '\n';
+			ofs << "numLevels=" << numLevels << '\n';
+			ofs << "angleStart=" << angleStart << '\n';
+			ofs << "angleExtent=" << angleExtent << '\n';
+			ofs << "angleStep=" << angleStep << '\n';
+			ofs << "optimization=" << optimization << '\n';
+			ofs << "metric=" << metric << '\n';
+			ofs << "contrast=" << contrast << '\n';
 			ofs << "minContrast=" << minContrast << '\n';
 			ofs << "modelPath=" << modelPath << '\n';
 			ofs.close();
@@ -217,17 +225,19 @@ namespace Config
 		}
 
 		bool readParamsSafe(const fs::path& filePath,
-			int& singleChannelType,
+			int& createModelPreProcessType,
 			double& centerX, double& centerY,
 			double& findCenterX, double& findCenterY,
 			double& offsetX, double& offsetY, double& offsetAngle,
-			int& findNumber, double& rotateAngle,
+			int& findNumber,
 			double& createModelExposureTime, double& createModelGain,
-			int& createModelPreProcessType,
+			bool& upperLight, bool& lowerLight,
 			bool& createModelUseOpening, int& createModelOpeningRadius,
 			bool& createModelUseClosing, int& createModelClosingRadius,
 			bool& createModelUseMean, int& createModelMeanRadius,
-			int& maxContrast, int& minContrast,
+			int& numLevels, double& angleStart, double& angleExtent, double& angleStep,
+			std::string& optimization, std::string& metric,
+			int& contrast, int& minContrast,
 			std::string& modelPath)
 		{
 			if (!fs::exists(filePath))
@@ -248,8 +258,8 @@ namespace Config
 				const std::string value = line.substr(pos + 1);
 				try
 				{
-					if (key == "SingleChannelType")
-						singleChannelType = std::stoi(value);
+					if (key == "createModelPreProcessType")
+						createModelPreProcessType = std::stoi(value);
 					else if (key == "centerX")
 						centerX = std::stod(value);
 					else if (key == "centerY")
@@ -266,14 +276,14 @@ namespace Config
 						offsetAngle = std::stod(value);
 					else if (key == "findnumber")
 						findNumber = std::stoi(value);
-					else if (key == "rotateAngle")
-						rotateAngle = std::stod(value);
 					else if (key == "createModelExposureTime")
 						createModelExposureTime = std::stod(value);
 					else if (key == "createModelGain")
 						createModelGain = std::stod(value);
-					else if (key == "createModelPreProcessType")
-						createModelPreProcessType = std::stoi(value);
+					else if (key == "upperLight")
+						upperLight = std::stoi(value) != 0;
+					else if (key == "lowerLight")
+						lowerLight = std::stoi(value) != 0;
 					else if (key == "createModelUseOpening")
 						createModelUseOpening = std::stoi(value) != 0;
 					else if (key == "createModelOpeningRadius")
@@ -286,8 +296,20 @@ namespace Config
 						createModelUseMean = std::stoi(value) != 0;
 					else if (key == "createModelMeanRadius")
 						createModelMeanRadius = std::stoi(value);
-					else if (key == "maxContrast")
-						maxContrast = std::stoi(value);
+					else if (key == "numLevels")
+						numLevels = std::stoi(value);
+					else if (key == "angleStart")
+						angleStart = std::stod(value);
+					else if (key == "angleExtent")
+						angleExtent = std::stod(value);
+					else if (key == "angleStep")
+						angleStep = std::stod(value);
+					else if (key == "optimization")
+						optimization = value;
+					else if (key == "metric")
+						metric = value;
+					else if (key == "contrast")
+						contrast = std::stoi(value);
 					else if (key == "minContrast")
 						minContrast = std::stoi(value);
 					else if (key == "modelPath")
@@ -310,17 +332,19 @@ namespace Config
 
 			// 加载基本参数
 			readParamsSafe(dirPath / kParamsFile,
-				_SingleChannelType,
+				_createModelPreProcessType,
 				centerX, centerY,
 				findCenterX, findCenterY,
 				offsetX, offsetY, offsetAngle,
-				findnumber, rotateAngle,
+				findnumber,
 				_createModelExposureTime, _createModelGain,
-				_createModelPreProcessType,
+				upperLight, lowerLight,
 				_createModelUseOpening, _createModelOpeningRadius,
 				_createModelUseClosing, _createModelClosingRadius,
 				_createModelUseMean, _createModelMeanRadius,
-				maxContrast, minContrast,
+				numLevels, angleStart, angleExtent, angleStep,
+				optimization, metric,
+				contrast, minContrast,
 				modelPath);
 
 			// 加载图像
@@ -383,17 +407,19 @@ namespace Config
 
 			// 保存基本参数
 			writeParamsSafe(dirPath / kParamsFile,
-				_SingleChannelType,
+				_createModelPreProcessType,
 				centerX, centerY,
 				findCenterX, findCenterY,
 				offsetX, offsetY, offsetAngle,
-				findnumber, rotateAngle,
+				findnumber,
 				_createModelExposureTime, _createModelGain,
-				_createModelPreProcessType,
+				upperLight, lowerLight,
 				_createModelUseOpening, _createModelOpeningRadius,
 				_createModelUseClosing, _createModelClosingRadius,
 				_createModelUseMean, _createModelMeanRadius,
-				maxContrast, minContrast,
+				numLevels, angleStart, angleExtent, angleStep,
+				optimization, metric,
+				contrast, minContrast,
 				modelPath);
 
 			// 保存图像

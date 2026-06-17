@@ -72,6 +72,9 @@ namespace ui
 
 		void updateToolButtons(ShapeEditor::Tool tool);
 		void updateContrastVisibility();
+		void refreshProcessedImage();
+
+		HalconCpp::HImage preprocessImage(const HalconCpp::HImage& image) const;
 
 		// 构建 CreateModelRequest（供识别和创建共用）
 		bun::CreateModelRequest buildRequest(const HalconCpp::HImage& image) const;

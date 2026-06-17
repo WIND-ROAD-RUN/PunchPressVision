@@ -116,6 +116,16 @@ namespace ui
 				ui->btn_mincontrast->setText(QString::number(minContrast_));
 		});
 
+		// 预处理参数变化时刷新显示
+		connect(ui->comboBox_ImageType, QOverload<int>::of(&QComboBox::currentIndexChanged),
+			this, &ModelEditorDialog::refreshProcessedImage);
+		connect(ui->ckb_opening, &QCheckBox::stateChanged,
+			this, &ModelEditorDialog::refreshProcessedImage);
+		connect(ui->ckb_closing, &QCheckBox::stateChanged,
+			this, &ModelEditorDialog::refreshProcessedImage);
+		connect(ui->ckb_mean, &QCheckBox::stateChanged,
+			this, &ModelEditorDialog::refreshProcessedImage);
+
 		// 操作
 		connect(ui->btn_recognize, &QPushButton::clicked,
 			this, &ModelEditorDialog::onRecognize);
@@ -125,6 +135,14 @@ namespace ui
 			this, &ModelEditorDialog::onReadImage);
 		connect(ui->btn_exit, &QPushButton::clicked,
 			this, &QDialog::accept);
+
+		// 创建模型成功后显示轮廓
+		auto& biz = app_.business();
+		if (biz.shape_mode_manager_bun)
+		{
+			connect(biz.shape_mode_manager_bun.get(), &bun::ShapeModeManagerBun::modelContoursFound,
+				shapeEditor_, &ShapeEditor::drawModelContours);
+		}
 	}
 
 	// ===== 帧回调 ==============================================================
@@ -133,7 +151,7 @@ namespace ui
 	{
 		lastFrame_ = image;
 		if (shapeEditor_)
-			shapeEditor_->displayImage(image);
+			shapeEditor_->displayImage(preprocessImage(image));
 	}
 
 	// ===== 形状编辑 ============================================================
@@ -141,19 +159,43 @@ namespace ui
 	void ModelEditorDialog::onPaintRegion()
 	{
 		if (!shapeEditor_) return;
-		if (shapeEditor_->tool() == ShapeEditor::Tool::RectangleROI)
+		const auto tool = shapeEditor_->tool();
+		if (tool == ShapeEditor::Tool::RectangleROI ||
+		    tool == ShapeEditor::Tool::FreehandROI)
+		{
+			// 退出绘制工具，保持停止采集（继续使用同一张图片）
 			shapeEditor_->setTool(ShapeEditor::Tool::View);
+		}
 		else
-			shapeEditor_->setTool(ShapeEditor::Tool::RectangleROI);
+		{
+			// 进入绘制前：停止实时采集，当前帧保持显示
+			app_.switchToMode(global::RunMode::Idle);
+			if (ui->rbtn_manual_2->isChecked())
+				shapeEditor_->setTool(ShapeEditor::Tool::FreehandROI);
+			else
+				shapeEditor_->setTool(ShapeEditor::Tool::RectangleROI);
+		}
 	}
 
 	void ModelEditorDialog::onPaintMask()
 	{
 		if (!shapeEditor_) return;
-		if (shapeEditor_->tool() == ShapeEditor::Tool::RectangleMask)
+		const auto tool = shapeEditor_->tool();
+		if (tool == ShapeEditor::Tool::RectangleMask ||
+		    tool == ShapeEditor::Tool::FreehandMask)
+		{
+			// 退出屏蔽工具，保持停止采集（继续使用同一张图片）
 			shapeEditor_->setTool(ShapeEditor::Tool::View);
+		}
 		else
-			shapeEditor_->setTool(ShapeEditor::Tool::RectangleMask);
+		{
+			// 进入屏蔽前：停止实时采集，当前帧保持显示
+			app_.switchToMode(global::RunMode::Idle);
+			if (ui->rbtn_manual_2->isChecked())
+				shapeEditor_->setTool(ShapeEditor::Tool::FreehandMask);
+			else
+				shapeEditor_->setTool(ShapeEditor::Tool::RectangleMask);
+		}
 	}
 
 	void ModelEditorDialog::onPaintCenterPoint()
@@ -168,7 +210,11 @@ namespace ui
 	void ModelEditorDialog::onClearRegion()
 	{
 		if (shapeEditor_)
+		{
 			shapeEditor_->clearAll();
+			// 清空绘制区域后恢复实时采集
+			app_.switchToMode(global::RunMode::CreateModel);
+		}
 	}
 
 	void ModelEditorDialog::onUndo()
@@ -199,8 +245,8 @@ namespace ui
 
 		if (shapeEditor_)
 		{
-			req.roiRects = shapeEditor_->roiRects();
-			req.maskRects = shapeEditor_->maskRects();
+			req._paintCreateRoiList = shapeEditor_->roiObjects();
+			req._paintShieldRoiList = shapeEditor_->maskObjects();
 			if (shapeEditor_->hasROI())
 				req.roi = shapeEditor_->roi();
 			if (shapeEditor_->hasMask())
@@ -253,7 +299,7 @@ namespace ui
 		if (!biz.shape_mode_manager_bun)
 			return;
 
-		const auto req = buildRequest(lastFrame_);
+		const auto req = buildRequest(preprocessImage(lastFrame_));
 		std::string err;
 		//TODO:这里面内部进行识别
 		const auto result = biz.shape_mode_manager_bun->testRecognize(req, &err);
@@ -288,7 +334,7 @@ namespace ui
 		if (!biz.shape_mode_manager_bun || !lastFrame_.IsInitialized())
 			return;
 
-		const auto req = buildRequest(lastFrame_);
+		const auto req = buildRequest(preprocessImage(lastFrame_));
 
 		Config::ShapeModelInfo outInfo;
 		std::string err;
@@ -390,19 +436,28 @@ namespace ui
 	void ModelEditorDialog::onOpeningClicked()
 	{
 		if (inputIntParam(ui->btn_opening, openingSize_, 1, 99, QStringLiteral("开运算核大小")))
+		{
 			ui->btn_opening->setText(QString::number(openingSize_));
+			refreshProcessedImage();
+		}
 	}
 
 	void ModelEditorDialog::onClosingClicked()
 	{
 		if (inputIntParam(ui->btn_closing, closingSize_, 1, 99, QStringLiteral("闭运算核大小")))
+		{
 			ui->btn_closing->setText(QString::number(closingSize_));
+			refreshProcessedImage();
+		}
 	}
 
 	void ModelEditorDialog::onMeanClicked()
 	{
 		if (inputIntParam(ui->btn_mean, meanSize_, 1, 99, QStringLiteral("均值滤波核大小")))
+		{
 			ui->btn_mean->setText(QString::number(meanSize_));
+			refreshProcessedImage();
+		}
 	}
 
 	void ModelEditorDialog::onContrastAutoToggled(bool checked)
@@ -414,6 +469,84 @@ namespace ui
 	void ModelEditorDialog::updateContrastVisibility()
 	{
 		ui->widget_contrastHide->setVisible(!contrastAuto_);
+	}
+
+	void ModelEditorDialog::refreshProcessedImage()
+	{
+		if (shapeEditor_ && lastFrame_.IsInitialized())
+			shapeEditor_->displayImage(preprocessImage(lastFrame_));
+	}
+
+	HalconCpp::HImage ModelEditorDialog::preprocessImage(const HalconCpp::HImage& image) const
+	{
+		using namespace HalconCpp;
+		if (!image.IsInitialized())
+			return image;
+
+		try
+		{
+			HImage result = image;
+
+			// 通道处理
+			HTuple channels;
+			CountChannels(image, &channels);
+			const int channelType = ui->comboBox_ImageType->currentIndex();
+			if (channels[0].I() >= 3)
+			{
+				switch (channelType)
+				{
+				case 0: // 灰度
+					Rgb1ToGray(image, &result);
+					break;
+				case 1: // 红
+					AccessChannel(image, &result, 1);
+					break;
+				case 2: // 绿
+					AccessChannel(image, &result, 2);
+					break;
+				case 3: // 蓝
+					AccessChannel(image, &result, 3);
+					break;
+				default:
+					break;
+				}
+			}
+			else if (channelType != 0 && channels[0].I() >= channelType)
+			{
+				AccessChannel(image, &result, channelType);
+			}
+
+			// 开运算
+			if (ui->ckb_opening->isChecked() && openingSize_ > 0)
+			{
+				HImage opened;
+				OpeningCircle(result, &opened, openingSize_);
+				result = opened;
+			}
+
+			// 闭运算
+			if (ui->ckb_closing->isChecked() && closingSize_ > 0)
+			{
+				HImage closed;
+				ClosingCircle(result, &closed, closingSize_);
+				result = closed;
+			}
+
+			// 均值滤波
+			if (ui->ckb_mean->isChecked() && meanSize_ > 0)
+			{
+				HImage smoothed;
+				const int size = meanSize_ * 2 + 1;
+				MeanImage(result, &smoothed, size, size);
+				result = smoothed;
+			}
+
+			return result;
+		}
+		catch (...)
+		{
+			return image;
+		}
 	}
 
 	// ===== 数字键盘 ============================================================
@@ -477,13 +610,17 @@ namespace ui
 
 	void ModelEditorDialog::updateToolButtons(ShapeEditor::Tool tool)
 	{
+		const bool isRoiTool = (tool == ShapeEditor::Tool::RectangleROI ||
+		                        tool == ShapeEditor::Tool::FreehandROI);
 		ui->btn_paintRegion->setText(
-			tool == ShapeEditor::Tool::RectangleROI
+			isRoiTool
 				? QStringLiteral("退出绘制")
 				: QStringLiteral("绘制感兴趣区域"));
 
+		const bool isMaskTool = (tool == ShapeEditor::Tool::RectangleMask ||
+		                         tool == ShapeEditor::Tool::FreehandMask);
 		ui->btn_shiledRegion->setText(
-			tool == ShapeEditor::Tool::RectangleMask
+			isMaskTool
 				? QStringLiteral("退出屏蔽")
 				: QStringLiteral("绘制屏蔽区域"));
 
@@ -508,7 +645,7 @@ namespace ui
 			HalconCpp::HImage image(path.toStdString().c_str());
 			lastFrame_ = image;
 			if (shapeEditor_)
-				shapeEditor_->displayImage(image);
+				shapeEditor_->displayImage(preprocessImage(image));
 		}
 		catch (...)
 		{

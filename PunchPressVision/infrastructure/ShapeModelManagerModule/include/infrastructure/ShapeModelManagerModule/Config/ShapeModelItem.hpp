@@ -8,7 +8,6 @@ namespace Config
 {
 	struct ShapeModelData
 	{
-		
 		// 创建的模板的图片
 		HalconCpp::HImage _templateMatImage;
 
@@ -44,20 +43,15 @@ namespace Config
 		// 角度偏差（单位：deg 或 rad，取决于业务定义）
 		double offsetAngle = 0;
 
-
 		int findnumber = 0;
 
-		double rotateAngle = 360.0;
-
-		// 创建模板时选择的单通道类型（对应单通道下拉框索引）
-		int _SingleChannelType = 0;
-
-		// 创建模板时候的曝光，创建模板时候的增益，创建模板的时候选择的通道，创建模板时候是否开启开运算
-		// 创建模板时候开运算的半径，创建模板时候是否开启均值，创建模板时候均值的半径
+		// 创建模板时的曝光、增益、光源
 		double _createModelExposureTime = 0.0;
 		double _createModelGain = 0.0;
-		// 选择的通道类型
+		bool upperLight = false;
+		bool lowerLight = false;
 
+		// 图像预处理参数
 		int _createModelPreProcessType = 0;      // 对应 comboBox_ImageType->currentIndex()
 
 		bool _createModelUseOpening = false;
@@ -69,8 +63,15 @@ namespace Config
 		bool _createModelUseMean = false;
 		int _createModelMeanRadius = 0;
 
-		int maxContrast{ 5 };
-		int minContrast{ 3 };
+		// 训练参数
+		int numLevels = 4;
+		double angleStart = -3.14;
+		double angleExtent = 6.28;
+		double angleStep = 0.0;                  // 0 = auto
+		std::string optimization = "auto";
+		std::string metric = "use_polarity";
+		int contrast = 30;
+		int minContrast = 10;
 
 		std::string modelPath{};
 
