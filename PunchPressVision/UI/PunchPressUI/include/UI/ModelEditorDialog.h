@@ -4,7 +4,7 @@
 
 #include "halconcpp/HalconCpp.h"
 #include "global/GlobalType.hpp"
-#include "UI/HalconView.h"
+#include "UI/ShapeEditor.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Dlg_createshapemodelClass; }
@@ -24,6 +24,13 @@ namespace ui
 
 	private slots:
 		void onFrameReady(HalconCpp::HImage image);
+		void onPaintRegion();
+		void onPaintMask();
+		void onPaintCenterPoint();
+		void onClearRegion();
+		void onUndo();
+		void onCreateModel();
+		void onReadImage();
 
 	private:
 		void buildConnections();
@@ -32,8 +39,7 @@ namespace ui
 
 		Ui::Dlg_createshapemodelClass* ui;
 		app::PunchPressApp& app_;
+		ui::ShapeEditor* shapeEditor_{ nullptr };
 		HalconCpp::HImage lastFrame_;
-		HalconCpp::HObject roi_;
-		HalconView view_;
 	};
 }

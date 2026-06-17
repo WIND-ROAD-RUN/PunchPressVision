@@ -7,6 +7,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QPointF>
 
 #include "global/GlobalInterface.hpp"
 #include "infrastructure/infrastructure.hpp"
@@ -21,6 +22,9 @@ namespace bun
 	{
 		HalconCpp::HImage trainingImage;
 		HalconCpp::HObject roi;              // ROI 区域
+		HalconCpp::HObject mask;             // 屏蔽区域（可选）
+		QPointF centerPoint;                 // 手动指定的中心点（可选）
+		bool hasCenterPoint{ false };        // 是否使用手动中心点
 		QString name;                        // 模型名称（空则用时间戳）
 		double exposure{ 0.0 };
 		double gain{ 0.0 };

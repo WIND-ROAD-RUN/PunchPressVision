@@ -15,8 +15,11 @@ HalconDisplayLabel                  ← L1: 纯显示
 └── HalconInteractiveLabel          ← L2: 视图操作 (子类)
     ├── 职责: 滚轮缩放、拖拽平移、复位、适应窗口、1:1 像素、选框放大
     │
-    └── ImageViewer 组合它          ← L3: 测量标注 (复合控件)
-        职责: 坐标/灰度取色、ROI 框选、双点测距、叠加层管理、截图
+    ├── ImageViewer 组合它          ← L3: 测量标注 (复合控件)
+    │   职责: 坐标/灰度取色、ROI 框选、双点测距、叠加层管理、截图
+    │
+    └── ShapeEditor 组合它          ← L3: 形状/模型编辑 (复合控件)
+        职责: ROI 绘制、Mask 绘制、中心点定义、撤销/清空
 ```
 
 ### 划分依据
@@ -167,6 +170,66 @@ signals:
 
 ---
 
+## L3: ShapeEditor（模型形状编辑器，已实现一期）
+
+**路径**: `include/UI/ShapeEditor.h`
+
+组合 `HalconInteractiveLabel` + 鼠标捕获叠加层，保留 L2 视图操纵能力，同时提供模型训练所需的 ROI、Mask、中心点绘制工具。
+
+### 结构
+
+```
+ShapeEditor (QWidget)
+├── HalconInteractiveLabel         ← 核心显示区 + 缩放平移
+└── 内部覆盖层                      ← 捕获鼠标，用于 ROI/中心点绘制
+```
+
+### 需求清单（一期）
+
+| # | 功能 | 描述 |
+|---|------|------|
+| 5.1 | 视图操纵 | 默认 Tool::View，滚轮缩放、拖拽平移、右键复位 |
+| 5.2 | 矩形 ROI | Tool::RectangleROI，左键拖拽生成 ROI，发射 roiChanged |
+| 5.3 | 中心点定义 | Tool::CenterPoint，左键点击设置模板中心点 |
+| 5.4 | 撤销/清空 | clearROI、clearCenterPoint、clearAll |
+| 5.5 | Halcon 原生绘制 | ROI 用 `DispRectangle1`，中心点用 `DispCross`，避免 z-order 问题 |
+
+### API 示意
+
+```cpp
+class ShapeEditor : public QWidget
+{
+    Q_OBJECT
+public:
+    enum class Tool { View, RectangleROI, CenterPoint };
+
+    void displayImage(const HalconCpp::HImage& image);
+    void setTool(Tool tool);
+
+    HalconCpp::HObject roi() const;
+    QPointF centerPoint() const;
+    bool hasCenterPoint() const;
+
+    void clearROI();
+    void clearCenterPoint();
+    void clearAll();
+
+signals:
+    void roiChanged();
+    void centerPointChanged();
+    void toolChanged(Tool tool);
+};
+```
+
+### 未来扩展
+
+- `RectangleMask` / `PolygonMask`
+- 多边形 ROI
+- 撤销历史栈
+- 可视化样式配置（颜色/线宽）
+
+---
+
 ## 使用场景对照
 
 | 场景 | 使用控件 | 说明 |
@@ -187,11 +250,13 @@ UI/Controls/HalconWidgets/
 ├── include/UI/
 │   ├── HalconDisplayLabel.h           ← L1 已实现
 │   ├── HalconInteractiveLabel.h       ← L2 已实现
-│   ├── ImageViewer.h                  ← L3 待实现
-│   └── OverlayWidget.h                ← 叠加绘制层 待实现
+│   ├── ImageViewer.h                  ← L3 已实现
+│   ├── OverlayWidget.h                ← 叠加绘制层 已实现
+│   └── ShapeEditor.h                  ← L3 模型编辑器 已实现一期
 └── src/
     ├── HalconDisplayLabel.cpp
     ├── HalconInteractiveLabel.cpp
     ├── ImageViewer.cpp
-    └── OverlayWidget.cpp
+    ├── OverlayWidget.cpp
+    └── ShapeEditor.cpp
 ```

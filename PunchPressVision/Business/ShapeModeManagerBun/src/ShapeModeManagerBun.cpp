@@ -38,6 +38,23 @@ namespace bun
 				}
 			}
 
+			// 若提供了屏蔽区域，从 ROI 中剔除
+			if (req.mask.IsInitialized())
+			{
+				HObject diff;
+				Difference(req.roi, req.mask, &diff);
+				HObject reduced;
+				ReduceDomain(req.trainingImage, diff, &reduced);
+				templateImage = HImage(reduced);
+			}
+
+			// 使用手动指定的中心点（优先于 ROI 形心）
+			if (req.hasCenterPoint)
+			{
+				centerX = req.centerPoint.x();
+				centerY = req.centerPoint.y();
+			}
+
 			// 2. 创建 Shape Model
 			HTuple modelID;
 			CreateShapeModel(templateImage,
