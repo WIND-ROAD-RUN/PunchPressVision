@@ -8,6 +8,8 @@
 
 namespace ui
 {
+	// ===== 构造 / 析构 ========================================================
+
 	ShapeEditor::ShapeEditor(QWidget* parent)
 		: QWidget(parent)
 	{
@@ -20,37 +22,45 @@ namespace ui
 
 	ShapeEditor::~ShapeEditor() = default;
 
+	// ===== 图像显示 ============================================================
+
 	void ShapeEditor::displayImage(const HalconCpp::HImage& image)
 	{
 		displaying_ = true;
 		imageLabel_->displayImage(image);
 		displaying_ = false;
 		drawAllROIs();
+		drawAllMasks();
 		drawCenterPoint();
 	}
 
-	HalconCpp::HObject ShapeEditor::roi() const
+	// ===== HObject 导出 ========================================================
+
+	HalconCpp::HObject ShapeEditor::rectToRegion(const QRectF& r)
+	{
+		HalconCpp::HObject obj;
+		try
+		{
+			HalconCpp::GenRectangle1(&obj,
+				r.top(), r.left(), r.bottom(), r.right());
+		}
+		catch (...) {}
+		return obj;
+	}
+
+	HalconCpp::HObject ShapeEditor::mergeRects(const QVector<QRectF>& rects)
 	{
 		using namespace HalconCpp;
-
-		HalconCpp::HObject result;
-		if (roiRects_.isEmpty())
+		HObject result;
+		if (rects.isEmpty())
 			return result;
 
 		try
 		{
-			// 首个矩形
-			GenRectangle1(&result,
-				roiRects_[0].top(), roiRects_[0].left(),
-				roiRects_[0].bottom(), roiRects_[0].right());
-
-			// 后续矩形逐一合并
-			for (int i = 1; i < roiRects_.size(); ++i)
+			result = rectToRegion(rects[0]);
+			for (int i = 1; i < rects.size(); ++i)
 			{
-				HObject next;
-				GenRectangle1(&next,
-					roiRects_[i].top(), roiRects_[i].left(),
-					roiRects_[i].bottom(), roiRects_[i].right());
+				HObject next = rectToRegion(rects[i]);
 				HObject merged;
 				Union2(result, next, &merged);
 				result = merged;
@@ -61,14 +71,27 @@ namespace ui
 		return result;
 	}
 
+	HalconCpp::HObject ShapeEditor::roi() const
+	{
+		return mergeRects(roiRects_);
+	}
+
+	HalconCpp::HObject ShapeEditor::mask() const
+	{
+		return mergeRects(maskRects_);
+	}
+
+	// ===== 工具切换 ============================================================
+
 	void ShapeEditor::setTool(Tool tool)
 	{
 		if (tool_ == tool)
 			return;
 
-		if (roiDrawing_)
+		// 切换工具时取消未完成的拖拽
+		if (drawing_)
 		{
-			roiDrawing_ = false;
+			drawing_ = false;
 			refreshOverlay();
 		}
 
@@ -84,23 +107,29 @@ namespace ui
 		emit toolChanged(tool_);
 	}
 
+	// ===== 编辑操作 ============================================================
+
 	void ShapeEditor::clearROI()
 	{
+		// 从历史栈中移除所有 ROI 条目
+		actionHistory_.erase(
+			std::remove(actionHistory_.begin(), actionHistory_.end(), ActionType::ROI),
+			actionHistory_.end());
 		roiRects_.clear();
-		roiDrawing_ = false;
+		drawing_ = false;
 		refreshOverlay();
 		emit roiChanged();
 	}
 
-	void ShapeEditor::undoROI()
+	void ShapeEditor::clearMask()
 	{
-		if (roiRects_.isEmpty())
-			return;
-
-		roiRects_.pop_back();
-		roiDrawing_ = false;
+		actionHistory_.erase(
+			std::remove(actionHistory_.begin(), actionHistory_.end(), ActionType::Mask),
+			actionHistory_.end());
+		maskRects_.clear();
+		drawing_ = false;
 		refreshOverlay();
-		emit roiChanged();
+		emit maskChanged();
 	}
 
 	void ShapeEditor::clearCenterPoint()
@@ -113,12 +142,46 @@ namespace ui
 	void ShapeEditor::clearAll()
 	{
 		roiRects_.clear();
-		roiDrawing_ = false;
+		maskRects_.clear();
+		actionHistory_.clear();
 		hasCenterPoint_ = false;
+		drawing_ = false;
 		refreshOverlay();
 		emit roiChanged();
+		emit maskChanged();
 		emit centerPointChanged();
 	}
+
+	void ShapeEditor::undo()
+	{
+		if (actionHistory_.isEmpty())
+			return;
+
+		const ActionType last = actionHistory_.takeLast();
+
+		switch (last)
+		{
+		case ActionType::ROI:
+			if (!roiRects_.isEmpty())
+			{
+				roiRects_.pop_back();
+				emit roiChanged();
+			}
+			break;
+		case ActionType::Mask:
+			if (!maskRects_.isEmpty())
+			{
+				maskRects_.pop_back();
+				emit maskChanged();
+			}
+			break;
+		}
+
+		drawing_ = false;
+		refreshOverlay();
+	}
+
+	// ===== Qt 事件 =============================================================
 
 	void ShapeEditor::resizeEvent(QResizeEvent* e)
 	{
@@ -137,12 +200,11 @@ namespace ui
 
 			if (me->button() == Qt::LeftButton)
 			{
-				if (tool_ == Tool::RectangleROI)
+				if (tool_ == Tool::RectangleROI || tool_ == Tool::RectangleMask)
 				{
-					// 开始新 ROI 拖拽（不清除已有 ROI，支持多个区域）
-					roiDrawing_ = true;
-					roiStartWidget_ = me->pos();
-					roiEndWidget_ = me->pos();
+					drawing_ = true;
+					drawStartWidget_ = me->pos();
+					drawEndWidget_ = me->pos();
 					refreshOverlay();
 					return true;
 				}
@@ -162,9 +224,9 @@ namespace ui
 		{
 			auto* me = static_cast<QMouseEvent*>(e);
 
-			if (tool_ == Tool::RectangleROI && roiDrawing_)
+			if ((tool_ == Tool::RectangleROI || tool_ == Tool::RectangleMask) && drawing_)
 			{
-				roiEndWidget_ = me->pos();
+				drawEndWidget_ = me->pos();
 				refreshOverlay();
 				return true;
 			}
@@ -175,19 +237,29 @@ namespace ui
 		{
 			auto* me = static_cast<QMouseEvent*>(e);
 
-			if (me->button() == Qt::LeftButton && tool_ == Tool::RectangleROI && roiDrawing_)
+			if (me->button() == Qt::LeftButton && drawing_)
 			{
-				roiEndWidget_ = me->pos();
-				roiDrawing_ = false;
+				drawEndWidget_ = me->pos();
+				drawing_ = false;
 
-				const QPointF p1 = widgetToImage(roiStartWidget_);
-				const QPointF p2 = widgetToImage(roiEndWidget_);
+				const QPointF p1 = widgetToImage(drawStartWidget_);
+				const QPointF p2 = widgetToImage(drawEndWidget_);
 				const QRectF rect = QRectF(p1, p2).normalized();
 
 				if (rect.width() > 1.0 && rect.height() > 1.0)
 				{
-					roiRects_.append(rect);  // 追加到列表
-					emit roiChanged();
+					if (tool_ == Tool::RectangleROI)
+					{
+						roiRects_.append(rect);
+						actionHistory_.append(ActionType::ROI);
+						emit roiChanged();
+					}
+					else if (tool_ == Tool::RectangleMask)
+					{
+						maskRects_.append(rect);
+						actionHistory_.append(ActionType::Mask);
+						emit maskChanged();
+					}
 				}
 
 				refreshOverlay();
@@ -201,9 +273,9 @@ namespace ui
 			auto* ke = static_cast<QKeyEvent*>(e);
 			if (ke->key() == Qt::Key_Escape)
 			{
-				if (roiDrawing_)
+				if (drawing_)
 				{
-					roiDrawing_ = false;
+					drawing_ = false;
 					refreshOverlay();
 				}
 				setTool(Tool::View);
@@ -219,6 +291,8 @@ namespace ui
 		return false;
 	}
 
+	// ===== 内部绘制 ============================================================
+
 	void ShapeEditor::refreshOverlay()
 	{
 		if (!imageLabel_ || !imageLabel_->isReady() || displaying_)
@@ -226,6 +300,7 @@ namespace ui
 
 		imageLabel_->displayImage(imageLabel_->lastImage());
 		drawAllROIs();
+		drawAllMasks();
 		drawCenterPoint();
 	}
 
@@ -236,7 +311,7 @@ namespace ui
 
 		using namespace HalconCpp;
 
-		// 绘制所有已确认的 ROI
+		// 已确认的 ROI
 		if (!roiRects_.isEmpty())
 		{
 			try
@@ -253,16 +328,59 @@ namespace ui
 			catch (...) {}
 		}
 
-		// 绘制拖拽中的橡皮筋矩形
-		if (roiDrawing_)
+		// 拖拽中的橡皮筋（仅在 RectangleROI 工具下绘制）
+		if (drawing_ && tool_ == Tool::RectangleROI)
 		{
-			const QPointF p1 = widgetToImage(roiStartWidget_);
-			const QPointF p2 = widgetToImage(roiEndWidget_);
+			const QPointF p1 = widgetToImage(drawStartWidget_);
+			const QPointF p2 = widgetToImage(drawEndWidget_);
 			const QRectF rect = QRectF(p1, p2).normalized();
 
 			try
 			{
 				SetColor(imageLabel_->halconHandle(), "yellow");
+				SetDraw(imageLabel_->halconHandle(), "margin");
+				SetLineWidth(imageLabel_->halconHandle(), 2);
+				DispRectangle1(imageLabel_->halconHandle(),
+					rect.top(), rect.left(), rect.bottom(), rect.right());
+			}
+			catch (...) {}
+		}
+	}
+
+	void ShapeEditor::drawAllMasks()
+	{
+		if (!imageLabel_ || !imageLabel_->isReady())
+			return;
+
+		using namespace HalconCpp;
+
+		// 已确认的 Mask
+		if (!maskRects_.isEmpty())
+		{
+			try
+			{
+				SetColor(imageLabel_->halconHandle(), "magenta");
+				SetDraw(imageLabel_->halconHandle(), "margin");
+				SetLineWidth(imageLabel_->halconHandle(), 2);
+				for (const auto& r : maskRects_)
+				{
+					DispRectangle1(imageLabel_->halconHandle(),
+						r.top(), r.left(), r.bottom(), r.right());
+				}
+			}
+			catch (...) {}
+		}
+
+		// 拖拽中的橡皮筋（仅在 RectangleMask 工具下绘制）
+		if (drawing_ && tool_ == Tool::RectangleMask)
+		{
+			const QPointF p1 = widgetToImage(drawStartWidget_);
+			const QPointF p2 = widgetToImage(drawEndWidget_);
+			const QRectF rect = QRectF(p1, p2).normalized();
+
+			try
+			{
+				SetColor(imageLabel_->halconHandle(), "orange");
 				SetDraw(imageLabel_->halconHandle(), "margin");
 				SetLineWidth(imageLabel_->halconHandle(), 2);
 				DispRectangle1(imageLabel_->halconHandle(),
@@ -279,13 +397,15 @@ namespace ui
 
 		try
 		{
-			HalconCpp::SetColor(imageLabel_->halconHandle(), "red");
+			HalconCpp::SetColor(imageLabel_->halconHandle(), "blue");
 			HalconCpp::SetLineWidth(imageLabel_->halconHandle(), 2);
 			HalconCpp::DispCross(imageLabel_->halconHandle(),
 				centerPoint_.y(), centerPoint_.x(), 40, 0.785398);
 		}
 		catch (...) {}
 	}
+
+	// ===== 坐标转换 ============================================================
 
 	QPointF ShapeEditor::widgetToImage(const QPoint& widgetPos) const
 	{

@@ -15,16 +15,24 @@ namespace ui
 	/// 组合 HalconInteractiveLabel + 鼠标捕获叠加层，保留 L2 的缩放平移能力，
 	/// 同时提供 ROI、Mask、中心点等绘制工具。
 	///
-	/// 支持多个 ROI 矩形，回撤移除最近添加的一个。
+	/// 二期：支持多 ROI / 多 Mask 绘制，统一回撤栈。
 	class ShapeEditor : public QWidget
 	{
 		Q_OBJECT
 	public:
 		enum class Tool
 		{
-			View,          ///< 视图操纵：缩放/平移/复位
-			RectangleROI,  ///< 矩形 ROI
-			CenterPoint,   ///< 定义模板中心点
+			View,           ///< 视图操纵：缩放/平移/复位
+			RectangleROI,   ///< 感兴趣区域（绿色矩形）
+			RectangleMask,  ///< 屏蔽区域（品红色矩形）
+			CenterPoint,    ///< 定义模板中心点
+		};
+
+		/// 操作类型，用于统一回撤栈
+		enum class ActionType : uint8_t
+		{
+			ROI,   ///< 感兴趣区域
+			Mask,  ///< 屏蔽区域
 		};
 
 		explicit ShapeEditor(QWidget* parent = nullptr);
@@ -37,28 +45,42 @@ namespace ui
 		void setTool(Tool tool);
 		Tool tool() const { return tool_; }
 
+		// === ROI ===
+
 		/// 将所有 ROI 合并为单个 Halcon 区域对象，未绘制时返回未初始化对象
 		HalconCpp::HObject roi() const;
-
-		/// 所有 ROI 矩形（图像坐标）
 		QVector<QRectF> roiRects() const { return roiRects_; }
 		int roiCount() const { return roiRects_.size(); }
 		bool hasROI() const { return !roiRects_.empty(); }
 
-		/// 当前中心点（图像坐标）
+		// === Mask ===
+
+		/// 将所有 Mask 合并为单个 Halcon 区域对象，未绘制时返回未初始化对象
+		HalconCpp::HObject mask() const;
+		QVector<QRectF> maskRects() const { return maskRects_; }
+		int maskCount() const { return maskRects_.size(); }
+		bool hasMask() const { return !maskRects_.empty(); }
+
+		// === 中心点 ===
+
 		QPointF centerPoint() const { return centerPoint_; }
 		bool hasCenterPoint() const { return hasCenterPoint_; }
+
+		// === 编辑操作 ===
+
+		/// 统一回撤：移除最近一次操作（ROI 或 Mask）
+		void undo();
 
 		/// 清除全部 ROI
 		void clearROI();
 
-		/// 回撤最近一个 ROI（LIFO）
-		void undoROI();
+		/// 清除全部 Mask
+		void clearMask();
 
 		/// 清除中心点
 		void clearCenterPoint();
 
-		/// 全部清空（ROI + 中心点）
+		/// 全部清空（ROI + Mask + 中心点 + 历史）
 		void clearAll();
 
 		/// 获取内部 L2 控件，用于连接 zoomChanged 等信号
@@ -66,6 +88,7 @@ namespace ui
 
 	signals:
 		void roiChanged();
+		void maskChanged();
 		void centerPointChanged();
 		void toolChanged(Tool tool);
 
@@ -74,9 +97,16 @@ namespace ui
 		bool eventFilter(QObject* obj, QEvent* e) override;
 
 	private:
-		void refreshOverlay();        ///< 重新绘制全部 ROI / 中心点
-		void drawAllROIs();           ///< 在 Halcon 窗口上绘制所有 ROI
-		void drawCenterPoint();       ///< 在 Halcon 窗口上绘制中心点
+		void refreshOverlay();
+		void drawAllROIs();
+		void drawAllMasks();
+		void drawCenterPoint();
+
+		/// 生成单个矩形区域对象
+		static HalconCpp::HObject rectToRegion(const QRectF& r);
+
+		/// 合并矩形列表为一个区域对象
+		static HalconCpp::HObject mergeRects(const QVector<QRectF>& rects);
 
 		QPointF widgetToImage(const QPoint& widgetPos) const;
 
@@ -84,17 +114,20 @@ namespace ui
 
 		Tool tool_{ Tool::View };
 
-		// ROI 绘制状态
-		bool roiDrawing_{ false };
-		QPoint roiStartWidget_;       // 拖拽起点（控件坐标）
-		QPoint roiEndWidget_;         // 拖拽终点（控件坐标）
-		QVector<QRectF> roiRects_;    // 已确认的全部 ROI（图像坐标）
+		// 拖拽状态
+		bool drawing_{ false };
+		QPoint drawStartWidget_;
+		QPoint drawEndWidget_;
 
-		// 中心点
-		QPointF centerPoint_;         // 图像坐标
+		// 数据
+		QVector<QRectF> roiRects_;
+		QVector<QRectF> maskRects_;
+		QVector<ActionType> actionHistory_;  // 统一回撤栈
+
+		QPointF centerPoint_;
 		bool hasCenterPoint_{ false };
 
-		// displayImage 重入哨兵：阻止 viewChanged → refreshOverlay 同步嵌套
+		// displayImage 重入哨兵
 		bool displaying_{ false };
 	};
 } // namespace ui

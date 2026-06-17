@@ -98,11 +98,13 @@ namespace ui
 
 	void ModelEditorDialog::onPaintMask()
 	{
-		// Mask 一期暂未实现；先清空 ROI 作为提示
-		if (shapeEditor_)
+		if (!shapeEditor_)
+			return;
+		// Toggle: 已在 RectangleMask 模式则切回 View，否则进入 RectangleMask
+		if (shapeEditor_->tool() == ShapeEditor::Tool::RectangleMask)
 			shapeEditor_->setTool(ShapeEditor::Tool::View);
-		rw::rqwu::MessageBox::information(this,
-			QStringLiteral("提示"), QStringLiteral("屏蔽区域功能将在二期实现"));
+		else
+			shapeEditor_->setTool(ShapeEditor::Tool::RectangleMask);
 	}
 
 	void ModelEditorDialog::onPaintCenterPoint()
@@ -124,9 +126,9 @@ namespace ui
 
 	void ModelEditorDialog::onUndo()
 	{
-		// 回撤最近一个 ROI（LIFO）
+		// 统一回撤：移除最近一次操作（ROI 或 Mask）
 		if (shapeEditor_)
-			shapeEditor_->undoROI();
+			shapeEditor_->undo();
 	}
 
 	void ModelEditorDialog::onCreateModel()
@@ -140,6 +142,8 @@ namespace ui
 		if (shapeEditor_)
 		{
 			req.roi = shapeEditor_->roi();
+			if (shapeEditor_->hasMask())
+				req.mask = shapeEditor_->mask();
 			if (shapeEditor_->hasCenterPoint())
 			{
 				req.centerPoint = shapeEditor_->centerPoint();
@@ -199,6 +203,11 @@ namespace ui
 			tool == ShapeEditor::Tool::RectangleROI
 				? QStringLiteral("退出绘制")
 				: QStringLiteral("绘制感兴趣区域"));
+
+		ui->btn_shiledRegion->setText(
+			tool == ShapeEditor::Tool::RectangleMask
+				? QStringLiteral("退出屏蔽")
+				: QStringLiteral("绘制屏蔽区域"));
 
 		ui->btn_paintCenterPoint->setText(
 			tool == ShapeEditor::Tool::CenterPoint
