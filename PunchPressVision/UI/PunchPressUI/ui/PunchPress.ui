@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <ui version="4.0">
  <class>PunchPressClass</class>
  <widget class="QMainWindow" name="PunchPressClass">
@@ -34,64 +34,9 @@ QGroupBox::title {
 }</string>
       </property>
       <property name="title">
-       <string/>
+       <string />
       </property>
-      <layout class="QVBoxLayout" name="vLayout_image" stretch="1,9">
-       <item>
-        <layout class="QHBoxLayout" name="hLayout_modelId" stretch="1,1">
-         <item>
-          <widget class="QLabel" name="label_modelIdA">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">QLabel {
-    font-size: 23px;
-    font-weight: bold;
-    color: #333;
-    background-color: transparent;
-}</string>
-           </property>
-           <property name="text">
-            <string>ModelId</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_modelIdB">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="layoutDirection">
-            <enum>Qt::LayoutDirection::LeftToRight</enum>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">QLabel {
-    font-size: 23px;
-    font-weight: bold;
-    color: #333;
-    background-color: transparent;
-}</string>
-           </property>
-           <property name="text">
-            <string>ModelId</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
+      <layout class="QVBoxLayout" name="vLayout_image" stretch="9">
        <item>
         <widget class="QLabel" name="label_imgDisplay">
          <property name="sizePolicy">
@@ -101,7 +46,7 @@ QGroupBox::title {
           </sizepolicy>
          </property>
          <property name="text">
-          <string/>
+          <string />
          </property>
         </widget>
        </item>
@@ -128,7 +73,7 @@ QGroupBox::title {
 }</string>
         </property>
         <property name="title">
-         <string/>
+         <string />
         </property>
         <layout class="QVBoxLayout" name="vLayout_head">
          <item>
@@ -169,7 +114,7 @@ QPushButton:pressed {
 }</string>
              </property>
              <property name="text">
-              <string/>
+              <string />
              </property>
             </widget>
            </item>
@@ -213,7 +158,7 @@ QPushButton:pressed {
                 <string notr="true">color: rgb(232, 232, 232);</string>
                </property>
                <property name="text">
-                <string/>
+                <string />
                </property>
               </widget>
              </item>
@@ -248,7 +193,7 @@ QPushButton:pressed {
                 <string notr="true">color: rgb(232, 232, 232);</string>
                </property>
                <property name="text">
-                <string/>
+                <string />
                </property>
               </widget>
              </item>
@@ -283,7 +228,7 @@ QPushButton:pressed {
                 <string notr="true">color: rgb(232, 232, 232);</string>
                </property>
                <property name="text">
-                <string/>
+                <string />
                </property>
               </widget>
              </item>
@@ -312,7 +257,7 @@ QGroupBox::title {
 }</string>
         </property>
         <property name="title">
-         <string/>
+         <string />
         </property>
         <layout class="QVBoxLayout" name="vLayout_info">
          <item>
@@ -810,7 +755,7 @@ QGroupBox::title {
 }</string>
         </property>
         <property name="title">
-         <string/>
+         <string />
         </property>
         <layout class="QVBoxLayout" name="vLayout_tools">
          <item>
@@ -983,11 +928,11 @@ QGroupBox::title {
 }</string>
         </property>
         <property name="title">
-         <string/>
+         <string />
         </property>
         <layout class="QVBoxLayout" name="vLayout_table">
          <item>
-          <widget class="QTableWidget" name="tableWidget_info"/>
+          <widget class="QTableWidget" name="tableWidget_info" />
          </item>
         </layout>
        </widget>
@@ -1010,7 +955,7 @@ QGroupBox::title {
 }</string>
         </property>
         <property name="title">
-         <string/>
+         <string />
         </property>
         <layout class="QHBoxLayout" name="hLayout_companyInfo">
          <item>
@@ -1030,7 +975,7 @@ QGroupBox::title {
 }</string>
            </property>
            <property name="text">
-            <string/>
+            <string />
            </property>
           </widget>
          </item>
@@ -1042,7 +987,7 @@ QGroupBox::title {
    </layout>
   </widget>
  </widget>
- <layoutdefault spacing="6" margin="11"/>
- <resources/>
- <connections/>
+ <layoutdefault spacing="6" margin="11" />
+ <resources />
+ <connections />
 </ui>
