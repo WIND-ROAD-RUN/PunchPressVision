@@ -7,6 +7,7 @@
 
 #include "global/GlobalType.hpp"
 #include "global/GlobalResult.hpp"
+#include "infrastructure/ConfigModule/Config/cameraCfg.hpp"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class PunchPressClass; }
@@ -63,6 +64,10 @@ namespace ui
 	private:
 		void buildConnections();
 		void setupImageView();
+
+		// UI 层配置读取入口：后续可在此扩展光源、PLC 地址等配置的读取
+		void loadConfigs();
+		void loadCameraConfig();
 		void updateCameraParamButtons();
 
 		Ui::PunchPressClass* ui;
@@ -74,5 +79,8 @@ namespace ui
 
 		// 图像显示控件（替换 ui->label_imgDisplay 的 QLabel 占位）
 		HalconInteractiveLabel* imageView_{ nullptr };
+
+		// 本地缓存的 UI 所需配置
+		Config::cameraCfg cameraCfg_;
 	};
 }

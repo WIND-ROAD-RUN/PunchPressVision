@@ -58,6 +58,7 @@ namespace ui
 		// 连接信号、读取已加载配置、执行启动检查。
 		// 必须在 infrastructure/business/app build 之后调用。
 		buildConnections();
+		loadConfigs();
 		updateCameraParamButtons();
 
 		// 启动检查（FR-001 ~ FR-004）
@@ -120,18 +121,28 @@ namespace ui
 		oldLabel->deleteLater();
 	}
 
-	void PunchPress::updateCameraParamButtons()
+	void PunchPress::loadConfigs()
 	{
-		// 从基础设施的相机配置中读取曝光/增益，刷新主界面显示
+		// UI 层配置读取入口：后续可在此扩展光源、PLC 地址、模型参数等配置的读取
+		loadCameraConfig();
+	}
+
+	void PunchPress::loadCameraConfig()
+	{
 		const auto& inf = app_.business().infrastructure();
 		if (!inf.camera_module_)
 			return;
 
-		const auto& cfg = inf.camera_module_->cameraCfg;
-		ui->pbtn_exposure1->setText(QString::number(cfg.exposureTime1));
-		ui->pbtn_gain1->setText(QString::number(cfg.gain1));
-		ui->pbtn_exposure2->setText(QString::number(cfg.exposureTime2));
-		ui->pbtn_gain2->setText(QString::number(cfg.gain2));
+		cameraCfg_ = inf.camera_module_->cameraCfg;
+	}
+
+	void PunchPress::updateCameraParamButtons()
+	{
+		// 用已加载的相机配置刷新主界面曝光/增益显示
+		ui->pbtn_exposure1->setText(QString::number(cameraCfg_.exposureTime1));
+		ui->pbtn_gain1->setText(QString::number(cameraCfg_.gain1));
+		ui->pbtn_exposure2->setText(QString::number(cameraCfg_.exposureTime2));
+		ui->pbtn_gain2->setText(QString::number(cameraCfg_.gain2));
 	}
 
 	void PunchPress::showEvent(QShowEvent* e)
