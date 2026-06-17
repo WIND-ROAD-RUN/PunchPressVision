@@ -124,11 +124,9 @@ namespace ui
 
 	void ModelEditorDialog::onUndo()
 	{
+		// 回撤最近一个 ROI（LIFO）
 		if (shapeEditor_)
-		{
-			// 一期仅支持单 ROI / 单中心点，undo 等价于 clearROI
-			shapeEditor_->clearROI();
-		}
+			shapeEditor_->undoROI();
 	}
 
 	void ModelEditorDialog::onCreateModel()

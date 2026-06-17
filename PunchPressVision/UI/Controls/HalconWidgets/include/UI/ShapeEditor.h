@@ -3,6 +3,7 @@
 #include <QWidget>
 #include <QPointF>
 #include <QRectF>
+#include <QVector>
 
 #include "halconcpp/HalconCpp.h"
 
@@ -14,7 +15,7 @@ namespace ui
 	/// 组合 HalconInteractiveLabel + 鼠标捕获叠加层，保留 L2 的缩放平移能力，
 	/// 同时提供 ROI、Mask、中心点等绘制工具。
 	///
-	/// 一期实现：View（视图操纵）、RectangleROI（矩形 ROI）、CenterPoint（中心点）。
+	/// 支持多个 ROI 矩形，回撤移除最近添加的一个。
 	class ShapeEditor : public QWidget
 	{
 		Q_OBJECT
@@ -36,24 +37,28 @@ namespace ui
 		void setTool(Tool tool);
 		Tool tool() const { return tool_; }
 
-		/// 当前 ROI（图像坐标 Halcon 区域对象），未绘制时返回未初始化对象
+		/// 将所有 ROI 合并为单个 Halcon 区域对象，未绘制时返回未初始化对象
 		HalconCpp::HObject roi() const;
 
-		/// 当前 ROI 矩形（图像坐标），未绘制时返回 null 矩形
-		QRectF roiRect() const { return hasROI_ ? roiRect_ : QRectF(); }
-		bool hasROI() const { return hasROI_; }
+		/// 所有 ROI 矩形（图像坐标）
+		QVector<QRectF> roiRects() const { return roiRects_; }
+		int roiCount() const { return roiRects_.size(); }
+		bool hasROI() const { return !roiRects_.empty(); }
 
 		/// 当前中心点（图像坐标）
 		QPointF centerPoint() const { return centerPoint_; }
 		bool hasCenterPoint() const { return hasCenterPoint_; }
 
-		/// 清除 ROI
+		/// 清除全部 ROI
 		void clearROI();
+
+		/// 回撤最近一个 ROI（LIFO）
+		void undoROI();
 
 		/// 清除中心点
 		void clearCenterPoint();
 
-		/// 全部清空
+		/// 全部清空（ROI + 中心点）
 		void clearAll();
 
 		/// 获取内部 L2 控件，用于连接 zoomChanged 等信号
@@ -69,8 +74,8 @@ namespace ui
 		bool eventFilter(QObject* obj, QEvent* e) override;
 
 	private:
-		void refreshOverlay();        ///< 重新绘制 ROI / 中心点
-		void drawROI();               ///< 在 Halcon 窗口上绘制 ROI（使用 DispRectangle1）
+		void refreshOverlay();        ///< 重新绘制全部 ROI / 中心点
+		void drawAllROIs();           ///< 在 Halcon 窗口上绘制所有 ROI
 		void drawCenterPoint();       ///< 在 Halcon 窗口上绘制中心点
 
 		QPointF widgetToImage(const QPoint& widgetPos) const;
@@ -83,8 +88,7 @@ namespace ui
 		bool roiDrawing_{ false };
 		QPoint roiStartWidget_;       // 拖拽起点（控件坐标）
 		QPoint roiEndWidget_;         // 拖拽终点（控件坐标）
-		QRectF roiRect_;              // 已确认的 ROI（图像坐标）
-		bool hasROI_{ false };
+		QVector<QRectF> roiRects_;    // 已确认的全部 ROI（图像坐标）
 
 		// 中心点
 		QPointF centerPoint_;         // 图像坐标

@@ -25,24 +25,40 @@ namespace ui
 		displaying_ = true;
 		imageLabel_->displayImage(image);
 		displaying_ = false;
-		drawROI();
+		drawAllROIs();
 		drawCenterPoint();
 	}
 
 	HalconCpp::HObject ShapeEditor::roi() const
 	{
-		HalconCpp::HObject obj;
-		if (hasROI_)
+		using namespace HalconCpp;
+
+		HalconCpp::HObject result;
+		if (roiRects_.isEmpty())
+			return result;
+
+		try
 		{
-			try
+			// 首个矩形
+			GenRectangle1(&result,
+				roiRects_[0].top(), roiRects_[0].left(),
+				roiRects_[0].bottom(), roiRects_[0].right());
+
+			// 后续矩形逐一合并
+			for (int i = 1; i < roiRects_.size(); ++i)
 			{
-				HalconCpp::GenRectangle1(&obj,
-					roiRect_.top(), roiRect_.left(),
-					roiRect_.bottom(), roiRect_.right());
+				HObject next;
+				GenRectangle1(&next,
+					roiRects_[i].top(), roiRects_[i].left(),
+					roiRects_[i].bottom(), roiRects_[i].right());
+				HObject merged;
+				Union2(result, next, &merged);
+				result = merged;
 			}
-			catch (...) {}
 		}
-		return obj;
+		catch (...) {}
+
+		return result;
 	}
 
 	void ShapeEditor::setTool(Tool tool)
@@ -50,7 +66,6 @@ namespace ui
 		if (tool_ == tool)
 			return;
 
-		// 切换工具时取消未完成的 ROI 绘制（橡皮筋）
 		if (roiDrawing_)
 		{
 			roiDrawing_ = false;
@@ -59,7 +74,6 @@ namespace ui
 
 		tool_ = tool;
 
-		// 根据工具设置光标
 		if (imageLabel_)
 		{
 			imageLabel_->setCursor(tool_ == Tool::View
@@ -72,8 +86,18 @@ namespace ui
 
 	void ShapeEditor::clearROI()
 	{
-		hasROI_ = false;
-		roiRect_ = QRectF();
+		roiRects_.clear();
+		roiDrawing_ = false;
+		refreshOverlay();
+		emit roiChanged();
+	}
+
+	void ShapeEditor::undoROI()
+	{
+		if (roiRects_.isEmpty())
+			return;
+
+		roiRects_.pop_back();
 		roiDrawing_ = false;
 		refreshOverlay();
 		emit roiChanged();
@@ -88,8 +112,7 @@ namespace ui
 
 	void ShapeEditor::clearAll()
 	{
-		hasROI_ = false;
-		roiRect_ = QRectF();
+		roiRects_.clear();
 		roiDrawing_ = false;
 		hasCenterPoint_ = false;
 		refreshOverlay();
@@ -116,9 +139,7 @@ namespace ui
 			{
 				if (tool_ == Tool::RectangleROI)
 				{
-					// 开始新的 ROI 拖拽前清除旧 ROI（单 ROI 模式）
-					hasROI_ = false;
-					roiRect_ = QRectF();
+					// 开始新 ROI 拖拽（不清除已有 ROI，支持多个区域）
 					roiDrawing_ = true;
 					roiStartWidget_ = me->pos();
 					roiEndWidget_ = me->pos();
@@ -165,8 +186,7 @@ namespace ui
 
 				if (rect.width() > 1.0 && rect.height() > 1.0)
 				{
-					roiRect_ = rect;
-					hasROI_ = true;
+					roiRects_.append(rect);  // 追加到列表
 					emit roiChanged();
 				}
 
@@ -196,7 +216,6 @@ namespace ui
 			break;
 		}
 
-		// View 工具或其他未消费事件放行给 L2
 		return false;
 	}
 
@@ -205,30 +224,31 @@ namespace ui
 		if (!imageLabel_ || !imageLabel_->isReady() || displaying_)
 			return;
 
-		// 重绘底图 + 叠加 ROI / 中心点
 		imageLabel_->displayImage(imageLabel_->lastImage());
-		drawROI();
+		drawAllROIs();
 		drawCenterPoint();
 	}
 
-	void ShapeEditor::drawROI()
+	void ShapeEditor::drawAllROIs()
 	{
 		if (!imageLabel_ || !imageLabel_->isReady())
 			return;
 
 		using namespace HalconCpp;
 
-		// 绘制已确认的 ROI（与橡皮筋使用同样的 DispRectangle1 API）
-		if (hasROI_)
+		// 绘制所有已确认的 ROI
+		if (!roiRects_.isEmpty())
 		{
 			try
 			{
 				SetColor(imageLabel_->halconHandle(), "green");
 				SetDraw(imageLabel_->halconHandle(), "margin");
 				SetLineWidth(imageLabel_->halconHandle(), 2);
-				DispRectangle1(imageLabel_->halconHandle(),
-					roiRect_.top(), roiRect_.left(),
-					roiRect_.bottom(), roiRect_.right());
+				for (const auto& r : roiRects_)
+				{
+					DispRectangle1(imageLabel_->halconHandle(),
+						r.top(), r.left(), r.bottom(), r.right());
+				}
 			}
 			catch (...) {}
 		}
