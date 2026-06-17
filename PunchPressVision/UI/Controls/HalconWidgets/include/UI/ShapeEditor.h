@@ -84,5 +84,8 @@ namespace ui
 		// 中心点
 		QPointF centerPoint_;         // 图像坐标
 		bool hasCenterPoint_{ false };
+
+		// displayImage 重入哨兵：阻止 viewChanged → refreshOverlay 同步嵌套
+		bool displaying_{ false };
 	};
 } // namespace ui

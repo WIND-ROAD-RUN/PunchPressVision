@@ -21,8 +21,16 @@ namespace ui
 
 	void ShapeEditor::displayImage(const HalconCpp::HImage& image)
 	{
+		// 底图渲染由 HalconInteractiveLabel 完成。
+		// 设重入哨兵阻止 viewChanged → refreshOverlay → displayImage 同步嵌套
+		// 导致 Halcon 渲染栈溢出（DispObj 内调 DispObj）。
+		// 覆盖层由末尾 drawROI/drawCenterPoint 绘制，refreshOverlay 仅在
+		// 缩放/平移等交互触发的 viewChanged 时工作。
+		displaying_ = true;
 		imageLabel_->displayImage(image);
-		refreshOverlay();
+		displaying_ = false;
+		drawROI();
+		drawCenterPoint();
 	}
 
 	void ShapeEditor::setTool(Tool tool)
@@ -165,16 +173,13 @@ namespace ui
 
 	void ShapeEditor::refreshOverlay()
 	{
-		if (!imageLabel_ || !imageLabel_->isReady())
+		// displayImage 正在执行中 → 覆盖层由 displayImage 末尾直接绘制，
+		// 无需通过 viewChanged 信号重入（避免 DispObj 嵌套导致栈溢出）。
+		if (!imageLabel_ || !imageLabel_->isReady() || displaying_)
 			return;
 
-		// 触发 L2 重绘，再在其上叠加 ROI / 中心点
-		// HalconInteractiveLabel::displayImage 会调用 applyView，
-		// 但这里需要强制刷新当前视图（无新图像时）。
-		// 通过 setZoomLevel 之类的方式不太合适，直接调用 applyView 又不是 public。
-		// 因此用 displayImage(lastImage) 的方式刷新。
+		// 缩放/平移等交互触发 → 重绘底图 + 叠加 ROI / 中心点
 		imageLabel_->displayImage(imageLabel_->lastImage());
-
 		drawROI();
 		drawCenterPoint();
 	}

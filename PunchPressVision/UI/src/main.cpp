@@ -1,5 +1,8 @@
 #include <QApplication>
 
+#include "halconcpp/HalconCpp.h"
+#include "global/GlobalType.hpp"
+
 #include "infrastructure/infrastructure.hpp"
 #include "Business/Business.hpp"
 #include "app/PunchPressApp.hpp"
@@ -15,6 +18,12 @@
 int main(int argc, char* argv[])
 {
 	QApplication a(argc, argv);
+
+	// 注册 Halcon 类型到 Qt 元类型系统——跨线程 QueuedConnection 必需。
+	// 帧管线中 TwoCameraSpliceInfTool(相机线程) → CameraBun(主线程) 通过
+	// QueuedConnection 跨线程传递 HImage，缺少此注册将导致连接静默失败。
+	qRegisterMetaType<HalconCpp::HImage>("HalconCpp::HImage");
+	qRegisterMetaType<global::CameraIndex>("global::CameraIndex");
 
 	// ======================================================
 	// Phase 1: 构造 — 只创建对象/共享指针，不执行初始化逻辑
