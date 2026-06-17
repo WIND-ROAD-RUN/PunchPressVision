@@ -69,14 +69,6 @@ namespace Config
 		bool _createModelUseMean = false;
 		int _createModelMeanRadius = 0;
 
-		// 模板匹配参数
-		int _matchChannelType{ 0 };
-		bool _matchUseOpening = false;
-		int _matchOpeningRadius = 0;
-		bool _matchUseClosing = false;
-		int _matchClosingRadius = 0;
-		bool _matchUseMean = false;
-		int _matchMeanRadius = 0;
 		int maxContrast{ 5 };
 		int minContrast{ 3 };
 

@@ -174,10 +174,6 @@ namespace Config
 			bool createModelUseOpening, int createModelOpeningRadius,
 			bool createModelUseClosing, int createModelClosingRadius,
 			bool createModelUseMean, int createModelMeanRadius,
-			int matchChannelType,
-			bool matchUseOpening, int matchOpeningRadius,
-			bool matchUseClosing, int matchClosingRadius,
-			bool matchUseMean, int matchMeanRadius,
 			int maxContrast, int minContrast,
 			const std::string& modelPath)
 		{
@@ -206,13 +202,6 @@ namespace Config
 			ofs << "createModelClosingRadius=" << createModelClosingRadius << '\n';
 			ofs << "createModelUseMean=" << (createModelUseMean ? 1 : 0) << '\n';
 			ofs << "createModelMeanRadius=" << createModelMeanRadius << '\n';
-			ofs << "matchChannelType=" << matchChannelType << '\n';
-			ofs << "matchUseOpening=" << (matchUseOpening ? 1 : 0) << '\n';
-			ofs << "matchOpeningRadius=" << matchOpeningRadius << '\n';
-			ofs << "matchUseClosing=" << (matchUseClosing ? 1 : 0) << '\n';
-			ofs << "matchClosingRadius=" << matchClosingRadius << '\n';
-			ofs << "matchUseMean=" << (matchUseMean ? 1 : 0) << '\n';
-			ofs << "matchMeanRadius=" << matchMeanRadius << '\n';
 			ofs << "maxContrast=" << maxContrast << '\n';
 			ofs << "minContrast=" << minContrast << '\n';
 			ofs << "modelPath=" << modelPath << '\n';
@@ -238,10 +227,6 @@ namespace Config
 			bool& createModelUseOpening, int& createModelOpeningRadius,
 			bool& createModelUseClosing, int& createModelClosingRadius,
 			bool& createModelUseMean, int& createModelMeanRadius,
-			int& matchChannelType,
-			bool& matchUseOpening, int& matchOpeningRadius,
-			bool& matchUseClosing, int& matchClosingRadius,
-			bool& matchUseMean, int& matchMeanRadius,
 			int& maxContrast, int& minContrast,
 			std::string& modelPath)
 		{
@@ -301,20 +286,6 @@ namespace Config
 						createModelUseMean = std::stoi(value) != 0;
 					else if (key == "createModelMeanRadius")
 						createModelMeanRadius = std::stoi(value);
-					else if (key == "matchChannelType")
-						matchChannelType = std::stoi(value);
-					else if (key == "matchUseOpening")
-						matchUseOpening = std::stoi(value) != 0;
-					else if (key == "matchOpeningRadius")
-						matchOpeningRadius = std::stoi(value);
-					else if (key == "matchUseClosing")
-						matchUseClosing = std::stoi(value) != 0;
-					else if (key == "matchClosingRadius")
-						matchClosingRadius = std::stoi(value);
-					else if (key == "matchUseMean")
-						matchUseMean = std::stoi(value) != 0;
-					else if (key == "matchMeanRadius")
-						matchMeanRadius = std::stoi(value);
 					else if (key == "maxContrast")
 						maxContrast = std::stoi(value);
 					else if (key == "minContrast")
@@ -349,10 +320,6 @@ namespace Config
 				_createModelUseOpening, _createModelOpeningRadius,
 				_createModelUseClosing, _createModelClosingRadius,
 				_createModelUseMean, _createModelMeanRadius,
-				_matchChannelType,
-				_matchUseOpening, _matchOpeningRadius,
-				_matchUseClosing, _matchClosingRadius,
-				_matchUseMean, _matchMeanRadius,
 				maxContrast, minContrast,
 				modelPath);
 
@@ -426,10 +393,6 @@ namespace Config
 				_createModelUseOpening, _createModelOpeningRadius,
 				_createModelUseClosing, _createModelClosingRadius,
 				_createModelUseMean, _createModelMeanRadius,
-				_matchChannelType,
-				_matchUseOpening, _matchOpeningRadius,
-				_matchUseClosing, _matchClosingRadius,
-				_matchUseMean, _matchMeanRadius,
 				maxContrast, minContrast,
 				modelPath);
 
