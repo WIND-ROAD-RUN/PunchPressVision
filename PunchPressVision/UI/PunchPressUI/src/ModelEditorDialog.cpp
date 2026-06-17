@@ -23,6 +23,11 @@ namespace ui
 		, app_(app)
 	{
 		ui->setupUi(this);
+
+		// 进入创建模型模式：相机自由运行取流，图像实时刷新到 ShapeEditor
+		previousMode_ = app_.currentMode();
+		app_.switchToMode(global::RunMode::CreateModel);
+
 		buildConnections();
 
 		// 用 ShapeEditor 替换 ui 中的占位 QLabel
@@ -41,6 +46,8 @@ namespace ui
 
 	ModelEditorDialog::~ModelEditorDialog()
 	{
+		// 退出创建模型模式，回到 Idle 停止取流
+		app_.switchToMode(global::RunMode::Idle);
 		delete ui;
 	}
 

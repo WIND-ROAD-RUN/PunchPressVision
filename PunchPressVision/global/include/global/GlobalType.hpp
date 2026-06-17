@@ -17,7 +17,8 @@ namespace global
 		Production,         // 工作模式（FR-008 ~ FR-010）
 		CalibDistortion,    // 畸变矫正模式（FR-011 ~ FR-014）
 		CalibNinePoint,     // 九点标定模式（FR-015 ~ FR-018）
-		Splice              // 双相机拼接模式（FR-019 ~ FR-020）
+		Splice,             // 双相机拼接模式（FR-019 ~ FR-020）
+		CreateModel         // 创建模型模式：相机自由运行取流，图像实时刷新到模型编辑器
 	};
 
 	// 触发源

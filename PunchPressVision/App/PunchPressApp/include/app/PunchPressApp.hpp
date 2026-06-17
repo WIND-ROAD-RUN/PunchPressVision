@@ -46,6 +46,7 @@ namespace app
 		bool configureCameraForProduction();
 		bool configureCameraForCalibration();
 		bool configureCameraForIdle();
+		bool configureCameraForCreateModel();
 
 		// 供 UI 访问 Business 能力
 		bun::Business& business() { return business_; }

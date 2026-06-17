@@ -351,6 +351,7 @@ namespace ui
 	{
 		ui->rbtn_debug->setChecked(mode == global::RunMode::Debug);
 		ui->rbtn_work->setChecked(mode == global::RunMode::Production);
+		// CreateModel / Idle / 标定模式均不选中任何模式按钮
 	}
 
 	void PunchPress::onCameraConnectionChanged(global::CameraIndex idx, bool connected, QString reason)

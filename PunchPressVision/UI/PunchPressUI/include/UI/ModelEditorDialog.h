@@ -41,5 +41,6 @@ namespace ui
 		app::PunchPressApp& app_;
 		ui::ShapeEditor* shapeEditor_{ nullptr };
 		HalconCpp::HImage lastFrame_;
+		global::RunMode previousMode_{ global::RunMode::Idle };
 	};
 }

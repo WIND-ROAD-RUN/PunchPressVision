@@ -237,6 +237,12 @@ namespace app
 		return ok;
 	}
 
+	bool PunchPressApp::configureCameraForCreateModel()
+	{
+		// 创建模型模式：自由运行模式，3fps，图像实时刷新到 ShapeEditor
+		return configureCameraForDebug();
+	}
+
 	// ===== 模式切换状态机（FR-005 ~ FR-020）=====
 
 	bool PunchPressApp::switchToMode(global::RunMode mode, QString* errorMsg)
@@ -288,6 +294,7 @@ namespace app
 		case global::RunMode::Idle: configureCameraForIdle(); break;
 		case global::RunMode::Debug: configureCameraForDebug(); break;
 		case global::RunMode::Production: configureCameraForProduction(); break;
+		case global::RunMode::CreateModel: configureCameraForCreateModel(); break;
 		case global::RunMode::CalibDistortion:
 		case global::RunMode::CalibNinePoint:
 		case global::RunMode::Splice: configureCameraForCalibration(); break;
