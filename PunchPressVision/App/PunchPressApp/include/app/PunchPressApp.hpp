@@ -41,10 +41,11 @@ namespace app
 		global::CalibReadiness checkCalibReadiness() const;
 		global::ProductionReadiness checkProductionReadiness() const;
 
-		// 相机配置代理（FR-005 / FR-008 / FR-011）
+		// 相机配置代理（FR-005 / FR-008 / FR-011 / Idle）
 		bool configureCameraForDebug();
 		bool configureCameraForProduction();
 		bool configureCameraForCalibration();
+		bool configureCameraForIdle();
 
 		// 供 UI 访问 Business 能力
 		bun::Business& business() { return business_; }

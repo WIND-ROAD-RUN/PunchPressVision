@@ -33,9 +33,9 @@ namespace ui
 		void resizeEvent(QResizeEvent* e) override;
 
 	private slots:
-		// 模式切换
-		void onDebugToggled(bool checked);
-		void onProductionToggled(bool checked);
+		// 模式切换（clicked 用于支持再次点击取消选中）
+		void onDebugClicked();
+		void onWorkClicked();
 
 		// 光源
 		void onUpperLightClicked();

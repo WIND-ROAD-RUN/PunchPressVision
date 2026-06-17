@@ -32,8 +32,13 @@ namespace ui
 
 		// 按钮分组：隔离模式和光源两组 RadioButton 的互斥作用域
 		modeGroup_ = new QButtonGroup(this);
+		modeGroup_->setExclusive(false); // 允许取消选中，进入 Idle/停止模式
 		modeGroup_->addButton(ui->rbtn_debug);
 		modeGroup_->addButton(ui->rbtn_work);
+
+		// 开机时调试/工作模式均不选中，对应 Idle 状态
+		ui->rbtn_debug->setChecked(false);
+		ui->rbtn_work->setChecked(false);
 
 		lightGroup_ = new QButtonGroup(this);
 		lightGroup_->setExclusive(false); // 上下光源可独立开关
@@ -78,8 +83,8 @@ namespace ui
 			this, &PunchPress::onStartupCheckFailed, Qt::QueuedConnection);
 
 		// UI 控件 → 槽
-		connect(ui->rbtn_debug, &QRadioButton::toggled, this, &PunchPress::onDebugToggled);
-		connect(ui->rbtn_work, &QRadioButton::toggled, this, &PunchPress::onProductionToggled);
+		connect(ui->rbtn_debug, &QRadioButton::clicked, this, &PunchPress::onDebugClicked);
+		connect(ui->rbtn_work, &QRadioButton::clicked, this, &PunchPress::onWorkClicked);
 		connect(ui->rbtn_upLight, &QRadioButton::clicked, this, &PunchPress::onUpperLightClicked);
 		connect(ui->rbtn_downLight, &QRadioButton::clicked, this, &PunchPress::onLowerLightClicked);
 		connect(ui->pbtn_modelManager, &QPushButton::clicked, this, &PunchPress::onModelManager);
@@ -116,20 +121,42 @@ namespace ui
 
 	// ===== 槽实现 =====
 
-	void PunchPress::onDebugToggled(bool checked)
+	void PunchPress::onDebugClicked()
 	{
-		if (!checked) return;
-		QString err;
-		if (!app_.switchToMode(global::RunMode::Debug, &err) && !err.isEmpty())
-			rw::rqwu::MessageBox::warning(this, QStringLiteral("调试模式"), err);
+		if (ui->rbtn_debug->isChecked())
+		{
+			ui->rbtn_work->setChecked(false);
+			QString err;
+			if (!app_.switchToMode(global::RunMode::Debug, &err) && !err.isEmpty())
+			{
+				rw::rqwu::MessageBox::warning(this, QStringLiteral("调试模式"), err);
+				ui->rbtn_debug->setChecked(false);
+			}
+		}
+		else
+		{
+			// 再次点击取消选中 → 回到 Idle/停止模式
+			app_.switchToMode(global::RunMode::Idle);
+		}
 	}
 
-	void PunchPress::onProductionToggled(bool checked)
+	void PunchPress::onWorkClicked()
 	{
-		if (!checked) return;
-		QString err;
-		if (!app_.switchToMode(global::RunMode::Production, &err))
-			rw::rqwu::MessageBox::warning(this, QStringLiteral("工作模式"), err);
+		if (ui->rbtn_work->isChecked())
+		{
+			ui->rbtn_debug->setChecked(false);
+			QString err;
+			if (!app_.switchToMode(global::RunMode::Production, &err) && !err.isEmpty())
+			{
+				rw::rqwu::MessageBox::warning(this, QStringLiteral("工作模式"), err);
+				ui->rbtn_work->setChecked(false);
+			}
+		}
+		else
+		{
+			// 再次点击取消选中 → 回到 Idle/停止模式
+			app_.switchToMode(global::RunMode::Idle);
+		}
 	}
 
 	void PunchPress::onUpperLightClicked()
@@ -173,8 +200,10 @@ namespace ui
 		statusBar()->showMessage(text);
 	}
 
-	void PunchPress::onModeChanged(global::RunMode /*mode*/)
+	void PunchPress::onModeChanged(global::RunMode mode)
 	{
+		ui->rbtn_debug->setChecked(mode == global::RunMode::Debug);
+		ui->rbtn_work->setChecked(mode == global::RunMode::Production);
 	}
 
 	void PunchPress::onCameraConnectionChanged(global::CameraIndex idx, bool connected, QString reason)

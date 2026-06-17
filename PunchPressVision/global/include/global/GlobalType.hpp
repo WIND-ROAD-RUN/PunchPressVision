@@ -12,7 +12,7 @@ namespace global
 	// 运行模式
 	enum class RunMode
 	{
-		Idle,               // 空闲状态
+		Idle,               // 空闲/停止状态：相机为触发模式且不取流，业务层不处理图像
 		Debug,              // 调试模式（FR-005 ~ FR-007）
 		Production,         // 工作模式（FR-008 ~ FR-010）
 		CalibDistortion,    // 畸变矫正模式（FR-011 ~ FR-014）

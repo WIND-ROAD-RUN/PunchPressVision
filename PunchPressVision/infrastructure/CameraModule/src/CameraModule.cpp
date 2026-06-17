@@ -72,8 +72,10 @@ namespace inf
 				continue;
 			}
 
-			// 默认自由运行模式，曝光/增益取自 cameraCfg
-			cam->setTriggerModeStatus(rw::hoec::TriggerModeStatus::OFF);
+			// 默认置于触发模式（软件触发），由上层 App 根据运行模式决定是否开始取流。
+			// 这样开机即处于“触发模式但不采集”的停止状态，符合安全/启动规范。
+			cam->setTriggerModeStatus(rw::hoec::TriggerModeStatus::ON);
+			cam->setTriggerSource(rw::hoec::TriggerSource::Software);
 			const int exposure = (idx == global::CameraIndex::Camera1)
 				? cameraCfg.exposureTime1 : cameraCfg.exposureTime2;
 			const int gain = (idx == global::CameraIndex::Camera1)

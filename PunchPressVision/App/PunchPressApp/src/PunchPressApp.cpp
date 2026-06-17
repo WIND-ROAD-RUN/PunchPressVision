@@ -69,6 +69,13 @@ namespace app
 			// TODO(硬件): 确认现场 PLC 的 IP/端口；默认取自 baseCfg。
 			inf.control_module_->connectToPLC(base.plcIp, base.plcPort);
 		}
+
+		// 启动后回到 Idle（触发模式、不取流、业务层不处理帧），由用户手动进入调试/工作模式。
+		// 此处不经过 switchToMode 的“同模式短路”，确保 business.start() 已经启动的 monitor 被停止。
+		configureCameraForIdle();
+		if (business_.camera_bun)
+			business_.camera_bun->stop();
+		emit modeChanged(global::RunMode::Idle);
 	}
 
 	void PunchPressApp::stop()
@@ -217,6 +224,19 @@ namespace app
 		return configureCameraForDebug();
 	}
 
+	bool PunchPressApp::configureCameraForIdle()
+	{
+		// 空闲/停止模式：触发模式（软件触发），不开始取流，由 switchToMode 统一停止 monitor
+		auto& inf = business_.infrastructure();
+		if (!inf.camera_module_)
+			return false;
+		bool ok = inf.camera_module_->setTriggerMode(
+			global::CameraIndex::Camera1, global::TriggerSource::Software, 3.0);
+		ok = inf.camera_module_->setTriggerMode(
+			global::CameraIndex::Camera2, global::TriggerSource::Software, 3.0) && ok;
+		return ok;
+	}
+
 	// ===== 模式切换状态机（FR-005 ~ FR-020）=====
 
 	bool PunchPressApp::switchToMode(global::RunMode mode, QString* errorMsg)
@@ -261,10 +281,11 @@ namespace app
 			break;
 		}
 
-		// 执行切换 + 配置相机
+		// 执行切换 + 配置相机 + 控制取流
 		currentMode_.store(mode, std::memory_order_release);
 		switch (mode)
 		{
+		case global::RunMode::Idle: configureCameraForIdle(); break;
 		case global::RunMode::Debug: configureCameraForDebug(); break;
 		case global::RunMode::Production: configureCameraForProduction(); break;
 		case global::RunMode::CalibDistortion:
@@ -273,7 +294,14 @@ namespace app
 		default: break;
 		}
 
-		// 拼接/平铺已下沉至 TwoCameraSpliceInfTool，CameraBun 始终从该层接收处理后帧
+		// 控制相机取流：Idle 模式必须停止 monitor；从 Idle 进入其他模式时需要开始取流
+		if (business_.camera_bun)
+		{
+			if (mode == global::RunMode::Idle)
+				business_.camera_bun->stop();
+			else if (current == global::RunMode::Idle)
+				business_.camera_bun->start();
+		}
 
 		emit modeChanged(mode);
 		return true;
@@ -283,6 +311,10 @@ namespace app
 
 	void PunchPressApp::onFrameReady(HalconCpp::HImage image)
 	{
+		// Idle 模式下相机应已停止取流；即便收到遗留帧，业务层也不处理
+		if (currentMode_.load(std::memory_order_acquire) == global::RunMode::Idle)
+			return;
+
 		// 转发给 UI 显示（跨线程由接收方用 QueuedConnection 处理）
 		emit frameReady(image);
 
