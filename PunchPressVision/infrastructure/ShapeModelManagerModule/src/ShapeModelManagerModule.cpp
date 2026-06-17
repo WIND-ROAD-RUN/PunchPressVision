@@ -54,7 +54,7 @@ namespace inf
         auto currentTime = getCurrentTime_yyMMddHHmmsszzz();
         info.setCreateTime(currentTime);
         info.setUpdateTime(currentTime);
-        info.setFolderPath(ShapeModelManagerModulePath.RootPath+ currentTime);
+        info.setFolderPath(ShapeModelManagerModulePath.RootPath + "/" + currentTime);
         info.setId(QUuid::createUuid().toString(QUuid::WithoutBraces).toStdString() + "_" + currentTime);
 		info.base_info = std::move(baseInfo);
 
