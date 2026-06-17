@@ -75,12 +75,16 @@ namespace Config
 		{
 			if (!image.IsInitialized())
 				return;
-			fs::create_directories(filePath.parent_path());
-			fs::path tmp = filePath;
-			tmp += ".tmp";
-			HalconCpp::SetSystem("jpeg_quality", kJpegQuality);
-		HalconCpp::HImage(image).WriteImage(kJpegFormat, 0, tmp.string().c_str());
-			replaceFile(tmp, filePath);
+			try
+			{
+				// FullDomain 展开 reduced-domain 图，防止 WriteImage 在 ROI 裁剪图上失败
+				HalconCpp::HImage fullImage;
+				HalconCpp::FullDomain(HalconCpp::HImage(image), &fullImage);
+				fs::create_directories(filePath.parent_path());
+				fs::path tmp = filePath;
+				fullImage.WriteImage(kJpegFormat, 0, tmp.string().c_str());
+			}
+			catch (...) {}
 		}
 
 		bool readImageSafe(const fs::path& filePath, HalconCpp::HImage& image)
@@ -422,13 +426,22 @@ namespace Config
 				contrast, minContrast,
 				modelPath);
 
-			// 保存图像
+			// 保存图像（逐个 try-catch 防止一个失败导致后续全部跳过）
 			if (_templateMatImage.IsInitialized())
-				writeImageSafe(_templateMatImage, dirPath / kTemplateImageFile);
+			{
+				try { writeImageSafe(_templateMatImage, dirPath / kTemplateImageFile); }
+				catch (...) {}
+			}
 			if (_originalImage.IsInitialized())
-				writeImageSafe(_originalImage, dirPath / kOriginalImageFile);
+			{
+				try { writeImageSafe(_originalImage, dirPath / kOriginalImageFile); }
+				catch (...) {}
+			}
 			if (_annotatedImage.IsInitialized())
-				writeImageSafe(_annotatedImage, dirPath / kAnnotatedImageFile);
+			{
+				try { writeImageSafe(_annotatedImage, dirPath / kAnnotatedImageFile); }
+				catch (...) {}
+			}
 
 			// 保存 ShapeModel
 			if (hv_ModelID.TupleLength() > 0)
