@@ -127,10 +127,12 @@ namespace ui
 		{
 			ui->rbtn_work->setChecked(false);
 			QString err;
-			if (!app_.switchToMode(global::RunMode::Debug, &err) && !err.isEmpty())
+			if (!app_.switchToMode(global::RunMode::Debug, &err))
 			{
-				rw::rqwu::MessageBox::warning(this, QStringLiteral("调试模式"), err);
-				ui->rbtn_debug->setChecked(false);
+				if (!err.isEmpty())
+					rw::rqwu::MessageBox::warning(this, QStringLiteral("调试模式"), err);
+				// 切换失败时回到 Idle/停止模式，停止取流
+				app_.switchToMode(global::RunMode::Idle);
 			}
 		}
 		else
@@ -146,10 +148,12 @@ namespace ui
 		{
 			ui->rbtn_debug->setChecked(false);
 			QString err;
-			if (!app_.switchToMode(global::RunMode::Production, &err) && !err.isEmpty())
+			if (!app_.switchToMode(global::RunMode::Production, &err))
 			{
-				rw::rqwu::MessageBox::warning(this, QStringLiteral("工作模式"), err);
-				ui->rbtn_work->setChecked(false);
+				if (!err.isEmpty())
+					rw::rqwu::MessageBox::warning(this, QStringLiteral("工作模式"), err);
+				// 切换失败时回到 Idle/停止模式，停止取流
+				app_.switchToMode(global::RunMode::Idle);
 			}
 		}
 		else
