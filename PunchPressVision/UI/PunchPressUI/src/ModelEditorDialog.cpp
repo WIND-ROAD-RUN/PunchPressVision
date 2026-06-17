@@ -255,6 +255,7 @@ namespace ui
 
 		const auto req = buildRequest(lastFrame_);
 		std::string err;
+		//TODO:这里面内部进行识别
 		const auto result = biz.shape_mode_manager_bun->testRecognize(req, &err);
 
 		if (shapeEditor_)
@@ -291,6 +292,7 @@ namespace ui
 
 		Config::ShapeModelInfo outInfo;
 		std::string err;
+		//TODO:这里面内部进行创建
 		if (!biz.shape_mode_manager_bun->createModel(req, outInfo, &err))
 		{
 			rw::rqwu::MessageBox::warning(this, QStringLiteral("创建模型"),
