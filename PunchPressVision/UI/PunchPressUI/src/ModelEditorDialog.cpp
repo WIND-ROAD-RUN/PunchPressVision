@@ -26,7 +26,6 @@ namespace ui
 	{
 		ui->setupUi(this);
 
-		// 进入创建模型模式
 		previousMode_ = app_.currentMode();
 		app_.switchToMode(global::RunMode::CreateModel);
 
@@ -41,11 +40,8 @@ namespace ui
 		oldLabel->deleteLater();
 		shapeEditor_->setGeometry(0, 0, oldLabel->width(), oldLabel->height());
 
-		// 加载当前相机配置并显示
 		loadCameraParams();
 		updateCameraParamButtons();
-
-		// 对比度可见性初始化
 		updateContrastVisibility();
 
 		buildConnections();
@@ -61,11 +57,9 @@ namespace ui
 
 	void ModelEditorDialog::buildConnections()
 	{
-		// App 帧流
 		connect(&app_, &app::PunchPressApp::frameReady,
 			this, &ModelEditorDialog::onFrameReady, Qt::QueuedConnection);
 
-		// ShapeEditor 工具切换 → 按钮文字
 		connect(shapeEditor_, &ShapeEditor::toolChanged,
 			this, &ModelEditorDialog::onToolChanged);
 
@@ -99,7 +93,6 @@ namespace ui
 		connect(ui->btn_mean, &QPushButton::clicked,
 			this, &ModelEditorDialog::onMeanClicked);
 
-		// 对比度 自动/手动
 		connect(ui->rbtn_auto, &QRadioButton::toggled,
 			this, &ModelEditorDialog::onContrastAutoToggled);
 		connect(ui->btn_contrast, &QPushButton::clicked, this, [this]()
@@ -116,6 +109,8 @@ namespace ui
 		});
 
 		// 操作
+		connect(ui->btn_recognize, &QPushButton::clicked,
+			this, &ModelEditorDialog::onRecognize);
 		connect(ui->btn_createShapeModel, &QPushButton::clicked,
 			this, &ModelEditorDialog::onCreateModel);
 		connect(ui->btn_readImage, &QPushButton::clicked,
@@ -174,226 +169,30 @@ namespace ui
 			shapeEditor_->undo();
 	}
 
-	// ===== 相机参数加载 ========================================================
+	// ===== ROI 校验 ============================================================
 
-	void ModelEditorDialog::loadCameraParams()
+	bool ModelEditorDialog::requireROI(const QString& action) const
 	{
-		const auto& inf = app_.business().infrastructure();
-		if (!inf.camera_module_)
-			return;
-
-		cameraCfg_ = inf.camera_module_->cameraCfg;
+		if (shapeEditor_ && shapeEditor_->hasROI())
+			return true;
+		rw::rqwu::MessageBox::warning(const_cast<ModelEditorDialog*>(this),
+			QStringLiteral("提示"),
+			QStringLiteral("%1前请先绘制感兴趣区域（ROI）").arg(action));
+		return false;
 	}
 
-	void ModelEditorDialog::updateCameraParamButtons()
+	// ===== 构建请求（识别和创建共用）===========================================
+
+	bun::CreateModelRequest ModelEditorDialog::buildRequest(
+		const HalconCpp::HImage& image) const
 	{
-		ui->btn_zengyi1->setText(QString::number(cameraCfg_.gain1));
-		ui->btn_baoguang1->setText(QString::number(cameraCfg_.exposureTime1));
-		ui->btn_zengyi2->setText(QString::number(cameraCfg_.gain2));
-		ui->btn_baoguang2->setText(QString::number(cameraCfg_.exposureTime2));
-	}
-
-	// ===== 相机参数编辑 ========================================================
-
-	void ModelEditorDialog::onGain1Clicked()
-	{
-		if (!inputIntParam(ui->btn_zengyi1, cameraCfg_.gain1, 0, 100,
-			QStringLiteral("增益1")))
-			return;
-		applyGain(global::CameraIndex::Camera1, cameraCfg_.gain1, &Config::cameraCfg::gain1);
-	}
-
-	void ModelEditorDialog::onExposure1Clicked()
-	{
-		if (!inputIntParam(ui->btn_baoguang1, cameraCfg_.exposureTime1, 1, 10000000,
-			QStringLiteral("曝光1")))
-			return;
-		applyExposure(global::CameraIndex::Camera1, cameraCfg_.exposureTime1,
-			&Config::cameraCfg::exposureTime1);
-	}
-
-	void ModelEditorDialog::onGain2Clicked()
-	{
-		if (!inputIntParam(ui->btn_zengyi2, cameraCfg_.gain2, 0, 100,
-			QStringLiteral("增益2")))
-			return;
-		applyGain(global::CameraIndex::Camera2, cameraCfg_.gain2, &Config::cameraCfg::gain2);
-	}
-
-	void ModelEditorDialog::onExposure2Clicked()
-	{
-		if (!inputIntParam(ui->btn_baoguang2, cameraCfg_.exposureTime2, 1, 10000000,
-			QStringLiteral("曝光2")))
-			return;
-		applyExposure(global::CameraIndex::Camera2, cameraCfg_.exposureTime2,
-			&Config::cameraCfg::exposureTime2);
-	}
-
-	void ModelEditorDialog::applyExposure(global::CameraIndex idx, int value,
-	                                       int Config::cameraCfg::* member)
-	{
-		cameraCfg_.*member = value;
-
-		auto& inf = app_.business().infrastructure();
-		if (inf.camera_module_)
-		{
-			inf.camera_module_->cameraCfg.*member = value;
-			if (!inf.camera_module_->setExposure(idx, static_cast<double>(value)))
-			{
-				rw::rqwu::MessageBox::warning(this, QStringLiteral("设置失败"),
-					QStringLiteral("无法设置 %1 曝光").arg(
-						idx == global::CameraIndex::Camera1
-							? QStringLiteral("相机1") : QStringLiteral("相机2")));
-				return;
-			}
-		}
-
-		if (inf.config_module_)
-		{
-			inf.config_module_->cameraCfg.*member = value;
-			inf.config_module_->save();
-		}
-
-		ui->btn_baoguang1->setText(QString::number(cameraCfg_.exposureTime1));
-		ui->btn_baoguang2->setText(QString::number(cameraCfg_.exposureTime2));
-	}
-
-	void ModelEditorDialog::applyGain(global::CameraIndex idx, int value,
-	                                   int Config::cameraCfg::* member)
-	{
-		cameraCfg_.*member = value;
-
-		auto& inf = app_.business().infrastructure();
-		if (inf.camera_module_)
-		{
-			inf.camera_module_->cameraCfg.*member = value;
-			if (!inf.camera_module_->setGain(idx, static_cast<double>(value)))
-			{
-				rw::rqwu::MessageBox::warning(this, QStringLiteral("设置失败"),
-					QStringLiteral("无法设置 %1 增益").arg(
-						idx == global::CameraIndex::Camera1
-							? QStringLiteral("相机1") : QStringLiteral("相机2")));
-				return;
-			}
-		}
-
-		if (inf.config_module_)
-		{
-			inf.config_module_->cameraCfg.*member = value;
-			inf.config_module_->save();
-		}
-
-		updateCameraParamButtons();
-	}
-
-	// ===== 模型参数编辑 ========================================================
-
-	void ModelEditorDialog::onOpeningClicked()
-	{
-		if (inputIntParam(ui->btn_opening, openingSize_, 1, 99,
-			QStringLiteral("开运算核大小")))
-			ui->btn_opening->setText(QString::number(openingSize_));
-	}
-
-	void ModelEditorDialog::onClosingClicked()
-	{
-		if (inputIntParam(ui->btn_closing, closingSize_, 1, 99,
-			QStringLiteral("闭运算核大小")))
-			ui->btn_closing->setText(QString::number(closingSize_));
-	}
-
-	void ModelEditorDialog::onMeanClicked()
-	{
-		if (inputIntParam(ui->btn_mean, meanSize_, 1, 99,
-			QStringLiteral("均值滤波核大小")))
-			ui->btn_mean->setText(QString::number(meanSize_));
-	}
-
-	void ModelEditorDialog::onContrastAutoToggled(bool checked)
-	{
-		contrastAuto_ = checked;
-		updateContrastVisibility();
-	}
-
-	void ModelEditorDialog::updateContrastVisibility()
-	{
-		// 手动模式下显示对比度参数控件
-		ui->widget_contrastHide->setVisible(!contrastAuto_);
-	}
-
-	// ===== 数字键盘输入 ========================================================
-
-	bool ModelEditorDialog::inputIntParam(QPushButton* button, int& value,
-	                                       int min, int max, const QString& title)
-	{
-		Q_UNUSED(title);
-		QString input = QString::number(value);
-
-		rw::rqwu::NumberKeyboard::InputDataConfig cfg;
-		cfg.isUsingMin = true;
-		cfg.isUsingMax = true;
-		cfg.min = static_cast<double>(min);
-		cfg.max = static_cast<double>(max);
-
-		const auto result = rw::rqwu::NumberKeyboard::inputDataOnQPushButton(
-			button, input, cfg);
-		if (result != rw::rqwu::NumberKeyboard::Accept)
-			return false;
-
-		bool ok = false;
-		const int newValue = input.toInt(&ok);
-		if (!ok)
-			return false;
-
-		value = newValue;
-		button->setText(QString::number(newValue));
-		return true;
-	}
-
-	bool ModelEditorDialog::inputDoubleParam(QPushButton* button, double& value,
-	                                          double min, double max, int decimals,
-	                                          const QString& title)
-	{
-		Q_UNUSED(title);
-		QString input = QString::number(value, 'f', decimals);
-
-		rw::rqwu::NumberKeyboard::InputDataConfig cfg;
-		cfg.isUsingMin = true;
-		cfg.isUsingMax = true;
-		cfg.min = min;
-		cfg.max = max;
-
-		const auto result = rw::rqwu::NumberKeyboard::inputDataOnQPushButton(
-			button, input, cfg);
-		if (result != rw::rqwu::NumberKeyboard::Accept)
-			return false;
-
-		bool ok = false;
-		const double newValue = input.toDouble(&ok);
-		if (!ok)
-			return false;
-
-		value = newValue;
-		button->setText(QString::number(newValue, 'f', decimals));
-		return true;
-	}
-
-	// ===== 创建模型 ============================================================
-
-	void ModelEditorDialog::onCreateModel()
-	{
-		auto& biz = app_.business();
-		if (!biz.shape_mode_manager_bun || !lastFrame_.IsInitialized())
-			return;
-
 		bun::CreateModelRequest req;
-		req.trainingImage = lastFrame_;
+		req.trainingImage = image;
+
 		if (shapeEditor_)
 		{
-			// ROI/Mask 矩形列表（逐个保存，支持回撤查看）
 			req.roiRects = shapeEditor_->roiRects();
 			req.maskRects = shapeEditor_->maskRects();
-			// 合并后的区域（用于模型训练裁剪）
 			if (shapeEditor_->hasROI())
 				req.roi = shapeEditor_->roi();
 			if (shapeEditor_->hasMask())
@@ -405,7 +204,7 @@ namespace ui
 			}
 		}
 
-		// 光源/曝光
+		auto& biz = app_.business();
 		if (biz.light_control_bun)
 		{
 			req.upperLight = biz.light_control_bun->getUpperLightState();
@@ -414,7 +213,6 @@ namespace ui
 		req.exposure = static_cast<double>(cameraCfg_.exposureTime1);
 		req.gain = static_cast<double>(cameraCfg_.gain1);
 
-		// 图像预处理参数
 		req.imageChannelType = ui->comboBox_ImageType->currentIndex();
 		req.useOpening = ui->ckb_opening->isChecked();
 		req.openingSize = openingSize_;
@@ -423,9 +221,65 @@ namespace ui
 		req.useMean = ui->ckb_mean->isChecked();
 		req.meanSize = meanSize_;
 
-		// 模型训练参数
 		req.contrast = contrastAuto_ ? 0 : contrast_;
 		req.minContrast = minContrast_;
+
+		return req;
+	}
+
+	// ===== 识别 ================================================================
+
+	void ModelEditorDialog::onRecognize()
+	{
+		if (!requireROI(QStringLiteral("识别")))
+			return;
+
+		if (!lastFrame_.IsInitialized())
+		{
+			rw::rqwu::MessageBox::warning(this, QStringLiteral("提示"),
+				QStringLiteral("请先载入图像"));
+			return;
+		}
+
+		auto& biz = app_.business();
+		if (!biz.shape_mode_manager_bun)
+			return;
+
+		const auto req = buildRequest(lastFrame_);
+		std::string err;
+		const auto result = biz.shape_mode_manager_bun->testRecognize(req, &err);
+
+		if (shapeEditor_)
+		{
+			if (result.found)
+			{
+				shapeEditor_->drawRecognitionMarker(
+					result.row, result.column, result.angle, result.score);
+			}
+			else
+			{
+				shapeEditor_->clearMarker();
+				rw::rqwu::MessageBox::information(this,
+					QStringLiteral("识别结果"),
+					err.empty()
+						? QStringLiteral("未匹配到模板\n请调整 ROI 或模型参数后重试")
+						: QString::fromStdString(err));
+			}
+		}
+	}
+
+	// ===== 创建模型 ============================================================
+
+	void ModelEditorDialog::onCreateModel()
+	{
+		if (!requireROI(QStringLiteral("创建模型")))
+			return;
+
+		auto& biz = app_.business();
+		if (!biz.shape_mode_manager_bun || !lastFrame_.IsInitialized())
+			return;
+
+		const auto req = buildRequest(lastFrame_);
 
 		Config::ShapeModelInfo outInfo;
 		std::string err;
@@ -439,32 +293,172 @@ namespace ui
 			QStringLiteral("模型已保存"));
 	}
 
-	// ===== 读取图片 ============================================================
+	// ===== 相机参数 ============================================================
 
-	void ModelEditorDialog::onReadImage()
+	void ModelEditorDialog::loadCameraParams()
 	{
-		const QString path = QFileDialog::getOpenFileName(this,
-			QStringLiteral("选择训练图片"),
-			QString(),
-			QStringLiteral("图片 (*.bmp *.png *.jpg *.jpeg *.tif *.tiff)"));
-		if (path.isEmpty())
+		const auto& inf = app_.business().infrastructure();
+		if (!inf.camera_module_)
 			return;
-
-		try
-		{
-			HalconCpp::HImage image(path.toStdString().c_str());
-			lastFrame_ = image;
-			if (shapeEditor_)
-				shapeEditor_->displayImage(image);
-		}
-		catch (...)
-		{
-			rw::rqwu::MessageBox::warning(this,
-				QStringLiteral("读取失败"), QStringLiteral("无法打开图片"));
-		}
+		cameraCfg_ = inf.camera_module_->cameraCfg;
 	}
 
-	// ===== 按钮文字更新 ========================================================
+	void ModelEditorDialog::updateCameraParamButtons()
+	{
+		ui->btn_zengyi1->setText(QString::number(cameraCfg_.gain1));
+		ui->btn_baoguang1->setText(QString::number(cameraCfg_.exposureTime1));
+		ui->btn_zengyi2->setText(QString::number(cameraCfg_.gain2));
+		ui->btn_baoguang2->setText(QString::number(cameraCfg_.exposureTime2));
+	}
+
+	void ModelEditorDialog::onGain1Clicked()
+	{
+		if (!inputIntParam(ui->btn_zengyi1, cameraCfg_.gain1, 0, 100, QStringLiteral("增益1")))
+			return;
+		applyGain(global::CameraIndex::Camera1, cameraCfg_.gain1, &Config::cameraCfg::gain1);
+	}
+
+	void ModelEditorDialog::onExposure1Clicked()
+	{
+		if (!inputIntParam(ui->btn_baoguang1, cameraCfg_.exposureTime1, 1, 10000000, QStringLiteral("曝光1")))
+			return;
+		applyExposure(global::CameraIndex::Camera1, cameraCfg_.exposureTime1, &Config::cameraCfg::exposureTime1);
+	}
+
+	void ModelEditorDialog::onGain2Clicked()
+	{
+		if (!inputIntParam(ui->btn_zengyi2, cameraCfg_.gain2, 0, 100, QStringLiteral("增益2")))
+			return;
+		applyGain(global::CameraIndex::Camera2, cameraCfg_.gain2, &Config::cameraCfg::gain2);
+	}
+
+	void ModelEditorDialog::onExposure2Clicked()
+	{
+		if (!inputIntParam(ui->btn_baoguang2, cameraCfg_.exposureTime2, 1, 10000000, QStringLiteral("曝光2")))
+			return;
+		applyExposure(global::CameraIndex::Camera2, cameraCfg_.exposureTime2, &Config::cameraCfg::exposureTime2);
+	}
+
+	void ModelEditorDialog::applyExposure(global::CameraIndex idx, int value,
+		int Config::cameraCfg::* member)
+	{
+		cameraCfg_.*member = value;
+		auto& inf = app_.business().infrastructure();
+		if (inf.camera_module_)
+		{
+			inf.camera_module_->cameraCfg.*member = value;
+			inf.camera_module_->setExposure(idx, static_cast<double>(value));
+		}
+		if (inf.config_module_)
+		{
+			inf.config_module_->cameraCfg.*member = value;
+			inf.config_module_->save();
+		}
+		updateCameraParamButtons();
+	}
+
+	void ModelEditorDialog::applyGain(global::CameraIndex idx, int value,
+		int Config::cameraCfg::* member)
+	{
+		cameraCfg_.*member = value;
+		auto& inf = app_.business().infrastructure();
+		if (inf.camera_module_)
+		{
+			inf.camera_module_->cameraCfg.*member = value;
+			inf.camera_module_->setGain(idx, static_cast<double>(value));
+		}
+		if (inf.config_module_)
+		{
+			inf.config_module_->cameraCfg.*member = value;
+			inf.config_module_->save();
+		}
+		updateCameraParamButtons();
+	}
+
+	// ===== 模型参数 ============================================================
+
+	void ModelEditorDialog::onOpeningClicked()
+	{
+		if (inputIntParam(ui->btn_opening, openingSize_, 1, 99, QStringLiteral("开运算核大小")))
+			ui->btn_opening->setText(QString::number(openingSize_));
+	}
+
+	void ModelEditorDialog::onClosingClicked()
+	{
+		if (inputIntParam(ui->btn_closing, closingSize_, 1, 99, QStringLiteral("闭运算核大小")))
+			ui->btn_closing->setText(QString::number(closingSize_));
+	}
+
+	void ModelEditorDialog::onMeanClicked()
+	{
+		if (inputIntParam(ui->btn_mean, meanSize_, 1, 99, QStringLiteral("均值滤波核大小")))
+			ui->btn_mean->setText(QString::number(meanSize_));
+	}
+
+	void ModelEditorDialog::onContrastAutoToggled(bool checked)
+	{
+		contrastAuto_ = checked;
+		updateContrastVisibility();
+	}
+
+	void ModelEditorDialog::updateContrastVisibility()
+	{
+		ui->widget_contrastHide->setVisible(!contrastAuto_);
+	}
+
+	// ===== 数字键盘 ============================================================
+
+	bool ModelEditorDialog::inputIntParam(QPushButton* button, int& value,
+		int min, int max, const QString& title)
+	{
+		Q_UNUSED(title);
+		QString input = QString::number(value);
+
+		rw::rqwu::NumberKeyboard::InputDataConfig cfg;
+		cfg.isUsingMin = true;
+		cfg.isUsingMax = true;
+		cfg.min = static_cast<double>(min);
+		cfg.max = static_cast<double>(max);
+
+		const auto result = rw::rqwu::NumberKeyboard::inputDataOnQPushButton(button, input, cfg);
+		if (result != rw::rqwu::NumberKeyboard::Accept)
+			return false;
+
+		bool ok = false;
+		const int newValue = input.toInt(&ok);
+		if (!ok) return false;
+
+		value = newValue;
+		button->setText(QString::number(newValue));
+		return true;
+	}
+
+	bool ModelEditorDialog::inputDoubleParam(QPushButton* button, double& value,
+		double min, double max, int decimals, const QString& title)
+	{
+		Q_UNUSED(title);
+		QString input = QString::number(value, 'f', decimals);
+
+		rw::rqwu::NumberKeyboard::InputDataConfig cfg;
+		cfg.isUsingMin = true;
+		cfg.isUsingMax = true;
+		cfg.min = min;
+		cfg.max = max;
+
+		const auto result = rw::rqwu::NumberKeyboard::inputDataOnQPushButton(button, input, cfg);
+		if (result != rw::rqwu::NumberKeyboard::Accept)
+			return false;
+
+		bool ok = false;
+		const double newValue = input.toDouble(&ok);
+		if (!ok) return false;
+
+		value = newValue;
+		button->setText(QString::number(value, 'f', decimals));
+		return true;
+	}
+
+	// ===== 按钮文字 ============================================================
 
 	void ModelEditorDialog::onToolChanged(ShapeEditor::Tool tool)
 	{
@@ -487,5 +481,29 @@ namespace ui
 			tool == ShapeEditor::Tool::CenterPoint
 				? QStringLiteral("退出定义")
 				: QStringLiteral("定义中心点"));
+	}
+
+	// ===== 读取图片 ============================================================
+
+	void ModelEditorDialog::onReadImage()
+	{
+		const QString path = QFileDialog::getOpenFileName(this,
+			QStringLiteral("选择训练图片"),
+			QString(),
+			QStringLiteral("图片 (*.bmp *.png *.jpg *.jpeg *.tif *.tiff)"));
+		if (path.isEmpty()) return;
+
+		try
+		{
+			HalconCpp::HImage image(path.toStdString().c_str());
+			lastFrame_ = image;
+			if (shapeEditor_)
+				shapeEditor_->displayImage(image);
+		}
+		catch (...)
+		{
+			rw::rqwu::MessageBox::warning(this,
+				QStringLiteral("读取失败"), QStringLiteral("无法打开图片"));
+		}
 	}
 } // namespace ui

@@ -14,6 +14,7 @@ namespace Config
 		constexpr const char* kParamsFile = "model_params.txt";
 		constexpr const char* kTemplateImageFile = "template_image.jpg";
 		constexpr const char* kOriginalImageFile = "original_image.jpg";
+		constexpr const char* kAnnotatedImageFile = "annotated.jpg";
 		constexpr const char* kModelFile = "model.shm";
 		constexpr const char* kMetrologyFile = "metrology.mmc";
 		constexpr const char* kPaintCreateRoiPrefix = "paint_create_roi_";
@@ -382,6 +383,7 @@ namespace Config
 			// 加载图像
 			readImageSafe(dirPath / kTemplateImageFile, _templateMatImage);
 			readImageSafe(dirPath / kOriginalImageFile, _originalImage);
+			readImageSafe(dirPath / kAnnotatedImageFile, _annotatedImage);
 
 			// 加载 ShapeModel
 			if (fs::exists(dirPath / kModelFile))
@@ -463,6 +465,8 @@ namespace Config
 				writeImageSafe(_templateMatImage, dirPath / kTemplateImageFile);
 			if (_originalImage.IsInitialized())
 				writeImageSafe(_originalImage, dirPath / kOriginalImageFile);
+			if (_annotatedImage.IsInitialized())
+				writeImageSafe(_annotatedImage, dirPath / kAnnotatedImageFile);
 
 			// 保存 ShapeModel
 			if (hv_ModelID.TupleLength() > 0)

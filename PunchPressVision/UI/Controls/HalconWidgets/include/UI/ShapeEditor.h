@@ -83,6 +83,12 @@ namespace ui
 		/// 全部清空（ROI + Mask + 中心点 + 历史）
 		void clearAll();
 
+		/// 绘制识别匹配结果标记（绿色十字 + 分数），row/col 为图像坐标
+		void drawRecognitionMarker(double row, double col, double angle, double score);
+
+		/// 清除识别标记
+		void clearMarker();
+
 		/// 获取内部 L2 控件，用于连接 zoomChanged 等信号
 		HalconInteractiveLabel* imageLabel() const { return imageLabel_; }
 
@@ -101,6 +107,7 @@ namespace ui
 		void drawAllROIs();
 		void drawAllMasks();
 		void drawCenterPoint();
+		void drawMarker();             ///< 绘制识别匹配结果标记
 
 		/// 生成单个矩形区域对象
 		static HalconCpp::HObject rectToRegion(const QRectF& r);
@@ -126,6 +133,10 @@ namespace ui
 
 		QPointF centerPoint_;
 		bool hasCenterPoint_{ false };
+
+		// 识别标记
+		bool showMarker_{ false };
+		double markerRow_{ 0.0 }, markerCol_{ 0.0 }, markerAngle_{ 0.0 }, markerScore_{ 0.0 };
 
 		// displayImage 重入哨兵
 		bool displaying_{ false };

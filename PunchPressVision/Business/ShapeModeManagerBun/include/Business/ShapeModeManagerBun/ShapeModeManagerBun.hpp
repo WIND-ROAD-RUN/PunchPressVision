@@ -91,6 +91,10 @@ namespace bun
 		// 模板匹配推理（FR-010）
 		MatchResult match(const HalconCpp::HImage& image);
 
+		// 临时创建模型并匹配测试（供创建界面"识别"按钮使用）
+		MatchResult testRecognize(const CreateModelRequest& req,
+			std::string* errorMsg = nullptr);
+
 		// 查询
 		std::vector<Config::ShapeModelInfo> getAllModels() const;
 		std::vector<Config::ShapeModelInfo> searchModels(const QString& keyword) const;

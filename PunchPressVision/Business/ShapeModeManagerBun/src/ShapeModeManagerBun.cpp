@@ -110,6 +110,27 @@ namespace bun
 				data._paintShieldRoiList.push_back(obj);
 			}
 
+			// 生成标注图：在原始图像上叠加 ROI（白线）和 Mask（黑线）
+			if (!req.roiRects.isEmpty() || !req.maskRects.isEmpty())
+			{
+				HImage annotated = req.trainingImage;
+				// ROI → 白色边框（灰度值 255）
+				for (const auto& r : req.roiRects)
+				{
+					HObject rectROI;
+					GenRectangle1(&rectROI, r.top(), r.left(), r.bottom(), r.right());
+					OverpaintRegion(annotated, rectROI, 255, "margin");
+				}
+				// Mask → 黑色边框（灰度值 0）
+				for (const auto& r : req.maskRects)
+				{
+					HObject rectMask;
+					GenRectangle1(&rectMask, r.top(), r.left(), r.bottom(), r.right());
+					OverpaintRegion(annotated, rectMask, 0, "margin");
+				}
+				data._annotatedImage = annotated;
+			}
+
 			// 4. 元数据
 			Config::ShapeModelInfo::BaseInfo baseInfo;
 			baseInfo.name = req.name.isEmpty()
@@ -286,6 +307,81 @@ namespace bun
 		{
 			// 匹配失败 → found=false
 		}
+		return result;
+	}
+
+	MatchResult ShapeModeManagerBun::testRecognize(const CreateModelRequest& req,
+		std::string* errorMsg)
+	{
+		using namespace HalconCpp;
+		MatchResult result;
+
+		if (!req.trainingImage.IsInitialized())
+		{
+			if (errorMsg) *errorMsg = "训练图像未初始化";
+			return result;
+		}
+
+		try
+		{
+			// 1. 在 ROI 内裁剪模板图
+			HImage templateImage = req.trainingImage;
+			if (req.roi.IsInitialized())
+			{
+				HObject reduced;
+				ReduceDomain(req.trainingImage, req.roi, &reduced);
+				templateImage = HImage(reduced);
+			}
+			if (req.mask.IsInitialized())
+			{
+				HObject diff;
+				Difference(req.roi, req.mask, &diff);
+				HObject reduced;
+				ReduceDomain(req.trainingImage, diff, &reduced);
+				templateImage = HImage(reduced);
+			}
+
+			// 2. 临时创建 Shape Model
+			HTuple modelID;
+			CreateShapeModel(templateImage,
+				req.numLevels,
+				HTuple(req.angleStart),
+				HTuple(req.angleExtent),
+				(req.angleStep > 0 ? HTuple(req.angleStep) : HTuple("auto")),
+				req.optimization.toStdString().c_str(),
+				req.metric.toStdString().c_str(),
+				req.contrast, req.minContrast,
+				&modelID);
+
+			// 3. 匹配测试
+			HTuple row, column, angle, score;
+			FindShapeModel(req.trainingImage, modelID,
+				HTuple(req.angleStart), HTuple(req.angleExtent),
+				0.3, 1, 0.5, "least_squares", 0, 0.9,
+				&row, &column, &angle, &score);
+
+			if (score.Length() > 0 && score[0].D() >= 0.3)
+			{
+				result.found = true;
+				result.row = row[0].D();
+				result.column = column[0].D();
+				result.angle = angle[0].D();
+				result.score = score[0].D();
+			}
+
+			// 4. 清理临时模型
+			ClearShapeModel(modelID);
+		}
+		catch (const HException& e)
+		{
+			if (errorMsg)
+				*errorMsg = std::string("识别测试失败: ") + e.ErrorMessage().Text();
+		}
+		catch (...)
+		{
+			if (errorMsg) *errorMsg = "识别测试发生未知错误";
+		}
+
 		return result;
 	}
 

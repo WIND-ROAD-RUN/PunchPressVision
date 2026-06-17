@@ -5,6 +5,7 @@
 #include "halconcpp/HalconCpp.h"
 #include "global/GlobalType.hpp"
 #include "infrastructure/ConfigModule/Config/cameraCfg.hpp"
+#include "Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp"
 #include "UI/ShapeEditor.h"
 
 QT_BEGIN_NAMESPACE
@@ -16,7 +17,6 @@ class QPushButton;
 
 namespace ui
 {
-	// 模板训练对话框（FR-023 ~ FR-026、FR-028）。复用旧 Dlg_createshapemodel.ui。
 	class ModelEditorDialog : public QDialog
 	{
 		Q_OBJECT
@@ -48,6 +48,7 @@ namespace ui
 		void onContrastAutoToggled(bool checked);
 
 		// 操作
+		void onRecognize();
 		void onCreateModel();
 		void onReadImage();
 
@@ -56,13 +57,11 @@ namespace ui
 		void loadCameraParams();
 		void updateCameraParamButtons();
 
-		// 数字键盘输入辅助
 		bool inputIntParam(QPushButton* button, int& value, int min, int max,
 		                   const QString& title = QString());
 		bool inputDoubleParam(QPushButton* button, double& value, double min, double max,
 		                      int decimals, const QString& title = QString());
 
-		// 模型参数回写
 		void applyExposure(global::CameraIndex idx, int value,
 		                   int Config::cameraCfg::* member);
 		void applyGain(global::CameraIndex idx, int value,
@@ -71,22 +70,24 @@ namespace ui
 		void updateToolButtons(ShapeEditor::Tool tool);
 		void updateContrastVisibility();
 
+		// 构建 CreateModelRequest（供识别和创建共用）
+		bun::CreateModelRequest buildRequest(const HalconCpp::HImage& image) const;
+
+		// ROI 缺失提示
+		bool requireROI(const QString& action) const;
+
 		Ui::Dlg_createshapemodelClass* ui;
 		app::PunchPressApp& app_;
 		ui::ShapeEditor* shapeEditor_{ nullptr };
 		HalconCpp::HImage lastFrame_;
 		global::RunMode previousMode_{ global::RunMode::Idle };
 
-		// 本地缓存的相机配置
 		Config::cameraCfg cameraCfg_;
 
 		// 模型训练参数
 		int openingSize_{ 5 };
 		int closingSize_{ 5 };
 		int meanSize_{ 5 };
-		bool useOpening_{ false };
-		bool useClosing_{ false };
-		bool useMean_{ false };
 		bool contrastAuto_{ true };
 		int contrast_{ 30 };
 		int minContrast_{ 10 };

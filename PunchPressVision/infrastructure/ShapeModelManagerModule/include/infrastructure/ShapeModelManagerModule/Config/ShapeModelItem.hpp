@@ -15,6 +15,9 @@ namespace Config
 		// 创建的原始图片
 		HalconCpp::HImage _originalImage;
 
+		// 带 ROI/Mask 标注的预览图（用于模型库预览）
+		HalconCpp::HImage _annotatedImage;
+
 		HalconCpp::HTuple hv_ModelID;
 		HalconCpp::HTuple hv_MetrologyHandle;
 

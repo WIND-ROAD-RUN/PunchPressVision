@@ -8,8 +8,6 @@
 
 namespace ui
 {
-	// ===== 构造 / 析构 ========================================================
-
 	ShapeEditor::ShapeEditor(QWidget* parent)
 		: QWidget(parent)
 	{
@@ -22,7 +20,7 @@ namespace ui
 
 	ShapeEditor::~ShapeEditor() = default;
 
-	// ===== 图像显示 ============================================================
+	// === 图像显示 ===
 
 	void ShapeEditor::displayImage(const HalconCpp::HImage& image)
 	{
@@ -32,9 +30,10 @@ namespace ui
 		drawAllROIs();
 		drawAllMasks();
 		drawCenterPoint();
+		drawMarker();
 	}
 
-	// ===== HObject 导出 ========================================================
+	// === HObject 导出 ===
 
 	HalconCpp::HObject ShapeEditor::rectToRegion(const QRectF& r)
 	{
@@ -81,14 +80,13 @@ namespace ui
 		return mergeRects(maskRects_);
 	}
 
-	// ===== 工具切换 ============================================================
+	// === 工具切换 ===
 
 	void ShapeEditor::setTool(Tool tool)
 	{
 		if (tool_ == tool)
 			return;
 
-		// 切换工具时取消未完成的拖拽
 		if (drawing_)
 		{
 			drawing_ = false;
@@ -107,11 +105,10 @@ namespace ui
 		emit toolChanged(tool_);
 	}
 
-	// ===== 编辑操作 ============================================================
+	// === 编辑操作 ===
 
 	void ShapeEditor::clearROI()
 	{
-		// 从历史栈中移除所有 ROI 条目
 		actionHistory_.erase(
 			std::remove(actionHistory_.begin(), actionHistory_.end(), ActionType::ROI),
 			actionHistory_.end());
@@ -146,10 +143,27 @@ namespace ui
 		actionHistory_.clear();
 		hasCenterPoint_ = false;
 		drawing_ = false;
+		showMarker_ = false;
 		refreshOverlay();
 		emit roiChanged();
 		emit maskChanged();
 		emit centerPointChanged();
+	}
+
+	void ShapeEditor::drawRecognitionMarker(double row, double col, double angle, double score)
+	{
+		markerRow_ = row;
+		markerCol_ = col;
+		markerAngle_ = angle;
+		markerScore_ = score;
+		showMarker_ = true;
+		refreshOverlay();
+	}
+
+	void ShapeEditor::clearMarker()
+	{
+		showMarker_ = false;
+		refreshOverlay();
 	}
 
 	void ShapeEditor::undo()
@@ -181,7 +195,7 @@ namespace ui
 		refreshOverlay();
 	}
 
-	// ===== Qt 事件 =============================================================
+	// === Qt 事件 ===
 
 	void ShapeEditor::resizeEvent(QResizeEvent* e)
 	{
@@ -197,7 +211,6 @@ namespace ui
 		case QEvent::MouseButtonPress:
 		{
 			auto* me = static_cast<QMouseEvent*>(e);
-
 			if (me->button() == Qt::LeftButton)
 			{
 				if (tool_ == Tool::RectangleROI || tool_ == Tool::RectangleMask)
@@ -223,7 +236,6 @@ namespace ui
 		case QEvent::MouseMove:
 		{
 			auto* me = static_cast<QMouseEvent*>(e);
-
 			if ((tool_ == Tool::RectangleROI || tool_ == Tool::RectangleMask) && drawing_)
 			{
 				drawEndWidget_ = me->pos();
@@ -236,7 +248,6 @@ namespace ui
 		case QEvent::MouseButtonRelease:
 		{
 			auto* me = static_cast<QMouseEvent*>(e);
-
 			if (me->button() == Qt::LeftButton && drawing_)
 			{
 				drawEndWidget_ = me->pos();
@@ -291,7 +302,7 @@ namespace ui
 		return false;
 	}
 
-	// ===== 内部绘制 ============================================================
+	// === 内部绘制 ===
 
 	void ShapeEditor::refreshOverlay()
 	{
@@ -302,6 +313,31 @@ namespace ui
 		drawAllROIs();
 		drawAllMasks();
 		drawCenterPoint();
+		drawMarker();
+	}
+
+	void ShapeEditor::drawMarker()
+	{
+		if (!showMarker_ || !imageLabel_ || !imageLabel_->isReady())
+			return;
+
+		try
+		{
+			using namespace HalconCpp;
+			SetColor(imageLabel_->halconHandle(), "#00FF00");
+			SetLineWidth(imageLabel_->halconHandle(), 3);
+			DispCross(imageLabel_->halconHandle(),
+				markerRow_, markerCol_, 60, markerAngle_);
+
+			SetLineWidth(imageLabel_->halconHandle(), 1);
+			QString scoreText = QString("Score: %1%").arg(markerScore_ * 100.0, 0, 'f', 1);
+			SetTposition(imageLabel_->halconHandle(),
+				static_cast<HTuple>(markerRow_ + 80),
+				static_cast<HTuple>(markerCol_ - 40));
+			WriteString(imageLabel_->halconHandle(),
+				scoreText.toStdString().c_str());
+		}
+		catch (...) {}
 	}
 
 	void ShapeEditor::drawAllROIs()
@@ -311,7 +347,6 @@ namespace ui
 
 		using namespace HalconCpp;
 
-		// 已确认的 ROI
 		if (!roiRects_.isEmpty())
 		{
 			try
@@ -328,7 +363,6 @@ namespace ui
 			catch (...) {}
 		}
 
-		// 拖拽中的橡皮筋（仅在 RectangleROI 工具下绘制）
 		if (drawing_ && tool_ == Tool::RectangleROI)
 		{
 			const QPointF p1 = widgetToImage(drawStartWidget_);
@@ -354,7 +388,6 @@ namespace ui
 
 		using namespace HalconCpp;
 
-		// 已确认的 Mask
 		if (!maskRects_.isEmpty())
 		{
 			try
@@ -371,7 +404,6 @@ namespace ui
 			catch (...) {}
 		}
 
-		// 拖拽中的橡皮筋（仅在 RectangleMask 工具下绘制）
 		if (drawing_ && tool_ == Tool::RectangleMask)
 		{
 			const QPointF p1 = widgetToImage(drawStartWidget_);
@@ -404,8 +436,6 @@ namespace ui
 		}
 		catch (...) {}
 	}
-
-	// ===== 坐标转换 ============================================================
 
 	QPointF ShapeEditor::widgetToImage(const QPoint& widgetPos) const
 	{
