@@ -108,10 +108,8 @@ namespace Config
 				return;
 			fs::create_directories(filePath.parent_path());
 			fs::path tmp = filePath;
-			tmp += ".tmp";
 			try { HalconCpp::WriteObject(obj, tmp.string().c_str()); }
 			catch (...) { return; }
-			replaceFile(tmp, filePath);
 		}
 
 		bool readObjectSafe(const fs::path& filePath, HalconCpp::HObject& obj)

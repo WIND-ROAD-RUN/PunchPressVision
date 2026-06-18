@@ -698,6 +698,21 @@ namespace ui
 		auto item = inf.shape_model_manager_module_->getShapeModelItem(id);
 		const auto& data = item.data;
 
+		//// ---- 诊断：检查加载的数据 ----
+		//{
+		//	const int roiCount = static_cast<int>(data._paintCreateRoiList.size());
+		//	const int maskCount = static_cast<int>(data._paintShieldRoiList.size());
+		//	const bool hasImg = data._originalImage.IsInitialized();
+		//	const bool hasCenter = (data.centerX != 0.0 || data.centerY != 0.0);
+		//	rw::rqwu::MessageBox::information(this,
+		//		QStringLiteral("加载诊断"),
+		//		QStringLiteral("原始图=%1 | ROI数=%2 | Mask数=%3 | 中心点=%4")
+		//			.arg(hasImg ? QStringLiteral("有") : QStringLiteral("无"))
+		//			.arg(roiCount)
+		//			.arg(maskCount)
+		//			.arg(hasCenter ? QStringLiteral("有") : QStringLiteral("无")));
+		//}
+
 		// 显示创建时的原始图片（始终使用原始图，不接收相机帧）
 		if (data._originalImage.IsInitialized())
 		{
