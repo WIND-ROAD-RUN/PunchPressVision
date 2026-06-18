@@ -730,6 +730,14 @@ namespace ui
 			"QMenu::item { padding: 8px 24px; }"
 			"QMenu::item:selected { background-color: #E3F2FD; color: #1976D2; }"));
 
+		QAction* editAction = menu.addAction(QStringLiteral("设置参数"));
+		connect(editAction, &QAction::triggered, this, [this, row]()
+		{
+			openOffsetEditor(row, 0);
+		});
+
+		menu.addSeparator();
+
 		QAction* unloadAction = menu.addAction(QStringLiteral("卸载 \"%1\"").arg(modelName));
 		auto* bunPtr = bun.get();
 		connect(unloadAction, &QAction::triggered, this, [this, bunPtr, modelId]()
