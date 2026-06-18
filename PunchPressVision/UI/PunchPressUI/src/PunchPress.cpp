@@ -119,8 +119,8 @@ namespace ui
 			<< QStringLiteral("最低角度°")
 			<< QStringLiteral("最高角度°");
 		loadedModelsTable_->setHorizontalHeaderLabels(headers);
-		loadedModelsTable_->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Fixed);
-		loadedModelsTable_->horizontalHeader()->resizeSection(0, 160);  // 模型名称最小宽度，其余列通过滚动条查看
+		loadedModelsTable_->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+		loadedModelsTable_->horizontalHeader()->setMinimumSectionSize(60);  // 防止内容列过窄
 		loadedModelsTable_->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
 		loadedModelsTable_->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
 		loadedModelsTable_->horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
