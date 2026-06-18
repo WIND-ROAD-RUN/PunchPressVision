@@ -505,6 +505,70 @@ namespace bun
 		}
 	}
 
+	// ===== 模板匹配参数 =====
+
+	ModelMatchParams ShapeModeManagerBun::getMatchParams(const std::string& modelId) const
+	{
+		std::shared_lock<std::shared_mutex> lk(modelCacheMutex_);
+		for (const auto& m : loadedModels_)
+		{
+			if (m.modelId == modelId)
+			{
+				ModelMatchParams p;
+				p.numMatches = m.data.findnumber > 0 ? m.data.findnumber : 1;
+				p.minScore = m.data.minScore;
+				p.angleStart = m.data.angleStart;
+				p.angleExtent = m.data.angleExtent;
+				return p;
+			}
+		}
+		return {};  // 未找到 → 默认值
+	}
+
+	bool ShapeModeManagerBun::setMatchParams(const std::string& modelId,
+		int numMatches, double minScore, double angleStart, double angleExtent,
+		std::string* errorMsg)
+	{
+		try
+		{
+			{
+				std::unique_lock<std::shared_mutex> lk(modelCacheMutex_);
+				for (auto& m : loadedModels_)
+				{
+					if (m.modelId == modelId)
+					{
+						m.data.findnumber = numMatches;
+						m.data.minScore = minScore;
+						m.data.angleStart = angleStart;
+						m.data.angleExtent = angleExtent;
+						break;
+					}
+				}
+			}
+
+			// 持久化到磁盘（model_params.txt）
+			auto item = inf_.shape_model_manager_module_->getShapeModelItem(modelId);
+			item.data.findnumber = numMatches;
+			item.data.minScore = minScore;
+			item.data.angleStart = angleStart;
+			item.data.angleExtent = angleExtent;
+			inf_.shape_model_manager_module_->changeShapeModelItem(modelId, item.data);
+
+			emit matchParamsChanged(QString::fromStdString(modelId));
+			return true;
+		}
+		catch (const std::exception& e)
+		{
+			if (errorMsg) *errorMsg = e.what();
+			return false;
+		}
+		catch (...)
+		{
+			if (errorMsg) *errorMsg = "保存匹配参数失败";
+			return false;
+		}
+	}
+
 	// ===== 多模型匹配 =====
 
 	HalconCpp::HImage ShapeModeManagerBun::preprocessImage(const HalconCpp::HImage& image,
@@ -619,7 +683,7 @@ namespace bun
 					HalconCpp::HTuple(model.data.angleStart),
 					HalconCpp::HTuple(model.data.angleExtent),
 					model.data.minScore,                                // MinScore
-					1,                                                  // NumMatches
+					std::max(1, model.data.findnumber),                 // NumMatches（兼容旧数据：0 → 1）
 					0.5,                                                // MaxOverlap
 					"least_squares",                                    // SubPixel
 					HalconCpp::HTuple(0),                                // NumLevels (0 = 使用全部金字塔层级)

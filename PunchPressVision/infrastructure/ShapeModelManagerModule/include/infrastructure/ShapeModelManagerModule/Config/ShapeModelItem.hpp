@@ -43,7 +43,7 @@ namespace Config
 		// 角度偏差（单位：deg 或 rad，取决于业务定义）
 		double offsetAngle = 0;
 
-		int findnumber = 0;
+		int findnumber = 1;
 
 		// 单通道类型 (0=灰度, 1=R, 2=G, 3=B, 4=H, 5=S, 6=V)
 		int _SingleChannelType = 0;

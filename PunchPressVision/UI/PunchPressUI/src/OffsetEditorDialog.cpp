@@ -13,15 +13,21 @@ namespace ui
 {
 	OffsetEditorDialog::OffsetEditorDialog(const QString& modelName,
 		double offsetX, double offsetY, double offsetAngle,
+		int numMatches, double minScore,
+		double minAngleDeg, double maxAngleDeg,
 		QWidget* parent)
 		: QDialog(parent)
 		, modelName_(modelName)
 		, offsetX_(offsetX)
 		, offsetY_(offsetY)
 		, offsetAngle_(offsetAngle)
+		, numMatches_(numMatches)
+		, minScore_(minScore)
+		, minAngleDeg_(minAngleDeg)
+		, maxAngleDeg_(maxAngleDeg)
 	{
-		setWindowTitle(QStringLiteral("设置偏移量 - %1").arg(modelName_));
-		setMinimumWidth(400);
+		setWindowTitle(QStringLiteral("设置参数 - %1").arg(modelName_));
+		setMinimumWidth(450);
 		buildUI();
 	}
 
@@ -84,6 +90,40 @@ namespace ui
 		btnOffsetAngle_->setToolTip(QStringLiteral("角度偏移 (°)，范围 -360.0 ~ 360.0"));
 		connect(btnOffsetAngle_, &QPushButton::clicked, this, &OffsetEditorDialog::onOffsetAngleClicked);
 		formLayout->addRow(QStringLiteral("OffsetAngle (°):"), btnOffsetAngle_);
+
+		// ---- 匹配参数分隔线 ----
+		auto* sepLabel = new QLabel(QStringLiteral("── 匹配参数 ──"), this);
+		sepLabel->setStyleSheet("font-size: 14px; font-weight: bold; color: #2196F3; padding: 12px 0 4px 0;");
+		sepLabel->setAlignment(Qt::AlignCenter);
+		formLayout->addRow(sepLabel);
+
+		// 查找数量
+		btnNumMatches_ = new QPushButton(QString::number(numMatches_), this);
+		btnNumMatches_->setStyleSheet(btnStyle);
+		btnNumMatches_->setToolTip(QStringLiteral("模板匹配查找数量 (1~20)"));
+		connect(btnNumMatches_, &QPushButton::clicked, this, &OffsetEditorDialog::onNumMatchesClicked);
+		formLayout->addRow(QStringLiteral("查找数量:"), btnNumMatches_);
+
+		// 最低匹配分数
+		btnMinScore_ = new QPushButton(QString::number(minScore_, 'f', 2), this);
+		btnMinScore_->setStyleSheet(btnStyle);
+		btnMinScore_->setToolTip(QStringLiteral("最低匹配分数 (0.00 ~ 1.00)"));
+		connect(btnMinScore_, &QPushButton::clicked, this, &OffsetEditorDialog::onMinScoreClicked);
+		formLayout->addRow(QStringLiteral("最低分数:"), btnMinScore_);
+
+		// 最低角度（度）
+		btnMinAngle_ = new QPushButton(QString::number(minAngleDeg_, 'f', 1), this);
+		btnMinAngle_->setStyleSheet(btnStyle);
+		btnMinAngle_->setToolTip(QStringLiteral("角度搜索范围下限 (°)，范围 -360.0 ~ 360.0"));
+		connect(btnMinAngle_, &QPushButton::clicked, this, &OffsetEditorDialog::onMinAngleClicked);
+		formLayout->addRow(QStringLiteral("最低角度 (°):"), btnMinAngle_);
+
+		// 最高角度（度）
+		btnMaxAngle_ = new QPushButton(QString::number(maxAngleDeg_, 'f', 1), this);
+		btnMaxAngle_->setStyleSheet(btnStyle);
+		btnMaxAngle_->setToolTip(QStringLiteral("角度搜索范围上限 (°)，范围 -360.0 ~ 360.0"));
+		connect(btnMaxAngle_, &QPushButton::clicked, this, &OffsetEditorDialog::onMaxAngleClicked);
+		formLayout->addRow(QStringLiteral("最高角度 (°):"), btnMaxAngle_);
 
 		rootLayout->addWidget(formGroup);
 		rootLayout->addStretch();
@@ -149,5 +189,65 @@ namespace ui
 		value = newValue;
 		button->setText(QString::number(value, 'f', decimals));
 		return true;
+	}
+
+	bool OffsetEditorDialog::inputIntParam(QPushButton* button, int& value, int min, int max)
+	{
+		QString input = QString::number(value);
+
+		rw::rqwu::NumberKeyboard::InputDataConfig cfg;
+		cfg.isUsingMin = true;
+		cfg.isUsingMax = true;
+		cfg.min = min;
+		cfg.max = max;
+
+		const auto result = rw::rqwu::NumberKeyboard::inputDataOnQPushButton(button, input, cfg);
+		if (result != rw::rqwu::NumberKeyboard::Accept)
+			return false;
+
+		bool ok = false;
+		const int newValue = input.toInt(&ok);
+		if (!ok)
+			return false;
+
+		value = newValue;
+		button->setText(QString::number(value));
+		return true;
+	}
+
+	void OffsetEditorDialog::onNumMatchesClicked()
+	{
+		inputIntParam(btnNumMatches_, numMatches_, 1, 20);
+	}
+
+	void OffsetEditorDialog::onMinScoreClicked()
+	{
+		inputDoubleParam(btnMinScore_, minScore_, 0.0, 1.0, 2);
+	}
+
+	void OffsetEditorDialog::onMinAngleClicked()
+	{
+		if (inputDoubleParam(btnMinAngle_, minAngleDeg_, -360.0, 360.0, 1))
+		{
+			// 确保最低角度 ≤ 最高角度
+			if (minAngleDeg_ > maxAngleDeg_)
+			{
+				maxAngleDeg_ = minAngleDeg_;
+				btnMaxAngle_->setText(QString::number(maxAngleDeg_, 'f', 1));
+			}
+		}
+	}
+
+	void OffsetEditorDialog::onMaxAngleClicked()
+	{
+		if (inputDoubleParam(btnMaxAngle_, maxAngleDeg_, -360.0, 360.0, 1))
+		{
+			// 确保最高角度 ≥ 最低角度
+			if (maxAngleDeg_ < minAngleDeg_)
+			{
+				minAngleDeg_ = maxAngleDeg_;
+				btnMinAngle_->setText(QString::number(minAngleDeg_, 'f', 1));
+			}
+		}
 	}
 }

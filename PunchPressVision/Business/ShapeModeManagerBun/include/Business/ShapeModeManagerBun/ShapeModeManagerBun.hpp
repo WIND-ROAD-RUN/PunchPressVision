@@ -95,6 +95,19 @@ namespace bun
 		double offsetAngle{ 0.0 };
 	};
 
+	/// <summary>
+	/// 用户可配置的模板匹配参数。
+	/// 值从 ShapeModelData 读取，通过 model_params.txt 持久化。
+	/// angleStart/angleExtent 使用弧度（与 Halcon 一致）。
+	/// </summary>
+	struct ModelMatchParams
+	{
+		int numMatches{ 1 };
+		double minScore{ 0.5 };
+		double angleStart{ 0.0 };    // 弧度，搜索起始角度
+		double angleExtent{ 6.28 };  // 弧度，搜索角度范围（2π ≈ 360°）
+	};
+
 	class ShapeModeManagerBun
 		: public QObject, public global::IBusiness
 	{
@@ -137,6 +150,14 @@ namespace bun
 			double offsetX, double offsetY, double offsetAngle,
 			std::string* errorMsg = nullptr);
 
+		// 模板匹配参数（查找数量、最低分数、角度范围）
+		/// <summary>获取指定模型的匹配参数。</summary>
+		ModelMatchParams getMatchParams(const std::string& modelId) const;
+		/// <summary>设置指定模型的匹配参数，更新内存并持久化到磁盘。</summary>
+		bool setMatchParams(const std::string& modelId,
+			int numMatches, double minScore, double angleStart, double angleExtent,
+			std::string* errorMsg = nullptr);
+
 		// 模板匹配推理（FR-010）— 遍历所有已加载模型，返回匹配到的结果集
 		/// <summary>
 		/// 对图像遍历所有已加载模型进行匹配。
@@ -171,6 +192,8 @@ namespace bun
 		void modelContoursFound(const HalconCpp::HObject& contours);
 		/// 模型偏移量已更新，通知 UI 刷新
 		void modelOffsetChanged(const QString& modelId);
+		/// 匹配参数已更新，通知 UI 刷新
+		void matchParamsChanged(const QString& modelId);
 
 	private:
 		inf::infrastructure& inf_;

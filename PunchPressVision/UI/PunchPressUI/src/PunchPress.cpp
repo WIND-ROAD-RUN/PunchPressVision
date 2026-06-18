@@ -77,7 +77,7 @@ namespace ui
 
 		auto* groupLayout = new QVBoxLayout(loadedModelsGroup_);
 
-		loadedModelsTable_ = new QTableWidget(0, 4, this);
+		loadedModelsTable_ = new QTableWidget(0, 8, this);
 		loadedModelsTable_->setStyleSheet(QStringLiteral(
 			"QTableWidget {"
 			"  font-size: 16px;"
@@ -112,12 +112,20 @@ namespace ui
 		headers << QStringLiteral("模型名称")
 			<< QStringLiteral("OffsetX")
 			<< QStringLiteral("OffsetY")
-			<< QStringLiteral("OffsetAngle");
+			<< QStringLiteral("OffsetAngle")
+			<< QStringLiteral("查找数量")
+			<< QStringLiteral("最低分数")
+			<< QStringLiteral("最低角度°")
+			<< QStringLiteral("最高角度°");
 		loadedModelsTable_->setHorizontalHeaderLabels(headers);
 		loadedModelsTable_->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
 		loadedModelsTable_->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
 		loadedModelsTable_->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
 		loadedModelsTable_->horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
+		loadedModelsTable_->horizontalHeader()->setSectionResizeMode(4, QHeaderView::ResizeToContents);
+		loadedModelsTable_->horizontalHeader()->setSectionResizeMode(5, QHeaderView::ResizeToContents);
+		loadedModelsTable_->horizontalHeader()->setSectionResizeMode(6, QHeaderView::ResizeToContents);
+		loadedModelsTable_->horizontalHeader()->setSectionResizeMode(7, QHeaderView::ResizeToContents);
 
 		// 双击行 → 编辑偏移量
 		connect(loadedModelsTable_, &QTableWidget::cellDoubleClicked,
@@ -198,6 +206,8 @@ namespace ui
 			connect(bun.get(), &bun::ShapeModeManagerBun::modelsUnloaded,
 				this, &PunchPress::refreshLoadedModelsList);
 			connect(bun.get(), &bun::ShapeModeManagerBun::modelOffsetChanged,
+				this, &PunchPress::refreshLoadedModelsList);
+			connect(bun.get(), &bun::ShapeModeManagerBun::matchParamsChanged,
 				this, &PunchPress::refreshLoadedModelsList);
 			connect(bun.get(), &bun::ShapeModeManagerBun::modelListChanged,
 				this, &PunchPress::refreshLoadedModelsList);
@@ -554,6 +564,12 @@ namespace ui
 			// 读取偏移量
 			auto offset = bun->getUserOffset(id);
 
+			// 读取匹配参数
+			auto matchParams = bun->getMatchParams(id);
+			constexpr double kRadToDeg = 180.0 / 3.14159265358979323846;
+			const double minAngleDeg = matchParams.angleStart * kRadToDeg;
+			const double maxAngleDeg = (matchParams.angleStart + matchParams.angleExtent) * kRadToDeg;
+
 			// 模型名称（蓝色加粗）
 			auto* nameItem = new QTableWidgetItem(QStringLiteral("● ") + name);
 			nameItem->setForeground(QColor(0x2196F3));
@@ -561,6 +577,8 @@ namespace ui
 			boldFont.setBold(true);
 			nameItem->setFont(boldFont);
 			nameItem->setFlags(nameItem->flags() & ~Qt::ItemIsEditable);
+			// 将模型 ID 存入 UserRole，供编辑对话框使用
+			nameItem->setData(Qt::UserRole, QString::fromStdString(id));
 			loadedModelsTable_->setItem(row, 0, nameItem);
 
 			// OffsetX
@@ -580,6 +598,30 @@ namespace ui
 			aItem->setTextAlignment(Qt::AlignCenter);
 			aItem->setFlags(aItem->flags() & ~Qt::ItemIsEditable);
 			loadedModelsTable_->setItem(row, 3, aItem);
+
+			// 查找数量（整数）
+			auto* numItem = new QTableWidgetItem(QString::number(matchParams.numMatches));
+			numItem->setTextAlignment(Qt::AlignCenter);
+			numItem->setFlags(numItem->flags() & ~Qt::ItemIsEditable);
+			loadedModelsTable_->setItem(row, 4, numItem);
+
+			// 最低分数（0.00 ~ 1.00）
+			auto* scoreItem = new QTableWidgetItem(QString::number(matchParams.minScore, 'f', 2));
+			scoreItem->setTextAlignment(Qt::AlignCenter);
+			scoreItem->setFlags(scoreItem->flags() & ~Qt::ItemIsEditable);
+			loadedModelsTable_->setItem(row, 5, scoreItem);
+
+			// 最低角度（度）
+			auto* minAngleItem = new QTableWidgetItem(QString::number(minAngleDeg, 'f', 1));
+			minAngleItem->setTextAlignment(Qt::AlignCenter);
+			minAngleItem->setFlags(minAngleItem->flags() & ~Qt::ItemIsEditable);
+			loadedModelsTable_->setItem(row, 6, minAngleItem);
+
+			// 最高角度（度）
+			auto* maxAngleItem = new QTableWidgetItem(QString::number(maxAngleDeg, 'f', 1));
+			maxAngleItem->setTextAlignment(Qt::AlignCenter);
+			maxAngleItem->setFlags(maxAngleItem->flags() & ~Qt::ItemIsEditable);
+			loadedModelsTable_->setItem(row, 7, maxAngleItem);
 		}
 
 		// 恢复双击连接
@@ -611,14 +653,22 @@ namespace ui
 		// 读取当前偏移量
 		auto current = bun->getUserOffset(id);
 
+		// 读取当前匹配参数（角度转换为度供 UI 显示）
+		auto matchParams = bun->getMatchParams(id);
+		constexpr double kRadToDeg = 180.0 / 3.14159265358979323846;
+		const double minAngleDeg = matchParams.angleStart * kRadToDeg;
+		const double maxAngleDeg = (matchParams.angleStart + matchParams.angleExtent) * kRadToDeg;
+
 		// 弹出编辑对话框
 		OffsetEditorDialog dlg(modelName,
 			current.offsetX, current.offsetY, current.offsetAngle,
+			matchParams.numMatches, matchParams.minScore,
+			minAngleDeg, maxAngleDeg,
 			this);
 		if (dlg.exec() != QDialog::Accepted)
 			return;
 
-		// 保存到业务层（自动持久化）
+		// 保存偏移量
 		std::string err;
 		if (!bun->setUserOffset(id,
 			dlg.offsetX(), dlg.offsetY(), dlg.offsetAngle(),
@@ -628,6 +678,20 @@ namespace ui
 				QStringLiteral("保存偏移量失败"),
 				QString::fromStdString(err));
 		}
-		// 表格刷新由 modelOffsetChanged 信号触发
+
+		// 保存匹配参数（角度从度转换为弧度）
+		constexpr double kDegToRad = 3.14159265358979323846 / 180.0;
+		const double angleStartRad = dlg.minAngleDeg() * kDegToRad;
+		const double angleExtentRad = (dlg.maxAngleDeg() - dlg.minAngleDeg()) * kDegToRad;
+		if (!bun->setMatchParams(id,
+			dlg.numMatches(), dlg.minScore(),
+			angleStartRad, angleExtentRad,
+			&err))
+		{
+			rw::rqwu::MessageBox::warning(this,
+				QStringLiteral("保存匹配参数失败"),
+				QString::fromStdString(err));
+		}
+		// 表格刷新由 modelOffsetChanged / matchParamsChanged 信号触发
 	}
 }
