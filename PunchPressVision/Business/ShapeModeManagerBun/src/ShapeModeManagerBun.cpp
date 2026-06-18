@@ -511,67 +511,7 @@ namespace bun
 
 	std::vector<MatchResult> ShapeModeManagerBun::match(const HalconCpp::HImage& image)
 	{
-		using namespace HalconCpp;
-		std::vector<MatchResult> results;
-
-		std::shared_lock<std::shared_mutex> lk(modelCacheMutex_);
-		if (loadedModels_.empty())
-			return results;
-		if (!image.IsInitialized())
-			return results;
-
-		// TODO(多模型阈值): minScore 目前硬编码 0.5，后续应支持每个模型独立的匹配阈值
-		constexpr double kMinScore = 0.5;
-		constexpr int kNumMatches = 1;
-		constexpr double kMaxOverlap = 0.5;
-		constexpr double kGreediness = 0.9;
-		const std::string kSubPixel = "least_squares";
-
-		for (const auto& model : loadedModels_)
-		{
-			if (model.handle.Length() == 0)
-				continue;
-
-			try
-			{
-				const double angleStart = model.data.angleStart;
-				const double angleExtent = model.data.angleExtent;
-				const int numLevels = model.data.numLevels;
-
-				HTuple row, column, angle, score;
-				FindShapeModel(image,
-					model.handle,
-					HTuple(angleStart),
-					HTuple(angleExtent),
-					kMinScore,
-					kNumMatches,
-					kMaxOverlap,
-					kSubPixel.c_str(),
-					(numLevels > 0 ? HTuple(numLevels) : HTuple("auto")),
-					kGreediness,
-					&row, &column, &angle, &score);
-
-				if (score.Length() > 0 && score[0].D() >= kMinScore)
-				{
-					MatchResult r;
-					r.modelId = model.modelId;
-					r.modelName = model.modelName;
-					r.found = true;
-					r.row = row[0].D();
-					r.column = column[0].D();
-					r.angle = angle[0].D();
-					r.score = score[0].D();
-					r.offsetX = r.column - model.data.centerX;
-					r.offsetY = r.row - model.data.centerY;
-					results.push_back(r);
-				}
-			}
-			catch (...)
-			{
-				// 单个模型匹配失败 → 跳过，继续下一个
-			}
-		}
-		return results;
+		
 	}
 
 	MatchResult ShapeModeManagerBun::testRecognize(const CreateModelRequest& req,
