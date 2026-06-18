@@ -6,6 +6,7 @@
 #include "global/GlobalType.hpp"
 #include "infrastructure/ConfigModule/Config/cameraCfg.hpp"
 #include "Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp"
+#include "infrastructure/ShapeModelManagerModule/Config/ShapeModelItem.hpp"
 #include "UI/ShapeEditor.h"
 
 QT_BEGIN_NAMESPACE
@@ -21,7 +22,8 @@ namespace ui
 	{
 		Q_OBJECT
 	public:
-		explicit ModelEditorDialog(app::PunchPressApp& app, QWidget* parent = nullptr);
+		explicit ModelEditorDialog(app::PunchPressApp& app, bool isModifyMode,
+		                         const std::string& modelId = {}, QWidget* parent = nullptr);
 		~ModelEditorDialog() override;
 
 	protected:
@@ -72,6 +74,14 @@ namespace ui
 
 		void updateToolButtons(ShapeEditor::Tool tool);
 		void updateContrastVisibility();
+		void refreshProcessedImage();
+
+		/// 修改模式：从 modelId 加载已有模型，恢复原始图、ROI/屏蔽区域、中心点和参数
+		void loadExistingModel(const std::string& id);
+		/// 根据已加载模型的数据恢复界面参数
+		void restoreParamsFromModel(const Config::ShapeModelData& data);
+
+		HalconCpp::HImage preprocessImage(const HalconCpp::HImage& image) const;
 
 		// 构建 CreateModelRequest（供识别和创建共用）
 		bun::CreateModelRequest buildRequest(const HalconCpp::HImage& image) const;
@@ -84,6 +94,10 @@ namespace ui
 		ui::ShapeEditor* shapeEditor_{ nullptr };
 		HalconCpp::HImage lastFrame_;
 		global::RunMode previousMode_{ global::RunMode::Idle };
+
+		bool isModifyMode_{ false };
+		std::string modelId_;
+		bool modelLoaded_{ false };   ///< 确保 loadExistingModel 仅执行一次
 
 		Config::cameraCfg cameraCfg_;
 

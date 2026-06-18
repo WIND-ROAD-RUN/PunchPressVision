@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>Dlg_createshapemodelClass</class>
  <widget class="QDialog" name="Dlg_createshapemodelClass">
@@ -36,7 +36,7 @@ QGroupBox::title {
 }</string>
        </property>
        <property name="title">
-        <string />
+        <string/>
        </property>
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="0">
@@ -81,13 +81,128 @@ QGroupBox::title {
 }</string>
        </property>
        <property name="title">
-        <string />
+        <string/>
        </property>
        <layout class="QGridLayout" name="gridLayout_8">
         <item row="0" column="0">
          <layout class="QVBoxLayout" name="verticalLayout_7" stretch="3">
           <item>
-           <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,1,1,1">
+           <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1,1,1,1">
+            <item>
+             <widget class="QGroupBox" name="groupBox_7">
+              <property name="styleSheet">
+               <string notr="true">QGroupBox {
+    font-size: 15px;
+    font-weight: bold;
+    background-color: rgb(255, 255, 255);
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+	border-radius: 15px
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 10px;
+    padding: 0 5px;
+    color: #2c3e50;
+}</string>
+              </property>
+              <property name="title">
+               <string/>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_12">
+               <item row="0" column="0">
+                <layout class="QHBoxLayout" name="horizontalLayout_22">
+                 <item>
+                  <widget class="QRadioButton" name="rbtn_rect">
+                   <property name="styleSheet">
+                    <string notr="true">QRadioButton {
+    spacing: 8px;
+    color: #333333;
+    font-size: 13px;
+    background: transparent;
+}
+
+QRadioButton::indicator {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #BFC7D1;
+    border-radius: 8px;
+    background: #FFFFFF;
+}
+
+QRadioButton::indicator:hover {
+    border-color: #409EFF;
+}
+
+QRadioButton::indicator:checked {
+    border: 5px solid #409EFF;
+    background: #FFFFFF;
+}
+
+QRadioButton:disabled {
+    color: #A8B0B8;
+}
+
+QRadioButton::indicator:disabled {
+    border-color: #D5DBE3;
+    background: #F3F5F7;
+}</string>
+                   </property>
+                   <property name="text">
+                    <string>矩形</string>
+                   </property>
+                   <property name="checked">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRadioButton" name="rbtn_manual_2">
+                   <property name="styleSheet">
+                    <string notr="true">QRadioButton {
+    spacing: 8px;
+    color: #333333;
+    font-size: 13px;
+    background: transparent;
+}
+
+QRadioButton::indicator {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #BFC7D1;
+    border-radius: 8px;
+    background: #FFFFFF;
+}
+
+QRadioButton::indicator:hover {
+    border-color: #409EFF;
+}
+
+QRadioButton::indicator:checked {
+    border: 5px solid #409EFF;
+    background: #FFFFFF;
+}
+
+QRadioButton:disabled {
+    color: #A8B0B8;
+}
+
+QRadioButton::indicator:disabled {
+    border-color: #D5DBE3;
+    background: #F3F5F7;
+}</string>
+                   </property>
+                   <property name="text">
+                    <string>自定义形状</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
             <item>
              <widget class="QPushButton" name="btn_paintRegion">
               <property name="sizePolicy">
@@ -247,7 +362,7 @@ QGroupBox::title {
 }</string>
        </property>
        <property name="title">
-        <string />
+        <string/>
        </property>
        <layout class="QGridLayout" name="gridLayout_4">
         <item row="0" column="0">
@@ -930,7 +1045,7 @@ QGroupBox::title {
 }</string>
                  </property>
                  <property name="title">
-                  <string />
+                  <string/>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_11">
                   <item row="0" column="0">
@@ -1316,9 +1431,9 @@ QPushButton:pressed {
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11" />
+ <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="../qrc/Dlg_createshapemodel.qrc" />
+  <include location="../qrc/PunchPress.qrc"/>
  </resources>
- <connections />
+ <connections/>
 </ui>

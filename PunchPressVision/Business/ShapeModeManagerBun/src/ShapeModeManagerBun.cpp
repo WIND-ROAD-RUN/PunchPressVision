@@ -1,5 +1,8 @@
 #include "Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp"
 
+#include <cstdlib>
+#include <filesystem>
+
 namespace bun
 {
 	ShapeModeManagerBun::ShapeModeManagerBun(inf::infrastructure& inf, infTool::infTool& infTool)
@@ -8,9 +11,8 @@ namespace bun
 	{
 	}
 
-	bool ShapeModeManagerBun::createModel(const CreateModelRequest& req,
-		Config::ShapeModelInfo& outInfo,
-		std::string* errorMsg)
+	bool ShapeModeManagerBun::createModelInternal(const CreateModelRequest& req,
+		Config::ShapeModelData& outData, std::string* errorMsg)
 	{
 		using namespace HalconCpp;
 		try
@@ -57,90 +59,114 @@ namespace bun
 
 			// 2. 创建 Shape Model
 			HTuple modelID;
-			CreateShapeModel(templateImage,
-				req.numLevels,
-				HTuple(req.angleStart),
-				HTuple(req.angleExtent),
-				(req.angleStep > 0 ? HTuple(req.angleStep) : HTuple("auto")),
-				req.optimization.toStdString().c_str(),
-				req.metric.toStdString().c_str(),
-				req.contrast,
-				req.minContrast,
+			HalconCpp::CreateShapeModel(
+				templateImage,
+				"auto",
+				0, HalconCpp::HTuple(360).TupleRad(),
+				"auto",
+				"auto",
+				"use_polarity",
+				"auto",
+				"auto",
 				&modelID);
 
-			// 3. 准备模型数据
-			Config::ShapeModelData data;
-			data._templateMatImage = templateImage;
-			data._originalImage = req.trainingImage;
-			data.hv_ModelID = modelID;
-			data._createModelExposureTime = req.exposure;
-			data._createModelGain = req.gain;
-			data.centerX = centerX;
-			data.centerY = centerY;
-			data.maxContrast = req.contrast;
-			data.minContrast = req.minContrast;
+			// 3. 使用刚创建的模板在原图上验证匹配，作为创建成功的依据
+			HTuple matchRow, matchCol, matchAngle, matchScore;
+			FindShapeModel(templateImage,
+				modelID,
+				HTuple(req.angleStart),
+				HTuple(req.angleExtent),
+				0.5,    // MinScore
+				1,      // NumMatches
+				0.5,    // MaxOverlap
+				"least_squares",
+				(req.numLevels > 0 ? HTuple(req.numLevels) : HTuple("auto")),
+				0.9,    // Greediness
+				&matchRow, &matchCol, &matchAngle, &matchScore);
+
+			if (matchScore.Length() == 0 || matchScore[0].D() < 0.5)
+			{
+				ClearShapeModel(modelID);
+				if (errorMsg) *errorMsg = "模板创建后无法在图像中匹配到自身，请调整 ROI 或训练参数";
+				return false;
+			}
+
+			// 找到模型中心，作为模板中心点
+			centerX = matchCol[0].D();
+			centerY = matchRow[0].D();
+
+			// 4. 准备模型数据
+			outData._templateMatImage = templateImage;
+			outData._originalImage = req.trainingImage;
+			outData.hv_ModelID = modelID;
+			outData._createModelExposureTime = req.exposure;
+			outData._createModelGain = req.gain;
+			outData.upperLight = req.upperLight;
+			outData.lowerLight = req.lowerLight;
+			outData.centerX = centerX;
+			outData.centerY = centerY;
 
 			// 图像预处理参数
-			data._SingleChannelType = req.imageChannelType;
-			data._createModelPreProcessType = req.imageChannelType;
-			data._createModelUseOpening = req.useOpening;
-			data._createModelOpeningRadius = req.openingSize;
-			data._createModelUseClosing = req.useClosing;
-			data._createModelClosingRadius = req.closingSize;
-			data._createModelUseMean = req.useMean;
-			data._createModelMeanRadius = req.meanSize;
+			outData._createModelPreProcessType = req.imageChannelType;
+			outData._createModelUseOpening = req.useOpening;
+			outData._createModelOpeningRadius = req.openingSize;
+			outData._createModelUseClosing = req.useClosing;
+			outData._createModelClosingRadius = req.closingSize;
+			outData._createModelUseMean = req.useMean;
+			outData._createModelMeanRadius = req.meanSize;
 
-			// ROI 矩形列表（逐个保存为 HObject，支持回撤）
-			data._paintCreateRoiList.clear();
-			for (const auto& r : req.roiRects)
-			{
-				HalconCpp::HObject obj;
-				HalconCpp::GenRectangle1(&obj,
-					r.top(), r.left(), r.bottom(), r.right());
-				data._paintCreateRoiList.push_back(obj);
-			}
+			// 训练参数
+			outData.numLevels = req.numLevels;
+			outData.angleStart = req.angleStart;
+			outData.angleExtent = req.angleExtent;
+			outData.angleStep = req.angleStep;
+			outData.optimization = req.optimization.toStdString();
+			outData.metric = req.metric.toStdString();
+			outData.contrast = req.contrast;
+			outData.minContrast = req.minContrast;
 
-			// Mask 矩形列表（逐个保存为 HObject，支持回撤）
-			data._paintShieldRoiList.clear();
-			for (const auto& r : req.maskRects)
-			{
-				HalconCpp::HObject obj;
-				HalconCpp::GenRectangle1(&obj,
-					r.top(), r.left(), r.bottom(), r.right());
-				data._paintShieldRoiList.push_back(obj);
-			}
+			// ROI 列表（逐个保存为 HObject，支持回撤）
+			outData._paintCreateRoiList = req._paintCreateRoiList;
+
+			// Mask 列表（逐个保存为 HObject，支持回撤）
+			outData._paintShieldRoiList = req._paintShieldRoiList;
 
 			// 生成标注图：在原始图像上叠加 ROI（白线）和 Mask（黑线）
-			if (!req.roiRects.isEmpty() || !req.maskRects.isEmpty())
+			if (!req._paintCreateRoiList.empty() || !req._paintShieldRoiList.empty())
 			{
 				HImage annotated = req.trainingImage;
 				// ROI → 白色边框（灰度值 255）
-				for (const auto& r : req.roiRects)
+				for (const auto& obj : req._paintCreateRoiList)
 				{
-					HObject rectROI;
-					GenRectangle1(&rectROI, r.top(), r.left(), r.bottom(), r.right());
-					OverpaintRegion(annotated, rectROI, 255, "margin");
+					if (obj.IsInitialized())
+						OverpaintRegion(annotated, obj, 255, "margin");
 				}
 				// Mask → 黑色边框（灰度值 0）
-				for (const auto& r : req.maskRects)
+				for (const auto& obj : req._paintShieldRoiList)
 				{
-					HObject rectMask;
-					GenRectangle1(&rectMask, r.top(), r.left(), r.bottom(), r.right());
-					OverpaintRegion(annotated, rectMask, 0, "margin");
+					if (obj.IsInitialized())
+						OverpaintRegion(annotated, obj, 0, "margin");
 				}
-				data._annotatedImage = annotated;
+				outData._annotatedImage = annotated;
 			}
 
-			// 4. 元数据
-			Config::ShapeModelInfo::BaseInfo baseInfo;
-			baseInfo.name = req.name.isEmpty()
-				? inf_.shape_model_manager_module_->getCurrentTime_yyMMddHHmmsszzz()
-				: req.name.toStdString();
+			// 5. 提取模型轮廓并变换到匹配位置，供 UI 显示
+			try
+			{
+				HObject modelContours;
+				GetShapeModelContours(&modelContours, modelID, 1);
 
-			// 5. 存储（生成 id/时间戳目录并落盘）
-			outInfo = inf_.shape_model_manager_module_->addShapeModelItem(data, baseInfo);
+				HTuple homMat2D;
+				VectorAngleToRigid(0, 0, 0, matchRow[0], matchCol[0], matchAngle[0], &homMat2D);
 
-			emit modelListChanged();
+				HObject transformedContours;
+				AffineTransContourXld(modelContours, &transformedContours, homMat2D);
+
+				outData._findCreateXldObj = transformedContours;
+				emit modelContoursFound(transformedContours);
+			}
+			catch (...) {}
+
 			return true;
 		}
 		catch (const HException& e)
@@ -154,6 +180,39 @@ namespace bun
 			if (errorMsg) *errorMsg = "创建模型发生未知错误";
 			return false;
 		}
+	}
+
+	bool ShapeModeManagerBun::createModel(const CreateModelRequest& req,
+		Config::ShapeModelInfo& outInfo, std::string* errorMsg)
+	{
+		Config::ShapeModelData data;
+		if (!createModelInternal(req, data, errorMsg))
+			return false;
+
+		// 元数据
+		Config::ShapeModelInfo::BaseInfo baseInfo;
+		baseInfo.name = req.name.isEmpty()
+			? inf_.shape_model_manager_module_->getCurrentTime_yyMMddHHmmsszzz()
+			: req.name.toStdString();
+
+		// 存储（生成 id/时间戳目录并落盘）
+		outInfo = inf_.shape_model_manager_module_->addShapeModelItem(data, baseInfo);
+
+		emit modelListChanged();
+		return true;
+	}
+
+	bool ShapeModeManagerBun::updateModel(const std::string& id,
+		const CreateModelRequest& req, std::string* errorMsg)
+	{
+		Config::ShapeModelData data;
+		if (!createModelInternal(req, data, errorMsg))
+			return false;
+
+		inf_.shape_model_manager_module_->changeShapeModelItem(id, data);
+
+		emit modelListChanged();
+		return true;
 	}
 
 	bool ShapeModeManagerBun::deleteModel(const std::string& id, std::string* errorMsg)
@@ -275,24 +334,29 @@ namespace bun
 
 		try
 		{
-			const double rotate = currentModelData_.rotateAngle;
-			HTuple angleStart = HTuple(-rotate).TupleRad();
-			HTuple angleExtent = HTuple(rotate * 2).TupleRad();
+			const double angleStart = currentModelData_.angleStart;
+			const double angleExtent = currentModelData_.angleExtent;
+			const int numLevels = currentModelData_.numLevels;
+			const double minScore = 0.5;
+			const int numMatches = 1;
+			const double maxOverlap = 0.5;
+			const std::string subPixel = "least_squares";
+			const double greediness = 0.9;
 
 			HTuple row, column, angle, score;
 			FindShapeModel(image,
 				currentModelHandle_,
-				angleStart,
-				angleExtent,
-				0.5,    // MinScore
-				1,      // NumMatches
-				0.5,    // MaxOverlap
-				"least_squares",
-				0,      // NumLevels(0=auto)
-				0.9,    // Greediness
+				HTuple(angleStart),
+				HTuple(angleExtent),
+				minScore,
+				numMatches,
+				maxOverlap,
+				subPixel.c_str(),
+				(numLevels > 0 ? HTuple(numLevels) : HTuple("auto")),
+				greediness,
 				&row, &column, &angle, &score);
 
-			if (score.Length() > 0 && score[0].D() >= 0.5)
+			if (score.Length() > 0 && score[0].D() >= minScore)
 			{
 				result.found = true;
 				result.row = row[0].D();

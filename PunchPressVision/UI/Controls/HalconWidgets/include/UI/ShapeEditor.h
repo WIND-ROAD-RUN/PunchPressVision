@@ -24,7 +24,9 @@ namespace ui
 		{
 			View,           ///< 视图操纵：缩放/平移/复位
 			RectangleROI,   ///< 感兴趣区域（绿色矩形）
+			FreehandROI,    ///< 感兴趣区域（Halcon 自由绘制）
 			RectangleMask,  ///< 屏蔽区域（品红色矩形）
+			FreehandMask,   ///< 屏蔽区域（Halcon 自由绘制）
 			CenterPoint,    ///< 定义模板中心点
 		};
 
@@ -49,21 +51,29 @@ namespace ui
 
 		/// 将所有 ROI 合并为单个 Halcon 区域对象，未绘制时返回未初始化对象
 		HalconCpp::HObject roi() const;
-		QVector<QRectF> roiRects() const { return roiRects_; }
-		int roiCount() const { return roiRects_.size(); }
-		bool hasROI() const { return !roiRects_.empty(); }
+		/// ROI 区域对象列表（逐个保存，支持回撤）
+		std::vector<HalconCpp::HObject> roiObjects() const { return roiObjects_; }
+		/// 批量设置 ROI 区域对象（修改模式时从已有模型恢复）
+		void setRoiObjects(const std::vector<HalconCpp::HObject>& objects);
+		int roiCount() const { return static_cast<int>(roiObjects_.size()); }
+		bool hasROI() const { return !roiObjects_.empty(); }
 
 		// === Mask ===
 
 		/// 将所有 Mask 合并为单个 Halcon 区域对象，未绘制时返回未初始化对象
 		HalconCpp::HObject mask() const;
-		QVector<QRectF> maskRects() const { return maskRects_; }
-		int maskCount() const { return maskRects_.size(); }
-		bool hasMask() const { return !maskRects_.empty(); }
+		/// Mask 区域对象列表（逐个保存，支持回撤）
+		std::vector<HalconCpp::HObject> maskObjects() const { return maskObjects_; }
+		/// 批量设置 Mask 区域对象（修改模式时从已有模型恢复）
+		void setMaskObjects(const std::vector<HalconCpp::HObject>& objects);
+		int maskCount() const { return static_cast<int>(maskObjects_.size()); }
+		bool hasMask() const { return !maskObjects_.empty(); }
 
 		// === 中心点 ===
 
 		QPointF centerPoint() const { return centerPoint_; }
+		/// 设置手动中心点（修改模式时从已有模型恢复）
+		void setCenterPoint(const QPointF& point);
 		bool hasCenterPoint() const { return hasCenterPoint_; }
 
 		// === 编辑操作 ===
@@ -89,6 +99,12 @@ namespace ui
 		/// 清除识别标记
 		void clearMarker();
 
+		/// 绘制模型轮廓（创建模型成功后显示）
+		void drawModelContours(const HalconCpp::HObject& contours);
+
+		/// 清除模型轮廓
+		void clearModelContours();
+
 		/// 获取内部 L2 控件，用于连接 zoomChanged 等信号
 		HalconInteractiveLabel* imageLabel() const { return imageLabel_; }
 
@@ -108,12 +124,16 @@ namespace ui
 		void drawAllMasks();
 		void drawCenterPoint();
 		void drawMarker();             ///< 绘制识别匹配结果标记
+		void drawFoundContours();      ///< 绘制模型轮廓
 
 		/// 生成单个矩形区域对象
 		static HalconCpp::HObject rectToRegion(const QRectF& r);
 
-		/// 合并矩形列表为一个区域对象
-		static HalconCpp::HObject mergeRects(const QVector<QRectF>& rects);
+		/// 合并区域对象列表为一个区域对象
+		static HalconCpp::HObject mergeObjects(const std::vector<HalconCpp::HObject>& objects);
+
+		/// 使用 Halcon 在窗口中自由绘制一个区域
+		static HalconCpp::HObject drawFreehandRegion(const HalconCpp::HTuple& windowHandle);
 
 		QPointF widgetToImage(const QPoint& widgetPos) const;
 
@@ -127,8 +147,8 @@ namespace ui
 		QPoint drawEndWidget_;
 
 		// 数据
-		QVector<QRectF> roiRects_;
-		QVector<QRectF> maskRects_;
+		std::vector<HalconCpp::HObject> roiObjects_;
+		std::vector<HalconCpp::HObject> maskObjects_;
 		QVector<ActionType> actionHistory_;  // 统一回撤栈
 
 		QPointF centerPoint_;
@@ -137,6 +157,10 @@ namespace ui
 		// 识别标记
 		bool showMarker_{ false };
 		double markerRow_{ 0.0 }, markerCol_{ 0.0 }, markerAngle_{ 0.0 }, markerScore_{ 0.0 };
+
+		// 模型轮廓
+		HalconCpp::HObject modelContours_;
+		bool showModelContours_{ false };
 
 		// displayImage 重入哨兵
 		bool displaying_{ false };

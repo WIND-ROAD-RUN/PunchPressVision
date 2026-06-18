@@ -47,21 +47,20 @@ namespace ui
 		return obj;
 	}
 
-	HalconCpp::HObject ShapeEditor::mergeRects(const QVector<QRectF>& rects)
+	HalconCpp::HObject ShapeEditor::mergeObjects(const std::vector<HalconCpp::HObject>& objects)
 	{
 		using namespace HalconCpp;
 		HObject result;
-		if (rects.isEmpty())
+		if (objects.empty())
 			return result;
 
 		try
 		{
-			result = rectToRegion(rects[0]);
-			for (int i = 1; i < rects.size(); ++i)
+			result = objects[0];
+			for (size_t i = 1; i < objects.size(); ++i)
 			{
-				HObject next = rectToRegion(rects[i]);
 				HObject merged;
-				Union2(result, next, &merged);
+				Union2(result, objects[i], &merged);
 				result = merged;
 			}
 		}
@@ -70,14 +69,62 @@ namespace ui
 		return result;
 	}
 
+	HalconCpp::HObject ShapeEditor::drawFreehandRegion(const HalconCpp::HTuple& windowHandle)
+	{
+		HalconCpp::HObject region;
+		try
+		{
+			HalconCpp::SetColor(windowHandle, "green");
+			HalconCpp::SetDraw(windowHandle, "margin");
+			HalconCpp::SetLineWidth(windowHandle, 2);
+			HalconCpp::DrawRegion(&region, windowHandle);
+		}
+		catch (...) {}
+		return region;
+	}
+
 	HalconCpp::HObject ShapeEditor::roi() const
 	{
-		return mergeRects(roiRects_);
+		return mergeObjects(roiObjects_);
 	}
 
 	HalconCpp::HObject ShapeEditor::mask() const
 	{
-		return mergeRects(maskRects_);
+		return mergeObjects(maskObjects_);
+	}
+
+	void ShapeEditor::setRoiObjects(const std::vector<HalconCpp::HObject>& objects)
+	{
+		roiObjects_ = objects;
+		actionHistory_.erase(
+			std::remove(actionHistory_.begin(), actionHistory_.end(), ActionType::ROI),
+			actionHistory_.end());
+		for (size_t i = 0; i < objects.size(); ++i)
+			actionHistory_.append(ActionType::ROI);
+		drawing_ = false;
+		refreshOverlay();
+		emit roiChanged();
+	}
+
+	void ShapeEditor::setMaskObjects(const std::vector<HalconCpp::HObject>& objects)
+	{
+		maskObjects_ = objects;
+		actionHistory_.erase(
+			std::remove(actionHistory_.begin(), actionHistory_.end(), ActionType::Mask),
+			actionHistory_.end());
+		for (size_t i = 0; i < objects.size(); ++i)
+			actionHistory_.append(ActionType::Mask);
+		drawing_ = false;
+		refreshOverlay();
+		emit maskChanged();
+	}
+
+	void ShapeEditor::setCenterPoint(const QPointF& point)
+	{
+		centerPoint_ = point;
+		hasCenterPoint_ = true;
+		refreshOverlay();
+		emit centerPointChanged();
 	}
 
 	// === 工具切换 ===
@@ -91,6 +138,34 @@ namespace ui
 		{
 			drawing_ = false;
 			refreshOverlay();
+		}
+
+		// 自由绘制 ROI / Mask：立即进入 Halcon 交互绘制，完成后回到 View
+		if (tool == Tool::FreehandROI || tool == Tool::FreehandMask)
+		{
+			if (imageLabel_ && imageLabel_->isReady())
+			{
+				HalconCpp::HObject region = drawFreehandRegion(imageLabel_->halconHandle());
+				if (region.IsInitialized())
+				{
+					if (tool == Tool::FreehandROI)
+					{
+						roiObjects_.push_back(region);
+						actionHistory_.append(ActionType::ROI);
+						emit roiChanged();
+					}
+					else
+					{
+						maskObjects_.push_back(region);
+						actionHistory_.append(ActionType::Mask);
+						emit maskChanged();
+					}
+				}
+				refreshOverlay();
+			}
+			tool_ = Tool::View;
+			emit toolChanged(tool_);
+			return;
 		}
 
 		tool_ = tool;
@@ -112,7 +187,7 @@ namespace ui
 		actionHistory_.erase(
 			std::remove(actionHistory_.begin(), actionHistory_.end(), ActionType::ROI),
 			actionHistory_.end());
-		roiRects_.clear();
+		roiObjects_.clear();
 		drawing_ = false;
 		refreshOverlay();
 		emit roiChanged();
@@ -123,7 +198,7 @@ namespace ui
 		actionHistory_.erase(
 			std::remove(actionHistory_.begin(), actionHistory_.end(), ActionType::Mask),
 			actionHistory_.end());
-		maskRects_.clear();
+		maskObjects_.clear();
 		drawing_ = false;
 		refreshOverlay();
 		emit maskChanged();
@@ -138,12 +213,14 @@ namespace ui
 
 	void ShapeEditor::clearAll()
 	{
-		roiRects_.clear();
-		maskRects_.clear();
+		roiObjects_.clear();
+		maskObjects_.clear();
 		actionHistory_.clear();
 		hasCenterPoint_ = false;
 		drawing_ = false;
 		showMarker_ = false;
+		showModelContours_ = false;
+		modelContours_ = HalconCpp::HObject();
 		refreshOverlay();
 		emit roiChanged();
 		emit maskChanged();
@@ -166,6 +243,20 @@ namespace ui
 		refreshOverlay();
 	}
 
+	void ShapeEditor::drawModelContours(const HalconCpp::HObject& contours)
+	{
+		modelContours_ = contours;
+		showModelContours_ = true;
+		refreshOverlay();
+	}
+
+	void ShapeEditor::clearModelContours()
+	{
+		showModelContours_ = false;
+		modelContours_ = HalconCpp::HObject();
+		refreshOverlay();
+	}
+
 	void ShapeEditor::undo()
 	{
 		if (actionHistory_.isEmpty())
@@ -176,16 +267,16 @@ namespace ui
 		switch (last)
 		{
 		case ActionType::ROI:
-			if (!roiRects_.isEmpty())
+			if (!roiObjects_.empty())
 			{
-				roiRects_.pop_back();
+				roiObjects_.pop_back();
 				emit roiChanged();
 			}
 			break;
 		case ActionType::Mask:
-			if (!maskRects_.isEmpty())
+			if (!maskObjects_.empty())
 			{
-				maskRects_.pop_back();
+				maskObjects_.pop_back();
 				emit maskChanged();
 			}
 			break;
@@ -259,17 +350,21 @@ namespace ui
 
 				if (rect.width() > 1.0 && rect.height() > 1.0)
 				{
-					if (tool_ == Tool::RectangleROI)
+					HalconCpp::HObject obj = rectToRegion(rect);
+					if (obj.IsInitialized())
 					{
-						roiRects_.append(rect);
-						actionHistory_.append(ActionType::ROI);
-						emit roiChanged();
-					}
-					else if (tool_ == Tool::RectangleMask)
-					{
-						maskRects_.append(rect);
-						actionHistory_.append(ActionType::Mask);
-						emit maskChanged();
+						if (tool_ == Tool::RectangleROI)
+						{
+							roiObjects_.push_back(obj);
+							actionHistory_.append(ActionType::ROI);
+							emit roiChanged();
+						}
+						else if (tool_ == Tool::RectangleMask)
+						{
+							maskObjects_.push_back(obj);
+							actionHistory_.append(ActionType::Mask);
+							emit maskChanged();
+						}
 					}
 				}
 
@@ -314,6 +409,7 @@ namespace ui
 		drawAllMasks();
 		drawCenterPoint();
 		drawMarker();
+		drawFoundContours();
 	}
 
 	void ShapeEditor::drawMarker()
@@ -340,6 +436,21 @@ namespace ui
 		catch (...) {}
 	}
 
+	void ShapeEditor::drawFoundContours()
+	{
+		if (!showModelContours_ || !imageLabel_ || !imageLabel_->isReady())
+			return;
+
+		try
+		{
+			using namespace HalconCpp;
+			SetColor(imageLabel_->halconHandle(), "cyan");
+			SetLineWidth(imageLabel_->halconHandle(), 2);
+			DispObj(modelContours_, imageLabel_->halconHandle());
+		}
+		catch (...) {}
+	}
+
 	void ShapeEditor::drawAllROIs()
 	{
 		if (!imageLabel_ || !imageLabel_->isReady())
@@ -347,17 +458,17 @@ namespace ui
 
 		using namespace HalconCpp;
 
-		if (!roiRects_.isEmpty())
+		if (!roiObjects_.empty())
 		{
 			try
 			{
 				SetColor(imageLabel_->halconHandle(), "green");
 				SetDraw(imageLabel_->halconHandle(), "margin");
 				SetLineWidth(imageLabel_->halconHandle(), 2);
-				for (const auto& r : roiRects_)
+				for (const auto& obj : roiObjects_)
 				{
-					DispRectangle1(imageLabel_->halconHandle(),
-						r.top(), r.left(), r.bottom(), r.right());
+					if (obj.IsInitialized())
+						DispObj(obj, imageLabel_->halconHandle());
 				}
 			}
 			catch (...) {}
@@ -388,17 +499,17 @@ namespace ui
 
 		using namespace HalconCpp;
 
-		if (!maskRects_.isEmpty())
+		if (!maskObjects_.empty())
 		{
 			try
 			{
 				SetColor(imageLabel_->halconHandle(), "magenta");
 				SetDraw(imageLabel_->halconHandle(), "margin");
 				SetLineWidth(imageLabel_->halconHandle(), 2);
-				for (const auto& r : maskRects_)
+				for (const auto& obj : maskObjects_)
 				{
-					DispRectangle1(imageLabel_->halconHandle(),
-						r.top(), r.left(), r.bottom(), r.right());
+					if (obj.IsInitialized())
+						DispObj(obj, imageLabel_->halconHandle());
 				}
 			}
 			catch (...) {}

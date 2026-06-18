@@ -25,8 +25,8 @@ namespace bun
 		HalconCpp::HImage trainingImage;
 		HalconCpp::HObject roi;              // ROI 区域（合并后的 HObject）
 		HalconCpp::HObject mask;             // 屏蔽区域（合并后的 HObject）
-		QVector<QRectF> roiRects;            // ROI 矩形列表（逐个保存，支持回撤）
-		QVector<QRectF> maskRects;           // Mask 矩形列表（逐个保存，支持回撤）
+		std::vector<HalconCpp::HObject> _paintCreateRoiList;   // ROI 列表（逐个保存，支持回撤）
+		std::vector<HalconCpp::HObject> _paintShieldRoiList;  // Mask 列表（逐个保存，支持回撤）
 		QPointF centerPoint;                 // 手动指定的中心点（可选）
 		bool hasCenterPoint{ false };        // 是否使用手动中心点
 		QString name;                        // 模型名称（空则用时间戳）
@@ -78,6 +78,8 @@ namespace bun
 		bool createModel(const CreateModelRequest& req,
 			Config::ShapeModelInfo& outInfo,
 			std::string* errorMsg = nullptr);
+		bool updateModel(const std::string& id, const CreateModelRequest& req,
+			std::string* errorMsg = nullptr);
 		bool deleteModel(const std::string& id, std::string* errorMsg = nullptr);
 		bool renameModel(const std::string& id, const QString& newName,
 			std::string* errorMsg = nullptr);
@@ -108,10 +110,16 @@ namespace bun
 		void modelListChanged();
 		void modelLoaded(const QString& modelName);
 		void modelUnloaded();
+		/// 创建模型成功并提取到轮廓后发出，供 UI 显示
+		void modelContoursFound(const HalconCpp::HObject& contours);
 
 	private:
 		inf::infrastructure& inf_;
 		infTool::infTool& inf_tool_;
+
+		// 创建/更新模型共用的数据生成逻辑
+		bool createModelInternal(const CreateModelRequest& req,
+			Config::ShapeModelData& outData, std::string* errorMsg);
 
 		// 当前加载的模型缓存
 		std::string currentModelId_;

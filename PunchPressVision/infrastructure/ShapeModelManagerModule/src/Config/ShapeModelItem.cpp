@@ -75,12 +75,16 @@ namespace Config
 		{
 			if (!image.IsInitialized())
 				return;
-			fs::create_directories(filePath.parent_path());
-			fs::path tmp = filePath;
-			tmp += ".tmp";
-			HalconCpp::SetSystem("jpeg_quality", kJpegQuality);
-		HalconCpp::HImage(image).WriteImage(kJpegFormat, 0, tmp.string().c_str());
-			replaceFile(tmp, filePath);
+			try
+			{
+				// FullDomain 展开 reduced-domain 图，防止 WriteImage 在 ROI 裁剪图上失败
+				HalconCpp::HImage fullImage;
+				HalconCpp::FullDomain(HalconCpp::HImage(image), &fullImage);
+				fs::create_directories(filePath.parent_path());
+				fs::path tmp = filePath;
+				fullImage.WriteImage(kJpegFormat, 0, tmp.string().c_str());
+			}
+			catch (...) {}
 		}
 
 		bool readImageSafe(const fs::path& filePath, HalconCpp::HImage& image)
@@ -164,24 +168,19 @@ namespace Config
 		}
 
 		void writeParamsSafe(const fs::path& filePath,
-			int singleChannelType,
+			int createModelPreProcessType,
 			double centerX, double centerY,
 			double findCenterX, double findCenterY,
 			double offsetX, double offsetY, double offsetAngle,
-			bool isSelectXLDToCreateModel,
-			double xldMinLength, double xldMin, double xldMax,
-			int findNumber, double rotateAngle,
-			bool enabled,
+			int findNumber,
 			double createModelExposureTime, double createModelGain,
-			int createModelPreProcessType,
+			bool upperLight, bool lowerLight,
 			bool createModelUseOpening, int createModelOpeningRadius,
 			bool createModelUseClosing, int createModelClosingRadius,
 			bool createModelUseMean, int createModelMeanRadius,
-			int matchChannelType,
-			bool matchUseOpening, int matchOpeningRadius,
-			bool matchUseClosing, int matchClosingRadius,
-			bool matchUseMean, int matchMeanRadius,
-			int maxContrast, int minContrast,
+			int numLevels, double angleStart, double angleExtent, double angleStep,
+			const std::string& optimization, const std::string& metric,
+			int contrast, int minContrast,
 			const std::string& modelPath)
 		{
 			fs::create_directories(filePath.parent_path());
@@ -190,7 +189,7 @@ namespace Config
 			std::ofstream ofs(tmp);
 			if (!ofs)
 				return;
-			ofs << "SingleChannelType=" << singleChannelType << '\n';
+			ofs << "createModelPreProcessType=" << createModelPreProcessType << '\n';
 			ofs << "centerX=" << centerX << '\n';
 			ofs << "centerY=" << centerY << '\n';
 			ofs << "findCenterX=" << findCenterX << '\n';
@@ -198,30 +197,24 @@ namespace Config
 			ofs << "offsetX=" << offsetX << '\n';
 			ofs << "offsetY=" << offsetY << '\n';
 			ofs << "offsetAngle=" << offsetAngle << '\n';
-			ofs << "isSelectXLDToCreateModel=" << (isSelectXLDToCreateModel ? 1 : 0) << '\n';
-			ofs << "xld_Minlength=" << xldMinLength << '\n';
-			ofs << "xld_min=" << xldMin << '\n';
-			ofs << "xld_max=" << xldMax << '\n';
 			ofs << "findnumber=" << findNumber << '\n';
-			ofs << "rotateAngle=" << rotateAngle << '\n';
-			ofs << "enabled=" << (enabled ? 1 : 0) << '\n';
 			ofs << "createModelExposureTime=" << createModelExposureTime << '\n';
 			ofs << "createModelGain=" << createModelGain << '\n';
-			ofs << "createModelPreProcessType=" << createModelPreProcessType << '\n';
+			ofs << "upperLight=" << (upperLight ? 1 : 0) << '\n';
+			ofs << "lowerLight=" << (lowerLight ? 1 : 0) << '\n';
 			ofs << "createModelUseOpening=" << (createModelUseOpening ? 1 : 0) << '\n';
 			ofs << "createModelOpeningRadius=" << createModelOpeningRadius << '\n';
 			ofs << "createModelUseClosing=" << (createModelUseClosing ? 1 : 0) << '\n';
 			ofs << "createModelClosingRadius=" << createModelClosingRadius << '\n';
 			ofs << "createModelUseMean=" << (createModelUseMean ? 1 : 0) << '\n';
 			ofs << "createModelMeanRadius=" << createModelMeanRadius << '\n';
-			ofs << "matchChannelType=" << matchChannelType << '\n';
-			ofs << "matchUseOpening=" << (matchUseOpening ? 1 : 0) << '\n';
-			ofs << "matchOpeningRadius=" << matchOpeningRadius << '\n';
-			ofs << "matchUseClosing=" << (matchUseClosing ? 1 : 0) << '\n';
-			ofs << "matchClosingRadius=" << matchClosingRadius << '\n';
-			ofs << "matchUseMean=" << (matchUseMean ? 1 : 0) << '\n';
-			ofs << "matchMeanRadius=" << matchMeanRadius << '\n';
-			ofs << "maxContrast=" << maxContrast << '\n';
+			ofs << "numLevels=" << numLevels << '\n';
+			ofs << "angleStart=" << angleStart << '\n';
+			ofs << "angleExtent=" << angleExtent << '\n';
+			ofs << "angleStep=" << angleStep << '\n';
+			ofs << "optimization=" << optimization << '\n';
+			ofs << "metric=" << metric << '\n';
+			ofs << "contrast=" << contrast << '\n';
 			ofs << "minContrast=" << minContrast << '\n';
 			ofs << "modelPath=" << modelPath << '\n';
 			ofs.close();
@@ -236,24 +229,19 @@ namespace Config
 		}
 
 		bool readParamsSafe(const fs::path& filePath,
-			int& singleChannelType,
+			int& createModelPreProcessType,
 			double& centerX, double& centerY,
 			double& findCenterX, double& findCenterY,
 			double& offsetX, double& offsetY, double& offsetAngle,
-			bool& isSelectXLDToCreateModel,
-			double& xldMinLength, double& xldMin, double& xldMax,
-			int& findNumber, double& rotateAngle,
-			bool& enabled,
+			int& findNumber,
 			double& createModelExposureTime, double& createModelGain,
-			int& createModelPreProcessType,
+			bool& upperLight, bool& lowerLight,
 			bool& createModelUseOpening, int& createModelOpeningRadius,
 			bool& createModelUseClosing, int& createModelClosingRadius,
 			bool& createModelUseMean, int& createModelMeanRadius,
-			int& matchChannelType,
-			bool& matchUseOpening, int& matchOpeningRadius,
-			bool& matchUseClosing, int& matchClosingRadius,
-			bool& matchUseMean, int& matchMeanRadius,
-			int& maxContrast, int& minContrast,
+			int& numLevels, double& angleStart, double& angleExtent, double& angleStep,
+			std::string& optimization, std::string& metric,
+			int& contrast, int& minContrast,
 			std::string& modelPath)
 		{
 			if (!fs::exists(filePath))
@@ -274,8 +262,8 @@ namespace Config
 				const std::string value = line.substr(pos + 1);
 				try
 				{
-					if (key == "SingleChannelType")
-						singleChannelType = std::stoi(value);
+					if (key == "createModelPreProcessType")
+						createModelPreProcessType = std::stoi(value);
 					else if (key == "centerX")
 						centerX = std::stod(value);
 					else if (key == "centerY")
@@ -290,26 +278,16 @@ namespace Config
 						offsetY = std::stod(value);
 					else if (key == "offsetAngle")
 						offsetAngle = std::stod(value);
-					else if (key == "isSelectXLDToCreateModel")
-						isSelectXLDToCreateModel = std::stoi(value) != 0;
-					else if (key == "xld_Minlength")
-						xldMinLength = std::stod(value);
-					else if (key == "xld_min")
-						xldMin = std::stod(value);
-					else if (key == "xld_max")
-						xldMax = std::stod(value);
 					else if (key == "findnumber")
 						findNumber = std::stoi(value);
-					else if (key == "rotateAngle")
-						rotateAngle = std::stod(value);
-					else if (key == "enabled")
-						enabled = std::stoi(value) != 0;
 					else if (key == "createModelExposureTime")
 						createModelExposureTime = std::stod(value);
 					else if (key == "createModelGain")
 						createModelGain = std::stod(value);
-					else if (key == "createModelPreProcessType")
-						createModelPreProcessType = std::stoi(value);
+					else if (key == "upperLight")
+						upperLight = std::stoi(value) != 0;
+					else if (key == "lowerLight")
+						lowerLight = std::stoi(value) != 0;
 					else if (key == "createModelUseOpening")
 						createModelUseOpening = std::stoi(value) != 0;
 					else if (key == "createModelOpeningRadius")
@@ -322,22 +300,20 @@ namespace Config
 						createModelUseMean = std::stoi(value) != 0;
 					else if (key == "createModelMeanRadius")
 						createModelMeanRadius = std::stoi(value);
-					else if (key == "matchChannelType")
-						matchChannelType = std::stoi(value);
-					else if (key == "matchUseOpening")
-						matchUseOpening = std::stoi(value) != 0;
-					else if (key == "matchOpeningRadius")
-						matchOpeningRadius = std::stoi(value);
-					else if (key == "matchUseClosing")
-						matchUseClosing = std::stoi(value) != 0;
-					else if (key == "matchClosingRadius")
-						matchClosingRadius = std::stoi(value);
-					else if (key == "matchUseMean")
-						matchUseMean = std::stoi(value) != 0;
-					else if (key == "matchMeanRadius")
-						matchMeanRadius = std::stoi(value);
-					else if (key == "maxContrast")
-						maxContrast = std::stoi(value);
+					else if (key == "numLevels")
+						numLevels = std::stoi(value);
+					else if (key == "angleStart")
+						angleStart = std::stod(value);
+					else if (key == "angleExtent")
+						angleExtent = std::stod(value);
+					else if (key == "angleStep")
+						angleStep = std::stod(value);
+					else if (key == "optimization")
+						optimization = value;
+					else if (key == "metric")
+						metric = value;
+					else if (key == "contrast")
+						contrast = std::stoi(value);
 					else if (key == "minContrast")
 						minContrast = std::stoi(value);
 					else if (key == "modelPath")
@@ -360,24 +336,19 @@ namespace Config
 
 			// 加载基本参数
 			readParamsSafe(dirPath / kParamsFile,
-				_SingleChannelType,
+				_createModelPreProcessType,
 				centerX, centerY,
 				findCenterX, findCenterY,
 				offsetX, offsetY, offsetAngle,
-				isSelectXLDToCreateModel,
-				xld_Minlength, xld_min, xld_max,
-				findnumber, rotateAngle,
-				enabled,
+				findnumber,
 				_createModelExposureTime, _createModelGain,
-				_createModelPreProcessType,
+				upperLight, lowerLight,
 				_createModelUseOpening, _createModelOpeningRadius,
 				_createModelUseClosing, _createModelClosingRadius,
 				_createModelUseMean, _createModelMeanRadius,
-				_matchChannelType,
-				_matchUseOpening, _matchOpeningRadius,
-				_matchUseClosing, _matchClosingRadius,
-				_matchUseMean, _matchMeanRadius,
-				maxContrast, minContrast,
+				numLevels, angleStart, angleExtent, angleStep,
+				optimization, metric,
+				contrast, minContrast,
 				modelPath);
 
 			// 加载图像
@@ -440,33 +411,37 @@ namespace Config
 
 			// 保存基本参数
 			writeParamsSafe(dirPath / kParamsFile,
-				_SingleChannelType,
+				_createModelPreProcessType,
 				centerX, centerY,
 				findCenterX, findCenterY,
 				offsetX, offsetY, offsetAngle,
-				isSelectXLDToCreateModel,
-				xld_Minlength, xld_min, xld_max,
-				findnumber, rotateAngle,
-				enabled,
+				findnumber,
 				_createModelExposureTime, _createModelGain,
-				_createModelPreProcessType,
+				upperLight, lowerLight,
 				_createModelUseOpening, _createModelOpeningRadius,
 				_createModelUseClosing, _createModelClosingRadius,
 				_createModelUseMean, _createModelMeanRadius,
-				_matchChannelType,
-				_matchUseOpening, _matchOpeningRadius,
-				_matchUseClosing, _matchClosingRadius,
-				_matchUseMean, _matchMeanRadius,
-				maxContrast, minContrast,
+				numLevels, angleStart, angleExtent, angleStep,
+				optimization, metric,
+				contrast, minContrast,
 				modelPath);
 
-			// 保存图像
+			// 保存图像（逐个 try-catch 防止一个失败导致后续全部跳过）
 			if (_templateMatImage.IsInitialized())
-				writeImageSafe(_templateMatImage, dirPath / kTemplateImageFile);
+			{
+				try { writeImageSafe(_templateMatImage, dirPath / kTemplateImageFile); }
+				catch (...) {}
+			}
 			if (_originalImage.IsInitialized())
-				writeImageSafe(_originalImage, dirPath / kOriginalImageFile);
+			{
+				try { writeImageSafe(_originalImage, dirPath / kOriginalImageFile); }
+				catch (...) {}
+			}
 			if (_annotatedImage.IsInitialized())
-				writeImageSafe(_annotatedImage, dirPath / kAnnotatedImageFile);
+			{
+				try { writeImageSafe(_annotatedImage, dirPath / kAnnotatedImageFile); }
+				catch (...) {}
+			}
 
 			// 保存 ShapeModel
 			if (hv_ModelID.TupleLength() > 0)
