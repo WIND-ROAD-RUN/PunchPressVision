@@ -49,7 +49,7 @@ namespace ui
 		ui->tableWidget_modelInfo->setSelectionMode(QAbstractItemView::NoSelection);
 		ui->tableWidget_modelInfo->setFocusPolicy(Qt::NoFocus);
 
-		// === 重建预览区域：替换单图 QLabel 为三列布局（原图 / 标注图 / 模板图）===
+		// === 重建预览区域：替换单图 QLabel 为两列布局（原图 / 模板图）===
 		ui->vLayout_preview->removeWidget(ui->label_imgPreview);
 		ui->label_imgPreview->hide();
 
@@ -76,7 +76,6 @@ namespace ui
 		};
 
 		createPreviewColumn(QStringLiteral("原图"),   labelImgOriginal_);
-		createPreviewColumn(QStringLiteral("标注图"), labelImgAnnotated_);
 		createPreviewColumn(QStringLiteral("模板图"), labelImgTemplate_);
 
 		// 插入到右侧操作区域（vLayout_actions 之上）
@@ -314,13 +313,6 @@ namespace ui
 		if (data._originalImage.IsInitialized())
 		{
 			try { previewOriginal_.display(data._originalImage); }
-			catch (...) {}
-		}
-
-		previewAnnotated_.ensure(labelImgAnnotated_);
-		if (data._annotatedImage.IsInitialized())
-		{
-			try { previewAnnotated_.display(data._annotatedImage); }
 			catch (...) {}
 		}
 

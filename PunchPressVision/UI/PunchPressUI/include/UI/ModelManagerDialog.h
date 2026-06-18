@@ -68,12 +68,10 @@ namespace ui
 		ShapeModelListModel* listModel_;
 		rw::rqwu::FullKeyboard* fullKeyboard_;
 		HalconView previewOriginal_;
-		HalconView previewAnnotated_;
 		HalconView previewTemplate_;
 
 		/// 动态创建的预览图像宿主 QLabel（不在 .ui 文件中）
 		QLabel* labelImgOriginal_{ nullptr };
-		QLabel* labelImgAnnotated_{ nullptr };
 		QLabel* labelImgTemplate_{ nullptr };
 
 		/// 动态创建的控件（不在 .ui 文件中）
