@@ -672,68 +672,6 @@ QPushButton:pressed {
            </item>
           </layout>
          </item>
-         <item>
-          <widget class="QPushButton" name="pbtn_saveProcessParam">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">QPushButton {
-    padding: 6px 14px;
-    border: 2px solid #CCC;
-    border-radius: 4px;
-    background-color: white;
-    color: #444;
-    font-size: 18px;
-}
-QPushButton:hover {
-    border-color: #999;
-    background-color: #F5F5F5;
-}
-QPushButton:pressed {
-    border-color: #777;
-    background-color: #EEE;
-}</string>
-           </property>
-           <property name="text">
-            <string>保存参数</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="pbtn_setOffSet">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">QPushButton {
-    padding: 6px 14px;
-    border: 2px solid #CCC;
-    border-radius: 4px;
-    background-color: white;
-    color: #444;
-    font-size: 18px;
-}
-QPushButton:hover {
-    border-color: #999;
-    background-color: #F5F5F5;
-}
-QPushButton:pressed {
-    border-color: #777;
-    background-color: #EEE;
-}</string>
-           </property>
-           <property name="text">
-            <string>设置偏移量</string>
-           </property>
-          </widget>
-         </item>
         </layout>
        </widget>
       </item>
@@ -758,37 +696,6 @@ QGroupBox::title {
          <string />
         </property>
         <layout class="QVBoxLayout" name="vLayout_tools">
-         <item>
-          <widget class="QPushButton" name="pbtn_saveAll">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">QPushButton {
-    padding: 6px 14px;
-    border: 2px solid #CCC;
-    border-radius: 4px;
-    background-color: white;
-    color: #444;
-    font-size: 18px;
-}
-QPushButton:hover {
-    border-color: #999;
-    background-color: #F5F5F5;
-}
-QPushButton:pressed {
-    border-color: #777;
-    background-color: #EEE;
-}</string>
-           </property>
-           <property name="text">
-            <string>保存所有参数</string>
-           </property>
-          </widget>
-         </item>
          <item>
           <widget class="QPushButton" name="pbtn_modelManager">
            <property name="sizePolicy">
