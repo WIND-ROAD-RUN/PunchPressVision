@@ -181,5 +181,9 @@ namespace bun
 		// 已加载的模型集合（加载顺序即匹配优先级）
 		std::vector<LoadedModel> loadedModels_;
 		mutable std::shared_mutex modelCacheMutex_;
+
+		// 持久化：保存/恢复上次加载的模型 ID 列表
+		void saveLastLoadedModels();
+		void loadLastLoadedModels();
 	};
 }

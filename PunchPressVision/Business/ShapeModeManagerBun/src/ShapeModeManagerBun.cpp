@@ -2,6 +2,11 @@
 
 #include <cstdlib>
 #include <filesystem>
+#include <fstream>
+
+#include <json/json.h>
+
+#include "global/GlobalPath.hpp"
 
 namespace bun
 {
@@ -334,6 +339,9 @@ namespace bun
 			emit modelLoaded(loadedNames.first());
 		emit modelsLoaded(loadedNames, successCount, failCount);
 
+		// 持久化本次加载的模型 ID 列表
+		saveLastLoadedModels();
+
 		return failCount == 0;
 	}
 
@@ -619,9 +627,87 @@ namespace bun
 
 	void ShapeModeManagerBun::start()
 	{
+		// 自动恢复上次加载的模型集合
+		loadLastLoadedModels();
 	}
 
 	void ShapeModeManagerBun::stop()
 	{
+	}
+
+	// ===== 持久化：上次加载的模型 ID =====
+
+	void ShapeModeManagerBun::saveLastLoadedModels()
+	{
+		try
+		{
+			const std::string configDir = global::path::configDir();
+			std::filesystem::create_directories(configDir);
+			const std::string filePath = configDir + "last_loaded_models.json";
+
+			Json::Value root(Json::arrayValue);
+			{
+				std::shared_lock<std::shared_mutex> lk(modelCacheMutex_);
+				for (const auto& m : loadedModels_)
+					root.append(m.modelId);
+			}
+
+			// 原子写入：先写 .tmp，再重命名
+			const std::string tmpPath = filePath + ".tmp";
+			{
+				std::ofstream ofs(tmpPath, std::ios::out | std::ios::trunc);
+				if (!ofs)
+					return;
+				Json::StreamWriterBuilder builder;
+				builder["indentation"] = "  ";
+				std::unique_ptr<Json::StreamWriter> writer(builder.newStreamWriter());
+				writer->write(root, &ofs);
+				ofs << '\n';
+			}
+			std::filesystem::rename(tmpPath, filePath);
+		}
+		catch (...)
+		{
+			// 持久化失败不应影响正常流程
+		}
+	}
+
+	void ShapeModeManagerBun::loadLastLoadedModels()
+	{
+		try
+		{
+			const std::string filePath = global::path::configDir() + "last_loaded_models.json";
+			if (!std::filesystem::exists(filePath))
+				return;
+
+			Json::Value root;
+			{
+				std::ifstream ifs(filePath);
+				if (!ifs)
+					return;
+				Json::CharReaderBuilder builder;
+				builder["collectComments"] = false;
+				std::string errs;
+				if (!Json::parseFromStream(builder, ifs, &root, &errs))
+					return;
+			}
+
+			if (!root.isArray() || root.empty())
+				return;
+
+			std::vector<std::string> ids;
+			for (const auto& val : root)
+			{
+				if (val.isString())
+					ids.push_back(val.asString());
+			}
+
+			if (!ids.empty())
+				loadModels(ids);
+		}
+		catch (...)
+		{
+			// 恢复失败不阻塞启动
+		}
 	}
 }
