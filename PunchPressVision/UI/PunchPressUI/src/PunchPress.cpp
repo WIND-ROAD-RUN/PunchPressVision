@@ -196,6 +196,8 @@ namespace ui
 				this, &PunchPress::refreshLoadedModelsList);
 			connect(bun.get(), &bun::ShapeModeManagerBun::modelOffsetChanged,
 				this, &PunchPress::refreshLoadedModelsList);
+			connect(bun.get(), &bun::ShapeModeManagerBun::modelListChanged,
+				this, &PunchPress::refreshLoadedModelsList);
 		}
 
 		// 初始化列表内容（模型可能在 build 之前已加载）

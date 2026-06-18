@@ -254,6 +254,20 @@ namespace bun
 			baseInfo = item.info.base_info;
 			baseInfo.name = newName.toStdString();
 			inf_.shape_model_manager_module_->changeShapeModelItem(id, baseInfo);
+
+			// 同步已加载模型缓存中的名称
+			{
+				std::unique_lock<std::shared_mutex> lk(modelCacheMutex_);
+				for (auto& m : loadedModels_)
+				{
+					if (m.modelId == id)
+					{
+						m.modelName = baseInfo.name;
+						break;
+					}
+				}
+			}
+
 			emit modelListChanged();
 			return true;
 		}
