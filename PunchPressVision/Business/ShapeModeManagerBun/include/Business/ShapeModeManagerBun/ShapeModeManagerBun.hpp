@@ -51,6 +51,7 @@ namespace bun
 		double angleExtent{ 6.28 };
 		int contrast{ 30 };
 		int minContrast{ 10 };
+		double minScore{ 0.5 };
 	};
 
 	// 匹配结果（FR-010）

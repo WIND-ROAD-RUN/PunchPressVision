@@ -138,6 +138,7 @@ namespace bun
 			outData.angleExtent = req.angleExtent;
 			outData.contrast = req.contrast;
 			outData.minContrast = req.minContrast;
+			outData.minScore = req.minScore;
 
 			// ROI 列表（逐个保存为 HObject，支持回撤）
 			outData._paintCreateRoiList = req._paintCreateRoiList;
@@ -524,7 +525,7 @@ namespace bun
 					model.handle,
 					HalconCpp::HTuple(model.data.angleStart),
 					HalconCpp::HTuple(model.data.angleExtent),
-					0.5,                                                // MinScore
+					model.data.minScore,                                // MinScore
 					1,                                                  // NumMatches
 					0.5,                                                // MaxOverlap
 					"least_squares",                                    // SubPixel
@@ -532,7 +533,7 @@ namespace bun
 					0.9,                                                // Greediness
 					&row, &column, &angle, &score);
 
-				if (score.Length() > 0 && score[0].D() >= 0.5)
+				if (score.Length() > 0 && score[0].D() >= model.data.minScore)
 				{
 					MatchResult result;
 					result.found = true;

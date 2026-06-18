@@ -52,8 +52,6 @@ namespace Config
 
 
 
-
-
 		// 创建模板时的曝光、增益、光源
 		double _createModelExposureTime = 0.0;
 		double _createModelGain = 0.0;
@@ -77,6 +75,7 @@ namespace Config
 		double angleExtent = 6.28;
 		int contrast = 30;
 		int minContrast = 10;
+		double minScore = 0.5;
 
 		std::string modelPath{};
 

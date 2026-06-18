@@ -178,7 +178,7 @@ namespace Config
 			bool createModelUseClosing, int createModelClosingRadius,
 			bool createModelUseMean, int createModelMeanRadius,
 			double angleStart, double angleExtent,
-			int contrast, int minContrast,
+			int contrast, int minContrast, double minScore,
 			const std::string& modelPath)
 		{
 			fs::create_directories(filePath.parent_path());
@@ -211,6 +211,7 @@ namespace Config
 			ofs << "angleExtent=" << angleExtent << '\n';
 			ofs << "contrast=" << contrast << '\n';
 			ofs << "minContrast=" << minContrast << '\n';
+			ofs << "minScore=" << minScore << '\n';
 			ofs << "modelPath=" << modelPath << '\n';
 			ofs.close();
 			replaceFile(tmp, filePath);
@@ -236,7 +237,7 @@ namespace Config
 			bool& createModelUseClosing, int& createModelClosingRadius,
 			bool& createModelUseMean, int& createModelMeanRadius,
 			double& angleStart, double& angleExtent,
-			int& contrast, int& minContrast,
+			int& contrast, int& minContrast, double& minScore,
 			std::string& modelPath)
 		{
 			if (!fs::exists(filePath))
@@ -305,6 +306,8 @@ namespace Config
 						contrast = std::stoi(value);
 					else if (key == "minContrast")
 						minContrast = std::stoi(value);
+					else if (key == "minScore")
+						minScore = std::stod(value);
 					else if (key == "modelPath")
 						modelPath = value;
 				}
@@ -337,7 +340,7 @@ namespace Config
 				_createModelUseClosing, _createModelClosingRadius,
 				_createModelUseMean, _createModelMeanRadius,
 				angleStart, angleExtent,
-				contrast, minContrast,
+				contrast, minContrast, minScore,
 				modelPath);
 
 			// 加载图像
@@ -412,7 +415,7 @@ namespace Config
 				_createModelUseClosing, _createModelClosingRadius,
 				_createModelUseMean, _createModelMeanRadius,
 				angleStart, angleExtent,
-				contrast, minContrast,
+				contrast, minContrast, minScore,
 				modelPath);
 
 			// 保存图像（逐个 try-catch 防止一个失败导致后续全部跳过）
