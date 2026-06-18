@@ -7,19 +7,22 @@
 #include "ui_PunchPress.h"
 
 #include <QButtonGroup>
+#include <QFont>
 #include <QGroupBox>
+#include <QHeaderView>
 #include <QLabel>
 #include <QLayout>
-#include <QListWidget>
 #include <QShowEvent>
 #include <QResizeEvent>
 #include <QStatusBar>
+#include <QTableWidget>
 #include <QVBoxLayout>
 
 #include "app/PunchPressApp.hpp"
 #include "Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp"
 #include "UI/HalconInteractiveLabel.h"
 #include "UI/ModelManagerDialog.h"
+#include "UI/OffsetEditorDialog.h"
 
 // 取消 Win32 MessageBox 宏，使用 rw::rqwu::MessageBox。
 #ifdef MessageBox
@@ -52,7 +55,7 @@ namespace ui
 
 		setupImageView();
 
-		// === 右侧栏：已加载模型列表 ===
+		// === 右侧栏：已加载模型表格 ===
 		loadedModelsGroup_ = new QGroupBox(QStringLiteral("已加载模型"), this);
 		loadedModelsGroup_->setStyleSheet(QStringLiteral(
 			"QGroupBox {"
@@ -71,30 +74,53 @@ namespace ui
 
 		auto* groupLayout = new QVBoxLayout(loadedModelsGroup_);
 
-		loadedModelsList_ = new QListWidget(this);
-		loadedModelsList_->setStyleSheet(QStringLiteral(
-			"QListWidget {"
+		loadedModelsTable_ = new QTableWidget(0, 4, this);
+		loadedModelsTable_->setStyleSheet(QStringLiteral(
+			"QTableWidget {"
 			"  font-size: 16px;"
 			"  color: #444;"
 			"  background-color: white;"
 			"  border: 1px solid #DDD;"
 			"  border-radius: 4px;"
-			"  padding: 4px;"
+			"  gridline-color: #EEE;"
 			"}"
-			"QListWidget::item {"
+			"QTableWidget::item {"
 			"  padding: 6px 10px;"
-			"  border-bottom: 1px solid #EEE;"
 			"}"
-			"QListWidget::item:selected {"
-			"  background-color: #E3F2FD;"
-			"  color: #444;"
+			"QHeaderView::section {"
+			"  background-color: #F5F5F5;"
+			"  border: 1px solid #DDD;"
+			"  padding: 6px 10px;"
+			"  font-size: 14px;"
+			"  font-weight: bold;"
+			"  color: #555;"
 			"}"));
-		loadedModelsList_->setMaximumHeight(160);
-		loadedModelsList_->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-		loadedModelsList_->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-		loadedModelsList_->setSelectionMode(QAbstractItemView::NoSelection);
-		loadedModelsList_->setFocusPolicy(Qt::NoFocus);
-		groupLayout->addWidget(loadedModelsList_);
+		loadedModelsTable_->setMaximumHeight(200);
+		loadedModelsTable_->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+		loadedModelsTable_->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+		loadedModelsTable_->setSelectionMode(QAbstractItemView::SingleSelection);
+		loadedModelsTable_->setSelectionBehavior(QAbstractItemView::SelectRows);
+		loadedModelsTable_->setEditTriggers(QAbstractItemView::NoEditTriggers);
+		loadedModelsTable_->setFocusPolicy(Qt::NoFocus);
+		loadedModelsTable_->verticalHeader()->setVisible(false);
+
+		// 表头
+		QStringList headers;
+		headers << QStringLiteral("模型名称")
+			<< QStringLiteral("OffsetX")
+			<< QStringLiteral("OffsetY")
+			<< QStringLiteral("OffsetAngle");
+		loadedModelsTable_->setHorizontalHeaderLabels(headers);
+		loadedModelsTable_->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+		loadedModelsTable_->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+		loadedModelsTable_->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+		loadedModelsTable_->horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
+
+		// 双击行 → 编辑偏移量
+		connect(loadedModelsTable_, &QTableWidget::cellDoubleClicked,
+			this, &PunchPress::openOffsetEditor);
+
+		groupLayout->addWidget(loadedModelsTable_);
 
 		// 插入到右侧控制栏：gBox_tools 之后、gBox_table 之前（索引 3）
 		ui->vLayout_control->insertWidget(3, loadedModelsGroup_);
@@ -167,6 +193,8 @@ namespace ui
 			connect(bun.get(), &bun::ShapeModeManagerBun::modelsLoaded,
 				this, &PunchPress::refreshLoadedModelsList);
 			connect(bun.get(), &bun::ShapeModeManagerBun::modelsUnloaded,
+				this, &PunchPress::refreshLoadedModelsList);
+			connect(bun.get(), &bun::ShapeModeManagerBun::modelOffsetChanged,
 				this, &PunchPress::refreshLoadedModelsList);
 		}
 
@@ -481,22 +509,34 @@ namespace ui
 
 	void PunchPress::refreshLoadedModelsList()
 	{
-		if (!loadedModelsList_)
+		if (!loadedModelsTable_)
 			return;
 
-		loadedModelsList_->clear();
+		// 断开双击信号避免刷新时触发
+		disconnect(loadedModelsTable_, &QTableWidget::cellDoubleClicked,
+			this, &PunchPress::openOffsetEditor);
+
+		loadedModelsTable_->setRowCount(0);
 
 		auto& bun = app_.business().shape_mode_manager_bun;
 		if (!bun || !bun->isModelLoaded())
+		{
+			connect(loadedModelsTable_, &QTableWidget::cellDoubleClicked,
+				this, &PunchPress::openOffsetEditor);
 			return;
+		}
 
 		const auto ids = bun->getLoadedModelIds();
 		const auto allModels = bun->getAllModels();
 
-		// 用已加载 ID 查找模型名称并添加到列表
-		for (const auto& id : ids)
+		loadedModelsTable_->setRowCount(static_cast<int>(ids.size()));
+
+		for (int row = 0; row < static_cast<int>(ids.size()); ++row)
 		{
-			QString name;
+			const auto& id = ids[row];
+
+			// 查找模型名称
+			QString name = QString::fromStdString(id);
 			for (const auto& info : allModels)
 			{
 				if (info.getId() == id)
@@ -505,12 +545,84 @@ namespace ui
 					break;
 				}
 			}
-			if (name.isEmpty())
-				name = QString::fromStdString(id);  // 兜底：使用 ID
 
-			auto* item = new QListWidgetItem(QStringLiteral("● ") + name);
-			item->setForeground(QColor(0x2196F3));
-			loadedModelsList_->addItem(item);
+			// 读取偏移量
+			auto offset = bun->getUserOffset(id);
+
+			// 模型名称（蓝色加粗）
+			auto* nameItem = new QTableWidgetItem(QStringLiteral("● ") + name);
+			nameItem->setForeground(QColor(0x2196F3));
+			QFont boldFont;
+			boldFont.setBold(true);
+			nameItem->setFont(boldFont);
+			nameItem->setFlags(nameItem->flags() & ~Qt::ItemIsEditable);
+			loadedModelsTable_->setItem(row, 0, nameItem);
+
+			// OffsetX
+			auto* xItem = new QTableWidgetItem(QString::number(offset.offsetX, 'f', 3));
+			xItem->setTextAlignment(Qt::AlignCenter);
+			xItem->setFlags(xItem->flags() & ~Qt::ItemIsEditable);
+			loadedModelsTable_->setItem(row, 1, xItem);
+
+			// OffsetY
+			auto* yItem = new QTableWidgetItem(QString::number(offset.offsetY, 'f', 3));
+			yItem->setTextAlignment(Qt::AlignCenter);
+			yItem->setFlags(yItem->flags() & ~Qt::ItemIsEditable);
+			loadedModelsTable_->setItem(row, 2, yItem);
+
+			// OffsetAngle
+			auto* aItem = new QTableWidgetItem(QString::number(offset.offsetAngle, 'f', 3));
+			aItem->setTextAlignment(Qt::AlignCenter);
+			aItem->setFlags(aItem->flags() & ~Qt::ItemIsEditable);
+			loadedModelsTable_->setItem(row, 3, aItem);
 		}
+
+		// 恢复双击连接
+		connect(loadedModelsTable_, &QTableWidget::cellDoubleClicked,
+			this, &PunchPress::openOffsetEditor);
+	}
+
+	void PunchPress::openOffsetEditor(int row, int /*column*/)
+	{
+		if (!loadedModelsTable_ || row < 0 || row >= loadedModelsTable_->rowCount())
+			return;
+
+		auto& bun = app_.business().shape_mode_manager_bun;
+		if (!bun)
+			return;
+
+		const auto ids = bun->getLoadedModelIds();
+		if (row >= static_cast<int>(ids.size()))
+			return;
+
+		const auto& id = ids[row];
+
+		// 从表格读取模型名称
+		auto* nameItem = loadedModelsTable_->item(row, 0);
+		const QString modelName = nameItem
+			? nameItem->text().mid(2)  // 去掉 "● " 前缀
+			: QString::fromStdString(id);
+
+		// 读取当前偏移量
+		auto current = bun->getUserOffset(id);
+
+		// 弹出编辑对话框
+		OffsetEditorDialog dlg(modelName,
+			current.offsetX, current.offsetY, current.offsetAngle,
+			this);
+		if (dlg.exec() != QDialog::Accepted)
+			return;
+
+		// 保存到业务层（自动持久化）
+		std::string err;
+		if (!bun->setUserOffset(id,
+			dlg.offsetX(), dlg.offsetY(), dlg.offsetAngle(),
+			&err))
+		{
+			rw::rqwu::MessageBox::warning(this,
+				QStringLiteral("保存偏移量失败"),
+				QString::fromStdString(err));
+		}
+		// 表格刷新由 modelOffsetChanged 信号触发
 	}
 }

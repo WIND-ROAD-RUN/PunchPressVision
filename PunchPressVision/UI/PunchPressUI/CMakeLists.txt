@@ -3,6 +3,9 @@ set(UI_TARGET PunchPressUI)
 # 收集源码与头文件
 file(GLOB SRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 file(GLOB INCLUDE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/UI/*.h")
+# 显式追加新增文件（GLOB 需重新配置才能检测到，此处作为兜底）
+list(APPEND SRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OffsetEditorDialog.cpp")
+list(APPEND INCLUDE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/UI/OffsetEditorDialog.h")
 
 # .ui 文件用 UIC 手动编译为 ui_*.h（根 CMake 未开启 AUTOUIC）
 file(GLOB UI_FILES "${CMAKE_CURRENT_SOURCE_DIR}/ui/*.ui")

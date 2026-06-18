@@ -82,6 +82,17 @@ namespace bun
 		Config::ShapeModelData data;
 	};
 
+	/// <summary>
+	/// 用户可配置的模型偏移量。
+	/// 值从 ShapeModelData.offsetX/Y/Angle 读取，通过 model_params.txt 持久化。
+	/// </summary>
+	struct ModelUserOffset
+	{
+		double offsetX{ 0.0 };
+		double offsetY{ 0.0 };
+		double offsetAngle{ 0.0 };
+	};
+
 	class ShapeModeManagerBun
 		: public QObject, public global::IBusiness
 	{
@@ -116,6 +127,14 @@ namespace bun
 		std::vector<std::string> getLoadedModelIds() const;
 		int getLoadedModelCount() const;
 
+		// 模型偏移量（FR-035）
+		/// <summary>获取指定模型的用户偏移量。</summary>
+		ModelUserOffset getUserOffset(const std::string& modelId) const;
+		/// <summary>设置指定模型的用户偏移量，更新内存并持久化到磁盘。</summary>
+		bool setUserOffset(const std::string& modelId,
+			double offsetX, double offsetY, double offsetAngle,
+			std::string* errorMsg = nullptr);
+
 		// 模板匹配推理（FR-010）— 遍历所有已加载模型，返回匹配到的结果集
 		/// <summary>
 		/// 对图像遍历所有已加载模型进行匹配。
@@ -148,6 +167,8 @@ namespace bun
 		void modelsUnloaded();
 		/// 创建模型成功并提取到轮廓后发出，供 UI 显示
 		void modelContoursFound(const HalconCpp::HObject& contours);
+		/// 模型偏移量已更新，通知 UI 刷新
+		void modelOffsetChanged(const QString& modelId);
 
 	private:
 		inf::infrastructure& inf_;

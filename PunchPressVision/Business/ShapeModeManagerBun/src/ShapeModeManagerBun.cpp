@@ -385,6 +385,68 @@ namespace bun
 		return static_cast<int>(loadedModels_.size());
 	}
 
+	// ===== 模型偏移量 =====
+
+	ModelUserOffset ShapeModeManagerBun::getUserOffset(const std::string& modelId) const
+	{
+		std::shared_lock<std::shared_mutex> lk(modelCacheMutex_);
+		for (const auto& m : loadedModels_)
+		{
+			if (m.modelId == modelId)
+			{
+				ModelUserOffset o;
+				o.offsetX = m.data.offsetX;
+				o.offsetY = m.data.offsetY;
+				o.offsetAngle = m.data.offsetAngle;
+				return o;
+			}
+		}
+		return {};  // 未找到 → 默认 0
+	}
+
+	bool ShapeModeManagerBun::setUserOffset(const std::string& modelId,
+		double offsetX, double offsetY, double offsetAngle,
+		std::string* errorMsg)
+	{
+		try
+		{
+			{
+				std::unique_lock<std::shared_mutex> lk(modelCacheMutex_);
+				for (auto& m : loadedModels_)
+				{
+					if (m.modelId == modelId)
+					{
+						m.data.offsetX = offsetX;
+						m.data.offsetY = offsetY;
+						m.data.offsetAngle = offsetAngle;
+						break;
+					}
+				}
+			}
+
+			// 持久化到磁盘（model_params.txt）
+			// 需要从 infra 重新加载完整 item，替换 data 后写回
+			auto item = inf_.shape_model_manager_module_->getShapeModelItem(modelId);
+			item.data.offsetX = offsetX;
+			item.data.offsetY = offsetY;
+			item.data.offsetAngle = offsetAngle;
+			inf_.shape_model_manager_module_->changeShapeModelItem(modelId, item.data);
+
+			emit modelOffsetChanged(QString::fromStdString(modelId));
+			return true;
+		}
+		catch (const std::exception& e)
+		{
+			if (errorMsg) *errorMsg = e.what();
+			return false;
+		}
+		catch (...)
+		{
+			if (errorMsg) *errorMsg = "保存偏移量失败";
+			return false;
+		}
+	}
+
 	// ===== 多模型匹配 =====
 
 	std::vector<MatchResult> ShapeModeManagerBun::match(const HalconCpp::HImage& image)
