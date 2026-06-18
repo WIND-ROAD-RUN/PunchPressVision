@@ -7,6 +7,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QStringList>
 #include <QPointF>
 #include <QRectF>
 #include <QVector>
@@ -58,6 +59,8 @@ namespace bun
 	// 匹配结果（FR-010）
 	struct MatchResult
 	{
+		std::string modelId;       // 匹配到的模型 ID（多模型场景）
+		std::string modelName;     // 匹配到的模型名称
 		double row{ 0.0 };
 		double column{ 0.0 };
 		double angle{ 0.0 };
@@ -65,6 +68,18 @@ namespace bun
 		double offsetX{ 0.0 };
 		double offsetY{ 0.0 };
 		bool found{ false };
+	};
+
+	/// <summary>
+	/// 已加载到内存中的模型条目。
+	/// 包含 Halcon 句柄及训练参数，供生产匹配使用。
+	/// </summary>
+	struct LoadedModel
+	{
+		std::string modelId;
+		std::string modelName;
+		HalconCpp::HTuple handle;
+		Config::ShapeModelData data;
 	};
 
 	class ShapeModeManagerBun
@@ -84,14 +99,29 @@ namespace bun
 		bool renameModel(const std::string& id, const QString& newName,
 			std::string* errorMsg = nullptr);
 
-		// 模型加载/卸载
+		// 模型加载/卸载（多模型支持）
+		/// <summary>批量加载模型，全量替换已加载集合。部分失败不中断其余加载。</summary>
+		/// <returns>全部成功返回 true；否则返回 false，失败 ID 放入 failedIds。</returns>
+		bool loadModels(const std::vector<std::string>& ids,
+			std::vector<std::string>* failedIds = nullptr,
+			std::string* errorMsg = nullptr);
+		/// <summary>加载单个模型（兼容旧接口），内部委托 loadModels({id})。</summary>
 		bool loadModel(const std::string& id, std::string* errorMsg = nullptr);
+		/// <summary>卸载所有已加载模型并释放 Halcon 句柄。</summary>
+		void unloadAllModels();
+		/// <summary>卸载所有模型（兼容旧接口）。</summary>
 		void unloadCurrentModel();
 		bool isModelLoaded() const;
 		std::string currentModelId() const;
+		std::vector<std::string> getLoadedModelIds() const;
+		int getLoadedModelCount() const;
 
-		// 模板匹配推理（FR-010）
-		MatchResult match(const HalconCpp::HImage& image);
+		// 模板匹配推理（FR-010）— 遍历所有已加载模型，返回匹配到的结果集
+		/// <summary>
+		/// 对图像遍历所有已加载模型进行匹配。
+		/// 返回所有 hit 的结果（可能为空），按 loadedModels_ 顺序排列。
+		/// </summary>
+		std::vector<MatchResult> match(const HalconCpp::HImage& image);
 
 		// 临时创建模型并匹配测试（供创建界面"识别"按钮使用）
 		MatchResult testRecognize(const CreateModelRequest& req,
@@ -108,8 +138,14 @@ namespace bun
 
 	signals:
 		void modelListChanged();
+		/// @deprecated 多模型场景请使用 modelsLoaded
 		void modelLoaded(const QString& modelName);
+		/// @deprecated 多模型场景请使用 modelsUnloaded
 		void modelUnloaded();
+		/// 批量加载完成：模型名列表、成功数、失败数
+		void modelsLoaded(const QStringList& modelNames, int successCount, int failCount);
+		/// 所有模型已卸载
+		void modelsUnloaded();
 		/// 创建模型成功并提取到轮廓后发出，供 UI 显示
 		void modelContoursFound(const HalconCpp::HObject& contours);
 
@@ -121,10 +157,8 @@ namespace bun
 		bool createModelInternal(const CreateModelRequest& req,
 			Config::ShapeModelData& outData, std::string* errorMsg);
 
-		// 当前加载的模型缓存
-		std::string currentModelId_;
-		HalconCpp::HTuple currentModelHandle_;
-		Config::ShapeModelData currentModelData_;
+		// 已加载的模型集合（加载顺序即匹配优先级）
+		std::vector<LoadedModel> loadedModels_;
 		mutable std::shared_mutex modelCacheMutex_;
 	};
 }

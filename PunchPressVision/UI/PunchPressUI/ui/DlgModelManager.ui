@@ -201,6 +201,9 @@ QComboBox::drop-down {
       </item>
       <item>
        <widget class="QListView" name="listView_modelList">
+        <property name="selectionMode">
+         <enum>QAbstractItemView::ExtendedSelection</enum>
+        </property>
         <property name="styleSheet">
          <string notr="true">QListView {
     font-size: 18px;
@@ -402,7 +405,7 @@ QPushButton:pressed {
 }</string>
             </property>
             <property name="text">
-             <string>加载模型</string>
+             <string>加载选中模型</string>
             </property>
            </widget>
           </item>

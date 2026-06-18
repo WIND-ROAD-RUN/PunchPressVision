@@ -10,8 +10,10 @@
 #include <QComboBox>
 #include <QListView>
 #include <QHeaderView>
+#include <QHBoxLayout>
 
 #include <algorithm>
+#include <set>
 
 #include "app/PunchPressApp.hpp"
 #include "Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp"
@@ -35,6 +37,9 @@ namespace ui
 		fullKeyboard_ = new rw::rqwu::FullKeyboard(this);
 		fullKeyboard_->emptyInputPolicy = rw::rqwu::Keyboard::EmptyInputPolicy::EnableAndAccept;
 
+		// === 多选支持 ===
+		ui->listView_modelList->setSelectionMode(QAbstractItemView::ExtendedSelection);
+
 		ui->listView_modelList->setModel(listModel_);
 
 		// 表头配置
@@ -43,6 +48,29 @@ namespace ui
 		ui->tableWidget_modelInfo->setEditTriggers(QAbstractItemView::NoEditTriggers);
 		ui->tableWidget_modelInfo->setSelectionMode(QAbstractItemView::NoSelection);
 		ui->tableWidget_modelInfo->setFocusPolicy(Qt::NoFocus);
+
+		// === 动态控件：加载状态 + 全部卸载按钮 ===
+		// 插入到右侧操作区域（vLayout_actions 之上）
+		auto* vLayout = ui->vLayout_detail;
+		constexpr int kInsertPos = 2;  // 在 gBox_imgPreview(0) 和 tableWidget(1) 之后、操作按钮(2) 之前
+
+		labelLoadedStatus_ = new QLabel(this);
+		labelLoadedStatus_->setStyleSheet(
+			"QLabel { font-size: 18px; font-weight: bold; color: #2196F3; padding: 4px 0; }");
+		labelLoadedStatus_->setText(QStringLiteral("已加载: 0 个"));
+
+		pbtnUnloadAll_ = new QPushButton(QStringLiteral("全部卸载"), this);
+		pbtnUnloadAll_->setStyleSheet(ui->pbtn_loadModel->styleSheet());
+		pbtnUnloadAll_->setMinimumHeight(44);
+
+		auto* statusBarLayout = new QHBoxLayout();
+		statusBarLayout->addWidget(labelLoadedStatus_);
+		statusBarLayout->addStretch();
+		statusBarLayout->addWidget(pbtnUnloadAll_);
+		vLayout->insertLayout(kInsertPos, statusBarLayout);
+
+		connect(pbtnUnloadAll_, &QPushButton::clicked,
+			this, &ModelManagerDialog::onUnloadAll);
 
 		buildConnections();
 	}
@@ -99,6 +127,7 @@ namespace ui
 		if (parentWidget())
 			resize(parentWidget()->size());
 		refreshModelList();
+		refreshLoadedState();
 
 		// 初始选中第一项
 		if (listModel_->modelCount() > 0)
@@ -156,6 +185,21 @@ namespace ui
 
 		// 清空详情
 		ui->tableWidget_modelInfo->setRowCount(0);
+	}
+
+	void ModelManagerDialog::refreshLoadedState()
+	{
+		auto& bun = app_.business().shape_mode_manager_bun;
+		if (!bun)
+			return;
+
+		const auto ids = bun->getLoadedModelIds();
+		std::set<std::string> idSet(ids.begin(), ids.end());
+		listModel_->setLoadedModelIds(idSet);
+
+		const int count = static_cast<int>(ids.size());
+		labelLoadedStatus_->setText(
+			QStringLiteral("已加载: %1 个").arg(count));
 	}
 
 	static const char* kChannelNames[] = {
@@ -250,12 +294,16 @@ namespace ui
 		}
 	}
 
-	std::string ModelManagerDialog::selectedModelId() const
+	std::vector<std::string> ModelManagerDialog::selectedModelIds() const
 	{
-		const int row = selectedRow();
-		if (row < 0 || row >= allModels_.size())
-			return {};
-		return allModels_.at(row).getId();
+		std::vector<std::string> ids;
+		const auto indexes = ui->listView_modelList->selectionModel()->selectedRows();
+		for (const auto& idx : indexes)
+		{
+			if (idx.row() >= 0 && idx.row() < allModels_.size())
+				ids.push_back(allModels_.at(idx.row()).getId());
+		}
+		return ids;
 	}
 
 	int ModelManagerDialog::selectedRow() const
@@ -279,6 +327,7 @@ namespace ui
 	void ModelManagerDialog::onSearchClicked()
 	{
 		refreshModelList();
+		refreshLoadedState();
 		if (listModel_->modelCount() > 0)
 		{
 			ui->listView_modelList->setCurrentIndex(listModel_->index(0, 0));
@@ -290,6 +339,7 @@ namespace ui
 	{
 		ui->pbtn_searchInput->setText(QString());
 		refreshModelList();
+		refreshLoadedState();
 		if (listModel_->modelCount() > 0)
 		{
 			ui->listView_modelList->setCurrentIndex(listModel_->index(0, 0));
@@ -302,6 +352,7 @@ namespace ui
 	void ModelManagerDialog::onSortChanged(int /*index*/)
 	{
 		refreshModelList();
+		refreshLoadedState();
 		if (listModel_->modelCount() > 0)
 		{
 			ui->listView_modelList->setCurrentIndex(listModel_->index(0, 0));
@@ -378,32 +429,53 @@ namespace ui
 
 	void ModelManagerDialog::onLoadModel()
 	{
-		const std::string id = selectedModelId();
-		if (id.empty())
+		const auto ids = selectedModelIds();
+		if (ids.empty())
+		{
+			rw::rqwu::MessageBox::information(this,
+				QStringLiteral("提示"), QStringLiteral("请先在列表中选择一个或多个模型"));
 			return;
+		}
 
 		auto& bun = app_.business().shape_mode_manager_bun;
 		if (!bun)
 			return;
 
+		std::vector<std::string> failedIds;
 		std::string err;
-		if (bun->loadModel(id, &err))
-		{
-			rw::rqwu::MessageBox::information(this,
-				QStringLiteral("加载模型"), QStringLiteral("模型已加载"));
-		}
+		const bool allOk = bun->loadModels(ids, &failedIds, &err);
+
+		const int successCount = static_cast<int>(ids.size()) - static_cast<int>(failedIds.size());
+		QString msg = QStringLiteral("成功加载 %1 个模型").arg(successCount);
+		if (!failedIds.empty())
+			msg += QStringLiteral("，%1 个失败").arg(static_cast<int>(failedIds.size()));
+
+		if (allOk)
+			rw::rqwu::MessageBox::information(this, QStringLiteral("加载模型"), msg);
 		else
-		{
-			rw::rqwu::MessageBox::warning(this,
-				QStringLiteral("加载失败"), QString::fromStdString(err));
-		}
+			rw::rqwu::MessageBox::warning(this, QStringLiteral("加载模型"), msg);
+
+		refreshLoadedState();
+	}
+
+	void ModelManagerDialog::onUnloadAll()
+	{
+		auto& bun = app_.business().shape_mode_manager_bun;
+		if (!bun)
+			return;
+
+		bun->unloadAllModels();
+		refreshLoadedState();
 	}
 
 	void ModelManagerDialog::onRenameModel()
 	{
-		const std::string id = selectedModelId();
-		if (id.empty())
+		const auto ids = selectedModelIds();
+		if (ids.empty())
 			return;
+
+		// 重命名仅对焦点项生效
+		const std::string id = allModels_.at(selectedRow()).getId();
 
 		const int ret = fullKeyboard_->exec();
 		if (ret != QDialog::Accepted)
@@ -421,6 +493,7 @@ namespace ui
 		if (bun->renameModel(id, newName, &err))
 		{
 			refreshModelList();
+			refreshLoadedState();
 		}
 		else
 		{
@@ -431,9 +504,12 @@ namespace ui
 
 	void ModelManagerDialog::onDeleteModel()
 	{
-		const std::string id = selectedModelId();
-		if (id.empty())
+		const auto ids = selectedModelIds();
+		if (ids.empty())
 			return;
+
+		// 删除仅对焦点项生效
+		const std::string id = allModels_.at(selectedRow()).getId();
 
 		const auto name = QString::fromStdString(allModels_.at(selectedRow()).base_info.name);
 		if (rw::rqwu::MessageBox::question(this,
@@ -450,6 +526,7 @@ namespace ui
 		if (bun->deleteModel(id, &err))
 		{
 			refreshModelList();
+			refreshLoadedState();
 			if (listModel_->modelCount() > 0)
 			{
 				ui->listView_modelList->setCurrentIndex(listModel_->index(0, 0));
@@ -474,13 +551,16 @@ namespace ui
 
 	void ModelManagerDialog::onEditModel()
 	{
-		const std::string id = selectedModelId();
-		if (id.empty())
+		const auto ids = selectedModelIds();
+		if (ids.empty())
 		{
 			rw::rqwu::MessageBox::information(this,
 				QStringLiteral("提示"), QStringLiteral("请先选择一个模型"));
 			return;
 		}
+
+		// 编辑仅对焦点项生效
+		const std::string id = allModels_.at(selectedRow()).getId();
 		ModelEditorDialog dlg(app_, true, id, this);
 		if (dlg.exec() == QDialog::Accepted)
 		{

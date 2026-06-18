@@ -10,5 +10,7 @@ namespace global
 		double angle{ 0.0 };     // 旋转角度（度）
 		double score{ 0.0 };     // 匹配得分（0.0 ~ 1.0）
 		bool valid{ false };     // 结果有效标志
+		std::string modelId;     // 匹配到的模型 ID（多模型场景）
+		std::string modelName;   // 匹配到的模型名称
 	};
 }
