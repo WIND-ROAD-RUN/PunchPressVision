@@ -24,7 +24,6 @@ namespace bun
 	{
 		HalconCpp::HImage trainingImage;       // 预处理后的图像（用于模型训练）
 		HalconCpp::HImage rawImage;            // 原始拼接图（未经预处理，用于存储/显示）
-		HalconCpp::HImage rawImage;            // 原始拼接图（未经预处理，用于存储/显示）
 		HalconCpp::HObject roi;              // ROI 区域（合并后的 HObject）
 		HalconCpp::HObject mask;             // 屏蔽区域（合并后的 HObject）
 		std::vector<HalconCpp::HObject> _paintCreateRoiList;   // ROI 列表（逐个保存，支持回撤）

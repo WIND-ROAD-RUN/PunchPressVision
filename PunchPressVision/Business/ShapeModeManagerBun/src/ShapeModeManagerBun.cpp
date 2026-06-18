@@ -97,7 +97,7 @@ namespace bun
 
 			// 4. 准备模型数据
 			outData._templateMatImage = templateImage;
-			outData._originalImage = req.trainingImage;
+			outData._originalImage = req.rawImage.IsInitialized() ? req.rawImage : req.trainingImage;
 			outData.hv_ModelID = modelID;
 			outData._createModelExposureTime = req.exposure;
 			outData._createModelGain = req.gain;
@@ -151,21 +151,46 @@ namespace bun
 			}
 
 			// 5. 提取模型轮廓并变换到匹配位置，供 UI 显示
+			HObject modelContours;
+			GetShapeModelContours(&modelContours, modelID, 1);
+
+			HTuple homMat2D;
+			VectorAngleToRigid(0, 0, 0, matchRow[0], matchCol[0], matchAngle[0], &homMat2D);
+
+			HObject transformedContours;
+			AffineTransContourXld(modelContours, &transformedContours, homMat2D);
+
+			outData._findCreateXldObj = transformedContours;
+			emit modelContoursFound(transformedContours);
+
+			// 6. 生成模板缩略图：预处理图像（单通道→3通道）叠加红色轮廓
 			try
 			{
-				HObject modelContours;
-				GetShapeModelContours(&modelContours, modelID, 1);
+				HTuple imgW, imgH;
+				templateImage.GetImageSize(&imgW, &imgH);
+				const int w = imgW[0].I(), h = imgH[0].I();
+				if (w > 0 && h > 0)
+				{
+					// 单通道转 3 通道（Halcon 显示/保存需要 RGB）
+					HImage rgbImage;
+					Compose3(templateImage, templateImage, templateImage, &rgbImage);
 
-				HTuple homMat2D;
-				VectorAngleToRigid(0, 0, 0, matchRow[0], matchCol[0], matchAngle[0], &homMat2D);
-
-				HObject transformedContours;
-				AffineTransContourXld(modelContours, &transformedContours, homMat2D);
-
-				outData._findCreateXldObj = transformedContours;
-				emit modelContoursFound(transformedContours);
+					// 在 buffer 窗口上叠加红色轮廓并截取
+					HTuple bufWin;
+					OpenWindow(0, 0, w, h, 0, "buffer", "", &bufWin);
+					SetPart(bufWin, 0, 0, h - 1, w - 1);
+					DispObj(rgbImage, bufWin);
+					SetColor(bufWin, "red");
+					SetLineWidth(bufWin, 3);
+					DispObj(transformedContours, bufWin);
+					DumpWindowImage(&outData._templateMatImage, bufWin);
+					CloseWindow(bufWin);
+				}
 			}
-			catch (...) {}
+			catch (...)
+			{
+				// 缩略图生成失败不阻断模型创建，保留模板原图
+			}
 
 			return true;
 		}

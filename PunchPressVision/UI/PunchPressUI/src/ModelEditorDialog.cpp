@@ -264,10 +264,12 @@ namespace ui
 	// ===== 构建请求（识别和创建共用）===========================================
 
 	bun::CreateModelRequest ModelEditorDialog::buildRequest(
-		const HalconCpp::HImage& image) const
+		const HalconCpp::HImage& preprocessedImage,
+		const HalconCpp::HImage& rawImage) const
 	{
 		bun::CreateModelRequest req;
-		req.trainingImage = image;
+		req.trainingImage = preprocessedImage;
+		req.rawImage = rawImage;
 
 		if (shapeEditor_)
 		{
@@ -325,7 +327,7 @@ namespace ui
 		if (!biz.shape_mode_manager_bun)
 			return;
 
-		const auto req = buildRequest(preprocessImage(lastFrame_));
+		const auto req = buildRequest(preprocessImage(lastFrame_), lastFrame_);
 		std::string err;
 		//TODO:这里面内部进行识别
 		const auto result = biz.shape_mode_manager_bun->testRecognize(req, &err);
@@ -360,7 +362,7 @@ namespace ui
 		if (!biz.shape_mode_manager_bun || !lastFrame_.IsInitialized())
 			return;
 
-		const auto req = buildRequest(preprocessImage(lastFrame_));
+		const auto req = buildRequest(preprocessImage(lastFrame_), lastFrame_);
 
 		std::string err;
 		if (isModifyMode_)
@@ -713,13 +715,16 @@ namespace ui
 		//			.arg(hasCenter ? QStringLiteral("有") : QStringLiteral("无")));
 		//}
 
-		// 显示创建时的原始图片（始终使用原始图，不接收相机帧）
+		// 保存原始图（双相机拼接原图，始终使用，不接收相机帧）
 		if (data._originalImage.IsInitialized())
-		{
 			lastFrame_ = data._originalImage;
-			if (shapeEditor_)
-				shapeEditor_->displayImage(preprocessImage(data._originalImage));
-		}
+
+		// 先恢复预处理参数，再显示（保证首次渲染就应用正确的通道/开闭运算等）
+		restoreParamsFromModel(data);
+
+		// 显示预处理后的图像
+		if (shapeEditor_ && lastFrame_.IsInitialized())
+			shapeEditor_->displayImage(preprocessImage(lastFrame_));
 
 		// 恢复 ROI 区域
 		if (!data._paintCreateRoiList.empty())
@@ -732,10 +737,6 @@ namespace ui
 		// 恢复中心点
 		if (data.centerX != 0.0 || data.centerY != 0.0)
 			shapeEditor_->setCenterPoint(QPointF(data.centerX, data.centerY));
-
-		// 恢复预处理参数并刷新显示
-		restoreParamsFromModel(data);
-		refreshProcessedImage();
 	}
 
 	void ModelEditorDialog::restoreParamsFromModel(const Config::ShapeModelData& data)

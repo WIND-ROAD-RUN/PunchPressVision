@@ -84,7 +84,8 @@ namespace ui
 		HalconCpp::HImage preprocessImage(const HalconCpp::HImage& image) const;
 
 		// 构建 CreateModelRequest（供识别和创建共用）
-		bun::CreateModelRequest buildRequest(const HalconCpp::HImage& image) const;
+		bun::CreateModelRequest buildRequest(const HalconCpp::HImage& preprocessedImage,
+		                                   const HalconCpp::HImage& rawImage) const;
 
 		// ROI 缺失提示
 		bool requireROI(const QString& action) const;
