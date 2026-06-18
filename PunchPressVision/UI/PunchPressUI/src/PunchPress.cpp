@@ -7,15 +7,22 @@
 #include "ui_PunchPress.h"
 
 #include <QButtonGroup>
+#include <QFont>
+#include <QGroupBox>
+#include <QHeaderView>
 #include <QLabel>
 #include <QLayout>
 #include <QShowEvent>
 #include <QResizeEvent>
 #include <QStatusBar>
+#include <QTableWidget>
+#include <QVBoxLayout>
 
 #include "app/PunchPressApp.hpp"
+#include "Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp"
 #include "UI/HalconInteractiveLabel.h"
 #include "UI/ModelManagerDialog.h"
+#include "UI/OffsetEditorDialog.h"
 
 // 取消 Win32 MessageBox 宏，使用 rw::rqwu::MessageBox。
 #ifdef MessageBox
@@ -47,6 +54,79 @@ namespace ui
 		lightGroup_->addButton(ui->rbtn_downLight);
 
 		setupImageView();
+
+		// === 右侧栏：已加载模型表格 ===
+		loadedModelsGroup_ = new QGroupBox(QStringLiteral("已加载模型"), this);
+		loadedModelsGroup_->setStyleSheet(QStringLiteral(
+			"QGroupBox {"
+			"  font-size: 20px;"
+			"  font-weight: bold;"
+			"  background-color: rgb(181, 181, 181);"
+			"  border: 1px solid #e0e0e0;"
+			"  border-radius: 15px;"
+			"  padding-top: 28px;"
+			"}"
+			"QGroupBox::title {"
+			"  subcontrol-origin: margin;"
+			"  subcontrol-position: top left;"
+			"  left: 10px;"
+			"  top: 4px;"
+			"  padding: 0 5px;"
+			"  color: #2c3e50;"
+			"}"));
+
+		auto* groupLayout = new QVBoxLayout(loadedModelsGroup_);
+
+		loadedModelsTable_ = new QTableWidget(0, 4, this);
+		loadedModelsTable_->setStyleSheet(QStringLiteral(
+			"QTableWidget {"
+			"  font-size: 16px;"
+			"  color: #444;"
+			"  background-color: white;"
+			"  border: 1px solid #DDD;"
+			"  border-radius: 4px;"
+			"  gridline-color: #EEE;"
+			"}"
+			"QTableWidget::item {"
+			"  padding: 6px 10px;"
+			"}"
+			"QHeaderView::section {"
+			"  background-color: #F5F5F5;"
+			"  border: 1px solid #DDD;"
+			"  padding: 6px 10px;"
+			"  font-size: 14px;"
+			"  font-weight: bold;"
+			"  color: #555;"
+			"}"));
+		loadedModelsTable_->setMaximumHeight(200);
+		loadedModelsTable_->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+		loadedModelsTable_->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+		loadedModelsTable_->setSelectionMode(QAbstractItemView::SingleSelection);
+		loadedModelsTable_->setSelectionBehavior(QAbstractItemView::SelectRows);
+		loadedModelsTable_->setEditTriggers(QAbstractItemView::NoEditTriggers);
+		loadedModelsTable_->setFocusPolicy(Qt::NoFocus);
+		loadedModelsTable_->verticalHeader()->setVisible(false);
+
+		// 表头
+		QStringList headers;
+		headers << QStringLiteral("模型名称")
+			<< QStringLiteral("OffsetX")
+			<< QStringLiteral("OffsetY")
+			<< QStringLiteral("OffsetAngle");
+		loadedModelsTable_->setHorizontalHeaderLabels(headers);
+		loadedModelsTable_->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+		loadedModelsTable_->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+		loadedModelsTable_->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+		loadedModelsTable_->horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
+
+		// 双击行 → 编辑偏移量
+		connect(loadedModelsTable_, &QTableWidget::cellDoubleClicked,
+			this, &PunchPress::openOffsetEditor);
+
+		groupLayout->addWidget(loadedModelsTable_);
+
+		// 插入到右侧控制栏：gBox_tools 之后、gBox_table 之前（索引 3）
+		ui->vLayout_control->insertWidget(3, loadedModelsGroup_);
 	}
 
 	PunchPress::~PunchPress()
@@ -108,6 +188,23 @@ namespace ui
 		connect(ui->pbtn_gain2, &QPushButton::clicked, this, &PunchPress::onGain2Clicked);
 		connect(ui->pbtn_modelManager, &QPushButton::clicked, this, &PunchPress::onModelManager);
 		connect(ui->pbtn_exit, &QPushButton::clicked, this, &PunchPress::onExit);
+
+		// 模型加载/卸载 → 刷新右侧栏列表
+		auto& bun = app_.business().shape_mode_manager_bun;
+		if (bun)
+		{
+			connect(bun.get(), &bun::ShapeModeManagerBun::modelsLoaded,
+				this, &PunchPress::refreshLoadedModelsList);
+			connect(bun.get(), &bun::ShapeModeManagerBun::modelsUnloaded,
+				this, &PunchPress::refreshLoadedModelsList);
+			connect(bun.get(), &bun::ShapeModeManagerBun::modelOffsetChanged,
+				this, &PunchPress::refreshLoadedModelsList);
+			connect(bun.get(), &bun::ShapeModeManagerBun::modelListChanged,
+				this, &PunchPress::refreshLoadedModelsList);
+		}
+
+		// 初始化列表内容（模型可能在 build 之前已加载）
+		refreshLoadedModelsList();
 	}
 
 	void PunchPress::setupImageView()
@@ -413,5 +510,124 @@ namespace ui
 	void PunchPress::onStartupCheckFailed(const QString& reason)
 	{
 		rw::rqwu::MessageBox::critical(this, QStringLiteral("启动检查失败"), reason);
+	}
+
+	void PunchPress::refreshLoadedModelsList()
+	{
+		if (!loadedModelsTable_)
+			return;
+
+		// 断开双击信号避免刷新时触发
+		disconnect(loadedModelsTable_, &QTableWidget::cellDoubleClicked,
+			this, &PunchPress::openOffsetEditor);
+
+		loadedModelsTable_->setRowCount(0);
+
+		auto& bun = app_.business().shape_mode_manager_bun;
+		if (!bun || !bun->isModelLoaded())
+		{
+			connect(loadedModelsTable_, &QTableWidget::cellDoubleClicked,
+				this, &PunchPress::openOffsetEditor);
+			return;
+		}
+
+		const auto ids = bun->getLoadedModelIds();
+		const auto allModels = bun->getAllModels();
+
+		loadedModelsTable_->setRowCount(static_cast<int>(ids.size()));
+
+		for (int row = 0; row < static_cast<int>(ids.size()); ++row)
+		{
+			const auto& id = ids[row];
+
+			// 查找模型名称
+			QString name = QString::fromStdString(id);
+			for (const auto& info : allModels)
+			{
+				if (info.getId() == id)
+				{
+					name = QString::fromStdString(info.base_info.name);
+					break;
+				}
+			}
+
+			// 读取偏移量
+			auto offset = bun->getUserOffset(id);
+
+			// 模型名称（蓝色加粗）
+			auto* nameItem = new QTableWidgetItem(QStringLiteral("● ") + name);
+			nameItem->setForeground(QColor(0x2196F3));
+			QFont boldFont;
+			boldFont.setBold(true);
+			nameItem->setFont(boldFont);
+			nameItem->setFlags(nameItem->flags() & ~Qt::ItemIsEditable);
+			loadedModelsTable_->setItem(row, 0, nameItem);
+
+			// OffsetX
+			auto* xItem = new QTableWidgetItem(QString::number(offset.offsetX, 'f', 3));
+			xItem->setTextAlignment(Qt::AlignCenter);
+			xItem->setFlags(xItem->flags() & ~Qt::ItemIsEditable);
+			loadedModelsTable_->setItem(row, 1, xItem);
+
+			// OffsetY
+			auto* yItem = new QTableWidgetItem(QString::number(offset.offsetY, 'f', 3));
+			yItem->setTextAlignment(Qt::AlignCenter);
+			yItem->setFlags(yItem->flags() & ~Qt::ItemIsEditable);
+			loadedModelsTable_->setItem(row, 2, yItem);
+
+			// OffsetAngle
+			auto* aItem = new QTableWidgetItem(QString::number(offset.offsetAngle, 'f', 3));
+			aItem->setTextAlignment(Qt::AlignCenter);
+			aItem->setFlags(aItem->flags() & ~Qt::ItemIsEditable);
+			loadedModelsTable_->setItem(row, 3, aItem);
+		}
+
+		// 恢复双击连接
+		connect(loadedModelsTable_, &QTableWidget::cellDoubleClicked,
+			this, &PunchPress::openOffsetEditor);
+	}
+
+	void PunchPress::openOffsetEditor(int row, int /*column*/)
+	{
+		if (!loadedModelsTable_ || row < 0 || row >= loadedModelsTable_->rowCount())
+			return;
+
+		auto& bun = app_.business().shape_mode_manager_bun;
+		if (!bun)
+			return;
+
+		const auto ids = bun->getLoadedModelIds();
+		if (row >= static_cast<int>(ids.size()))
+			return;
+
+		const auto& id = ids[row];
+
+		// 从表格读取模型名称
+		auto* nameItem = loadedModelsTable_->item(row, 0);
+		const QString modelName = nameItem
+			? nameItem->text().mid(2)  // 去掉 "● " 前缀
+			: QString::fromStdString(id);
+
+		// 读取当前偏移量
+		auto current = bun->getUserOffset(id);
+
+		// 弹出编辑对话框
+		OffsetEditorDialog dlg(modelName,
+			current.offsetX, current.offsetY, current.offsetAngle,
+			this);
+		if (dlg.exec() != QDialog::Accepted)
+			return;
+
+		// 保存到业务层（自动持久化）
+		std::string err;
+		if (!bun->setUserOffset(id,
+			dlg.offsetX(), dlg.offsetY(), dlg.offsetAngle(),
+			&err))
+		{
+			rw::rqwu::MessageBox::warning(this,
+				QStringLiteral("保存偏移量失败"),
+				QString::fromStdString(err));
+		}
+		// 表格刷新由 modelOffsetChanged 信号触发
 	}
 }

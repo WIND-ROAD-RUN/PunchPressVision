@@ -20,6 +20,7 @@ namespace global
 	{
 		CalibReadiness calib;            // 标定就绪性
 		bool hasLoadedModel{ false };    // 至少一个模型已加载
+		int loadedModelCount{ 0 };       // 已加载模型数量（多模型场景）
 		bool plcConnected{ false };      // PLC 已连接
 
 		bool allReady() const noexcept

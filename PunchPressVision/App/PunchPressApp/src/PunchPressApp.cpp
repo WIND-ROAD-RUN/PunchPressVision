@@ -1,5 +1,6 @@
 #include "app/PunchPressApp.hpp"
 
+#include <algorithm>
 #include <QProcess>
 #include <QStringList>
 
@@ -185,8 +186,11 @@ namespace app
 	{
 		global::ProductionReadiness pr;
 		pr.calib = checkCalibReadiness();
-		pr.hasLoadedModel = business_.shape_mode_manager_bun
-			? business_.shape_mode_manager_bun->isModelLoaded() : false;
+		if (business_.shape_mode_manager_bun)
+		{
+			pr.hasLoadedModel = business_.shape_mode_manager_bun->isModelLoaded();
+			pr.loadedModelCount = business_.shape_mode_manager_bun->getLoadedModelCount();
+		}
 		const auto& inf = business_.infrastructure();
 		pr.plcConnected = inf.control_module_ ? inf.control_module_->isConnected() : false;
 		return pr;
@@ -335,20 +339,42 @@ namespace app
 		emit cameraConnectionChanged(idx, connected, reason);
 	}
 
+	// TODO(多模型PLC): 根据实际需求决定每个模型的 PLC 地址映射策略。
+	// 当前实现：仅取最佳匹配写入已有 PLC 地址。若需要多模型独立 PLC 地址，
+	// 可扩展 plcAddressCfg 为数组映射，在此函数中遍历 matches 分别写入。
+	static void writePositionToPLC(
+		const global::PositionResult& result,
+		inf::ControlModule& ctrl, const Config::PlcAddressCfg& plc)
+	{
+		ctrl.writeFloat(plc.regOffsetX, static_cast<float>(result.offsetX));
+		ctrl.writeFloat(plc.regOffsetY, static_cast<float>(result.offsetY));
+		ctrl.writeFloat(plc.regAngle, static_cast<float>(result.angle));
+		ctrl.writeRegister(plc.regValid, result.valid ? 1 : 0);
+	}
+
 	void PunchPressApp::processProductionFrame(const HalconCpp::HImage& image)
 	{
 		if (!business_.shape_mode_manager_bun)
 			return;
 
-		bun::MatchResult m = business_.shape_mode_manager_bun->match(image);
+		// 多模型匹配：遍历所有已加载模型
+		std::vector<bun::MatchResult> matches = business_.shape_mode_manager_bun->match(image);
 
-		global::PositionResult result;
-		result.valid = m.found;
-		result.score = m.score;
+		// 取最佳匹配（最高 score）
+		auto best = std::max_element(matches.begin(), matches.end(),
+			[](const bun::MatchResult& a, const bun::MatchResult& b) {
+				return a.score < b.score;
+			});
 
-		if (m.found)
+		if (best != matches.end() && best->found)
 		{
 			auto& inf = business_.infrastructure();
+
+			global::PositionResult result;
+			result.valid = true;
+			result.score = best->score;
+			result.modelId = best->modelId;
+			result.modelName = best->modelName;
 
 			// 像素坐标 → 世界坐标（若九点标定矩阵就绪）
 			bool converted = false;
@@ -357,7 +383,7 @@ namespace app
 				const auto& homMat = inf.nine_point_module_->ninePointConfig.outHomMat2D;
 				double wx = 0.0, wy = 0.0;
 				if (homMat.Length() >= 6 &&
-					business_.nine_point_bun->pixToWorld(homMat, m.column, m.row, wx, wy))
+					business_.nine_point_bun->pixToWorld(homMat, best->column, best->row, wx, wy))
 				{
 					result.offsetX = wx;
 					result.offsetY = wy;
@@ -367,23 +393,31 @@ namespace app
 			if (!converted)
 			{
 				// 回退到像素偏移（未标定时）
-				result.offsetX = m.offsetX;
-				result.offsetY = m.offsetY;
+				result.offsetX = best->offsetX;
+				result.offsetY = best->offsetY;
 			}
-			result.angle = m.angle;
+			result.angle = best->angle;
+
+			emit positionResultReady(result);
+
+			// 写 PLC（若已连接）
+			if (inf.control_module_ && inf.control_module_->isConnected() && inf.config_module_)
+			{
+				const auto& plc = inf.config_module_->plcAddressCfg;
+				writePositionToPLC(result, *inf.control_module_, plc);
+			}
 		}
-
-		emit positionResultReady(result);
-
-		// 写 PLC（若已连接）：X/Y 偏移、角度、有效标志（寄存器地址来自 plcAddressCfg）
-		auto& inf = business_.infrastructure();
-		if (inf.control_module_ && inf.control_module_->isConnected() && inf.config_module_)
+		else
 		{
-			const auto& plc = inf.config_module_->plcAddressCfg;
-			inf.control_module_->writeFloat(plc.regOffsetX, static_cast<float>(result.offsetX));
-			inf.control_module_->writeFloat(plc.regOffsetY, static_cast<float>(result.offsetY));
-			inf.control_module_->writeFloat(plc.regAngle, static_cast<float>(result.angle));
-			inf.control_module_->writeRegister(plc.regValid, result.valid ? 1 : 0);
+			// 无匹配结果：发出无效结果 + 写 PLC 无效标志
+			global::PositionResult result;
+			emit positionResultReady(result);
+
+			auto& inf = business_.infrastructure();
+			if (inf.control_module_ && inf.control_module_->isConnected() && inf.config_module_)
+			{
+				writePositionToPLC(result, *inf.control_module_, inf.config_module_->plcAddressCfg);
+			}
 		}
 	}
 }

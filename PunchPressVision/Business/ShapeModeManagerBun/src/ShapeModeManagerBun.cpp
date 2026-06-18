@@ -2,6 +2,11 @@
 
 #include <cstdlib>
 #include <filesystem>
+#include <fstream>
+
+#include <json/json.h>
+
+#include "global/GlobalPath.hpp"
 
 namespace bun
 {
@@ -246,11 +251,11 @@ namespace bun
 		{
 			{
 				std::unique_lock<std::shared_mutex> lk(modelCacheMutex_);
-				if (currentModelId_ == id)
-				{
-					currentModelId_.clear();
-					currentModelHandle_ = HalconCpp::HTuple();
-				}
+				// 从已加载列表中移除（若存在）
+				loadedModels_.erase(
+					std::remove_if(loadedModels_.begin(), loadedModels_.end(),
+						[&id](const LoadedModel& m) { return m.modelId == id; }),
+					loadedModels_.end());
 			}
 			inf_.shape_model_manager_module_->deleteShapeModelItem(id);
 			emit modelListChanged();
@@ -274,6 +279,20 @@ namespace bun
 			baseInfo = item.info.base_info;
 			baseInfo.name = newName.toStdString();
 			inf_.shape_model_manager_module_->changeShapeModelItem(id, baseInfo);
+
+			// 同步已加载模型缓存中的名称
+			{
+				std::unique_lock<std::shared_mutex> lk(modelCacheMutex_);
+				for (auto& m : loadedModels_)
+				{
+					if (m.modelId == id)
+					{
+						m.modelName = baseInfo.name;
+						break;
+					}
+				}
+			}
+
 			emit modelListChanged();
 			return true;
 		}
@@ -284,119 +303,262 @@ namespace bun
 		}
 	}
 
-	bool ShapeModeManagerBun::loadModel(const std::string& id, std::string* errorMsg)
+	// ===== 多模型加载/卸载 =====
+
+	bool ShapeModeManagerBun::loadModels(const std::vector<std::string>& ids,
+		std::vector<std::string>* failedIds, std::string* errorMsg)
 	{
 		using namespace HalconCpp;
-		try
+		if (ids.empty())
 		{
-			auto item = inf_.shape_model_manager_module_->getShapeModelItem(id);
-
-			std::unique_lock<std::shared_mutex> lk(modelCacheMutex_);
-			currentModelData_ = item.data;
-			currentModelId_ = id;
-
-			// 优先使用已加载的模型句柄；否则从 .shm 读取
-			if (item.data.hv_ModelID.Length() > 0)
-			{
-				currentModelHandle_ = item.data.hv_ModelID;
-			}
-			else if (!item.data.modelPath.empty())
-			{
-				ReadShapeModel((item.data.modelPath + "/model.shm").c_str(), &currentModelHandle_);
-			}
-			else
-			{
-				currentModelId_.clear();
-				if (errorMsg) *errorMsg = "模型文件缺失";
-				return false;
-			}
-
-			emit modelLoaded(QString::fromStdString(item.info.base_info.name));
+			// 空列表 = 卸载全部
+			unloadAllModels();
 			return true;
 		}
-		catch (const HException& e)
+
+		int successCount = 0;
+		int failCount = 0;
+		QStringList loadedNames;
+
 		{
-			if (errorMsg) *errorMsg = std::string("加载模型失败: ") + e.ErrorMessage().Text();
-			return false;
+			std::unique_lock<std::shared_mutex> lk(modelCacheMutex_);
+			// 全量替换：先清空旧的（析构 HTuple 自动释放 Halcon 资源）
+			loadedModels_.clear();
+
+			for (const auto& id : ids)
+			{
+				try
+				{
+					auto item = inf_.shape_model_manager_module_->getShapeModelItem(id);
+
+					LoadedModel lm;
+					lm.modelId = id;
+					lm.modelName = item.info.base_info.name;
+					lm.data = item.data;
+
+					// 优先使用内存中的句柄；否则从 .shm 读取
+					if (item.data.hv_ModelID.Length() > 0)
+					{
+						lm.handle = item.data.hv_ModelID;
+					}
+					else if (!item.data.modelPath.empty())
+					{
+						ReadShapeModel((item.data.modelPath + "/model.shm").c_str(), &lm.handle);
+					}
+					else
+					{
+						if (failedIds) failedIds->push_back(id);
+						++failCount;
+						continue;
+					}
+
+					loadedModels_.push_back(std::move(lm));
+					loadedNames.append(QString::fromStdString(lm.modelName));
+					++successCount;
+				}
+				catch (const HException& e)
+				{
+					if (failedIds) failedIds->push_back(id);
+					if (errorMsg)
+						*errorMsg = std::string("加载模型失败: ") + e.ErrorMessage().Text();
+					++failCount;
+				}
+				catch (...)
+				{
+					if (failedIds) failedIds->push_back(id);
+					if (errorMsg)
+						*errorMsg = "加载模型发生未知错误";
+					++failCount;
+				}
+			}
 		}
-		catch (...)
+
+		// 发出信号（兼容旧 + 新）
+		if (!loadedNames.isEmpty())
+			emit modelLoaded(loadedNames.first());
+		emit modelsLoaded(loadedNames, successCount, failCount);
+
+		// 持久化本次加载的模型 ID 列表
+		saveLastLoadedModels();
+
+		return failCount == 0;
+	}
+
+	bool ShapeModeManagerBun::loadModel(const std::string& id, std::string* errorMsg)
+	{
+		return loadModels({id}, nullptr, errorMsg);
+	}
+
+	void ShapeModeManagerBun::unloadAllModels()
+	{
 		{
-			if (errorMsg) *errorMsg = "加载模型发生未知错误";
-			return false;
+			std::unique_lock<std::shared_mutex> lk(modelCacheMutex_);
+			loadedModels_.clear();  // HTuple 析构自动释放 Halcon 句柄
 		}
+		emit modelUnloaded();
+		emit modelsUnloaded();
 	}
 
 	void ShapeModeManagerBun::unloadCurrentModel()
 	{
-		std::unique_lock<std::shared_mutex> lk(modelCacheMutex_);
-		currentModelId_.clear();
-		currentModelHandle_ = HalconCpp::HTuple();
-		emit modelUnloaded();
+		unloadAllModels();
 	}
 
 	bool ShapeModeManagerBun::isModelLoaded() const
 	{
 		std::shared_lock<std::shared_mutex> lk(modelCacheMutex_);
-		return !currentModelId_.empty();
+		return !loadedModels_.empty();
 	}
 
 	std::string ShapeModeManagerBun::currentModelId() const
 	{
 		std::shared_lock<std::shared_mutex> lk(modelCacheMutex_);
-		return currentModelId_;
+		return loadedModels_.empty() ? std::string{} : loadedModels_.front().modelId;
 	}
 
-	MatchResult ShapeModeManagerBun::match(const HalconCpp::HImage& image)
+	std::vector<std::string> ShapeModeManagerBun::getLoadedModelIds() const
 	{
-		using namespace HalconCpp;
-		MatchResult result;
-
 		std::shared_lock<std::shared_mutex> lk(modelCacheMutex_);
-		if (currentModelId_.empty() || currentModelHandle_.Length() == 0)
-			return result;
-		if (!image.IsInitialized())
-			return result;
+		std::vector<std::string> ids;
+		ids.reserve(loadedModels_.size());
+		for (const auto& m : loadedModels_)
+			ids.push_back(m.modelId);
+		return ids;
+	}
 
+	int ShapeModeManagerBun::getLoadedModelCount() const
+	{
+		std::shared_lock<std::shared_mutex> lk(modelCacheMutex_);
+		return static_cast<int>(loadedModels_.size());
+	}
+
+	// ===== 模型偏移量 =====
+
+	ModelUserOffset ShapeModeManagerBun::getUserOffset(const std::string& modelId) const
+	{
+		std::shared_lock<std::shared_mutex> lk(modelCacheMutex_);
+		for (const auto& m : loadedModels_)
+		{
+			if (m.modelId == modelId)
+			{
+				ModelUserOffset o;
+				o.offsetX = m.data.offsetX;
+				o.offsetY = m.data.offsetY;
+				o.offsetAngle = m.data.offsetAngle;
+				return o;
+			}
+		}
+		return {};  // 未找到 → 默认 0
+	}
+
+	bool ShapeModeManagerBun::setUserOffset(const std::string& modelId,
+		double offsetX, double offsetY, double offsetAngle,
+		std::string* errorMsg)
+	{
 		try
 		{
-			const double angleStart = currentModelData_.angleStart;
-			const double angleExtent = currentModelData_.angleExtent;
-			const int numLevels = currentModelData_.numLevels;
-			const double minScore = 0.5;
-			const int numMatches = 1;
-			const double maxOverlap = 0.5;
-			const std::string subPixel = "least_squares";
-			const double greediness = 0.9;
-
-			HTuple row, column, angle, score;
-			FindShapeModel(image,
-				currentModelHandle_,
-				HTuple(angleStart),
-				HTuple(angleExtent),
-				minScore,
-				numMatches,
-				maxOverlap,
-				subPixel.c_str(),
-				(numLevels > 0 ? HTuple(numLevels) : HTuple("auto")),
-				greediness,
-				&row, &column, &angle, &score);
-
-			if (score.Length() > 0 && score[0].D() >= minScore)
 			{
-				result.found = true;
-				result.row = row[0].D();
-				result.column = column[0].D();
-				result.angle = angle[0].D();
-				result.score = score[0].D();
-				result.offsetX = result.column - currentModelData_.centerX;
-				result.offsetY = result.row - currentModelData_.centerY;
+				std::unique_lock<std::shared_mutex> lk(modelCacheMutex_);
+				for (auto& m : loadedModels_)
+				{
+					if (m.modelId == modelId)
+					{
+						m.data.offsetX = offsetX;
+						m.data.offsetY = offsetY;
+						m.data.offsetAngle = offsetAngle;
+						break;
+					}
+				}
 			}
+
+			// 持久化到磁盘（model_params.txt）
+			// 需要从 infra 重新加载完整 item，替换 data 后写回
+			auto item = inf_.shape_model_manager_module_->getShapeModelItem(modelId);
+			item.data.offsetX = offsetX;
+			item.data.offsetY = offsetY;
+			item.data.offsetAngle = offsetAngle;
+			inf_.shape_model_manager_module_->changeShapeModelItem(modelId, item.data);
+
+			emit modelOffsetChanged(QString::fromStdString(modelId));
+			return true;
+		}
+		catch (const std::exception& e)
+		{
+			if (errorMsg) *errorMsg = e.what();
+			return false;
 		}
 		catch (...)
 		{
-			// 匹配失败 → found=false
+			if (errorMsg) *errorMsg = "保存偏移量失败";
+			return false;
 		}
-		return result;
+	}
+
+	// ===== 多模型匹配 =====
+
+	std::vector<MatchResult> ShapeModeManagerBun::match(const HalconCpp::HImage& image)
+	{
+		using namespace HalconCpp;
+		std::vector<MatchResult> results;
+
+		std::shared_lock<std::shared_mutex> lk(modelCacheMutex_);
+		if (loadedModels_.empty())
+			return results;
+		if (!image.IsInitialized())
+			return results;
+
+		// TODO(多模型阈值): minScore 目前硬编码 0.5，后续应支持每个模型独立的匹配阈值
+		constexpr double kMinScore = 0.5;
+		constexpr int kNumMatches = 1;
+		constexpr double kMaxOverlap = 0.5;
+		constexpr double kGreediness = 0.9;
+		const std::string kSubPixel = "least_squares";
+
+		for (const auto& model : loadedModels_)
+		{
+			if (model.handle.Length() == 0)
+				continue;
+
+			try
+			{
+				const double angleStart = model.data.angleStart;
+				const double angleExtent = model.data.angleExtent;
+				const int numLevels = model.data.numLevels;
+
+				HTuple row, column, angle, score;
+				FindShapeModel(image,
+					model.handle,
+					HTuple(angleStart),
+					HTuple(angleExtent),
+					kMinScore,
+					kNumMatches,
+					kMaxOverlap,
+					kSubPixel.c_str(),
+					(numLevels > 0 ? HTuple(numLevels) : HTuple("auto")),
+					kGreediness,
+					&row, &column, &angle, &score);
+
+				if (score.Length() > 0 && score[0].D() >= kMinScore)
+				{
+					MatchResult r;
+					r.modelId = model.modelId;
+					r.modelName = model.modelName;
+					r.found = true;
+					r.row = row[0].D();
+					r.column = column[0].D();
+					r.angle = angle[0].D();
+					r.score = score[0].D();
+					r.offsetX = r.column - model.data.centerX;
+					r.offsetY = r.row - model.data.centerY;
+					results.push_back(r);
+				}
+			}
+			catch (...)
+			{
+				// 单个模型匹配失败 → 跳过，继续下一个
+			}
+		}
+		return results;
 	}
 
 	MatchResult ShapeModeManagerBun::testRecognize(const CreateModelRequest& req,
@@ -499,14 +661,92 @@ namespace bun
 
 	void ShapeModeManagerBun::destroy()
 	{
-		unloadCurrentModel();
+		unloadAllModels();
 	}
 
 	void ShapeModeManagerBun::start()
 	{
+		// 自动恢复上次加载的模型集合
+		loadLastLoadedModels();
 	}
 
 	void ShapeModeManagerBun::stop()
 	{
+	}
+
+	// ===== 持久化：上次加载的模型 ID =====
+
+	void ShapeModeManagerBun::saveLastLoadedModels()
+	{
+		try
+		{
+			const std::string configDir = global::path::configDir();
+			std::filesystem::create_directories(configDir);
+			const std::string filePath = configDir + "last_loaded_models.json";
+
+			Json::Value root(Json::arrayValue);
+			{
+				std::shared_lock<std::shared_mutex> lk(modelCacheMutex_);
+				for (const auto& m : loadedModels_)
+					root.append(m.modelId);
+			}
+
+			// 原子写入：先写 .tmp，再重命名
+			const std::string tmpPath = filePath + ".tmp";
+			{
+				std::ofstream ofs(tmpPath, std::ios::out | std::ios::trunc);
+				if (!ofs)
+					return;
+				Json::StreamWriterBuilder builder;
+				builder["indentation"] = "  ";
+				std::unique_ptr<Json::StreamWriter> writer(builder.newStreamWriter());
+				writer->write(root, &ofs);
+				ofs << '\n';
+			}
+			std::filesystem::rename(tmpPath, filePath);
+		}
+		catch (...)
+		{
+			// 持久化失败不应影响正常流程
+		}
+	}
+
+	void ShapeModeManagerBun::loadLastLoadedModels()
+	{
+		try
+		{
+			const std::string filePath = global::path::configDir() + "last_loaded_models.json";
+			if (!std::filesystem::exists(filePath))
+				return;
+
+			Json::Value root;
+			{
+				std::ifstream ifs(filePath);
+				if (!ifs)
+					return;
+				Json::CharReaderBuilder builder;
+				builder["collectComments"] = false;
+				std::string errs;
+				if (!Json::parseFromStream(builder, ifs, &root, &errs))
+					return;
+			}
+
+			if (!root.isArray() || root.empty())
+				return;
+
+			std::vector<std::string> ids;
+			for (const auto& val : root)
+			{
+				if (val.isString())
+					ids.push_back(val.asString());
+			}
+
+			if (!ids.empty())
+				loadModels(ids);
+		}
+		catch (...)
+		{
+			// 恢复失败不阻塞启动
+		}
 	}
 }

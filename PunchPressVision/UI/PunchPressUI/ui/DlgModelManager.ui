@@ -23,10 +23,13 @@
     background-color: rgb(181, 181, 181);
     border: 1px solid #e0e0e0;
     border-radius: 15px;
+    padding-top: 28px;
 }
 QGroupBox::title {
     subcontrol-origin: margin;
+    subcontrol-position: top left;
     left: 10px;
+    top: 4px;
     padding: 0 5px;
     color: #2c3e50;
 }</string>
@@ -201,6 +204,9 @@ QComboBox::drop-down {
       </item>
       <item>
        <widget class="QListView" name="listView_modelList">
+        <property name="selectionMode">
+         <enum>QAbstractItemView::ExtendedSelection</enum>
+        </property>
         <property name="styleSheet">
          <string notr="true">QListView {
     font-size: 18px;
@@ -402,7 +408,7 @@ QPushButton:pressed {
 }</string>
             </property>
             <property name="text">
-             <string>加载模型</string>
+             <string>加载选中模型</string>
             </property>
            </widget>
           </item>
