@@ -146,6 +146,7 @@ namespace ui
 		{
 			HTuple oldW, oldH, newW, newH;
 			lastImage_.GetImageSize(&oldW, &oldH);
+
 			image.GetImageSize(&newW, &newH);
 			isNewImage = (oldW[0].I() != newW[0].I()) || (oldH[0].I() != newH[0].I());
 		}
@@ -456,6 +457,8 @@ namespace ui
 			return 1.0;
 
 		HalconCpp::HTuple iw, ih;
+
+
 		lastImage_.GetImageSize(&iw, &ih);
 		const double imgW = static_cast<double>(iw[0].I());
 		const double imgH = static_cast<double>(ih[0].I());

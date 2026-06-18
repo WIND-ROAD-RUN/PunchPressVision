@@ -555,19 +555,21 @@ namespace ui
 				AccessChannel(image, &result, channelType);
 			}
 
-			// 开运算
+			// 开运算（灰度形态学，矩形掩膜）
 			if (ui->ckb_opening->isChecked() && openingSize_ > 0)
 			{
 				HImage opened;
-				OpeningCircle(result, &opened, openingSize_);
+				const int openSize = openingSize_ * 2 + 1;
+				GrayOpeningRect(result, &opened, openSize, openSize);
 				result = opened;
 			}
 
-			// 闭运算
+			// 闭运算（灰度形态学，矩形掩膜）
 			if (ui->ckb_closing->isChecked() && closingSize_ > 0)
 			{
 				HImage closed;
-				ClosingCircle(result, &closed, closingSize_);
+				const int closeSize = closingSize_ * 2 + 1;
+				GrayClosingRect(result, &closed, closeSize, closeSize);
 				result = closed;
 			}
 
@@ -582,8 +584,20 @@ namespace ui
 
 			return result;
 		}
+		catch (const HException& e)
+		{
+			rw::rqwu::MessageBox::warning(nullptr,
+				QStringLiteral("预处理异常"),
+				QStringLiteral("Halcon 错误 (%1): %2")
+					.arg(QString::number(e.ErrorCode()),
+					     QString::fromUtf8(e.ErrorMessage().Text())));
+			return image;
+		}
 		catch (...)
 		{
+			rw::rqwu::MessageBox::warning(nullptr,
+				QStringLiteral("预处理异常"),
+				QStringLiteral("未知错误"));
 			return image;
 		}
 	}
@@ -704,8 +718,9 @@ namespace ui
 		if (data.centerX != 0.0 || data.centerY != 0.0)
 			shapeEditor_->setCenterPoint(QPointF(data.centerX, data.centerY));
 
-		// 恢复预处理参数
+		// 恢复预处理参数并刷新显示
 		restoreParamsFromModel(data);
+		refreshProcessedImage();
 	}
 
 	void ModelEditorDialog::restoreParamsFromModel(const Config::ShapeModelData& data)

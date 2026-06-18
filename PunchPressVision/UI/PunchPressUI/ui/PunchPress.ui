@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>PunchPressClass</class>
  <widget class="QMainWindow" name="PunchPressClass">
@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>2047</width>
-    <height>1213</height>
+    <width>1114</width>
+    <height>828</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -34,7 +34,7 @@ QGroupBox::title {
 }</string>
       </property>
       <property name="title">
-       <string />
+       <string/>
       </property>
       <layout class="QVBoxLayout" name="vLayout_image" stretch="9">
        <item>
@@ -46,7 +46,7 @@ QGroupBox::title {
           </sizepolicy>
          </property>
          <property name="text">
-          <string />
+          <string/>
          </property>
         </widget>
        </item>
@@ -73,7 +73,7 @@ QGroupBox::title {
 }</string>
         </property>
         <property name="title">
-         <string />
+         <string/>
         </property>
         <layout class="QVBoxLayout" name="vLayout_head">
          <item>
@@ -114,7 +114,7 @@ QPushButton:pressed {
 }</string>
              </property>
              <property name="text">
-              <string />
+              <string/>
              </property>
             </widget>
            </item>
@@ -158,7 +158,7 @@ QPushButton:pressed {
                 <string notr="true">color: rgb(232, 232, 232);</string>
                </property>
                <property name="text">
-                <string />
+                <string/>
                </property>
               </widget>
              </item>
@@ -193,7 +193,7 @@ QPushButton:pressed {
                 <string notr="true">color: rgb(232, 232, 232);</string>
                </property>
                <property name="text">
-                <string />
+                <string/>
                </property>
               </widget>
              </item>
@@ -228,7 +228,7 @@ QPushButton:pressed {
                 <string notr="true">color: rgb(232, 232, 232);</string>
                </property>
                <property name="text">
-                <string />
+                <string/>
                </property>
               </widget>
              </item>
@@ -257,7 +257,7 @@ QGroupBox::title {
 }</string>
         </property>
         <property name="title">
-         <string />
+         <string/>
         </property>
         <layout class="QVBoxLayout" name="vLayout_info">
          <item>
@@ -755,7 +755,7 @@ QGroupBox::title {
 }</string>
         </property>
         <property name="title">
-         <string />
+         <string/>
         </property>
         <layout class="QVBoxLayout" name="vLayout_tools">
          <item>
@@ -928,11 +928,11 @@ QGroupBox::title {
 }</string>
         </property>
         <property name="title">
-         <string />
+         <string/>
         </property>
         <layout class="QVBoxLayout" name="vLayout_table">
          <item>
-          <widget class="QTableWidget" name="tableWidget_info" />
+          <widget class="QTableWidget" name="tableWidget_info"/>
          </item>
         </layout>
        </widget>
@@ -955,13 +955,14 @@ QGroupBox::title {
 }</string>
         </property>
         <property name="title">
-         <string />
+         <string/>
         </property>
         <layout class="QHBoxLayout" name="hLayout_companyInfo">
          <item>
           <widget class="QLabel" name="label_companyInfo">
            <property name="font">
             <font>
+             <pointsize>-1</pointsize>
              <bold>true</bold>
             </font>
            </property>
@@ -975,7 +976,7 @@ QGroupBox::title {
 }</string>
            </property>
            <property name="text">
-            <string />
+            <string/>
            </property>
           </widget>
          </item>
@@ -987,7 +988,7 @@ QGroupBox::title {
    </layout>
   </widget>
  </widget>
- <layoutdefault spacing="6" margin="11" />
- <resources />
- <connections />
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
 </ui>
