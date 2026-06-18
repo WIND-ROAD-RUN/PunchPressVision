@@ -307,12 +307,17 @@ namespace app
 		if (currentMode_.load(std::memory_order_acquire) == global::RunMode::Idle)
 			return;
 
-		// 转发给 UI 显示（跨线程由接收方用 QueuedConnection 处理）
-		emit frameReady(image);
-
-		// 工作模式下执行定位流水线
 		if (currentMode_.load(std::memory_order_acquire) == global::RunMode::Production)
+		{
+			// 工作模式：由 processProductionFrame 完成匹配、绘制匹配位置并发送标注后图像到 UI
 			processProductionFrame(image);
+		}
+		else
+		{
+			// 非工作模式（Debug / CreateModel）：直接转发原始图像到 UI 显示
+			// 跨线程由接收方用 QueuedConnection 处理
+			emit frameReady(image);
+		}
 	}
 
 	void PunchPressApp::onCameraConnectionChanged(global::CameraIndex idx, bool connected, QString reason)
@@ -336,7 +341,10 @@ namespace app
 	void PunchPressApp::processProductionFrame(const HalconCpp::HImage& image)
 	{
 		if (!business_.shape_mode_manager_bun)
+		{
+			emit frameReady(image);
 			return;
+		}
 
 		// 多模型匹配：遍历所有已加载模型
 		std::vector<bun::MatchResult> matches = business_.shape_mode_manager_bun->match(image);
@@ -346,6 +354,9 @@ namespace app
 			[](const bun::MatchResult& a, const bun::MatchResult& b) {
 				return a.score < b.score;
 			});
+
+		// 准备显示图像（默认原始图像，匹配成功时叠加标注）
+		HalconCpp::HImage displayImage = image;
 
 		if (best != matches.end() && best->found)
 		{
@@ -387,6 +398,26 @@ namespace app
 				const auto& plc = inf.config_module_->plcAddressCfg;
 				writePositionToPLC(result, *inf.control_module_, plc);
 			}
+
+			// 在工作图像上绘制匹配位置（红色十字线，与模板角度对齐）
+			try
+			{
+				HalconCpp::HTuple imgW, imgH;
+				image.GetImageSize(&imgW, &imgH);
+				HalconCpp::HTuple bufWin;
+				HalconCpp::OpenWindow(0, 0, imgW[0].I(), imgH[0].I(), 0, "buffer", "", &bufWin);
+				HalconCpp::SetPart(bufWin, 0, 0, imgH[0].I() - 1, imgW[0].I() - 1);
+				HalconCpp::DispObj(image, bufWin);
+				HalconCpp::SetColor(bufWin, "red");
+				HalconCpp::SetLineWidth(bufWin, 2);
+				HalconCpp::DispCross(bufWin, best->row, best->column, 60.0, best->angle);
+				HalconCpp::DumpWindowImage(&displayImage, bufWin);
+				HalconCpp::CloseWindow(bufWin);
+			}
+			catch (...)
+			{
+				displayImage = image;  // 绘制失败时回退到原始图像
+			}
 		}
 		else
 		{
@@ -400,5 +431,8 @@ namespace app
 				writePositionToPLC(result, *inf.control_module_, inf.config_module_->plcAddressCfg);
 			}
 		}
+
+		// 发送图像到 UI 显示（跨线程由接收方用 QueuedConnection 处理）
+		emit frameReady(displayImage);
 	}
 }
