@@ -182,10 +182,10 @@ namespace ui
 
 	static QString contrastSummary(const Config::ShapeModelData& d)
 	{
-		// maxContrast==0  or (maxContrast==5 && minContrast==3) → auto default
-		if (d.maxContrast == 0)
+		// contrast==0 → auto default
+		if (d.contrast == 0)
 			return QStringLiteral("自动");
-		return QStringLiteral("手动 %1 / %2").arg(d.maxContrast).arg(d.minContrast);
+		return QStringLiteral("手动 %1 / %2").arg(d.contrast).arg(d.minContrast);
 	}
 
 	void ModelManagerDialog::refreshModelDetail(int row)

@@ -45,6 +45,9 @@ namespace Config
 
 		int findnumber = 0;
 
+		// 单通道类型 (0=灰度, 1=R, 2=G, 3=B, 4=H, 5=S, 6=V)
+		int _SingleChannelType = 0;
+
 		// 创建模板时的曝光、增益、光源
 		double _createModelExposureTime = 0.0;
 		double _createModelGain = 0.0;

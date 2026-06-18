@@ -173,6 +173,7 @@ namespace Config
 			double findCenterX, double findCenterY,
 			double offsetX, double offsetY, double offsetAngle,
 			int findNumber,
+			int singleChannelType,
 			double createModelExposureTime, double createModelGain,
 			bool upperLight, bool lowerLight,
 			bool createModelUseOpening, int createModelOpeningRadius,
@@ -198,6 +199,7 @@ namespace Config
 			ofs << "offsetY=" << offsetY << '\n';
 			ofs << "offsetAngle=" << offsetAngle << '\n';
 			ofs << "findnumber=" << findNumber << '\n';
+			ofs << "singleChannelType=" << singleChannelType << '\n';
 			ofs << "createModelExposureTime=" << createModelExposureTime << '\n';
 			ofs << "createModelGain=" << createModelGain << '\n';
 			ofs << "upperLight=" << (upperLight ? 1 : 0) << '\n';
@@ -234,6 +236,7 @@ namespace Config
 			double& findCenterX, double& findCenterY,
 			double& offsetX, double& offsetY, double& offsetAngle,
 			int& findNumber,
+			int& singleChannelType,
 			double& createModelExposureTime, double& createModelGain,
 			bool& upperLight, bool& lowerLight,
 			bool& createModelUseOpening, int& createModelOpeningRadius,
@@ -280,6 +283,8 @@ namespace Config
 						offsetAngle = std::stod(value);
 					else if (key == "findnumber")
 						findNumber = std::stoi(value);
+					else if (key == "singleChannelType")
+						singleChannelType = std::stoi(value);
 					else if (key == "createModelExposureTime")
 						createModelExposureTime = std::stod(value);
 					else if (key == "createModelGain")
@@ -341,6 +346,7 @@ namespace Config
 				findCenterX, findCenterY,
 				offsetX, offsetY, offsetAngle,
 				findnumber,
+				_SingleChannelType,
 				_createModelExposureTime, _createModelGain,
 				upperLight, lowerLight,
 				_createModelUseOpening, _createModelOpeningRadius,
@@ -416,6 +422,7 @@ namespace Config
 				findCenterX, findCenterY,
 				offsetX, offsetY, offsetAngle,
 				findnumber,
+				_SingleChannelType,
 				_createModelExposureTime, _createModelGain,
 				upperLight, lowerLight,
 				_createModelUseOpening, _createModelOpeningRadius,
