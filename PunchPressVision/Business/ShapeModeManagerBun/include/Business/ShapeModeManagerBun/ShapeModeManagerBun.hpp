@@ -135,6 +135,8 @@ namespace bun
 		bool loadModel(const std::string& id, std::string* errorMsg = nullptr);
 		/// <summary>卸载所有已加载模型并释放 Halcon 句柄。</summary>
 		void unloadAllModels();
+		/// <summary>卸载指定模型。返回 true 表示成功移除。</summary>
+		bool unloadModel(const std::string& id);
 		/// <summary>卸载所有模型（兼容旧接口）。</summary>
 		void unloadCurrentModel();
 		bool isModelLoaded() const;

@@ -56,6 +56,8 @@ namespace ui
 		void refreshLoadedModelsList();
 		/// <summary>双击表格行 → 打开偏移量编辑对话框。</summary>
 		void openOffsetEditor(int row, int column);
+		/// <summary>右键菜单 → 卸载指定模型。</summary>
+		void onTableContextMenu(const QPoint& pos);
 
 		// 相机参数（曝光/增益）
 		void onExposure1Clicked();

@@ -410,6 +410,26 @@ namespace bun
 		emit modelsUnloaded();
 	}
 
+	bool ShapeModeManagerBun::unloadModel(const std::string& id)
+	{
+		{
+			std::unique_lock<std::shared_mutex> lk(modelCacheMutex_);
+			const auto it = std::find_if(loadedModels_.begin(), loadedModels_.end(),
+				[&id](const LoadedModel& m) { return m.modelId == id; });
+			if (it == loadedModels_.end())
+				return false;
+			loadedModels_.erase(it);  // HTuple 析构自动释放 Halcon 句柄
+		}
+
+		if (loadedModels_.empty())
+			emit modelsUnloaded();
+		else
+			emit modelListChanged();  // 触发 UI 刷新
+
+		saveLastLoadedModels();
+		return true;
+	}
+
 	void ShapeModeManagerBun::unloadCurrentModel()
 	{
 		unloadAllModels();

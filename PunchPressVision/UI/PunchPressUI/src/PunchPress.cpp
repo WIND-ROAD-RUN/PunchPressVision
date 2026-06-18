@@ -12,6 +12,7 @@
 #include <QHeaderView>
 #include <QLabel>
 #include <QLayout>
+#include <QMenu>
 #include <QShowEvent>
 #include <QResizeEvent>
 #include <QStatusBar>
@@ -128,9 +129,14 @@ namespace ui
 		loadedModelsTable_->horizontalHeader()->setSectionResizeMode(6, QHeaderView::ResizeToContents);
 		loadedModelsTable_->horizontalHeader()->setSectionResizeMode(7, QHeaderView::ResizeToContents);
 
-		// 双击行 → 编辑偏移量
+		// 双击行 → 编辑参数
 		connect(loadedModelsTable_, &QTableWidget::cellDoubleClicked,
 			this, &PunchPress::openOffsetEditor);
+
+		// 右键菜单 → 卸载模型
+		loadedModelsTable_->setContextMenuPolicy(Qt::CustomContextMenu);
+		connect(loadedModelsTable_, &QTableWidget::customContextMenuRequested,
+			this, &PunchPress::onTableContextMenu);
 
 		groupLayout->addWidget(loadedModelsTable_);
 
@@ -694,5 +700,44 @@ namespace ui
 				QString::fromStdString(err));
 		}
 		// 表格刷新由 modelOffsetChanged / matchParamsChanged 信号触发
+	}
+
+	void PunchPress::onTableContextMenu(const QPoint& pos)
+	{
+		auto& bun = app_.business().shape_mode_manager_bun;
+		if (!bun)
+			return;
+
+		// 获取右键点击的行
+		const QModelIndex index = loadedModelsTable_->indexAt(pos);
+		if (!index.isValid())
+			return;
+
+		const int row = index.row();
+		auto* nameItem = loadedModelsTable_->item(row, 0);
+		if (!nameItem)
+			return;
+
+		const QString modelId = nameItem->data(Qt::UserRole).toString();
+		if (modelId.isEmpty())
+			return;
+
+		const QString modelName = nameItem->text().mid(2);  // 去掉 "● " 前缀
+
+		QMenu menu(this);
+		menu.setStyleSheet(QStringLiteral(
+			"QMenu { font-size: 16px; padding: 4px; }"
+			"QMenu::item { padding: 8px 24px; }"
+			"QMenu::item:selected { background-color: #E3F2FD; color: #1976D2; }"));
+
+		QAction* unloadAction = menu.addAction(QStringLiteral("卸载 \"%1\"").arg(modelName));
+		auto* bunPtr = bun.get();
+		connect(unloadAction, &QAction::triggered, this, [this, bunPtr, modelId]()
+		{
+			bunPtr->unloadModel(modelId.toStdString());
+			// 表格刷新由 modelListChanged / modelsUnloaded 信号自动触发
+		});
+
+		menu.exec(loadedModelsTable_->viewport()->mapToGlobal(pos));
 	}
 }
