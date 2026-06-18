@@ -47,8 +47,8 @@ namespace bun
 		int meanSize{ 5 };
 
 		// 训练参数
-		double angleStart{ -3.14 };
-		double angleExtent{ 6.28 };
+		double angleStart{ -0.3 };
+		double angleExtent{0.79 };
 		int contrast{ 30 };
 		int minContrast{ 10 };
 		double minScore{ 0.5 };
@@ -63,6 +63,10 @@ namespace bun
 		double column{ 0.0 };
 		double angle{ 0.0 };
 		double score{ 0.0 };
+		double realX{ 0.0 }; 
+
+		double realY{ 0.0 };
+
 		double offsetX{ 0.0 };
 		double offsetY{ 0.0 };
 		bool found{ false };
@@ -175,6 +179,10 @@ namespace bun
 		// 创建/更新模型共用的数据生成逻辑
 		bool createModelInternal(const CreateModelRequest& req,
 			Config::ShapeModelData& outData, std::string* errorMsg);
+
+		// 对图像应用与创建模板时相同的预处理（通道提取、开/闭运算、均值滤波）
+		HalconCpp::HImage preprocessImage(const HalconCpp::HImage& image,
+			const Config::ShapeModelData& data) const;
 
 		// 已加载的模型集合（加载顺序即匹配优先级）
 		std::vector<LoadedModel> loadedModels_;

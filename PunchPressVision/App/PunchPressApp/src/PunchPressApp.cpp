@@ -368,26 +368,9 @@ namespace app
 			result.modelId = best->modelId;
 			result.modelName = best->modelName;
 
-			// 像素坐标 → 世界坐标（若九点标定矩阵就绪）
-			bool converted = false;
-			if (business_.nine_point_bun && inf.nine_point_module_)
-			{
-				const auto& homMat = inf.nine_point_module_->ninePointConfig.outHomMat2D;
-				double wx = 0.0, wy = 0.0;
-				if (homMat.Length() >= 6 &&
-					business_.nine_point_bun->pixToWorld(homMat, best->column, best->row, wx, wy))
-				{
-					result.offsetX = wx;
-					result.offsetY = wy;
-					converted = true;
-				}
-			}
-			if (!converted)
-			{
-				// 回退到像素偏移（未标定时）
-				result.offsetX = best->offsetX;
-				result.offsetY = best->offsetY;
-			}
+			// match() 已完成像素→世界坐标转换，直接使用
+			result.offsetX = best->offsetX;
+			result.offsetY = best->offsetY;
 			result.angle = best->angle;
 
 			emit positionResultReady(result);

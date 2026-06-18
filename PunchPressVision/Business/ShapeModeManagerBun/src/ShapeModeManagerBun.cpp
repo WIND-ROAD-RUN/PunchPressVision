@@ -1,5 +1,6 @@
 #include "Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp"
 
+#include <cmath>
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
@@ -77,13 +78,13 @@ namespace bun
 			HTuple matchRow, matchCol, matchAngle, matchScore;
 			FindShapeModel(templateImage,
 				modelID,
-				HTuple(req.angleStart),
-				HTuple(req.angleExtent),
+				0,
+				HalconCpp::HTuple(360).TupleRad(),
 				0.5,    // MinScore
 				1,      // NumMatches
 				0.5,    // MaxOverlap
 				"least_squares",
-				HTuple("auto"),                                     // NumLevels
+				0,                                    // NumLevels
 				0.9,    // Greediness
 				&matchRow, &matchCol, &matchAngle, &matchScore);
 
@@ -506,6 +507,82 @@ namespace bun
 
 	// ===== 多模型匹配 =====
 
+	HalconCpp::HImage ShapeModeManagerBun::preprocessImage(const HalconCpp::HImage& image,
+		const Config::ShapeModelData& data) const
+	{
+		using namespace HalconCpp;
+		if (!image.IsInitialized())
+			return image;
+
+		try
+		{
+			HImage result = image;
+
+			// 1. 通道提取（与创建模板时一致）
+			HTuple channels;
+			CountChannels(image, &channels);
+			const int channelType = data._createModelPreProcessType;
+			if (channels[0].I() >= 3)
+			{
+				switch (channelType)
+				{
+				case 0: // 灰度
+					Rgb1ToGray(image, &result);
+					break;
+				case 1: // 红
+					AccessChannel(image, &result, 1);
+					break;
+				case 2: // 绿
+					AccessChannel(image, &result, 2);
+					break;
+				case 3: // 蓝
+					AccessChannel(image, &result, 3);
+					break;
+				default:
+					break;
+				}
+			}
+			else if (channelType != 0 && channels[0].I() >= channelType)
+			{
+				AccessChannel(image, &result, channelType);
+			}
+
+			// 2. 开运算（灰度形态学，矩形掩膜）
+			if (data._createModelUseOpening && data._createModelOpeningRadius > 0)
+			{
+				HImage opened;
+				const int openSize = data._createModelOpeningRadius * 2 + 1;
+				GrayOpeningRect(result, &opened, openSize, openSize);
+				result = opened;
+			}
+
+			// 3. 闭运算（灰度形态学，矩形掩膜）
+			if (data._createModelUseClosing && data._createModelClosingRadius > 0)
+			{
+				HImage closed;
+				const int closeSize = data._createModelClosingRadius * 2 + 1;
+				GrayClosingRect(result, &closed, closeSize, closeSize);
+				result = closed;
+			}
+
+			// 4. 均值滤波
+			if (data._createModelUseMean && data._createModelMeanRadius > 0)
+			{
+				HImage smoothed;
+				const int size = data._createModelMeanRadius * 2 + 1;
+				MeanImage(result, &smoothed, size, size);
+				result = smoothed;
+			}
+
+			return result;
+		}
+		catch (const HException&)
+		{
+			// 预处理失败时返回原图，不阻断匹配流程
+			return image;
+		}
+	}
+
 	std::vector<MatchResult> ShapeModeManagerBun::match(const HalconCpp::HImage& image)
 	{
 		std::vector<MatchResult> results;
@@ -513,15 +590,31 @@ namespace bun
 		if (!image.IsInitialized())
 			return results;
 
+		// 获取九点标定矩阵（所有模型共用同一个标定矩阵）
+		HalconCpp::HTuple homMat2D;
+		bool hasNinePoint = false;
+		if (inf_.nine_point_module_ && inf_tool_.nine_point_bun)
+		{
+			const auto& cfg = inf_.nine_point_module_->ninePointConfig;
+			if (cfg.outHomMat2D.TupleLength() >= 6)
+			{
+				homMat2D = cfg.outHomMat2D;
+				hasNinePoint = true;
+			}
+		}
+
 		std::shared_lock<std::shared_mutex> lk(modelCacheMutex_);
 
 		for (const auto& model : loadedModels_)
 		{
 			try
 			{
+				// 对图像应用与创建模板时相同的预处理
+				HalconCpp::HImage processed = preprocessImage(image, model.data);
+
 				HalconCpp::HTuple row, column, angle, score;
 				HalconCpp::FindShapeModel(
-					image,
+					processed,
 					model.handle,
 					HalconCpp::HTuple(model.data.angleStart),
 					HalconCpp::HTuple(model.data.angleExtent),
@@ -529,23 +622,80 @@ namespace bun
 					1,                                                  // NumMatches
 					0.5,                                                // MaxOverlap
 					"least_squares",                                    // SubPixel
-					HalconCpp::HTuple(0),                                   // NumLevels (0 = 使用全部金字塔层级)
+					HalconCpp::HTuple(0),                                // NumLevels (0 = 使用全部金字塔层级)
 					0.9,                                                // Greediness
 					&row, &column, &angle, &score);
 
 				if (score.Length() > 0 && score[0].D() >= model.data.minScore)
 				{
+					const double matchRow = row[0].D();
+					const double matchCol = column[0].D();
+					const double matchAngle = angle[0].D();
+
+					// 自定义中心点相对于模板参考点的偏移（模型局部坐标系）
+					const double localRow = model.data.centerY - model.data.findCenterY;
+					const double localCol = model.data.centerX - model.data.findCenterX;
+
+					// 将自定义中心点从模型局部坐标系变换到当前匹配位置
+					HalconCpp::HTuple matchHomMat2D;
+					HalconCpp::VectorAngleToRigid(
+						0.0, 0.0, 0.0,
+						matchRow, matchCol, matchAngle,
+						&matchHomMat2D);
+
+					double customRow = matchRow, customCol = matchCol;
+					if (std::abs(localRow) > 1e-9 || std::abs(localCol) > 1e-9)
+					{
+						HalconCpp::HTuple htCustomRow, htCustomCol;
+						HalconCpp::AffineTransPoint2d(
+							matchHomMat2D,
+							HalconCpp::HTuple(localRow), HalconCpp::HTuple(localCol),
+							&htCustomRow, &htCustomCol);
+						customRow = htCustomRow[0].D();
+						customCol = htCustomCol[0].D();
+					}
+
 					MatchResult result;
 					result.found = true;
 					result.modelId = model.modelId;
 					result.modelName = model.modelName;
-					result.row = row[0].D();
-					result.column = column[0].D();
-					result.angle = angle[0].D() + model.data.offsetAngle;
+					// 自定义中心点的像素坐标（供上层绘图）
+					result.row = customRow;
+					result.column = customCol;
 					result.score = score[0].D();
-					// 像素偏移 = 匹配位置 − 模型中心 + 用户补偿
-					result.offsetX = column[0].D() - model.data.centerX + model.data.offsetX;
-					result.offsetY = row[0].D() - model.data.centerY + model.data.offsetY;
+
+					// 像素 → 世界坐标（九点标定）
+					if (hasNinePoint)
+					{
+						double worldX = 0.0, worldY = 0.0;
+						if (inf_tool_.nine_point_bun->pixToWorld(homMat2D,
+							customCol, customRow, worldX, worldY))
+						{
+							result.realX = worldX;
+							result.realY = worldY;
+						}
+						else
+						{
+							// 标定转换失败，回退到像素坐标
+							result.realX = customCol;
+							result.realY = customRow;
+						}
+					}
+					else
+					{
+						// 无九点标定，直接使用像素坐标
+						result.realX = customCol;
+						result.realY = customRow;
+					}
+
+					// 偏移量 = 世界坐标 + 用户补偿（供 PLC 写入）
+					result.offsetX = result.realX + model.data.offsetX;
+					result.offsetY = result.realY + model.data.offsetY;
+
+					// 角度补偿（offsetAngle 为角度制，Halcon 返回的是弧度制）
+					const double offsetAngleRad = model.data.offsetAngle * M_PI / 180.0;
+					result.angle = matchAngle + offsetAngleRad;
+
 					results.push_back(result);
 				}
 			}
