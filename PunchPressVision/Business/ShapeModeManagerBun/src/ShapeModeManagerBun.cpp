@@ -30,6 +30,7 @@ namespace bun
 
 			// 1. 在 ROI 内裁剪模板图（若提供了 ROI）
 			HImage templateImage = req.trainingImage;
+			double findcenterX = 0.0, findcenterY = 0.0;
 			double centerX = 0.0, centerY = 0.0;
 			if (req.roi.IsInitialized())
 			{
@@ -37,7 +38,7 @@ namespace bun
 				AreaCenter(req.roi, &area, &row, &col);
 				if (area.Length() > 0 && area[0].D() > 0)
 				{
-					centerY = row[0].D();
+					findcenterX = row[0].D();
 					centerX = col[0].D();
 					HObject reduced;
 					ReduceDomain(req.trainingImage, req.roi, &reduced);
@@ -55,12 +56,9 @@ namespace bun
 				templateImage = HImage(reduced);
 			}
 
-			// 使用手动指定的中心点（优先于 ROI 形心）
-			if (req.hasCenterPoint)
-			{
-				centerX = req.centerPoint.x();
-				centerY = req.centerPoint.y();
-			}
+			
+			
+			
 
 			// 2. 创建 Shape Model
 			HTuple modelID;
@@ -97,9 +95,22 @@ namespace bun
 			}
 
 			// 找到模型中心，作为模板中心点
-			centerX = matchCol[0].D();
-			centerY = matchRow[0].D();
+			findcenterX = matchCol[0].D();
+			findcenterY = matchRow[0].D();
 
+			// 使用手动指定的中心点（优先于 ROI 形心）
+			if (req.hasCenterPoint)
+			{
+				centerX = req.centerPoint.x();
+				centerY = req.centerPoint.y();
+			}
+			else
+			{
+				centerX = findcenterX;
+				centerY = findcenterY;
+
+
+			}
 			// 4. 准备模型数据
 			outData._templateMatImage = templateImage;
 			outData._originalImage = req.rawImage.IsInitialized() ? req.rawImage : req.trainingImage;
@@ -110,6 +121,8 @@ namespace bun
 			outData.lowerLight = req.lowerLight;
 			outData.centerX = centerX;
 			outData.centerY = centerY;
+			outData.findCenterX = findcenterX;
+			outData.findCenterY = findcenterY;
 
 			// 图像预处理参数
 			outData._createModelPreProcessType = req.imageChannelType;
