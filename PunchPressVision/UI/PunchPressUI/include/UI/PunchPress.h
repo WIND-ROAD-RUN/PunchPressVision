@@ -15,6 +15,8 @@ QT_END_NAMESPACE
 
 namespace app { class PunchPressApp; }
 class QButtonGroup;
+class QGroupBox;
+class QListWidget;
 class QPushButton;
 
 namespace ui
@@ -50,6 +52,8 @@ namespace ui
 
 		// 模型管理
 		void onModelManager();
+		/// <summary>刷新右侧栏已加载模型列表。</summary>
+		void refreshLoadedModelsList();
 
 		// 相机参数（曝光/增益）
 		void onExposure1Clicked();
@@ -93,6 +97,10 @@ namespace ui
 
 		// 图像显示控件（替换 ui->label_imgDisplay 的 QLabel 占位）
 		HalconInteractiveLabel* imageView_{ nullptr };
+
+		// 右侧栏：已加载模型列表
+		QGroupBox* loadedModelsGroup_{ nullptr };
+		QListWidget* loadedModelsList_{ nullptr };
 
 		// 本地缓存的 UI 所需配置
 		Config::cameraCfg cameraCfg_;

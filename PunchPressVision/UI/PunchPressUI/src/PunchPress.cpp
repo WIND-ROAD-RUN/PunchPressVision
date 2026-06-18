@@ -7,13 +7,17 @@
 #include "ui_PunchPress.h"
 
 #include <QButtonGroup>
+#include <QGroupBox>
 #include <QLabel>
 #include <QLayout>
+#include <QListWidget>
 #include <QShowEvent>
 #include <QResizeEvent>
 #include <QStatusBar>
+#include <QVBoxLayout>
 
 #include "app/PunchPressApp.hpp"
+#include "Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp"
 #include "UI/HalconInteractiveLabel.h"
 #include "UI/ModelManagerDialog.h"
 
@@ -47,6 +51,53 @@ namespace ui
 		lightGroup_->addButton(ui->rbtn_downLight);
 
 		setupImageView();
+
+		// === 右侧栏：已加载模型列表 ===
+		loadedModelsGroup_ = new QGroupBox(QStringLiteral("已加载模型"), this);
+		loadedModelsGroup_->setStyleSheet(QStringLiteral(
+			"QGroupBox {"
+			"  font-size: 20px;"
+			"  font-weight: bold;"
+			"  background-color: rgb(181, 181, 181);"
+			"  border: 1px solid #e0e0e0;"
+			"  border-radius: 15px;"
+			"}"
+			"QGroupBox::title {"
+			"  subcontrol-origin: margin;"
+			"  left: 10px;"
+			"  padding: 0 5px;"
+			"  color: #2c3e50;"
+			"}"));
+
+		auto* groupLayout = new QVBoxLayout(loadedModelsGroup_);
+
+		loadedModelsList_ = new QListWidget(this);
+		loadedModelsList_->setStyleSheet(QStringLiteral(
+			"QListWidget {"
+			"  font-size: 16px;"
+			"  color: #444;"
+			"  background-color: white;"
+			"  border: 1px solid #DDD;"
+			"  border-radius: 4px;"
+			"  padding: 4px;"
+			"}"
+			"QListWidget::item {"
+			"  padding: 6px 10px;"
+			"  border-bottom: 1px solid #EEE;"
+			"}"
+			"QListWidget::item:selected {"
+			"  background-color: #E3F2FD;"
+			"  color: #444;"
+			"}"));
+		loadedModelsList_->setMaximumHeight(160);
+		loadedModelsList_->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+		loadedModelsList_->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+		loadedModelsList_->setSelectionMode(QAbstractItemView::NoSelection);
+		loadedModelsList_->setFocusPolicy(Qt::NoFocus);
+		groupLayout->addWidget(loadedModelsList_);
+
+		// 插入到右侧控制栏：gBox_tools 之后、gBox_table 之前（索引 3）
+		ui->vLayout_control->insertWidget(3, loadedModelsGroup_);
 	}
 
 	PunchPress::~PunchPress()
@@ -108,6 +159,19 @@ namespace ui
 		connect(ui->pbtn_gain2, &QPushButton::clicked, this, &PunchPress::onGain2Clicked);
 		connect(ui->pbtn_modelManager, &QPushButton::clicked, this, &PunchPress::onModelManager);
 		connect(ui->pbtn_exit, &QPushButton::clicked, this, &PunchPress::onExit);
+
+		// 模型加载/卸载 → 刷新右侧栏列表
+		auto& bun = app_.business().shape_mode_manager_bun;
+		if (bun)
+		{
+			connect(bun.get(), &bun::ShapeModeManagerBun::modelsLoaded,
+				this, &PunchPress::refreshLoadedModelsList);
+			connect(bun.get(), &bun::ShapeModeManagerBun::modelsUnloaded,
+				this, &PunchPress::refreshLoadedModelsList);
+		}
+
+		// 初始化列表内容（模型可能在 build 之前已加载）
+		refreshLoadedModelsList();
 	}
 
 	void PunchPress::setupImageView()
@@ -413,5 +477,40 @@ namespace ui
 	void PunchPress::onStartupCheckFailed(const QString& reason)
 	{
 		rw::rqwu::MessageBox::critical(this, QStringLiteral("启动检查失败"), reason);
+	}
+
+	void PunchPress::refreshLoadedModelsList()
+	{
+		if (!loadedModelsList_)
+			return;
+
+		loadedModelsList_->clear();
+
+		auto& bun = app_.business().shape_mode_manager_bun;
+		if (!bun || !bun->isModelLoaded())
+			return;
+
+		const auto ids = bun->getLoadedModelIds();
+		const auto allModels = bun->getAllModels();
+
+		// 用已加载 ID 查找模型名称并添加到列表
+		for (const auto& id : ids)
+		{
+			QString name;
+			for (const auto& info : allModels)
+			{
+				if (info.getId() == id)
+				{
+					name = QString::fromStdString(info.base_info.name);
+					break;
+				}
+			}
+			if (name.isEmpty())
+				name = QString::fromStdString(id);  // 兜底：使用 ID
+
+			auto* item = new QListWidgetItem(QStringLiteral("● ") + name);
+			item->setForeground(QColor(0x2196F3));
+			loadedModelsList_->addItem(item);
+		}
 	}
 }
