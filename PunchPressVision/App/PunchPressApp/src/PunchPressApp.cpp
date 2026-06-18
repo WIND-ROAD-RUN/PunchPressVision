@@ -222,12 +222,6 @@ namespace app
 		return ok;
 	}
 
-	bool PunchPressApp::configureCameraForCalibration()
-	{
-		// 自由运行模式，1fps（测试用，FR-011）
-		return configureCameraForDebug();
-	}
-
 	bool PunchPressApp::configureCameraForIdle()
 	{
 		// 空闲/停止模式：触发模式（软件触发），不开始取流，由 switchToMode 统一停止 monitor
@@ -247,7 +241,7 @@ namespace app
 		return configureCameraForDebug();
 	}
 
-	// ===== 模式切换状态机（FR-005 ~ FR-020）=====
+	// ===== 模式切换状态机（FR-005 ~ FR-010）=====
 
 	bool PunchPressApp::switchToMode(global::RunMode mode, QString* errorMsg)
 	{
@@ -259,7 +253,6 @@ namespace app
 		switch (mode)
 		{
 		case global::RunMode::Debug:
-		case global::RunMode::Splice:
 		{
 			if (!checkCalibReadiness().allReady())
 			{
@@ -278,15 +271,6 @@ namespace app
 			}
 			break;
 		}
-		case global::RunMode::CalibNinePoint:
-		{
-			if (!checkCalibReadiness().distortionReady)
-			{
-				// 提示但不强制
-				if (errorMsg) *errorMsg = QStringLiteral("建议先完成畸变矫正标定");
-			}
-			break;
-		}
 		default:
 			break;
 		}
@@ -295,13 +279,10 @@ namespace app
 		currentMode_.store(mode, std::memory_order_release);
 		switch (mode)
 		{
-		case global::RunMode::Idle: configureCameraForIdle(); break;
-		case global::RunMode::Debug: configureCameraForDebug(); break;
-		case global::RunMode::Production: configureCameraForProduction(); break;
+		case global::RunMode::Idle:        configureCameraForIdle(); break;
+		case global::RunMode::Debug:       configureCameraForDebug(); break;
+		case global::RunMode::Production:  configureCameraForProduction(); break;
 		case global::RunMode::CreateModel: configureCameraForCreateModel(); break;
-		case global::RunMode::CalibDistortion:
-		case global::RunMode::CalibNinePoint:
-		case global::RunMode::Splice: configureCameraForCalibration(); break;
 		default: break;
 		}
 

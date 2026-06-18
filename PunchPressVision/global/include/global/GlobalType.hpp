@@ -9,15 +9,14 @@ namespace global
 		Camera2     // 右相机 / 相机 B
 	};
 
-	// 运行模式
+	// 运行模式（App 层）
+	// 注意：畸变矫正、九点标定、双相机拼接已下沉至 infTool 层，不再作为 App 层模式。
+	// 相关功能由独立工具程序提供，标定结果被主应用生产模式消费。
 	enum class RunMode
 	{
 		Idle,               // 空闲/停止状态：相机为触发模式且不取流，业务层不处理图像
 		Debug,              // 调试模式（FR-005 ~ FR-007）
 		Production,         // 工作模式（FR-008 ~ FR-010）
-		CalibDistortion,    // 畸变矫正模式（FR-011 ~ FR-014）
-		CalibNinePoint,     // 九点标定模式（FR-015 ~ FR-018）
-		Splice,             // 双相机拼接模式（FR-019 ~ FR-020）
 		CreateModel         // 创建模型模式：相机自由运行取流，图像实时刷新到模型编辑器
 	};
 

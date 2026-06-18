@@ -30,7 +30,7 @@ namespace app
 		void start();
 		void stop();
 
-		// 模式切换（FR-005 ~ FR-020）
+		// 模式切换（FR-005 ~ FR-010）
 		bool switchToMode(global::RunMode mode, QString* errorMsg = nullptr);
 		global::RunMode currentMode() const;
 
@@ -41,10 +41,9 @@ namespace app
 		global::CalibReadiness checkCalibReadiness() const;
 		global::ProductionReadiness checkProductionReadiness() const;
 
-		// 相机配置代理（FR-005 / FR-008 / FR-011 / Idle）
+		// 相机配置代理
 		bool configureCameraForDebug();
 		bool configureCameraForProduction();
-		bool configureCameraForCalibration();
 		bool configureCameraForIdle();
 		bool configureCameraForCreateModel();
 
