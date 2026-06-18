@@ -49,7 +49,36 @@ namespace ui
 		ui->tableWidget_modelInfo->setSelectionMode(QAbstractItemView::NoSelection);
 		ui->tableWidget_modelInfo->setFocusPolicy(Qt::NoFocus);
 
-		// === 动态控件：加载状态 + 全部卸载按钮 ===
+		// === 重建预览区域：替换单图 QLabel 为三列布局（原图 / 标注图 / 模板图）===
+		ui->vLayout_preview->removeWidget(ui->label_imgPreview);
+		ui->label_imgPreview->hide();
+
+		auto* hPreviews = new QHBoxLayout();
+		ui->vLayout_preview->addLayout(hPreviews);
+
+		auto createPreviewColumn = [this, hPreviews](const QString& title, QLabel*& outImageLabel) {
+			auto* vCol = new QVBoxLayout();
+
+			auto* titleLabel = new QLabel(title, this);
+			titleLabel->setStyleSheet(QStringLiteral(
+				"font-size: 16px; font-weight: bold; color: rgb(85, 85, 85);"));
+			titleLabel->setAlignment(Qt::AlignCenter);
+
+			auto* imgLabel = new QLabel(this);
+			imgLabel->setMinimumSize(200, 150);
+			imgLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+			imgLabel->setAlignment(Qt::AlignCenter);
+			outImageLabel = imgLabel;
+
+			vCol->addWidget(titleLabel);
+			vCol->addWidget(imgLabel);
+			hPreviews->addLayout(vCol);
+		};
+
+		createPreviewColumn(QStringLiteral("原图"),   labelImgOriginal_);
+		createPreviewColumn(QStringLiteral("标注图"), labelImgAnnotated_);
+		createPreviewColumn(QStringLiteral("模板图"), labelImgTemplate_);
+
 		// 插入到右侧操作区域（vLayout_actions 之上）
 		auto* vLayout = ui->vLayout_detail;
 		constexpr int kInsertPos = 2;  // 在 gBox_imgPreview(0) 和 tableWidget(1) 之后、操作按钮(2) 之前
@@ -280,20 +309,29 @@ namespace ui
 		setRow(r++, QStringLiteral("更新时间"), QString::fromStdString(info.getUpdateTime()));
 		setRow(r++, QStringLiteral("文件夹"),   QString::fromStdString(info.getFolderPath()));
 
-		// 模板预览：尝试显示标注图
-		previewView_.ensure(ui->label_imgPreview);
+		// 三图预览：原图 / 标注图 / 模板图
+		previewOriginal_.ensure(labelImgOriginal_);
+		if (data._originalImage.IsInitialized())
+		{
+			try { previewOriginal_.display(data._originalImage); }
+			catch (...) {}
+		}
+
+		previewAnnotated_.ensure(labelImgAnnotated_);
 		if (data._annotatedImage.IsInitialized())
 		{
-			try { previewView_.display(data._annotatedImage); }
+			try { previewAnnotated_.display(data._annotatedImage); }
 			catch (...) {}
 		}
-		else if (data._originalImage.IsInitialized())
-		{
-			try { previewView_.display(data._originalImage); }
-			catch (...) {}
-		}
-	}
 
+		previewTemplate_.ensure(labelImgTemplate_);
+		if (data._templateMatImage.IsInitialized())
+		{
+			try { previewTemplate_.display(data._templateMatImage); }
+			catch (...) {}
+		}
+
+		}
 	std::vector<std::string> ModelManagerDialog::selectedModelIds() const
 	{
 		std::vector<std::string> ids;
