@@ -177,8 +177,7 @@ namespace Config
 			bool createModelUseOpening, int createModelOpeningRadius,
 			bool createModelUseClosing, int createModelClosingRadius,
 			bool createModelUseMean, int createModelMeanRadius,
-			int numLevels, double angleStart, double angleExtent, double angleStep,
-			const std::string& optimization, const std::string& metric,
+			double angleStart, double angleExtent,
 			int contrast, int minContrast,
 			const std::string& modelPath)
 		{
@@ -208,12 +207,8 @@ namespace Config
 			ofs << "createModelClosingRadius=" << createModelClosingRadius << '\n';
 			ofs << "createModelUseMean=" << (createModelUseMean ? 1 : 0) << '\n';
 			ofs << "createModelMeanRadius=" << createModelMeanRadius << '\n';
-			ofs << "numLevels=" << numLevels << '\n';
 			ofs << "angleStart=" << angleStart << '\n';
 			ofs << "angleExtent=" << angleExtent << '\n';
-			ofs << "angleStep=" << angleStep << '\n';
-			ofs << "optimization=" << optimization << '\n';
-			ofs << "metric=" << metric << '\n';
 			ofs << "contrast=" << contrast << '\n';
 			ofs << "minContrast=" << minContrast << '\n';
 			ofs << "modelPath=" << modelPath << '\n';
@@ -240,8 +235,7 @@ namespace Config
 			bool& createModelUseOpening, int& createModelOpeningRadius,
 			bool& createModelUseClosing, int& createModelClosingRadius,
 			bool& createModelUseMean, int& createModelMeanRadius,
-			int& numLevels, double& angleStart, double& angleExtent, double& angleStep,
-			std::string& optimization, std::string& metric,
+			double& angleStart, double& angleExtent,
 			int& contrast, int& minContrast,
 			std::string& modelPath)
 		{
@@ -303,18 +297,10 @@ namespace Config
 						createModelUseMean = std::stoi(value) != 0;
 					else if (key == "createModelMeanRadius")
 						createModelMeanRadius = std::stoi(value);
-					else if (key == "numLevels")
-						numLevels = std::stoi(value);
 					else if (key == "angleStart")
 						angleStart = std::stod(value);
 					else if (key == "angleExtent")
 						angleExtent = std::stod(value);
-					else if (key == "angleStep")
-						angleStep = std::stod(value);
-					else if (key == "optimization")
-						optimization = value;
-					else if (key == "metric")
-						metric = value;
 					else if (key == "contrast")
 						contrast = std::stoi(value);
 					else if (key == "minContrast")
@@ -350,8 +336,7 @@ namespace Config
 				_createModelUseOpening, _createModelOpeningRadius,
 				_createModelUseClosing, _createModelClosingRadius,
 				_createModelUseMean, _createModelMeanRadius,
-				numLevels, angleStart, angleExtent, angleStep,
-				optimization, metric,
+				angleStart, angleExtent,
 				contrast, minContrast,
 				modelPath);
 
@@ -426,8 +411,7 @@ namespace Config
 				_createModelUseOpening, _createModelOpeningRadius,
 				_createModelUseClosing, _createModelClosingRadius,
 				_createModelUseMean, _createModelMeanRadius,
-				numLevels, angleStart, angleExtent, angleStep,
-				optimization, metric,
+				angleStart, angleExtent,
 				contrast, minContrast,
 				modelPath);
 

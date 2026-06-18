@@ -47,12 +47,8 @@ namespace bun
 		int meanSize{ 5 };
 
 		// 训练参数
-		int numLevels{ 4 };
 		double angleStart{ -3.14 };
 		double angleExtent{ 6.28 };
-		double angleStep{ 0.0 };             // 0 = auto
-		QString optimization{ "auto" };
-		QString metric{ "use_polarity" };
 		int contrast{ 30 };
 		int minContrast{ 10 };
 	};

@@ -83,7 +83,7 @@ namespace bun
 				1,      // NumMatches
 				0.5,    // MaxOverlap
 				"least_squares",
-				(req.numLevels > 0 ? HTuple(req.numLevels) : HTuple("auto")),
+				HTuple("auto"),                                     // NumLevels
 				0.9,    // Greediness
 				&matchRow, &matchCol, &matchAngle, &matchScore);
 
@@ -134,12 +134,8 @@ namespace bun
 			outData._createModelMeanRadius = req.meanSize;
 
 			// 训练参数
-			outData.numLevels = req.numLevels;
 			outData.angleStart = req.angleStart;
 			outData.angleExtent = req.angleExtent;
-			outData.angleStep = req.angleStep;
-			outData.optimization = req.optimization.toStdString();
-			outData.metric = req.metric.toStdString();
 			outData.contrast = req.contrast;
 			outData.minContrast = req.minContrast;
 
@@ -511,7 +507,55 @@ namespace bun
 
 	std::vector<MatchResult> ShapeModeManagerBun::match(const HalconCpp::HImage& image)
 	{
-		
+		std::vector<MatchResult> results;
+
+		if (!image.IsInitialized())
+			return results;
+
+		std::shared_lock<std::shared_mutex> lk(modelCacheMutex_);
+
+		for (const auto& model : loadedModels_)
+		{
+			try
+			{
+				HalconCpp::HTuple row, column, angle, score;
+				HalconCpp::FindShapeModel(
+					image,
+					model.handle,
+					HalconCpp::HTuple(model.data.angleStart),
+					HalconCpp::HTuple(model.data.angleExtent),
+					0.5,                                                // MinScore
+					1,                                                  // NumMatches
+					0.5,                                                // MaxOverlap
+					"least_squares",                                    // SubPixel
+					HalconCpp::HTuple(0),                                   // NumLevels (0 = 使用全部金字塔层级)
+					0.9,                                                // Greediness
+					&row, &column, &angle, &score);
+
+				if (score.Length() > 0 && score[0].D() >= 0.5)
+				{
+					MatchResult result;
+					result.found = true;
+					result.modelId = model.modelId;
+					result.modelName = model.modelName;
+					result.row = row[0].D();
+					result.column = column[0].D();
+					result.angle = angle[0].D() + model.data.offsetAngle;
+					result.score = score[0].D();
+					// 像素偏移 = 匹配位置 − 模型中心 + 用户补偿
+					result.offsetX = column[0].D() - model.data.centerX + model.data.offsetX;
+					result.offsetY = row[0].D() - model.data.centerY + model.data.offsetY;
+					results.push_back(result);
+				}
+			}
+			catch (const HalconCpp::HException&)
+			{
+				// 单个模型匹配失败不中断其余模型的匹配
+				continue;
+			}
+		}
+
+		return results;
 	}
 
 	MatchResult ShapeModeManagerBun::testRecognize(const CreateModelRequest& req,
@@ -548,12 +592,12 @@ namespace bun
 			// 2. 临时创建 Shape Model
 			HTuple modelID;
 			CreateShapeModel(templateImage,
-				req.numLevels,
+				"auto",                                     // NumLevels
 				HTuple(req.angleStart),
 				HTuple(req.angleExtent),
-				(req.angleStep > 0 ? HTuple(req.angleStep) : HTuple("auto")),
-				req.optimization.toStdString().c_str(),
-				req.metric.toStdString().c_str(),
+				"auto",                                     // AngleStep
+				"auto",                                     // Optimization
+				"use_polarity",                             // Metric
 				req.contrast, req.minContrast,
 				&modelID);
 
