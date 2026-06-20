@@ -111,9 +111,9 @@ namespace ui
 		// 表头
 		QStringList headers;
 		headers << QStringLiteral("模型名称")
-			<< QStringLiteral("OffsetX")
-			<< QStringLiteral("OffsetY")
-			<< QStringLiteral("OffsetAngle")
+			<< QStringLiteral("X方向偏移")
+			<< QStringLiteral("Y方向偏移")
+			<< QStringLiteral("角度偏移")
 			<< QStringLiteral("查找数量")
 			<< QStringLiteral("最低分数")
 			<< QStringLiteral("最低角度°")

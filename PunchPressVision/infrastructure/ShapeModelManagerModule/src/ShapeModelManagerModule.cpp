@@ -41,6 +41,12 @@ namespace inf
                 info.loadInDir(entry.path().string());
                 shape_model_infos_.push_back(std::move(info));
             }
+
+            // 按创建时间降序排列（最近的在最上面）
+            std::sort(shape_model_infos_.begin(), shape_model_infos_.end(),
+                [](const Config::ShapeModelInfo& a, const Config::ShapeModelInfo& b) {
+                    return a.getCreateTime() > b.getCreateTime();
+                });
         }
         catch (...)
         {
@@ -63,7 +69,7 @@ namespace inf
 		item.data = data;
 
         item.saveInDir(info.getFolderPath());
-        shape_model_infos_.push_back(info);
+        shape_model_infos_.insert(shape_model_infos_.begin(), info);
 
         return info;
     }

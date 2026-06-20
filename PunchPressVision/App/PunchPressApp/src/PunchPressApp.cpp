@@ -71,12 +71,8 @@ namespace app
 			inf.control_module_->connectToPLC(base.plcIp, base.plcPort);
 		}
 
-		// 启动后回到 Idle（触发模式、不取流、业务层不处理帧），由用户手动进入调试/工作模式。
-		// 此处不经过 switchToMode 的“同模式短路”，确保 business.start() 已经启动的 monitor 被停止。
-		configureCameraForIdle();
-		if (business_.camera_bun)
-			business_.camera_bun->stop();
-		emit modeChanged(global::RunMode::Idle);
+		// 启动后默认进入工作模式
+		switchToMode(global::RunMode::Production);
 	}
 
 	void PunchPressApp::stop()

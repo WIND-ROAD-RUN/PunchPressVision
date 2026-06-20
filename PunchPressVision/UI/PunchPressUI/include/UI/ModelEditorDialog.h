@@ -14,6 +14,7 @@ namespace Ui { class Dlg_createshapemodelClass; }
 QT_END_NAMESPACE
 
 namespace app { class PunchPressApp; }
+class QLabel;
 class QPushButton;
 
 namespace ui
@@ -53,9 +54,9 @@ namespace ui
 		void onContrastAutoToggled(bool checked);
 
 		// 操作
-		void onRecognize();
 		void onCreateModel();
 		void onReadImage();
+		void onExit();
 
 	private:
 		void buildConnections();
@@ -89,16 +90,20 @@ namespace ui
 
 		// ROI 缺失提示
 		bool requireROI(const QString& action) const;
+		bool requireImage(const QString& action) const;
+		bool isInDrawingTool() const;
 
 		Ui::Dlg_createshapemodelClass* ui;
 		app::PunchPressApp& app_;
 		ui::ShapeEditor* shapeEditor_{ nullptr };
+		QLabel* hintLabel_{ nullptr };
 		HalconCpp::HImage lastFrame_;
 		global::RunMode previousMode_{ global::RunMode::Idle };
 
 		bool isModifyMode_{ false };
 		std::string modelId_;
 		bool modelLoaded_{ false };   ///< 确保 loadExistingModel 仅执行一次
+		bool modelCreated_{ false };  ///< 是否已成功创建/更新过模板
 
 		Config::cameraCfg cameraCfg_;
 

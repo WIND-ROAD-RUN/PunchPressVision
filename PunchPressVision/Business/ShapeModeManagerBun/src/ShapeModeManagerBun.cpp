@@ -658,6 +658,30 @@ namespace bun
 				case 3: // 蓝
 					AccessChannel(image, &result, 3);
 					break;
+				case 4: // H（色调）
+				{
+					HImage r, g, b, h, s, v;
+					Decompose3(image, &r, &g, &b);
+					TransFromRgb(r, g, b, &h, &s, &v, "hsv");
+					result = h;
+					break;
+				}
+				case 5: // S（饱和度）
+				{
+					HImage r, g, b, h, s, v;
+					Decompose3(image, &r, &g, &b);
+					TransFromRgb(r, g, b, &h, &s, &v, "hsv");
+					result = s;
+					break;
+				}
+				case 6: // V（明度）
+				{
+					HImage r, g, b, h, s, v;
+					Decompose3(image, &r, &g, &b);
+					TransFromRgb(r, g, b, &h, &s, &v, "hsv");
+					result = v;
+					break;
+				}
 				default:
 					break;
 				}

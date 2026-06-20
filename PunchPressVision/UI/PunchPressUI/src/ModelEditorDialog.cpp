@@ -6,6 +6,7 @@
 #include "ui_Dlg_createshapemodel.h"
 
 #include <QFileDialog>
+#include <QLabel>
 #include <QLayout>
 #include <QShowEvent>
 
@@ -148,14 +149,12 @@ namespace ui
 			this, &ModelEditorDialog::refreshProcessedImage);
 
 		// 操作
-		connect(ui->btn_recognize, &QPushButton::clicked,
-			this, &ModelEditorDialog::onRecognize);
 		connect(ui->btn_createShapeModel, &QPushButton::clicked,
 			this, &ModelEditorDialog::onCreateModel);
 		connect(ui->btn_readImage, &QPushButton::clicked,
 			this, &ModelEditorDialog::onReadImage);
 		connect(ui->btn_exit, &QPushButton::clicked,
-			this, &QDialog::accept);
+			this, &ModelEditorDialog::onExit);
 
 		// 创建模型成功后显示轮廓
 		auto& biz = app_.business();
@@ -193,7 +192,10 @@ namespace ui
 		}
 		else
 		{
-			// 进入绘制前：停止实时采集，当前帧保持显示
+			// 进入绘制前：检查图像是否就绪
+			if (!requireImage(QStringLiteral("绘制")))
+				return;
+			// 停止实时采集，当前帧保持显示
 			app_.switchToMode(global::RunMode::Idle);
 			if (ui->rbtn_manual_2->isChecked())
 				shapeEditor_->setTool(ShapeEditor::Tool::FreehandROI);
@@ -214,7 +216,10 @@ namespace ui
 		}
 		else
 		{
-			// 进入屏蔽前：停止实时采集，当前帧保持显示
+			// 进入屏蔽前：检查图像是否就绪
+			if (!requireImage(QStringLiteral("绘制屏蔽")))
+				return;
+			// 停止实时采集，当前帧保持显示
 			app_.switchToMode(global::RunMode::Idle);
 			if (ui->rbtn_manual_2->isChecked())
 				shapeEditor_->setTool(ShapeEditor::Tool::FreehandMask);
@@ -309,52 +314,18 @@ namespace ui
 		return req;
 	}
 
-	// ===== 识别 ================================================================
-
-	void ModelEditorDialog::onRecognize()
-	{
-		if (!requireROI(QStringLiteral("识别")))
-			return;
-
-		if (!lastFrame_.IsInitialized())
-		{
-			rw::rqwu::MessageBox::warning(this, QStringLiteral("提示"),
-				QStringLiteral("请先载入图像"));
-			return;
-		}
-
-		auto& biz = app_.business();
-		if (!biz.shape_mode_manager_bun)
-			return;
-
-		const auto req = buildRequest(preprocessImage(lastFrame_), lastFrame_);
-		std::string err;
-		//TODO:这里面内部进行识别
-		const auto result = biz.shape_mode_manager_bun->testRecognize(req, &err);
-
-		if (shapeEditor_)
-		{
-			if (result.found)
-			{
-				shapeEditor_->drawRecognitionMarker(
-					result.row, result.column, result.angle, result.score);
-			}
-			else
-			{
-				shapeEditor_->clearMarker();
-				rw::rqwu::MessageBox::information(this,
-					QStringLiteral("识别结果"),
-					err.empty()
-						? QStringLiteral("未匹配到模板\n请调整 ROI 或模型参数后重试")
-						: QString::fromStdString(err));
-			}
-		}
-	}
-
 	// ===== 创建模型 ============================================================
 
 	void ModelEditorDialog::onCreateModel()
 	{
+		// 仍在绘制中，提示用户先右键完成绘制
+		if (isInDrawingTool())
+		{
+			rw::rqwu::MessageBox::warning(this,
+				QStringLiteral("提示"),
+				QStringLiteral("请先右键完成当前绘制，再创建模板"));
+			return;
+		}
 		if (!requireROI(QStringLiteral("创建模型")))
 			return;
 
@@ -375,6 +346,7 @@ namespace ui
 			}
 			rw::rqwu::MessageBox::information(this, QStringLiteral("修改模型"),
 				QStringLiteral("模型已更新"));
+			modelCreated_ = true;
 		}
 		else
 		{
@@ -387,6 +359,8 @@ namespace ui
 			}
 			rw::rqwu::MessageBox::information(this, QStringLiteral("创建模型"),
 				QStringLiteral("模型已保存"));
+			modelId_ = outInfo.getId();
+			modelCreated_ = true;
 		}
 	}
 
@@ -548,6 +522,30 @@ namespace ui
 				case 3: // 蓝
 					AccessChannel(image, &result, 3);
 					break;
+				case 4: // H（色调）
+				{
+					HImage r, g, b, h, s, v;
+					Decompose3(image, &r, &g, &b);
+					TransFromRgb(r, g, b, &h, &s, &v, "hsv");
+					result = h;
+					break;
+				}
+				case 5: // S（饱和度）
+				{
+					HImage r, g, b, h, s, v;
+					Decompose3(image, &r, &g, &b);
+					TransFromRgb(r, g, b, &h, &s, &v, "hsv");
+					result = s;
+					break;
+				}
+				case 6: // V（明度）
+				{
+					HImage r, g, b, h, s, v;
+					Decompose3(image, &r, &g, &b);
+					TransFromRgb(r, g, b, &h, &s, &v, "hsv");
+					result = v;
+					break;
+				}
 				default:
 					break;
 				}
@@ -807,4 +805,39 @@ namespace ui
 				QStringLiteral("读取失败"), QStringLiteral("无法打开图片"));
 		}
 	}
+
+	void ModelEditorDialog::onExit()
+	{
+		// 修改模式或已创建过模板 → 弹窗询问是否保存；否则直接退出
+		if (isModifyMode_ || modelCreated_)
+		{
+			if (rw::rqwu::MessageBox::question(this,
+				QStringLiteral("退出"),
+				QStringLiteral("是否创建模板？\n\n选择\"是\"保存模板后退出，选择\"否\"直接退出。"))
+				== rw::rqwu::MessageBox::StandardButton::Yes)
+			{
+				onCreateModel();
+			}
+		}
+		accept();
+	}
+bool ModelEditorDialog::requireImage(const QString& action) const
+{
+	if (lastFrame_.IsInitialized())
+		return true;
+	rw::rqwu::MessageBox::warning(const_cast<ModelEditorDialog*>(this),
+		QStringLiteral("提示"),
+		QStringLiteral("请等待图像显示后再进行%1操作").arg(action));
+	return false;
+}
+
+bool ModelEditorDialog::isInDrawingTool() const
+{
+	if (!shapeEditor_)
+		return false;
+	const auto tool = shapeEditor_->tool();
+	return tool == ShapeEditor::Tool::RectangleROI || tool == ShapeEditor::Tool::FreehandROI ||
+	       tool == ShapeEditor::Tool::RectangleMask || tool == ShapeEditor::Tool::FreehandMask;
+}
+
 } // namespace ui
