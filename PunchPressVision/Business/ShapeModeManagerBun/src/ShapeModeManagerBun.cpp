@@ -179,26 +179,49 @@ namespace bun
 			outData._findCreateXldObj = transformedContours;
 			emit modelContoursFound(transformedContours);
 
-			// 6. 生成模板缩略图：预处理图像（单通道→3通道）叠加红色轮廓
+			// 6. 生成模板缩略图：在原图上叠加 ROI 区域轮廓与 ShapeModel 轮廓（加粗）
 			try
 			{
+				// 使用原始图像（非裁剪后的 reduced-domain 图），完整显示画面
+				HImage displayImage = req.trainingImage;
 				HTuple imgW, imgH;
-				templateImage.GetImageSize(&imgW, &imgH);
+				displayImage.GetImageSize(&imgW, &imgH);
 				const int w = imgW[0].I(), h = imgH[0].I();
 				if (w > 0 && h > 0)
 				{
 					// 单通道转 3 通道（Halcon 显示/保存需要 RGB）
 					HImage rgbImage;
-					Compose3(templateImage, templateImage, templateImage, &rgbImage);
+					Compose3(displayImage, displayImage, displayImage, &rgbImage);
 
-					// 在 buffer 窗口上叠加红色轮廓并截取
 					HTuple bufWin;
 					OpenWindow(0, 0, w, h, 0, "buffer", "", &bufWin);
 					SetPart(bufWin, 0, 0, h - 1, w - 1);
 					DispObj(rgbImage, bufWin);
+
+					// 绘制 ROI 区域轮廓（绿色，margin 模式只绘边框）
+					SetDraw(bufWin, "margin");
+					SetColor(bufWin, "green");
+					SetLineWidth(bufWin, 2);
+					for (const auto& obj : req._paintCreateRoiList)
+					{
+						if (obj.IsInitialized())
+							DispObj(obj, bufWin);
+					}
+
+					// 绘制 Mask 区域轮廓（蓝色）
+					SetColor(bufWin, "blue");
+					for (const auto& obj : req._paintShieldRoiList)
+					{
+						if (obj.IsInitialized())
+							DispObj(obj, bufWin);
+					}
+
+					// 绘制 ShapeModel 轮廓（红色加粗，方便观察）
+					SetDraw(bufWin, "fill");
 					SetColor(bufWin, "red");
-					SetLineWidth(bufWin, 3);
+					SetLineWidth(bufWin, 5);
 					DispObj(transformedContours, bufWin);
+
 					DumpWindowImage(&outData._templateMatImage, bufWin);
 					CloseWindow(bufWin);
 				}
