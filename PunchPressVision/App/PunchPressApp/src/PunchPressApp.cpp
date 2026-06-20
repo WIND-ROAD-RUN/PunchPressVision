@@ -342,6 +342,8 @@ namespace app
 			return;
 		}
 
+		try
+		{
 		// 多模型匹配：遍历所有已加载模型
 		std::vector<bun::MatchResult> matches = business_.shape_mode_manager_bun->match(image);
 
@@ -415,14 +417,20 @@ namespace app
 				})
 			: matches.end();
 
-		if (bestMatch != matches.end() && bestMatch->found)
+		if (!allResults.empty())
 		{
 			// 发出最佳匹配结果（供状态栏显示）
 			emit positionResultReady(*best);
 
-			// 在工作图像上绘制匹配位置（红色十字线，与模板角度对齐）
+			// 在工作图像上叠加所有匹配轮廓与十字线（每个模型不同颜色）
 			try
 			{
+				const char* kColors[] = {
+					"#FF0000", "#00FF00", "#00FFFF", "#FFFF00", "#FF00FF",
+					"#FF8000", "#00FF80", "#FF0080", "#80FF00", "#0080FF"
+				};
+				constexpr int kColorCount = sizeof(kColors) / sizeof(kColors[0]);
+
 				HalconCpp::HTuple imgW, imgH;
 				image.GetImageSize(&imgW, &imgH);
 				HalconCpp::HTuple bufWin;
@@ -430,24 +438,34 @@ namespace app
 				HalconCpp::SetPart(bufWin, 0, 0, imgH[0].I() - 1, imgW[0].I() - 1);
 				HalconCpp::DispObj(image, bufWin);
 
-				// 匹配轮廓（青色 XLD）
-				if (bestMatch->matchedContours.IsInitialized())
+				int colorIdx = 0;
+				for (const auto& m : matches)
 				{
-					HalconCpp::SetColor(bufWin, "cyan");
-					HalconCpp::SetLineWidth(bufWin, 2);
-					HalconCpp::DispObj(bestMatch->matchedContours, bufWin);
+					if (!m.found) continue;
+
+					const char* color = kColors[colorIdx % kColorCount];
+					++colorIdx;
+
+					if (m.matchedContours.IsInitialized())
+					{
+						HalconCpp::SetColor(bufWin, color);
+						HalconCpp::SetLineWidth(bufWin, 2);
+						HalconCpp::DispObj(m.matchedContours, bufWin);
+					}
+
+					HalconCpp::SetColor(bufWin, color);
+					HalconCpp::SetLineWidth(bufWin, 6);
+					// m.angle 为角度制，Halcon DispCross 需要弧度
+					HalconCpp::DispCross(bufWin, m.row, m.column, 75.0,
+						m.angle * 3.14159265358979323846 / 180.0);
 				}
 
-				// 中心点十字线（红色，与模板角度对齐）
-				HalconCpp::SetColor(bufWin, "red");
-				HalconCpp::SetLineWidth(bufWin, 2);
-				HalconCpp::DispCross(bufWin, bestMatch->row, bestMatch->column, 60.0, bestMatch->angle);
 				HalconCpp::DumpWindowImage(&displayImage, bufWin);
 				HalconCpp::CloseWindow(bufWin);
 			}
 			catch (...)
 			{
-				displayImage = image;  // 绘制失败时回退到原始图像
+				displayImage = image;
 			}
 		}
 		else
@@ -457,7 +475,11 @@ namespace app
 			emit positionResultReady(result);
 		}
 
-		// 发送图像到 UI 显示（跨线程由接收方用 QueuedConnection 处理）
 		emit frameReady(displayImage);
+		}
+		catch (...)
+		{
+			emit frameReady(image);
+		}
 	}
 }

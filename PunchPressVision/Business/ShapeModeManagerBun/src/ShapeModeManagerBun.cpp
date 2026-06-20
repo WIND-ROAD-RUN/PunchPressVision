@@ -365,15 +365,20 @@ namespace bun
 
 		int successCount = 0;
 		int failCount = 0;
-		QStringList loadedNames;
 
 		{
 			std::unique_lock<std::shared_mutex> lk(modelCacheMutex_);
-			// 全量替换：先清空旧的（析构 HTuple 自动释放 Halcon 资源）
-			loadedModels_.clear();
 
 			for (const auto& id : ids)
 			{
+				// 跳过已加载的模型
+				if (std::any_of(loadedModels_.begin(), loadedModels_.end(),
+					[&id](const LoadedModel& m) { return m.modelId == id; }))
+				{
+					++successCount;
+					continue;
+				}
+
 				try
 				{
 					auto item = inf_.shape_model_manager_module_->getShapeModelItem(id);
@@ -400,7 +405,6 @@ namespace bun
 					}
 
 					loadedModels_.push_back(std::move(lm));
-					loadedNames.append(QString::fromStdString(lm.modelName));
 					++successCount;
 				}
 				catch (const HException& e)
@@ -420,10 +424,15 @@ namespace bun
 			}
 		}
 
-		// 发出信号（兼容旧 + 新）
-		if (!loadedNames.isEmpty())
-			emit modelLoaded(loadedNames.first());
-		emit modelsLoaded(loadedNames, successCount, failCount);
+		// 发出信号（包含全部已加载模型名称）
+		{
+			QStringList allNames;
+			for (const auto& m : loadedModels_)
+				allNames.append(QString::fromStdString(m.modelName));
+			if (!allNames.isEmpty())
+				emit modelLoaded(allNames.first());
+			emit modelsLoaded(allNames, static_cast<int>(loadedModels_.size()), failCount);
+		}
 
 		// 持久化本次加载的模型 ID 列表
 		saveLastLoadedModels();

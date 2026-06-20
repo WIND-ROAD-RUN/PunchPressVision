@@ -65,7 +65,7 @@ namespace ui
 
 	ModelEditorDialog::~ModelEditorDialog()
 	{
-		app_.switchToMode(global::RunMode::Idle);
+		app_.switchToMode(previousMode_);
 		delete ui;
 	}
 
