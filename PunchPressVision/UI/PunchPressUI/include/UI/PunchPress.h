@@ -47,9 +47,7 @@ namespace ui
 		void onWorkClicked();
 
 		// 光源
-		void onUpperLightClicked();
-		void onLowerLightClicked();
-
+		
 		// 模型管理
 		void onModelManager();
 		/// <summary>刷新右侧栏已加载模型表格。</summary>
@@ -99,8 +97,7 @@ namespace ui
 
 		// 按钮分组：隔离模式和光源两组 RadioButton 的互斥作用域
 		QButtonGroup* modeGroup_{ nullptr };
-		QButtonGroup* lightGroup_{ nullptr };
-
+	
 		// 图像显示控件（替换 ui->label_imgDisplay 的 QLabel 占位）
 		HalconInteractiveLabel* imageView_{ nullptr };
 

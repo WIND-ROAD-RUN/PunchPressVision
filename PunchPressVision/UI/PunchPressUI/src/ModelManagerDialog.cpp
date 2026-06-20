@@ -34,6 +34,9 @@ namespace ui
 	{
 		ui->setupUi(this);
 
+		// 默认按创建时间降序排列
+		ui->cbox_sort->setCurrentIndex(3);
+
 		fullKeyboard_ = new rw::rqwu::FullKeyboard(this);
 		fullKeyboard_->emptyInputPolicy = rw::rqwu::Keyboard::EmptyInputPolicy::EnableAndAccept;
 
@@ -197,9 +200,9 @@ namespace ui
 				{
 				case 1: return a.base_info.name > b.base_info.name;          // 名称降序
 				case 2: return a.getCreateTime() < b.getCreateTime();        // 创建时间升序
-				case 3: return a.getCreateTime() > b.getCreateTime();        // 创建时间降序
-				case 0:
-				default: return a.base_info.name < b.base_info.name;         // 名称升序
+				case 0: return a.base_info.name < b.base_info.name;           // 名称升序
+				case 3:
+				default: return a.getCreateTime() > b.getCreateTime();       // 创建时间降序
 				}
 			});
 

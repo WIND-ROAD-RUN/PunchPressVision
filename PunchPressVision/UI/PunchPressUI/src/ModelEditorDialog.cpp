@@ -361,6 +361,7 @@ namespace ui
 				QStringLiteral("模型已保存"));
 			modelId_ = outInfo.getId();
 			modelCreated_ = true;
+			isModifyMode_ = true;  // 后续保存走更新逻辑，避免重复创建
 		}
 	}
 

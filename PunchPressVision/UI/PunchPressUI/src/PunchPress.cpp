@@ -49,10 +49,6 @@ namespace ui
 		ui->rbtn_debug->setChecked(false);
 		ui->rbtn_work->setChecked(false);
 
-		lightGroup_ = new QButtonGroup(this);
-		lightGroup_->setExclusive(false); // 上下光源可独立开关
-		lightGroup_->addButton(ui->rbtn_upLight);
-		lightGroup_->addButton(ui->rbtn_downLight);
 
 		setupImageView();
 
@@ -198,8 +194,6 @@ namespace ui
 		// UI 控件 → 槽
 		connect(ui->rbtn_debug, &QRadioButton::clicked, this, &PunchPress::onDebugClicked);
 		connect(ui->rbtn_work, &QRadioButton::clicked, this, &PunchPress::onWorkClicked);
-		connect(ui->rbtn_upLight, &QRadioButton::clicked, this, &PunchPress::onUpperLightClicked);
-		connect(ui->rbtn_downLight, &QRadioButton::clicked, this, &PunchPress::onLowerLightClicked);
 		connect(ui->pbtn_exposure1, &QPushButton::clicked, this, &PunchPress::onExposure1Clicked);
 		connect(ui->pbtn_gain1, &QPushButton::clicked, this, &PunchPress::onGain1Clicked);
 		connect(ui->pbtn_exposure2, &QPushButton::clicked, this, &PunchPress::onExposure2Clicked);
@@ -421,20 +415,6 @@ namespace ui
 			// 再次点击取消选中 → 回到 Idle/停止模式
 			app_.switchToMode(global::RunMode::Idle);
 		}
-	}
-
-	void PunchPress::onUpperLightClicked()
-	{
-		auto& biz = app_.business();
-		if (biz.light_control_bun)
-			biz.light_control_bun->setUpperLight(ui->rbtn_upLight->isChecked());
-	}
-
-	void PunchPress::onLowerLightClicked()
-	{
-		auto& biz = app_.business();
-		if (biz.light_control_bun)
-			biz.light_control_bun->setLowerLight(ui->rbtn_downLight->isChecked());
 	}
 
 	void PunchPress::onModelManager()
