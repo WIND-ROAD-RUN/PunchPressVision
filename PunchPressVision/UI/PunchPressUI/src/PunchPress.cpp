@@ -154,6 +154,7 @@ namespace ui
 		// 连接信号、读取已加载配置、执行启动检查。
 		// 必须在 infrastructure/business/app build 之后调用。
 		buildConnections();
+		setupInfoTable();
 		loadConfigs();
 		updateCameraParamButtons();
 
@@ -183,6 +184,8 @@ namespace ui
 			this, &PunchPress::onFrameReady, Qt::QueuedConnection);
 		connect(&app_, &app::PunchPressApp::positionResultReady,
 			this, &PunchPress::onPositionResult, Qt::QueuedConnection);
+		connect(&app_, &app::PunchPressApp::allPositionResultsReady,
+			this, &PunchPress::onAllPositionResults, Qt::QueuedConnection);
 		connect(&app_, &app::PunchPressApp::modeChanged,
 			this, &PunchPress::onModeChanged, Qt::QueuedConnection);
 		connect(&app_, &app::PunchPressApp::cameraConnectionChanged,
@@ -461,6 +464,82 @@ namespace ui
 		statusBar()->showMessage(text);
 	}
 
+	void PunchPress::onAllPositionResults(std::vector<global::PositionResult> results)
+	{
+		auto* table = ui->tableWidget_info;
+		if (!table) return;
+
+		table->setUpdatesEnabled(false);
+
+		// 每个有效结果在表格顶部插入一行（最新数据置顶）
+		for (auto it = results.rbegin(); it != results.rend(); ++it)
+		{
+			if (!it->valid) continue;
+
+			table->insertRow(0);
+
+			// 模型名称
+			auto* nameItem = new QTableWidgetItem(
+				QString::fromStdString(it->modelName));
+			nameItem->setFlags(nameItem->flags() & ~Qt::ItemIsEditable);
+			table->setItem(0, 0, nameItem);
+
+			// X (mm)
+			auto* xItem = new QTableWidgetItem(
+				QString::number(it->offsetX, 'f', 3));
+			xItem->setFlags(xItem->flags() & ~Qt::ItemIsEditable);
+			table->setItem(0, 1, xItem);
+
+			// Y (mm)
+			auto* yItem = new QTableWidgetItem(
+				QString::number(it->offsetY, 'f', 3));
+			yItem->setFlags(yItem->flags() & ~Qt::ItemIsEditable);
+			table->setItem(0, 2, yItem);
+
+			// 角度 (°)
+			auto* aItem = new QTableWidgetItem(
+				QString::number(it->angle, 'f', 3));
+			aItem->setFlags(aItem->flags() & ~Qt::ItemIsEditable);
+			table->setItem(0, 3, aItem);
+
+			// 分数
+			auto* sItem = new QTableWidgetItem(
+				QString::number(it->score, 'f', 3));
+			sItem->setFlags(sItem->flags() & ~Qt::ItemIsEditable);
+			table->setItem(0, 4, sItem);
+		}
+
+		// 限制最大行数，超出时删除旧行
+		constexpr int kMaxRows = 200;
+		while (table->rowCount() > kMaxRows)
+			table->removeRow(table->rowCount() - 1);
+
+		table->resizeColumnsToContents();
+		table->setUpdatesEnabled(true);
+	}
+
+	void PunchPress::setupInfoTable()
+	{
+		auto* table = ui->tableWidget_info;
+		if (!table) return;
+
+		table->setColumnCount(5);
+		table->setHorizontalHeaderLabels({
+			QStringLiteral("模型"),
+			QStringLiteral("X(mm)"),
+			QStringLiteral("Y(mm)"),
+			QStringLiteral("角度(°)"),
+			QStringLiteral("分数")
+		});
+		table->horizontalHeader()->setVisible(true);
+		table->verticalHeader()->setVisible(false);
+		table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+		table->setSelectionMode(QAbstractItemView::NoSelection);
+		table->setFocusPolicy(Qt::NoFocus);
+		table->setAlternatingRowColors(true);
+		table->horizontalHeader()->setStretchLastSection(true);
+	}
+
 	void PunchPress::onModeChanged(global::RunMode mode)
 	{
 		ui->rbtn_debug->setChecked(mode == global::RunMode::Debug);
@@ -660,11 +739,10 @@ namespace ui
 		// 读取当前偏移量
 		auto current = bun->getUserOffset(id);
 
-		// 读取当前匹配参数（角度转换为度供 UI 显示）
+		// 读取当前匹配参数（角度制，直接供 UI 显示）
 		auto matchParams = bun->getMatchParams(id);
-		constexpr double kRadToDeg = 180.0 / 3.14159265358979323846;
-		const double minAngleDeg = matchParams.angleStart * kRadToDeg;
-		const double maxAngleDeg = (matchParams.angleStart + matchParams.angleExtent) * kRadToDeg;
+		const double minAngleDeg = matchParams.angleStart;
+		const double maxAngleDeg = matchParams.angleStart + matchParams.angleExtent;
 
 		// 弹出编辑对话框
 		OffsetEditorDialog dlg(modelName,
@@ -686,13 +764,12 @@ namespace ui
 				QString::fromStdString(err));
 		}
 
-		// 保存匹配参数（角度从度转换为弧度）
-		constexpr double kDegToRad = 3.14159265358979323846 / 180.0;
-		const double angleStartRad = dlg.minAngleDeg() * kDegToRad;
-		const double angleExtentRad = (dlg.maxAngleDeg() - dlg.minAngleDeg()) * kDegToRad;
+		// 保存匹配参数（角度制，直接传递）
+		const double angleStartDeg = dlg.minAngleDeg();
+		const double angleExtentDeg = dlg.maxAngleDeg() - dlg.minAngleDeg();
 		if (!bun->setMatchParams(id,
 			dlg.numMatches(), dlg.minScore(),
-			angleStartRad, angleExtentRad,
+			angleStartDeg, angleExtentDeg,
 			&err))
 		{
 			rw::rqwu::MessageBox::warning(this,

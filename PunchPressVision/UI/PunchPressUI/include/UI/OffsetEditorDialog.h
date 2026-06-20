@@ -61,7 +61,7 @@ namespace ui
 		double offsetAngle_{ 0.0 };
 		int numMatches_{ 1 };
 		double minScore_{ 0.5 };
-		double minAngleDeg_{ 0.0 };
-		double maxAngleDeg_{ 360.0 };
+		double minAngleDeg_{ -45.0 };
+		double maxAngleDeg_{ 45.0 };
 	};
 }

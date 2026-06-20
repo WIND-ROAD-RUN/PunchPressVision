@@ -71,6 +71,7 @@ namespace ui
 		// 来自 App 层的信号
 		void onFrameReady(HalconCpp::HImage image);
 		void onPositionResult(global::PositionResult result);
+		void onAllPositionResults(std::vector<global::PositionResult> results);
 		void onModeChanged(global::RunMode mode);
 		void onCameraConnectionChanged(global::CameraIndex idx, bool connected, QString reason);
 		void onPlcConnectionChanged(bool connected);
@@ -79,6 +80,7 @@ namespace ui
 	private:
 		void buildConnections();
 		void setupImageView();
+		void setupInfoTable();
 
 		// UI 层配置读取入口：后续可在此扩展光源、PLC 地址等配置的读取
 		void loadConfigs();

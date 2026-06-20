@@ -55,6 +55,7 @@ namespace app
 		void startupCheckFailed(const QString& reason);
 		void frameReady(HalconCpp::HImage image);
 		void positionResultReady(global::PositionResult result);
+		void allPositionResultsReady(std::vector<global::PositionResult> results);
 		void cameraConnectionChanged(global::CameraIndex idx, bool connected, QString reason);
 		void plcConnectionChanged(bool connected);
 

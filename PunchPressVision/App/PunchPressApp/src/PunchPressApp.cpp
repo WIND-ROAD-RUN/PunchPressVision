@@ -349,38 +349,80 @@ namespace app
 		// 多模型匹配：遍历所有已加载模型
 		std::vector<bun::MatchResult> matches = business_.shape_mode_manager_bun->match(image);
 
-		// 取最佳匹配（最高 score）
-		auto best = std::max_element(matches.begin(), matches.end(),
+		// 按分数降序排列
+		std::sort(matches.begin(), matches.end(),
 			[](const bun::MatchResult& a, const bun::MatchResult& b) {
-				return a.score < b.score;
+				return a.score > b.score;
 			});
+
+		// 收集所有有效结果
+		std::vector<global::PositionResult> allResults;
+		for (const auto& m : matches)
+		{
+			if (!m.found) continue;
+			global::PositionResult r;
+			r.valid = true;
+			r.score = m.score;
+			r.modelId = m.modelId;
+			r.modelName = m.modelName;
+			r.offsetX = m.offsetX;
+			r.offsetY = m.offsetY;
+			r.angle = m.angle;  // 已为角度制
+			allResults.push_back(r);
+		}
+
+		// 写 PLC：每个匹配结果占一组寄存器（间隔 10），无效槽位清零
+		auto& inf = business_.infrastructure();
+		if (inf.control_module_ && inf.control_module_->isConnected() && inf.config_module_)
+		{
+			const auto& plc = inf.config_module_->plcAddressCfg;
+			constexpr int kRegSpacing = 10;   // 每组结果的寄存器间隔
+			constexpr size_t kMaxSlots = 50;  // 最大结果槽位数
+
+			for (size_t i = 0; i < allResults.size() && i < kMaxSlots; ++i)
+			{
+				const int base = plc.regOffsetX + static_cast<int>(i) * kRegSpacing;
+				inf.control_module_->writeFloat(base,     static_cast<float>(allResults[i].offsetX));
+				inf.control_module_->writeFloat(base + 2, static_cast<float>(allResults[i].offsetY));
+				inf.control_module_->writeFloat(base + 4, static_cast<float>(allResults[i].angle));
+				inf.control_module_->writeRegister(base + 6, 1);  // valid
+			}
+
+			// 清空剩余槽位
+			for (size_t i = allResults.size(); i < kMaxSlots; ++i)
+			{
+				const int base = plc.regOffsetX + static_cast<int>(i) * kRegSpacing;
+				inf.control_module_->writeFloat(base,     0.0f);
+				inf.control_module_->writeFloat(base + 2, 0.0f);
+				inf.control_module_->writeFloat(base + 4, 0.0f);
+				inf.control_module_->writeRegister(base + 6, 0);
+			}
+		}
+
+		// 发出所有有效结果（供 UI tableWidget_info 显示）
+		if (!allResults.empty())
+			emit allPositionResultsReady(allResults);
+
+		// 取最佳匹配用于图像标注与状态栏显示
+		auto best = allResults.empty()
+			? allResults.end()
+			: allResults.begin();
 
 		// 准备显示图像（默认原始图像，匹配成功时叠加标注）
 		HalconCpp::HImage displayImage = image;
 
-		if (best != matches.end() && best->found)
+		// 找到 best 对应的原始 MatchResult（含轮廓等）
+		auto bestMatch = best != allResults.end()
+			? std::find_if(matches.begin(), matches.end(),
+				[&](const bun::MatchResult& m) {
+					return m.found && m.modelId == best->modelId;
+				})
+			: matches.end();
+
+		if (bestMatch != matches.end() && bestMatch->found)
 		{
-			auto& inf = business_.infrastructure();
-
-			global::PositionResult result;
-			result.valid = true;
-			result.score = best->score;
-			result.modelId = best->modelId;
-			result.modelName = best->modelName;
-
-			// match() 已完成像素→世界坐标转换，直接使用
-			result.offsetX = best->offsetX;
-			result.offsetY = best->offsetY;
-			result.angle = best->angle;
-
-			emit positionResultReady(result);
-
-			// 写 PLC（若已连接）
-			if (inf.control_module_ && inf.control_module_->isConnected() && inf.config_module_)
-			{
-				const auto& plc = inf.config_module_->plcAddressCfg;
-				writePositionToPLC(result, *inf.control_module_, plc);
-			}
+			// 发出最佳匹配结果（供状态栏显示）
+			emit positionResultReady(*best);
 
 			// 在工作图像上绘制匹配位置（红色十字线，与模板角度对齐）
 			try
@@ -391,9 +433,19 @@ namespace app
 				HalconCpp::OpenWindow(0, 0, imgW[0].I(), imgH[0].I(), 0, "buffer", "", &bufWin);
 				HalconCpp::SetPart(bufWin, 0, 0, imgH[0].I() - 1, imgW[0].I() - 1);
 				HalconCpp::DispObj(image, bufWin);
+
+				// 匹配轮廓（青色 XLD）
+				if (bestMatch->matchedContours.IsInitialized())
+				{
+					HalconCpp::SetColor(bufWin, "cyan");
+					HalconCpp::SetLineWidth(bufWin, 2);
+					HalconCpp::DispObj(bestMatch->matchedContours, bufWin);
+				}
+
+				// 中心点十字线（红色，与模板角度对齐）
 				HalconCpp::SetColor(bufWin, "red");
 				HalconCpp::SetLineWidth(bufWin, 2);
-				HalconCpp::DispCross(bufWin, best->row, best->column, 60.0, best->angle);
+				HalconCpp::DispCross(bufWin, bestMatch->row, bestMatch->column, 60.0, bestMatch->angle);
 				HalconCpp::DumpWindowImage(&displayImage, bufWin);
 				HalconCpp::CloseWindow(bufWin);
 			}
@@ -404,15 +456,9 @@ namespace app
 		}
 		else
 		{
-			// 无匹配结果：发出无效结果 + 写 PLC 无效标志
+			// 无匹配结果：发出无效结果信号（状态栏清除）
 			global::PositionResult result;
 			emit positionResultReady(result);
-
-			auto& inf = business_.infrastructure();
-			if (inf.control_module_ && inf.control_module_->isConnected() && inf.config_module_)
-			{
-				writePositionToPLC(result, *inf.control_module_, inf.config_module_->plcAddressCfg);
-			}
 		}
 
 		// 发送图像到 UI 显示（跨线程由接收方用 QueuedConnection 处理）

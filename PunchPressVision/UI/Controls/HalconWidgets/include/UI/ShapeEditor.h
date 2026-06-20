@@ -133,7 +133,7 @@ namespace ui
 		static HalconCpp::HObject mergeObjects(const std::vector<HalconCpp::HObject>& objects);
 
 		/// 使用 Halcon 在窗口中自由绘制一个区域
-		static HalconCpp::HObject drawFreehandRegion(const HalconCpp::HTuple& windowHandle);
+		static HalconCpp::HObject drawFreehandRegion(const HalconCpp::HTuple& windowHandle, Tool tool);
 
 		QPointF widgetToImage(const QPoint& widgetPos) const;
 
@@ -145,6 +145,14 @@ namespace ui
 		bool drawing_{ false };
 		QPoint drawStartWidget_;
 		QPoint drawEndWidget_;
+
+		// 交互拖拽模式（Halcon draw 风格：右键确认前可移动/缩放）
+		enum class DragMode : uint8_t { None, New, Move, Resize };
+		DragMode dragMode_{ DragMode::None };
+		QPoint dragAnchor_;       // 拖拽锚点（widget 坐标）
+		QPoint dragStartOrig_;    // drawStartWidget_ 初始值
+		QPoint dragEndOrig_;      // drawEndWidget_ 初始值
+		uint8_t resizeEdges_{ 0 }; // 被拖拽的边（位掩码：Left/Right/Top/Bottom）
 
 		// 数据
 		std::vector<HalconCpp::HObject> roiObjects_;

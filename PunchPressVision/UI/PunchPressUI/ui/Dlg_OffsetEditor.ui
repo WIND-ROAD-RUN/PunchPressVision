@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>OffsetEditorDialog</class>
+ <widget class="QDialog" name="OffsetEditorDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>450</width>
+    <height>520</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>450</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>设置参数</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_root">
+   <item>
+    <widget class="QLabel" name="label_title">
+     <property name="styleSheet">
+      <string notr="true">font-size: 16px; font-weight: bold; color: #2c3e50; padding: 8px 0;</string>
+     </property>
+     <property name="text">
+      <string>请设置模型的偏移量：</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_form">
+     <property name="styleSheet">
+      <string notr="true">QGroupBox {
+  font-size: 14px;
+  background-color: #F8F8F8;
+  border: 1px solid #DDD;
+  border-radius: 8px;
+  padding: 12px;
+}</string>
+     </property>
+     <property name="title">
+      <string/>
+     </property>
+     <layout class="QFormLayout" name="formLayout">
+      <property name="labelAlignment">
+       <set>Qt::AlignRight|Qt::AlignVCenter</set>
+      </property>
+      <property name="spacing">
+       <number>12</number>
+      </property>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_offsetX">
+        <property name="text">
+         <string>X方向偏移 (mm):</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QPushButton" name="btn_offsetX">
+        <property name="toolTip">
+         <string>X 方向偏移 (mm)，范围 -9999.999 ~ 9999.999</string>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+  font-size: 18px;
+  padding: 8px 16px;
+  border: 2px solid #CCC;
+  border-radius: 4px;
+  background-color: white;
+  color: #444;
+  min-width: 120px;
+}
+QPushButton:hover {
+  border-color: #2196F3;
+  background-color: #E3F2FD;
+}</string>
+        </property>
+        <property name="text">
+         <string>0.000</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_offsetY">
+        <property name="text">
+         <string>Y方向偏移 (mm):</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QPushButton" name="btn_offsetY">
+        <property name="toolTip">
+         <string>Y 方向偏移 (mm)，范围 -9999.999 ~ 9999.999</string>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+  font-size: 18px;
+  padding: 8px 16px;
+  border: 2px solid #CCC;
+  border-radius: 4px;
+  background-color: white;
+  color: #444;
+  min-width: 120px;
+}
+QPushButton:hover {
+  border-color: #2196F3;
+  background-color: #E3F2FD;
+}</string>
+        </property>
+        <property name="text">
+         <string>0.000</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_offsetAngle">
+        <property name="text">
+         <string>角度偏移 (°):</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QPushButton" name="btn_offsetAngle">
+        <property name="toolTip">
+         <string>角度偏移 (°)，范围 -360.0 ~ 360.0</string>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+  font-size: 18px;
+  padding: 8px 16px;
+  border: 2px solid #CCC;
+  border-radius: 4px;
+  background-color: white;
+  color: #444;
+  min-width: 120px;
+}
+QPushButton:hover {
+  border-color: #2196F3;
+  background-color: #E3F2FD;
+}</string>
+        </property>
+        <property name="text">
+         <string>0.000</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="2">
+       <widget class="QLabel" name="label_separator">
+        <property name="styleSheet">
+         <string notr="true">font-size: 14px; font-weight: bold; color: #2196F3; padding: 12px 0 4px 0;</string>
+        </property>
+        <property name="text">
+         <string>── 匹配参数 ──</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_numMatches">
+        <property name="text">
+         <string>查找数量:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QPushButton" name="btn_numMatches">
+        <property name="toolTip">
+         <string>模板匹配查找数量 (1~20)</string>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+  font-size: 18px;
+  padding: 8px 16px;
+  border: 2px solid #CCC;
+  border-radius: 4px;
+  background-color: white;
+  color: #444;
+  min-width: 120px;
+}
+QPushButton:hover {
+  border-color: #2196F3;
+  background-color: #E3F2FD;
+}</string>
+        </property>
+        <property name="text">
+         <string>1</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_minScore">
+        <property name="text">
+         <string>最低分数:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QPushButton" name="btn_minScore">
+        <property name="toolTip">
+         <string>最低匹配分数 (0.00 ~ 1.00)</string>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+  font-size: 18px;
+  padding: 8px 16px;
+  border: 2px solid #CCC;
+  border-radius: 4px;
+  background-color: white;
+  color: #444;
+  min-width: 120px;
+}
+QPushButton:hover {
+  border-color: #2196F3;
+  background-color: #E3F2FD;
+}</string>
+        </property>
+        <property name="text">
+         <string>0.50</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="label_minAngle">
+        <property name="text">
+         <string>最低角度 (°):</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="QPushButton" name="btn_minAngle">
+        <property name="toolTip">
+         <string>角度搜索范围下限 (°)，范围 -360.0 ~ 360.0</string>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+  font-size: 18px;
+  padding: 8px 16px;
+  border: 2px solid #CCC;
+  border-radius: 4px;
+  background-color: white;
+  color: #444;
+  min-width: 120px;
+}
+QPushButton:hover {
+  border-color: #2196F3;
+  background-color: #E3F2FD;
+}</string>
+        </property>
+        <property name="text">
+         <string>-45.0</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="0">
+       <widget class="QLabel" name="label_maxAngle">
+        <property name="text">
+         <string>最高角度 (°):</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="1">
+       <widget class="QPushButton" name="btn_maxAngle">
+        <property name="toolTip">
+         <string>角度搜索范围上限 (°)，范围 -360.0 ~ 360.0</string>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+  font-size: 18px;
+  padding: 8px 16px;
+  border: 2px solid #CCC;
+  border-radius: 4px;
+  background-color: white;
+  color: #444;
+  min-width: 120px;
+}
+QPushButton:hover {
+  border-color: #2196F3;
+  background-color: #E3F2FD;
+}</string>
+        </property>
+        <property name="text">
+         <string>45.0</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>0</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+     <property name="centerButtons">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

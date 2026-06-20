@@ -46,9 +46,9 @@ namespace bun
 		bool useMean{ false };
 		int meanSize{ 5 };
 
-		// 训练参数
-		double angleStart{ -0.3 };
-		double angleExtent{0.79 };
+		// 训练参数（角度制）
+		double angleStart{ -45.0 };
+		double angleExtent{ 90.0 };
 		int contrast{ 30 };
 		int minContrast{ 10 };
 		double minScore{ 0.5 };
@@ -63,13 +63,14 @@ namespace bun
 		double column{ 0.0 };
 		double angle{ 0.0 };
 		double score{ 0.0 };
-		double realX{ 0.0 }; 
+		double realX{ 0.0 };
 
 		double realY{ 0.0 };
 
 		double offsetX{ 0.0 };
 		double offsetY{ 0.0 };
 		bool found{ false };
+		HalconCpp::HObject matchedContours;  // 匹配后变换到位的轮廓 XLD（用于主界面显示）
 	};
 
 	/// <summary>
@@ -104,8 +105,8 @@ namespace bun
 	{
 		int numMatches{ 1 };
 		double minScore{ 0.5 };
-		double angleStart{ 0.0 };    // 弧度，搜索起始角度
-		double angleExtent{ 6.28 };  // 弧度，搜索角度范围（2π ≈ 360°）
+		double angleStart{ -45.0 };  // 角度制，搜索起始角度
+		double angleExtent{ 90.0 };  // 角度制，搜索角度范围（-45°~45°）
 	};
 
 	class ShapeModeManagerBun

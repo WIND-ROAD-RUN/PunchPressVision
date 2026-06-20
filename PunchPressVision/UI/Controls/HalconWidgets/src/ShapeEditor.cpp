@@ -69,12 +69,12 @@ namespace ui
 		return result;
 	}
 
-	HalconCpp::HObject ShapeEditor::drawFreehandRegion(const HalconCpp::HTuple& windowHandle)
+	HalconCpp::HObject ShapeEditor::drawFreehandRegion(const HalconCpp::HTuple& windowHandle, Tool tool)
 	{
 		HalconCpp::HObject region;
 		try
 		{
-			HalconCpp::SetColor(windowHandle, "green");
+			HalconCpp::SetColor(windowHandle, (tool == Tool::FreehandMask) ? "red" : "green");
 			HalconCpp::SetDraw(windowHandle, "margin");
 			HalconCpp::SetLineWidth(windowHandle, 2);
 			HalconCpp::DrawRegion(&region, windowHandle);
@@ -137,6 +137,8 @@ namespace ui
 		if (drawing_)
 		{
 			drawing_ = false;
+			dragMode_ = DragMode::None;
+			resizeEdges_ = 0;
 			refreshOverlay();
 		}
 
@@ -145,7 +147,7 @@ namespace ui
 		{
 			if (imageLabel_ && imageLabel_->isReady())
 			{
-				HalconCpp::HObject region = drawFreehandRegion(imageLabel_->halconHandle());
+				HalconCpp::HObject region = drawFreehandRegion(imageLabel_->halconHandle(), tool);
 				if (region.IsInitialized())
 				{
 					if (tool == Tool::FreehandROI)
@@ -295,6 +297,15 @@ namespace ui
 			imageLabel_->setGeometry(0, 0, e->size().width(), e->size().height());
 	}
 
+	namespace
+	{
+		constexpr uint8_t kEdgeLeft   = 1 << 0;
+		constexpr uint8_t kEdgeRight  = 1 << 1;
+		constexpr uint8_t kEdgeTop    = 1 << 2;
+		constexpr uint8_t kEdgeBottom = 1 << 3;
+		constexpr double kEdgeHitThreshold = 10.0; // widget 像素，判定“靠近边”的距离
+	}
+
 	bool ShapeEditor::eventFilter(QObject* /*obj*/, QEvent* e)
 	{
 		switch (e->type())
@@ -306,9 +317,56 @@ namespace ui
 			{
 				if (tool_ == Tool::RectangleROI || tool_ == Tool::RectangleMask)
 				{
-					drawing_ = true;
-					drawStartWidget_ = me->pos();
-					drawEndWidget_ = me->pos();
+					const QPoint pos = me->pos();
+
+					if (drawing_)
+					{
+						// 已有预览矩形 → 根据点击位置决定 移动/缩放/新建
+						const QRectF r = QRectF(drawStartWidget_, drawEndWidget_).normalized();
+
+						const bool nearLeft   = qAbs(pos.x() - r.left())   < kEdgeHitThreshold;
+						const bool nearRight  = qAbs(pos.x() - r.right())  < kEdgeHitThreshold;
+						const bool nearTop    = qAbs(pos.y() - r.top())    < kEdgeHitThreshold;
+						const bool nearBottom = qAbs(pos.y() - r.bottom()) < kEdgeHitThreshold;
+
+						if (nearLeft || nearRight || nearTop || nearBottom)
+						{
+							// 靠近边/角 → 缩放模式
+							dragMode_ = DragMode::Resize;
+							resizeEdges_ = 0;
+							if (nearLeft)   resizeEdges_ |= kEdgeLeft;
+							if (nearRight)  resizeEdges_ |= kEdgeRight;
+							if (nearTop)    resizeEdges_ |= kEdgeTop;
+							if (nearBottom) resizeEdges_ |= kEdgeBottom;
+							dragAnchor_ = pos;
+							dragStartOrig_ = drawStartWidget_;
+							dragEndOrig_   = drawEndWidget_;
+						}
+						else if (r.contains(pos))
+						{
+							// 在矩形内部但远离边 → 移动模式
+							dragMode_ = DragMode::Move;
+							dragAnchor_ = pos;
+							dragStartOrig_ = drawStartWidget_;
+							dragEndOrig_   = drawEndWidget_;
+						}
+						else
+						{
+							// 在矩形外部 → 开始新的矩形
+							dragMode_ = DragMode::New;
+							drawStartWidget_ = pos;
+							drawEndWidget_   = pos;
+						}
+					}
+					else
+					{
+						// 无预览 → 开始新绘制
+						dragMode_ = DragMode::New;
+						drawing_ = true;
+						drawStartWidget_ = pos;
+						drawEndWidget_   = pos;
+					}
+
 					refreshOverlay();
 					return true;
 				}
@@ -321,15 +379,89 @@ namespace ui
 					return true;
 				}
 			}
+			else if (me->button() == Qt::RightButton)
+			{
+				// 右键确认绘制完成（Halcon draw 风格）
+				if ((tool_ == Tool::RectangleROI || tool_ == Tool::RectangleMask) && drawing_)
+				{
+					drawing_ = false;
+					dragMode_ = DragMode::None;
+					resizeEdges_ = 0;
+
+					const QPointF p1 = widgetToImage(drawStartWidget_);
+					const QPointF p2 = widgetToImage(drawEndWidget_);
+					const QRectF rect = QRectF(p1, p2).normalized();
+
+					if (rect.width() > 1.0 && rect.height() > 1.0)
+					{
+						HalconCpp::HObject obj = rectToRegion(rect);
+						if (obj.IsInitialized())
+						{
+							if (tool_ == Tool::RectangleROI)
+							{
+								roiObjects_.push_back(obj);
+								actionHistory_.append(ActionType::ROI);
+								emit roiChanged();
+							}
+							else if (tool_ == Tool::RectangleMask)
+							{
+								maskObjects_.push_back(obj);
+								actionHistory_.append(ActionType::Mask);
+								emit maskChanged();
+							}
+						}
+					}
+
+					refreshOverlay();
+					// 确认后返回 View，必须再次点击按钮才能进行下一次绘制
+					setTool(Tool::View);
+					return true;
+				}
+			}
 			break;
 		}
 
 		case QEvent::MouseMove:
 		{
 			auto* me = static_cast<QMouseEvent*>(e);
+
 			if ((tool_ == Tool::RectangleROI || tool_ == Tool::RectangleMask) && drawing_)
 			{
-				drawEndWidget_ = me->pos();
+				const QPoint delta = me->pos() - dragAnchor_;
+
+				switch (dragMode_)
+				{
+				case DragMode::Move:
+					// 整体平移
+					drawStartWidget_ = dragStartOrig_ + delta;
+					drawEndWidget_   = dragEndOrig_   + delta;
+					break;
+
+				case DragMode::Resize:
+				{
+					// 根据靠近的边调整对应角点
+					int dx = delta.x();
+					int dy = delta.y();
+					// 对调左右边，使拖拽方向与矩形边距方向一致：
+					// 比如拖拽左边 → 只需要 dx 影响 drawStartWidget_.x
+					if (resizeEdges_ & kEdgeLeft)
+						drawStartWidget_.setX(dragStartOrig_.x() + dx);
+					if (resizeEdges_ & kEdgeRight)
+						drawEndWidget_.setX(dragEndOrig_.x() + dx);
+					if (resizeEdges_ & kEdgeTop)
+						drawStartWidget_.setY(dragStartOrig_.y() + dy);
+					if (resizeEdges_ & kEdgeBottom)
+						drawEndWidget_.setY(dragEndOrig_.y() + dy);
+					break;
+				}
+
+				case DragMode::New:
+				default:
+					// 首次拖拽：固定起点，移动终点
+					drawEndWidget_ = me->pos();
+					break;
+				}
+
 				refreshOverlay();
 				return true;
 			}
@@ -338,39 +470,8 @@ namespace ui
 
 		case QEvent::MouseButtonRelease:
 		{
-			auto* me = static_cast<QMouseEvent*>(e);
-			if (me->button() == Qt::LeftButton && drawing_)
-			{
-				drawEndWidget_ = me->pos();
-				drawing_ = false;
-
-				const QPointF p1 = widgetToImage(drawStartWidget_);
-				const QPointF p2 = widgetToImage(drawEndWidget_);
-				const QRectF rect = QRectF(p1, p2).normalized();
-
-				if (rect.width() > 1.0 && rect.height() > 1.0)
-				{
-					HalconCpp::HObject obj = rectToRegion(rect);
-					if (obj.IsInitialized())
-					{
-						if (tool_ == Tool::RectangleROI)
-						{
-							roiObjects_.push_back(obj);
-							actionHistory_.append(ActionType::ROI);
-							emit roiChanged();
-						}
-						else if (tool_ == Tool::RectangleMask)
-						{
-							maskObjects_.push_back(obj);
-							actionHistory_.append(ActionType::Mask);
-							emit maskChanged();
-						}
-					}
-				}
-
-				refreshOverlay();
-				return true;
-			}
+			// 矩形绘制不再在左键释放时确认，改为右键确认
+			// 左键释放后预览保持，用户可继续调整或右键确认
 			break;
 		}
 
@@ -382,6 +483,8 @@ namespace ui
 				if (drawing_)
 				{
 					drawing_ = false;
+					dragMode_ = DragMode::None;
+					resizeEdges_ = 0;
 					refreshOverlay();
 				}
 				setTool(Tool::View);
@@ -482,7 +585,7 @@ namespace ui
 
 			try
 			{
-				SetColor(imageLabel_->halconHandle(), "yellow");
+				SetColor(imageLabel_->halconHandle(), "green");
 				SetDraw(imageLabel_->halconHandle(), "margin");
 				SetLineWidth(imageLabel_->halconHandle(), 2);
 				DispRectangle1(imageLabel_->halconHandle(),
@@ -503,7 +606,7 @@ namespace ui
 		{
 			try
 			{
-				SetColor(imageLabel_->halconHandle(), "magenta");
+				SetColor(imageLabel_->halconHandle(), "red");
 				SetDraw(imageLabel_->halconHandle(), "margin");
 				SetLineWidth(imageLabel_->halconHandle(), 2);
 				for (const auto& obj : maskObjects_)
@@ -523,7 +626,7 @@ namespace ui
 
 			try
 			{
-				SetColor(imageLabel_->halconHandle(), "orange");
+				SetColor(imageLabel_->halconHandle(), "red");
 				SetDraw(imageLabel_->halconHandle(), "margin");
 				SetLineWidth(imageLabel_->halconHandle(), 2);
 				DispRectangle1(imageLabel_->halconHandle(),

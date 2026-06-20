@@ -179,29 +179,41 @@ namespace bun
 			outData._findCreateXldObj = transformedContours;
 			emit modelContoursFound(transformedContours);
 
-			// 6. 生成模板缩略图：在原图上叠加 ROI 区域轮廓与 ShapeModel 轮廓（加粗）
+			// 6. 生成模板缩略图：在原图上叠加 ROI 区域轮廓与 ShapeModel 轮廓
+			//    使用固定大小缩略图窗口，使线宽相对图像内容保持可见
 			try
 			{
-				// 使用原始图像（非裁剪后的 reduced-domain 图），完整显示画面
 				HImage displayImage = req.trainingImage;
 				HTuple imgW, imgH;
 				displayImage.GetImageSize(&imgW, &imgH);
-				const int w = imgW[0].I(), h = imgH[0].I();
-				if (w > 0 && h > 0)
+				const int imgWi = imgW[0].I(), imgHi = imgH[0].I();
+				if (imgWi > 0 && imgHi > 0)
 				{
+					// 缩略图最大边长（保持宽高比）
+					constexpr int kMaxThumb = 800;
+					int winW = imgWi, winH = imgHi;
+					if (imgWi > kMaxThumb || imgHi > kMaxThumb)
+					{
+						const double scale = static_cast<double>(kMaxThumb) / std::max(imgWi, imgHi);
+						winW = static_cast<int>(imgWi * scale);
+						winH = static_cast<int>(imgHi * scale);
+						if (winW < 1) winW = 1;
+						if (winH < 1) winH = 1;
+					}
+
 					// 单通道转 3 通道（Halcon 显示/保存需要 RGB）
 					HImage rgbImage;
 					Compose3(displayImage, displayImage, displayImage, &rgbImage);
 
 					HTuple bufWin;
-					OpenWindow(0, 0, w, h, 0, "buffer", "", &bufWin);
-					SetPart(bufWin, 0, 0, h - 1, w - 1);
+					OpenWindow(0, 0, winW, winH, 0, "buffer", "", &bufWin);
+					SetPart(bufWin, 0, 0, imgHi - 1, imgWi - 1);
 					DispObj(rgbImage, bufWin);
 
 					// 绘制 ROI 区域轮廓（绿色，margin 模式只绘边框）
 					SetDraw(bufWin, "margin");
 					SetColor(bufWin, "green");
-					SetLineWidth(bufWin, 2);
+					SetLineWidth(bufWin, 3);
 					for (const auto& obj : req._paintCreateRoiList)
 					{
 						if (obj.IsInitialized())
@@ -210,16 +222,17 @@ namespace bun
 
 					// 绘制 Mask 区域轮廓（蓝色）
 					SetColor(bufWin, "blue");
+					SetLineWidth(bufWin, 3);
 					for (const auto& obj : req._paintShieldRoiList)
 					{
 						if (obj.IsInitialized())
 							DispObj(obj, bufWin);
 					}
 
-					// 绘制 ShapeModel 轮廓（红色加粗，方便观察）
+					// 绘制 ShapeModel 轮廓（红色，填充模式）
 					SetDraw(bufWin, "fill");
 					SetColor(bufWin, "red");
-					SetLineWidth(bufWin, 5);
+					SetLineWidth(bufWin, 4);
 					DispObj(transformedContours, bufWin);
 
 					DumpWindowImage(&outData._templateMatImage, bufWin);
@@ -723,8 +736,8 @@ namespace bun
 				HalconCpp::FindShapeModel(
 					processed,
 					model.handle,
-					HalconCpp::HTuple(model.data.angleStart),
-					HalconCpp::HTuple(model.data.angleExtent),
+					HalconCpp::HTuple(model.data.angleStart).TupleRad(),
+					HalconCpp::HTuple(model.data.angleExtent).TupleRad(),
 					model.data.minScore,                                // MinScore
 					std::max(1, model.data.findnumber),                 // NumMatches（兼容旧数据：0 → 1）
 					0.5,                                                // MaxOverlap
@@ -733,78 +746,143 @@ namespace bun
 					0.9,                                                // Greediness
 					&row, &column, &angle, &score);
 
-				if (score.Length() > 0 && score[0].D() >= model.data.minScore)
-				{
-					const double matchRow = row[0].D();
-					const double matchCol = column[0].D();
-					const double matchAngle = angle[0].D();
-
-					// 自定义中心点相对于模板参考点的偏移（模型局部坐标系）
-					const double localRow = model.data.centerY - model.data.findCenterY;
-					const double localCol = model.data.centerX - model.data.findCenterX;
-
-					// 将自定义中心点从模型局部坐标系变换到当前匹配位置
-					HalconCpp::HTuple matchHomMat2D;
-					HalconCpp::VectorAngleToRigid(
-						0.0, 0.0, 0.0,
-						matchRow, matchCol, matchAngle,
-						&matchHomMat2D);
-
-					double customRow = matchRow, customCol = matchCol;
-					if (std::abs(localRow) > 1e-9 || std::abs(localCol) > 1e-9)
+					if (score.Length() > 0 && score[0].D() >= model.data.minScore)
 					{
-						HalconCpp::HTuple htCustomRow, htCustomCol;
-						HalconCpp::AffineTransPoint2d(
-							matchHomMat2D,
-							HalconCpp::HTuple(localRow), HalconCpp::HTuple(localCol),
-							&htCustomRow, &htCustomCol);
-						customRow = htCustomRow[0].D();
-						customCol = htCustomCol[0].D();
-					}
+						const double matchRow = row[0].D();
+						const double matchCol = column[0].D();
+						const double matchAngle = angle[0].D();
 
-					MatchResult result;
-					result.found = true;
-					result.modelId = model.modelId;
-					result.modelName = model.modelName;
-					// 自定义中心点的像素坐标（供上层绘图）
-					result.row = customRow;
-					result.column = customCol;
-					result.score = score[0].D();
+						// 模板参考中心点（用于旋转/平移自定义点，与 findShapemodel 一致）
+						const double refRow = model.data.findCenterY;
+						const double refCol = model.data.findCenterX;
 
-					// 像素 → 世界坐标（九点标定）
-					if (hasNinePoint)
-					{
-						double worldX = 0.0, worldY = 0.0;
-						if (inf_tool_.nine_point_bun->pixToWorld(homMat2D,
-							customCol, customRow, worldX, worldY))
+						// 自定义点（创建模板时画的点，像素坐标）
+						double customRow = model.data.centerY;
+						double customCol = model.data.centerX;
+
+						// 偏移量单位是 mm，这里先换算成像素偏移量，再加到自定义点上
+						// （与 findShapemodel 一致：mm→pixel 后在旋转变换前叠加，使偏移随工件旋转）
+						if (hasNinePoint
+							&& (std::abs(model.data.offsetX) > 1e-9 || std::abs(model.data.offsetY) > 1e-9))
 						{
-							result.realX = worldX;
-							result.realY = worldY;
+							try
+							{
+								HalconCpp::HTuple invHomMat2D;
+								HalconCpp::HomMat2dInvert(homMat2D, &invHomMat2D);
+
+								HalconCpp::HTuple basePixRow, basePixCol;
+								HalconCpp::HTuple offsetPixRow, offsetPixCol;
+
+								HalconCpp::AffineTransPoint2d(invHomMat2D, 0.0, 0.0,
+									&basePixRow, &basePixCol);
+								HalconCpp::AffineTransPoint2d(invHomMat2D,
+									model.data.offsetX, model.data.offsetY,
+									&offsetPixRow, &offsetPixCol);
+
+								if (basePixRow.TupleLength() > 0 && basePixCol.TupleLength() > 0 &&
+									offsetPixRow.TupleLength() > 0 && offsetPixCol.TupleLength() > 0)
+								{
+									const double deltaRow = offsetPixRow[0].D() - basePixRow[0].D();
+									const double deltaCol = offsetPixCol[0].D() - basePixCol[0].D();
+									customRow += deltaRow;
+									customCol += deltaCol;
+								}
+							}
+							catch (...)
+							{
+								// fallback: 使用原始 customRow/customCol
+							}
 						}
-						else
+
+						const bool canTransform =
+							(std::abs(refCol) > 1e-9) || (std::abs(refRow) > 1e-9) ||
+							(std::abs(customCol) > 1e-9) || (std::abs(customRow) > 1e-9);
+
+						// 将自定义点从模板参考系变换到当前匹配位置（与 findShapemodel 一致）
+						double outRow = matchRow, outCol = matchCol;
+						if (canTransform)
 						{
-							// 标定转换失败，回退到像素坐标
-							result.realX = customCol;
-							result.realY = customRow;
+							try
+							{
+								HalconCpp::HTuple h;
+								HalconCpp::VectorAngleToRigid(
+									refRow, refCol, 0.0,
+									matchRow, matchCol, matchAngle,
+									&h);
+
+								HalconCpp::HTuple r, c;
+								HalconCpp::AffineTransPoint2d(h, customRow, customCol, &r, &c);
+
+								if (r.TupleLength() > 0 && c.TupleLength() > 0)
+								{
+									outRow = r[0].D();
+									outCol = c[0].D();
+								}
+							}
+							catch (...)
+							{
+								// fallback: 使用匹配中心
+							}
 						}
+
+						MatchResult result;
+						result.found = true;
+						result.modelId = model.modelId;
+						result.modelName = model.modelName;
+						// 自定义中心点的像素坐标（供上层绘图）
+						result.row = outRow;
+						result.column = outCol;
+						result.score = score[0].D();
+
+						// 像素 → 世界坐标（九点标定）
+						double worldX = outCol, worldY = outRow;
+						if (hasNinePoint)
+						{
+							if (!inf_tool_.nine_point_bun->pixToWorld(homMat2D,
+								outCol, outRow, worldX, worldY))
+							{
+								// 标定转换失败，回退到像素坐标
+								worldX = outCol;
+								worldY = outRow;
+							}
+						}
+						result.realX = worldX;
+						result.realY = worldY;
+
+						// 偏移量已在像素域叠加到 customRow/customCol 中，realX/Y 已包含偏移
+						result.offsetX = result.realX;
+						result.offsetY = result.realY;
+
+						// 角度补偿（matchAngle 为 Halcon 弧度制，统一转为角度制存储）
+						constexpr double kRadToDeg = 180.0 / 3.14159265358979323846;
+						result.angle = matchAngle * kRadToDeg + model.data.offsetAngle;
+
+						// 生成匹配轮廓 XLD（与 findShapemodel 一致），供主界面叠加显示
+						try
+						{
+							HalconCpp::HObject modelContours;
+							HalconCpp::GetShapeModelContours(&modelContours, model.handle, 1);
+
+							HalconCpp::HTuple hv_HomMat2D;
+							HalconCpp::HomMat2dIdentity(&hv_HomMat2D);
+							HalconCpp::HomMat2dRotate(hv_HomMat2D, matchAngle, 0.0, 0.0, &hv_HomMat2D);
+							HalconCpp::HomMat2dTranslate(hv_HomMat2D, matchRow, matchCol, &hv_HomMat2D);
+
+							HalconCpp::HXLDCont ho_TransContours;
+							HalconCpp::AffineTransContourXld(modelContours, &ho_TransContours, hv_HomMat2D);
+
+							// 叠加自定义中心点十字
+							HalconCpp::HXLDCont ho_Cross;
+							HalconCpp::GenCrossContourXld(&ho_Cross, outRow, outCol, 24.0, matchAngle);
+							HalconCpp::ConcatObj(ho_TransContours, ho_Cross, &result.matchedContours);
+						}
+						catch (...)
+						{
+							// 轮廓生成失败不影响匹配结果
+						}
+
+						results.push_back(result);
 					}
-					else
-					{
-						// 无九点标定，直接使用像素坐标
-						result.realX = customCol;
-						result.realY = customRow;
-					}
-
-					// 偏移量 = 世界坐标 + 用户补偿（供 PLC 写入）
-					result.offsetX = result.realX + model.data.offsetX;
-					result.offsetY = result.realY + model.data.offsetY;
-
-					// 角度补偿（offsetAngle 为角度制，Halcon 返回的是弧度制）
-					const double offsetAngleRad = model.data.offsetAngle * M_PI / 180.0;
-					result.angle = matchAngle + offsetAngleRad;
-
-					results.push_back(result);
-				}
 			}
 			catch (const HalconCpp::HException&)
 			{
@@ -851,8 +929,8 @@ namespace bun
 			HTuple modelID;
 			CreateShapeModel(templateImage,
 				"auto",                                     // NumLevels
-				HTuple(req.angleStart),
-				HTuple(req.angleExtent),
+				HTuple(req.angleStart).TupleRad(),
+				HTuple(req.angleExtent).TupleRad(),
 				"auto",                                     // AngleStep
 				"auto",                                     // Optimization
 				"use_polarity",                             // Metric
@@ -862,7 +940,7 @@ namespace bun
 			// 3. 匹配测试
 			HTuple row, column, angle, score;
 			FindShapeModel(req.trainingImage, modelID,
-				HTuple(req.angleStart), HTuple(req.angleExtent),
+				HTuple(req.angleStart).TupleRad(), HTuple(req.angleExtent).TupleRad(),
 				0.3, 1, 0.5, "least_squares", 0, 0.9,
 				&row, &column, &angle, &score);
 
@@ -871,7 +949,7 @@ namespace bun
 				result.found = true;
 				result.row = row[0].D();
 				result.column = column[0].D();
-				result.angle = angle[0].D();
+				result.angle = angle[0].D() * 180.0 / 3.14159265358979323846;
 				result.score = score[0].D();
 			}
 

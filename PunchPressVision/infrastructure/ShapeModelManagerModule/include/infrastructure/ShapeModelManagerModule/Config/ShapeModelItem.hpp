@@ -71,8 +71,8 @@ namespace Config
 		int _createModelMeanRadius = 0;
 
 		// 训练参数
-		double angleStart = 0;
-		double angleExtent = 6.28;
+		double angleStart = -45.0;   // 角度制
+		double angleExtent = 90.0;   // 角度制
 		int contrast = 30;
 		int minContrast = 10;
 		double minScore = 0.5;
