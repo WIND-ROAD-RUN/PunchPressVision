@@ -316,6 +316,16 @@ void ToolCalibDistortionWindow::onSetRotate()
     else
         cfg.rotateCount2 = value;
 
+    // 同步到 CameraModule（回调 lambda 读取的是 CameraModule 的 cameraCfg 副本）
+    if (inf_.camera_module_)
+    {
+        auto& camCfg = inf_.camera_module_->cameraCfg;
+        if (idx == global::CameraIndex::Camera1)
+            camCfg.rotateCount1 = value;
+        else
+            camCfg.rotateCount2 = value;
+    }
+
     inf_.config_module_->save();
 
     statusBar()->showMessage(QStringLiteral("%1 旋转次数已设置为 %2 (顺时针%3°)")
