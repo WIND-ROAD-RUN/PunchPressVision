@@ -8,6 +8,7 @@
 #include "global/GlobalType.hpp"
 #include "global/GlobalResult.hpp"
 #include "infrastructure/ConfigModule/Config/cameraCfg.hpp"
+#include "UI/ShapeEditor.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class PunchPressClass; }
@@ -21,8 +22,6 @@ class QTableWidget;
 
 namespace ui
 {
-	class HalconInteractiveLabel;
-
 	// 主窗口：承载模式切换、图像显示、状态指示。
 	// 通过 app::PunchPressApp& 注入，UI 不直接触碰 Business/Infrastructure。
 	class PunchPress : public QMainWindow
@@ -47,7 +46,7 @@ namespace ui
 		void onWorkClicked();
 
 		// 光源
-		
+
 		// 模型管理
 		void onModelManager();
 		/// <summary>刷新右侧栏已加载模型表格。</summary>
@@ -65,6 +64,13 @@ namespace ui
 
 		// 高度参数（双相机拼接）
 		void onHeightClicked();
+
+		// 匹配范围绘制
+		void onMatchRegionClicked();
+		void onDrawConfirm();
+		void onDrawCancel();
+		void onDrawClear();
+		void onDrawRedraw();
 
 		// 系统
 		void onExit();
@@ -91,6 +97,14 @@ namespace ui
 		void updateHeightButton();
 		void applyHeight(double value);
 
+		// 匹配范围：配置加载/显示/持久化
+		void loadMatchRegionConfig();
+		void saveMatchRegion(const HalconCpp::HObject& region);
+		void drawMatchRegion();
+		void showDrawingToolbar(bool visible);
+		void updateMatchRegionButton();
+		void exitDrawMode();
+
 		// 弹出数字键盘编辑整数参数（带范围校验）
 		bool inputIntegerParam(QPushButton* button, int& value, int min, int max);
 
@@ -103,13 +117,20 @@ namespace ui
 
 		// 按钮分组：隔离模式和光源两组 RadioButton 的互斥作用域
 		QButtonGroup* modeGroup_{ nullptr };
-	
+
 		// 图像显示控件（替换 ui->label_imgDisplay 的 QLabel 占位）
-		HalconInteractiveLabel* imageView_{ nullptr };
+		// 升级为 ShapeEditor：View 模式下等价于 HalconInteractiveLabel，
+		// 绘制模式下提供 RectangleROI 绘制能力。
+		ShapeEditor* imageView_{ nullptr };
 
 		// 右侧栏：已加载模型表格
 		QGroupBox* loadedModelsGroup_{ nullptr };
 		QTableWidget* loadedModelsTable_{ nullptr };
+
+		// 绘制模式状态
+		bool drawingMode_{ false };
+		global::RunMode previousMode_{ global::RunMode::Idle };
+		HalconCpp::HObject originalMatchRegion_;  // 取消时恢复用
 
 		// 本地缓存的 UI 所需配置
 		Config::cameraCfg cameraCfg_;

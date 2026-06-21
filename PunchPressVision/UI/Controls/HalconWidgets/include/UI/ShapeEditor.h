@@ -105,6 +105,17 @@ namespace ui
 		/// 清除模型轮廓
 		void clearModelContours();
 
+		// === 匹配范围（持久化只读显示） ===
+
+		/// 设置匹配范围（只读显示，cyan 色边框）
+		void setMatchRegion(const HalconCpp::HObject& region);
+		/// 清除匹配范围
+		void clearMatchRegion();
+		/// 是否已设置匹配范围
+		bool hasMatchRegion() const { return hasMatchRegion_; }
+		/// 获取当前匹配范围
+		HalconCpp::HObject matchRegion() const { return matchRegion_; }
+
 		/// 获取内部 L2 控件，用于连接 zoomChanged 等信号
 		HalconInteractiveLabel* imageLabel() const { return imageLabel_; }
 
@@ -125,6 +136,9 @@ namespace ui
 		void drawCenterPoint();
 		void drawMarker();             ///< 绘制识别匹配结果标记
 		void drawFoundContours();      ///< 绘制模型轮廓
+
+		/// 绘制匹配范围（持久化只读显示，cyan 色）
+		void drawMatchRegion();
 
 		/// 生成单个矩形区域对象
 		static HalconCpp::HObject rectToRegion(const QRectF& r);
@@ -169,6 +183,10 @@ namespace ui
 		// 模型轮廓
 		HalconCpp::HObject modelContours_;
 		bool showModelContours_{ false };
+
+		// 匹配范围（持久化只读显示，cyan 色边框）
+		HalconCpp::HObject matchRegion_;
+		bool hasMatchRegion_{ false };
 
 		// displayImage 重入哨兵
 		bool displaying_{ false };

@@ -765,6 +765,23 @@ namespace bun
 				// 对图像应用与创建模板时相同的预处理
 				HalconCpp::HImage processed = preprocessImage(image, model.data);
 
+				// 如果设置了匹配范围，限制搜索区域
+				if (inf_.config_module_ && inf_.config_module_->setCfg.matchRegionValid)
+				{
+					try
+					{
+						const auto& cfg = inf_.config_module_->setCfg;
+						HalconCpp::HObject matchRegion;
+						HalconCpp::GenRectangle1(&matchRegion,
+							cfg.matchRegionRow1, cfg.matchRegionCol1,
+							cfg.matchRegionRow2, cfg.matchRegionCol2);
+						HalconCpp::HImage reduced;
+						HalconCpp::ReduceDomain(processed, matchRegion, &reduced);
+						processed = reduced;
+					}
+					catch (...) {}
+				}
+
 				HalconCpp::HTuple row, column, angle, score;
 				HalconCpp::FindShapeModel(
 					processed,

@@ -3,5 +3,10 @@ namespace Config{
     {
     public:
         diffHeight : double : default = 0;
+        matchRegionValid : bool : default = false;
+        matchRegionRow1 : double : default = 0;
+        matchRegionCol1 : double : default = 0;
+        matchRegionRow2 : double : default = 0;
+        matchRegionCol2 : double : default = 0;
     };
 }

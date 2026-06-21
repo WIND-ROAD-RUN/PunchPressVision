@@ -21,7 +21,7 @@
 
 #include "app/PunchPressApp.hpp"
 #include "Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp"
-#include "UI/HalconInteractiveLabel.h"
+#include "UI/ShapeEditor.h"
 #include "UI/ModelManagerDialog.h"
 #include "UI/OffsetEditorDialog.h"
 
@@ -138,6 +138,20 @@ namespace ui
 
 		// 插入到右侧控制栏：gBox_tools 之后、gBox_table 之前（索引 3）
 		ui->vLayout_control->insertWidget(3, loadedModelsGroup_);
+
+		// 绘制工具栏初始隐藏
+		showDrawingToolbar(false);
+
+		// 监听 ShapeEditor 工具切换：绘制模式下右键确认后自动回到 View，
+		// 此时更新按钮状态提示用户可以"重新绘制"
+		connect(imageView_, &ShapeEditor::toolChanged, this, [this](ShapeEditor::Tool tool)
+		{
+			if (drawingMode_ && tool == ShapeEditor::Tool::View)
+			{
+				// 用户刚通过右键确认完成了一次绘制，tool 自动切回 View
+				updateMatchRegionButton();
+			}
+		});
 	}
 
 	PunchPress::~PunchPress()
@@ -153,6 +167,7 @@ namespace ui
 		setupInfoTable();
 		loadConfigs();
 		updateCameraParamButtons();
+		updateMatchRegionButton();
 
 		// 启动检查（FR-001 ~ FR-004）
 		QString startupError;
@@ -199,6 +214,11 @@ namespace ui
 		connect(ui->pbtn_exposure2, &QPushButton::clicked, this, &PunchPress::onExposure2Clicked);
 		connect(ui->pbtn_gain2, &QPushButton::clicked, this, &PunchPress::onGain2Clicked);
 		connect(ui->pbtn_height, &QPushButton::clicked, this, &PunchPress::onHeightClicked);
+		connect(ui->pbtn_matchRegion, &QPushButton::clicked, this, &PunchPress::onMatchRegionClicked);
+		connect(ui->pbtn_drawConfirm, &QPushButton::clicked, this, &PunchPress::onDrawConfirm);
+		connect(ui->pbtn_drawCancel, &QPushButton::clicked, this, &PunchPress::onDrawCancel);
+		connect(ui->pbtn_clearRegion, &QPushButton::clicked, this, &PunchPress::onDrawClear);
+		connect(ui->pbtn_redraw, &QPushButton::clicked, this, &PunchPress::onDrawRedraw);
 		connect(ui->pbtn_modelManager, &QPushButton::clicked, this, &PunchPress::onModelManager);
 		connect(ui->pbtn_exit, &QPushButton::clicked, this, &PunchPress::onExit);
 
@@ -224,8 +244,10 @@ namespace ui
 
 	void PunchPress::setupImageView()
 	{
-		// 用 HalconDisplayLabel 替换 ui 中的占位 QLabel
-		imageView_ = new HalconInteractiveLabel(this);
+		// 用 ShapeEditor 替换 ui 中的占位 QLabel。
+		// View 模式下等价于 HalconInteractiveLabel（缩放/平移），
+		// 绘制模式下提供 RectangleROI 绘制能力。
+		imageView_ = new ShapeEditor(this);
 
 		auto* oldLabel = ui->label_imgDisplay;
 		if (auto* parentWidget = oldLabel->parentWidget())
@@ -243,6 +265,7 @@ namespace ui
 		// UI 层配置读取入口：后续可在此扩展光源、PLC 地址、模型参数等配置的读取
 		loadCameraConfig();
 		loadHeightConfig();
+		loadMatchRegionConfig();
 	}
 
 	void PunchPress::loadCameraConfig()
@@ -276,6 +299,218 @@ namespace ui
 	void PunchPress::updateHeightButton()
 	{
 		ui->pbtn_height->setText(QString::number(diffHeight_, 'f', 3));
+	}
+
+	// ===== 匹配范围：配置加载 / 显示 / 持久化 =====
+
+	void PunchPress::loadMatchRegionConfig()
+	{
+		const auto& inf = app_.business().infrastructure();
+		if (!inf.config_module_)
+			return;
+
+		const auto& cfg = inf.config_module_->setCfg;
+		if (!cfg.matchRegionValid)
+			return;
+
+		try
+		{
+			HalconCpp::HObject region;
+			HalconCpp::GenRectangle1(&region,
+				cfg.matchRegionRow1, cfg.matchRegionCol1,
+				cfg.matchRegionRow2, cfg.matchRegionCol2);
+			imageView_->setMatchRegion(region);
+		}
+		catch (...) {}
+	}
+
+	void PunchPress::saveMatchRegion(const HalconCpp::HObject& region)
+	{
+		auto& inf = app_.business().infrastructure();
+		if (!inf.config_module_)
+			return;
+
+		auto& cfg = inf.config_module_->setCfg;
+
+		if (!region.IsInitialized())
+		{
+			cfg.matchRegionValid = false;
+		}
+		else
+		{
+			try
+			{
+				HalconCpp::HTuple row1, col1, row2, col2;
+				HalconCpp::SmallestRectangle1(region, &row1, &col1, &row2, &col2);
+				cfg.matchRegionValid = true;
+				cfg.matchRegionRow1 = row1[0].D();
+				cfg.matchRegionCol1 = col1[0].D();
+				cfg.matchRegionRow2 = row2[0].D();
+				cfg.matchRegionCol2 = col2[0].D();
+			}
+			catch (...)
+			{
+				cfg.matchRegionValid = false;
+			}
+		}
+
+		inf.config_module_->save();
+	}
+
+	void PunchPress::drawMatchRegion()
+	{
+		// ShapeEditor 在 displayImage / refreshOverlay 中自动绘制 matchRegion_，
+		// 该方法保留供外部显式触发重绘（如 onFrameReady 后额外刷新）。
+		// 当前 ShapeEditor::displayImage() 已包含 drawMatchRegion() 调用，
+		// 故此处为空实现即可。
+	}
+
+	void PunchPress::showDrawingToolbar(bool visible)
+	{
+		// 绘制工具栏（重新绘制/清空/取消/确认）仅在绘制模式下可见
+		ui->pbtn_redraw->setVisible(visible);
+		ui->pbtn_clearRegion->setVisible(visible);
+		ui->pbtn_drawCancel->setVisible(visible);
+		ui->pbtn_drawConfirm->setVisible(visible);
+
+		// hLayout_drawTools 整体可见性由 contained widgets 决定；
+		// 父 layout 会随子 widget 显隐自动调整。
+	}
+
+	void PunchPress::updateMatchRegionButton()
+	{
+		if (drawingMode_)
+		{
+			ui->pbtn_matchRegion->setText(QStringLiteral("● 绘制中..."));
+			ui->pbtn_matchRegion->setStyleSheet(QStringLiteral(
+				"QPushButton {"
+				"  padding: 6px 14px;"
+				"  border: 2px solid #FF9800;"
+				"  border-radius: 4px;"
+				"  background-color: #FFF3E0;"
+				"  color: #E65100;"
+				"  font-size: 18px;"
+				"  font-weight: bold;"
+				"}"));
+			ui->pbtn_matchRegion->setEnabled(false);  // 绘制中，禁止重复进入
+		}
+		else if (imageView_ && imageView_->hasMatchRegion())
+		{
+			ui->pbtn_matchRegion->setText(QStringLiteral("已设置 ✓"));
+			ui->pbtn_matchRegion->setStyleSheet(QStringLiteral(
+				"QPushButton {"
+				"  padding: 6px 14px;"
+				"  border: 2px solid #4CAF50;"
+				"  border-radius: 4px;"
+				"  background-color: white;"
+				"  color: #2E7D32;"
+				"  font-size: 18px;"
+				"  font-weight: bold;"
+				"}"));
+			ui->pbtn_matchRegion->setEnabled(true);
+		}
+		else
+		{
+			ui->pbtn_matchRegion->setText(QStringLiteral("绘制识别范围"));
+			ui->pbtn_matchRegion->setStyleSheet(QStringLiteral(
+				"QPushButton {"
+				"  padding: 6px 14px;"
+				"  border: 2px solid #CCC;"
+				"  border-radius: 4px;"
+				"  background-color: white;"
+				"  color: #444;"
+				"  font-size: 18px;"
+				"}"));
+			ui->pbtn_matchRegion->setEnabled(true);
+		}
+	}
+
+	// ===== 绘制模式：入口 / 确认 / 取消 / 清空 / 重绘 =====
+
+	void PunchPress::onMatchRegionClicked()
+	{
+		if (drawingMode_)
+			return;
+
+		// 1. 保存现场
+		previousMode_ = app_.currentMode();
+		drawingMode_ = true;
+
+		// 保存原始 matchRegion（取消时恢复用）
+		originalMatchRegion_.Clear();
+		if (imageView_->hasMatchRegion())
+		{
+			originalMatchRegion_ = imageView_->matchRegion();
+			imageView_->clearMatchRegion();                         // 移除 cyan 只读显示
+			imageView_->setRoiObjects({ originalMatchRegion_ });    // 转为绿色可编辑 ROI
+		}
+
+		// 2. 切换运行模式：先停流再以 FreeRun 起流
+		app_.switchToMode(global::RunMode::Idle);
+		app_.switchToMode(global::RunMode::DrawMatchRegion);
+
+		// 3. 进入 RectangleROI 绘制工具
+		imageView_->setTool(ShapeEditor::Tool::RectangleROI);
+
+		// 4. UI 更新
+		showDrawingToolbar(true);
+		updateMatchRegionButton();
+	}
+
+	void PunchPress::onDrawConfirm()
+	{
+		// 取出所有 ROI 并合并（取最后一个有效矩形作为匹配范围）
+		auto roi = imageView_->roi();
+
+		// 持久化
+		saveMatchRegion(roi);
+
+		// 退出绘制模式
+		exitDrawMode();
+
+		// 显示确认后保存的范围
+		if (roi.IsInitialized())
+		{
+			imageView_->clearROI();
+			imageView_->setMatchRegion(roi);
+		}
+	}
+
+	void PunchPress::onDrawCancel()
+	{
+		// 清除 ROI，恢复之前的匹配范围
+		imageView_->clearROI();
+		if (originalMatchRegion_.IsInitialized())
+			imageView_->setMatchRegion(originalMatchRegion_);
+
+		exitDrawMode();
+	}
+
+	void PunchPress::onDrawClear()
+	{
+		imageView_->clearROI();
+	}
+
+	void PunchPress::onDrawRedraw()
+	{
+		// 清除当前 ROI 并重新进入 RectangleROI 绘制
+		imageView_->clearROI();
+		imageView_->setTool(ShapeEditor::Tool::RectangleROI);
+	}
+
+	void PunchPress::exitDrawMode()
+	{
+		// 切回 View 工具
+		imageView_->setTool(ShapeEditor::Tool::View);
+
+		// 隐藏绘制工具栏
+		showDrawingToolbar(false);
+		drawingMode_ = false;
+		originalMatchRegion_.Clear();
+
+		// 恢复之前的运行模式
+		app_.switchToMode(previousMode_);
+		updateMatchRegionButton();
 	}
 
 	bool PunchPress::inputIntegerParam(QPushButton* button, int& value, int min, int max)
@@ -446,6 +681,11 @@ namespace ui
 
 	void PunchPress::onDebugClicked()
 	{
+		if (drawingMode_)
+		{
+			ui->rbtn_debug->setChecked(false);
+			return;
+		}
 		if (ui->rbtn_debug->isChecked())
 		{
 			ui->rbtn_work->setChecked(false);
@@ -467,6 +707,11 @@ namespace ui
 
 	void PunchPress::onWorkClicked()
 	{
+		if (drawingMode_)
+		{
+			ui->rbtn_work->setChecked(false);
+			return;
+		}
 		if (ui->rbtn_work->isChecked())
 		{
 			ui->rbtn_debug->setChecked(false);

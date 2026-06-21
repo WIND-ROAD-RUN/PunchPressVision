@@ -279,7 +279,7 @@ namespace app
 		case global::RunMode::Debug:       configureCameraForDebug(); break;
 		case global::RunMode::Production:  configureCameraForProduction(); break;
 		case global::RunMode::CreateModel: configureCameraForCreateModel(); break;
-		default: break;
+		case global::RunMode::DrawMatchRegion: configureCameraForDebug(); break;  // 同 Debug：FreeRun 3fps
 		}
 
 		// 控制相机取流：Idle 模式必须停止 monitor；从 Idle 进入其他模式时需要开始取流

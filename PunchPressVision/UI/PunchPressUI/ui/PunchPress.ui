@@ -626,6 +626,141 @@ QPushButton:pressed {
            </item>
           </layout>
          </item>
+         <item>
+          <layout class="QHBoxLayout" name="hLayout_matchRegion">
+           <item>
+            <widget class="QLabel" name="label_matchRegion">
+             <property name="styleSheet">
+              <string notr="true">QLabel {
+    font-size: 18px;
+    font-weight: bold;
+    color: rgb(85, 85, 85);
+    padding: 5px 5px;
+    border-bottom: 2px solid #cccccc;
+}</string>
+             </property>
+             <property name="text">
+              <string>模板匹配范围</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pbtn_matchRegion">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QPushButton {
+    padding: 6px 14px;
+    border: 2px solid #CCC;
+    border-radius: 4px;
+    background-color: white;
+    color: #444;
+    font-size: 18px;
+}
+QPushButton:hover {
+    border-color: #999;
+    background-color: #F5F5F5;
+}
+QPushButton:pressed {
+    border-color: #777;
+    background-color: #EEE;
+}</string>
+             </property>
+             <property name="text">
+              <string>绘制识别范围</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="hLayout_drawTools">
+           <item>
+            <widget class="QPushButton" name="pbtn_redraw">
+             <property name="styleSheet">
+              <string notr="true">QPushButton {
+    padding: 6px 10px;
+    border: 2px solid #CCC;
+    border-radius: 4px;
+    font-size: 16px;
+}</string>
+             </property>
+             <property name="text">
+              <string>重新绘制</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="hSpacer_drawTools">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pbtn_clearRegion">
+             <property name="styleSheet">
+              <string notr="true">QPushButton {
+    padding: 6px 10px;
+    border: 2px solid #CCC;
+    border-radius: 4px;
+    font-size: 16px;
+}</string>
+             </property>
+             <property name="text">
+              <string>清空</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pbtn_drawCancel">
+             <property name="styleSheet">
+              <string notr="true">QPushButton {
+    padding: 6px 10px;
+    border: 2px solid #CCC;
+    border-radius: 4px;
+    font-size: 16px;
+}</string>
+             </property>
+             <property name="text">
+              <string>取消</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pbtn_drawConfirm">
+             <property name="styleSheet">
+              <string notr="true">QPushButton {
+    padding: 6px 10px;
+    border: 2px solid #4CAF50;
+    border-radius: 4px;
+    background-color: #4CAF50;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+}
+QPushButton:hover {
+    border-color: #388E3C;
+    background-color: #43A047;
+}</string>
+             </property>
+             <property name="text">
+              <string>确认</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
         </layout>
        </widget>
       </item>

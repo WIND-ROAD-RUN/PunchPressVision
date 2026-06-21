@@ -31,6 +31,7 @@ namespace ui
 		drawAllMasks();
 		drawCenterPoint();
 		drawMarker();
+		drawMatchRegion();
 	}
 
 	// === HObject 导出 ===
@@ -513,6 +514,7 @@ namespace ui
 		drawCenterPoint();
 		drawMarker();
 		drawFoundContours();
+		drawMatchRegion();
 	}
 
 	void ShapeEditor::drawMarker()
@@ -649,6 +651,35 @@ namespace ui
 				centerPoint_.y(), centerPoint_.x(), 40, 0.785398);
 		}
 		catch (...) {}
+	}
+
+	void ShapeEditor::drawMatchRegion()
+	{
+		if (!hasMatchRegion_ || !imageLabel_ || !imageLabel_->isReady())
+			return;
+
+		try
+		{
+			HalconCpp::SetColor(imageLabel_->halconHandle(), "#00BCD4");  // cyan
+			HalconCpp::SetDraw(imageLabel_->halconHandle(), "margin");
+			HalconCpp::SetLineWidth(imageLabel_->halconHandle(), 2);
+			HalconCpp::DispObj(matchRegion_, imageLabel_->halconHandle());
+		}
+		catch (...) {}
+	}
+
+	void ShapeEditor::setMatchRegion(const HalconCpp::HObject& region)
+	{
+		matchRegion_ = region;
+		hasMatchRegion_ = region.IsInitialized();
+		refreshOverlay();
+	}
+
+	void ShapeEditor::clearMatchRegion()
+	{
+		hasMatchRegion_ = false;
+		matchRegion_ = HalconCpp::HObject();
+		refreshOverlay();
 	}
 
 	QPointF ShapeEditor::widgetToImage(const QPoint& widgetPos) const
