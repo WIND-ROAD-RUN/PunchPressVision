@@ -8,5 +8,7 @@ namespace Config{
 		exposureTime2 : int : default = 200;
 		gain1 : int : default = 1;
 		gain2 : int : default = 1;
+		rotateCount1 : int : default = 0;
+		rotateCount2 : int : default = 0;
 	};
 }

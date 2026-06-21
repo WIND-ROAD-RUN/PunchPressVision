@@ -1,5 +1,7 @@
 #include "infrastructure/CameraModule/CameraModule.hpp"
 
+#include <opencv2/core.hpp>
+
 namespace inf
 {
 	namespace
@@ -47,6 +49,14 @@ namespace inf
 			cam->setCallBackFuncPost(
 				[this, idx](rw::hoec::MatInfo& matInfo)
 				{
+					// 根据相机安装方向，对原始图像执行顺时针旋转
+					const int rotateCount = (idx == global::CameraIndex::Camera1)
+						? cameraCfg.rotateCount1 : cameraCfg.rotateCount2;
+					if (rotateCount > 0 && rotateCount <= 3 && !matInfo.mat.empty())
+					{
+						// cv::rotate code: 0=90°CW, 1=180°, 2=270°CW(90°CCW)
+						cv::rotate(matInfo.mat, matInfo.mat, rotateCount - 1);
+					}
 					emit callBackFunc(matInfo, idx);
 				});
 

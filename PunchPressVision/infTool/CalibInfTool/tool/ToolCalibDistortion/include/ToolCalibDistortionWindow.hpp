@@ -41,6 +41,7 @@ private slots:
 
     void onSetExposure();
     void onSetGain();
+    void onSetRotate();
     void onStartStop();
     void onCameraSelected(int index);
 

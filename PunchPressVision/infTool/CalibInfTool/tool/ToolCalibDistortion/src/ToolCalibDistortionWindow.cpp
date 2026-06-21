@@ -147,6 +147,9 @@ void ToolCalibDistortionWindow::buildConnections()
         this, &ToolCalibDistortionWindow::onSetExposure);
     connect(ui->setGainBtn, &QPushButton::clicked,
         this, &ToolCalibDistortionWindow::onSetGain);
+    // 旋转次数（持久化到 cameraCfg，在 CameraModule 回调中实际执行旋转）
+    connect(ui->setRotateBtn, &QPushButton::clicked,
+        this, &ToolCalibDistortionWindow::onSetRotate);
 
     // 相机回调使用 DirectConnection，在采集线程中处理图像并排队到 UI 线程显示
     if (inf_.camera_module_)
@@ -297,6 +300,29 @@ void ToolCalibDistortionWindow::onSetGain()
 }
 
 // ===================================================================
+// 旋转次数（持久化到 cameraCfg，实际旋转在 CameraModule 回调中执行）
+// ===================================================================
+void ToolCalibDistortionWindow::onSetRotate()
+{
+    if (!inf_.config_module_)
+        return;
+
+    const int value = ui->rotateSpin->value();
+    const global::CameraIndex idx = cameraIndexFromCombo(ui->cameraSelect->currentIndex());
+
+    auto& cfg = inf_.config_module_->cameraCfg;
+    if (idx == global::CameraIndex::Camera1)
+        cfg.rotateCount1 = value;
+    else
+        cfg.rotateCount2 = value;
+
+    inf_.config_module_->save();
+
+    statusBar()->showMessage(QStringLiteral("%1 旋转次数已设置为 %2 (顺时针%3°)")
+        .arg(cameraDisplayName(idx)).arg(value).arg(value * 90));
+}
+
+// ===================================================================
 // 采集控制
 // ===================================================================
 void ToolCalibDistortionWindow::onStartStop()
@@ -324,6 +350,16 @@ void ToolCalibDistortionWindow::onCameraSelected(int index)
 {
     const global::CameraIndex idx = cameraIndexFromCombo(index);
     selectedCamera_.store(idx, std::memory_order_release);
+
+    // 切换相机时同步旋转次数 spinner
+    if (inf_.config_module_)
+    {
+        const auto& cfg = inf_.config_module_->cameraCfg;
+        const int rotateCount = (idx == global::CameraIndex::Camera1)
+            ? cfg.rotateCount1 : cfg.rotateCount2;
+        ui->rotateSpin->setValue(rotateCount);
+    }
+
     statusBar()->showMessage(
         QStringLiteral("当前操作/显示已切换到 %1").arg(cameraDisplayName(idx)));
 }
@@ -688,6 +724,16 @@ void ToolCalibDistortionWindow::applyDefaultCameraParams()
     ok &= inf_.camera_module_->setExposure(global::CameraIndex::Camera2, exposure);
     ok &= inf_.camera_module_->setGain(global::CameraIndex::Camera1, gain);
     ok &= inf_.camera_module_->setGain(global::CameraIndex::Camera2, gain);
+
+    // 从持久化配置恢复旋转次数到 UI spinner（当前选中相机）
+    if (inf_.config_module_)
+    {
+        const auto& cfg = inf_.config_module_->cameraCfg;
+        const global::CameraIndex idx = cameraIndexFromCombo(ui->cameraSelect->currentIndex());
+        const int rotateCount = (idx == global::CameraIndex::Camera1)
+            ? cfg.rotateCount1 : cfg.rotateCount2;
+        ui->rotateSpin->setValue(rotateCount);
+    }
 
     if (ok)
     {

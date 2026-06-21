@@ -23,6 +23,8 @@ namespace Config {
         int exposureTime2{ 200 };
         int gain1{ 1 };
         int gain2{ 1 };
+        int rotateCount1{ 0 };
+        int rotateCount2{ 0 };
     };
 
     inline cameraCfg::cameraCfg(const rw::oso::ObjectStoreAssembly& assembly)
@@ -52,6 +54,16 @@ namespace Config {
             throw std::runtime_error("$variable$gain2 is not found");
         }
         gain2 = gain2Item->getValueAsInt();
+        auto rotateCount1Item = rw::oso::ObjectStoreCoreToItem(assembly.getItem("$variable$rotateCount1$"));
+        if (!rotateCount1Item) {
+            throw std::runtime_error("$variable$rotateCount1 is not found");
+        }
+        rotateCount1 = rotateCount1Item->getValueAsInt();
+        auto rotateCount2Item = rw::oso::ObjectStoreCoreToItem(assembly.getItem("$variable$rotateCount2$"));
+        if (!rotateCount2Item) {
+            throw std::runtime_error("$variable$rotateCount2 is not found");
+        }
+        rotateCount2 = rotateCount2Item->getValueAsInt();
     }
 
     inline cameraCfg::cameraCfg(const cameraCfg& obj)
@@ -60,6 +72,8 @@ namespace Config {
         exposureTime2 = obj.exposureTime2;
         gain1 = obj.gain1;
         gain2 = obj.gain2;
+        rotateCount1 = obj.rotateCount1;
+        rotateCount2 = obj.rotateCount2;
     }
 
     inline cameraCfg& cameraCfg::operator=(const cameraCfg& obj)
@@ -69,6 +83,8 @@ namespace Config {
             exposureTime2 = obj.exposureTime2;
             gain1 = obj.gain1;
             gain2 = obj.gain2;
+            rotateCount1 = obj.rotateCount1;
+            rotateCount2 = obj.rotateCount2;
         }
         return *this;
     }
@@ -93,12 +109,20 @@ namespace Config {
         gain2Item->setName("$variable$gain2$");
         gain2Item->setValueFromInt(gain2);
         assembly.addItem(gain2Item);
+        auto rotateCount1Item = std::make_shared<rw::oso::ObjectStoreItem>();
+        rotateCount1Item->setName("$variable$rotateCount1$");
+        rotateCount1Item->setValueFromInt(rotateCount1);
+        assembly.addItem(rotateCount1Item);
+        auto rotateCount2Item = std::make_shared<rw::oso::ObjectStoreItem>();
+        rotateCount2Item->setName("$variable$rotateCount2$");
+        rotateCount2Item->setValueFromInt(rotateCount2);
+        assembly.addItem(rotateCount2Item);
         return assembly;
     }
 
     inline bool cameraCfg::operator==(const cameraCfg& obj) const
     {
-        return exposureTime1 == obj.exposureTime1 && exposureTime2 == obj.exposureTime2 && gain1 == obj.gain1 && gain2 == obj.gain2;
+        return exposureTime1 == obj.exposureTime1 && exposureTime2 == obj.exposureTime2 && gain1 == obj.gain1 && gain2 == obj.gain2 && rotateCount1 == obj.rotateCount1 && rotateCount2 == obj.rotateCount2;
     }
 
     inline bool cameraCfg::operator!=(const cameraCfg& obj) const

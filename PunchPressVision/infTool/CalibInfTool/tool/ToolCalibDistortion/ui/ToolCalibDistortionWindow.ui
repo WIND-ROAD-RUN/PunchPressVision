@@ -178,6 +178,36 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QLabel" name="labelRotate">
+        <property name="text">
+         <string>旋转次数:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="rotateSpin">
+        <property name="minimum">
+         <number>0</number>
+        </property>
+        <property name="maximum">
+         <number>3</number>
+        </property>
+        <property name="value">
+         <number>0</number>
+        </property>
+        <property name="toolTip">
+         <string>0=不旋转, 1=顺时针90°, 2=顺时针180°, 3=顺时针270°</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="setRotateBtn">
+        <property name="text">
+         <string>设置旋转</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
     <item>
