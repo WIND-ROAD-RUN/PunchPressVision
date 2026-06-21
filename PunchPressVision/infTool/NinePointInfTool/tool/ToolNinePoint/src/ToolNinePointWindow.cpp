@@ -580,11 +580,11 @@ void ToolNinePointWindow::onDisplayFrame()
 	{
 		redrawHalconView(true);
 
-		// 九点标定模式下自动检测矩形（始终基于相机1）
-		if (isJiuDianBiaoDing_ && cam1Image_.IsInitialized())
+		// 九点标定模式下自动检测矩形（基于拼接图像，与 DlgJiudianbiaoding 一致）
+		if (isJiuDianBiaoDing_ && halconLastImage_.IsInitialized())
 		{
 			QVector<RectangleResult> results;
-			const bool found = findRectangle(cam1Image_, results, true, 3);
+			const bool found = findRectangle(halconLastImage_, results, true, 3);
 
 			if (found && !results.isEmpty())
 			{
@@ -1046,6 +1046,40 @@ void ToolNinePointWindow::btn_findRectangle_clicked()
 					.arg(i + 1).arg(results[i].x, 0, 'f', 2).arg(results[i].y, 0, 'f', 2);
 			}
 			QMessageBox::information(this, QStringLiteral("提示"), msg);
+
+			// 在图上绘制找到的所有点（与 DlgJiudianbiaoding 一致）
+			try
+			{
+				HalconCpp::HObject allCrosses;
+				HalconCpp::GenEmptyObj(&allCrosses);
+
+				for (const auto& result : results)
+				{
+					HalconCpp::HObject hoCross;
+					HalconCpp::GenCrossContourXld(&hoCross, result.y, result.x, 30.0, 0.0);
+
+					HalconCpp::HObject temp;
+					HalconCpp::ConcatObj(allCrosses, hoCross, &temp);
+					allCrosses = temp;
+				}
+
+				if (findCreateXldObj_ && halconCountObj(findCreateXldObj_) > 0)
+				{
+					HalconCpp::HObject out;
+					HalconCpp::ConcatObj(*findCreateXldObj_, allCrosses, &out);
+					*findCreateXldObj_ = out;
+				}
+				else
+				{
+					*findCreateXldObj_ = allCrosses;
+				}
+
+				redrawHalconView(false);
+			}
+			catch (...)
+			{
+				// 绘制失败不影响主流程
+			}
 		}
 		else
 		{
