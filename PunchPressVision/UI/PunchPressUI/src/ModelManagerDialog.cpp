@@ -541,35 +541,52 @@ namespace ui
 		if (ids.empty())
 			return;
 
-		// 删除仅对焦点项生效
-		const std::string id = allModels_.at(selectedRow()).getId();
-
-		const auto name = QString::fromStdString(allModels_.at(selectedRow()).base_info.name);
-		if (rw::rqwu::MessageBox::question(this,
-			QStringLiteral("确认删除"),
-			QStringLiteral("确定要删除模型 \"%1\" 吗？").arg(name))
-			!= rw::rqwu::MessageBox::StandardButton::Yes)
-			return;
-
 		auto& bun = app_.business().shape_mode_manager_bun;
 		if (!bun)
 			return;
 
-		std::string err;
-		if (bun->deleteModel(id, &err))
+		// 多选确认
+		const int count = static_cast<int>(ids.size());
+		QString confirmMsg;
+		if (count == 1)
 		{
-			refreshModelList();
-			refreshLoadedState();
-			if (listModel_->modelCount() > 0)
-			{
-				ui->listView_modelList->setCurrentIndex(listModel_->index(0, 0));
-				refreshModelDetail(0);
-			}
+			const QString name = QString::fromStdString(allModels_.at(selectedRow()).base_info.name);
+			confirmMsg = QStringLiteral("确定要删除模型 \"%1\" 吗？").arg(name);
 		}
 		else
 		{
+			confirmMsg = QStringLiteral("确定要删除选中的 %1 个模型吗？").arg(count);
+		}
+
+		if (rw::rqwu::MessageBox::question(this,
+			QStringLiteral("确认删除"), confirmMsg)
+			!= rw::rqwu::MessageBox::StandardButton::Yes)
+			return;
+
+		int successCount = 0;
+		int failCount = 0;
+		for (const auto& id : ids)
+		{
+			std::string err;
+			if (bun->deleteModel(id, &err))
+				++successCount;
+			else
+				++failCount;
+		}
+
+		refreshModelList();
+		refreshLoadedState();
+		if (listModel_->modelCount() > 0)
+		{
+			ui->listView_modelList->setCurrentIndex(listModel_->index(0, 0));
+			refreshModelDetail(0);
+		}
+
+		if (failCount > 0)
+		{
 			rw::rqwu::MessageBox::warning(this,
-				QStringLiteral("删除失败"), QString::fromStdString(err));
+				QStringLiteral("删除结果"),
+				QStringLiteral("成功 %1 个，失败 %2 个").arg(successCount).arg(failCount));
 		}
 	}
 
