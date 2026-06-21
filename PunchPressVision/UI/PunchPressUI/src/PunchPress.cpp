@@ -7,7 +7,6 @@
 #include "ui_PunchPress.h"
 
 #include <QButtonGroup>
-#include <QDebug>
 #include <QFont>
 #include <QGroupBox>
 #include <QHeaderView>
@@ -170,25 +169,6 @@ namespace ui
 		updateCameraParamButtons();
 		updateMatchRegionButton();
 
-		// 诊断：打印配置模块中的 setCfg 实际值
-		{
-			const auto& inf = app_.business().infrastructure();
-			if (inf.config_module_)
-			{
-				const auto& cfg = inf.config_module_->setCfg;
-				qDebug() << "[PunchPress::build] setCfg from config module:"
-					<< "valid=" << cfg.matchRegionValid
-					<< "row1=" << cfg.matchRegionRow1
-					<< "col1=" << cfg.matchRegionCol1
-					<< "row2=" << cfg.matchRegionRow2
-					<< "col2=" << cfg.matchRegionCol2;
-			}
-			else
-			{
-				qDebug() << "[PunchPress::build] config_module_ is NULL!";
-			}
-		}
-
 		// 启动检查（FR-001 ~ FR-004）
 		QString startupError;
 		if (!app_.performStartupCheck(&startupError))
@@ -326,20 +306,15 @@ namespace ui
 	void PunchPress::loadMatchRegionConfig()
 	{
 		// Halcon 引擎在首次 OpenWindow 之前未完全初始化，
-		// 此时 GenRectangle1 会返回空区域（即使 hardcode 坐标也一样）。
-		// 因此只在此处检查配置有效性，HObject 的创建推迟到
-		// showEvent() 中 Halcon 窗口就绪后执行 deferredCreateMatchRegion()。
-		const auto& inf = app_.business().infrastructure();
-		if (inf.config_module_ && inf.config_module_->setCfg.matchRegionValid)
-		{
-			qDebug() << "[loadMatchRegionConfig] matchRegion found in config, deferring HObject creation";
-		}
+		// 此时 GenRectangle1 会返回空区域。
+		// HObject 的创建推迟到 showEvent() 之后的 deferredCreateMatchRegion()。
 	}
 
 	void PunchPress::deferredCreateMatchRegion()
 	{
-		// 在 Halcon 窗口已就绪后（showEvent 之后）被调用，
-		// 此时 GenRectangle1 才能正常创建非零面积的 region。
+		// Halcon 引擎在首次 OpenWindow 之前未完全初始化，
+		// GenRectangle1 此时会返回空区域，因此 HObject 创建
+		// 推迟到 showEvent 之后（Halcon 窗口已就绪）。
 		const auto& inf = app_.business().infrastructure();
 		if (!inf.config_module_)
 			return;
@@ -359,17 +334,8 @@ namespace ui
 				cfg.matchRegionRow1, cfg.matchRegionCol1,
 				cfg.matchRegionRow2, cfg.matchRegionCol2);
 			imageView_->setMatchRegion(region);
-
-			qDebug() << "[deferredCreateMatchRegion] Created matchRegion from config:"
-				<< "row1=" << cfg.matchRegionRow1
-				<< "col1=" << cfg.matchRegionCol1
-				<< "row2=" << cfg.matchRegionRow2
-				<< "col2=" << cfg.matchRegionCol2
-				<< "regionInit=" << region.IsInitialized();
 		}
-		catch (...) {
-			qDebug() << "[deferredCreateMatchRegion] EXCEPTION!";
-		}
+		catch (...) {}
 	}
 
 	void PunchPress::saveMatchRegion(const HalconCpp::HObject& region)
@@ -382,7 +348,6 @@ namespace ui
 
 		if (!region.IsInitialized())
 		{
-			qDebug() << "[saveMatchRegion] region not initialized, clearing valid flag";
 			cfg.matchRegionValid = false;
 		}
 		else
@@ -396,24 +361,14 @@ namespace ui
 				cfg.matchRegionCol1 = col1[0].D();
 				cfg.matchRegionRow2 = row2[0].D();
 				cfg.matchRegionCol2 = col2[0].D();
-
-				qDebug() << "[saveMatchRegion] Saving:"
-					<< "row1=" << cfg.matchRegionRow1
-					<< "col1=" << cfg.matchRegionCol1
-					<< "row2=" << cfg.matchRegionRow2
-					<< "col2=" << cfg.matchRegionCol2
-					<< "area=" << ((cfg.matchRegionRow2-cfg.matchRegionRow1)*(cfg.matchRegionCol2-cfg.matchRegionCol1));
 			}
 			catch (...)
 			{
-				qDebug() << "[saveMatchRegion] SmallestRectangle1 failed!";
 				cfg.matchRegionValid = false;
 			}
 		}
 
-		qDebug() << "[saveMatchRegion] Calling config_module_->save()...";
 		inf.config_module_->save();
-		qDebug() << "[saveMatchRegion] Save complete. matchRegionValid=" << cfg.matchRegionValid;
 	}
 
 	void PunchPress::drawMatchRegion()
