@@ -198,6 +198,7 @@ namespace ui
 		connect(ui->pbtn_gain1, &QPushButton::clicked, this, &PunchPress::onGain1Clicked);
 		connect(ui->pbtn_exposure2, &QPushButton::clicked, this, &PunchPress::onExposure2Clicked);
 		connect(ui->pbtn_gain2, &QPushButton::clicked, this, &PunchPress::onGain2Clicked);
+		connect(ui->pbtn_height, &QPushButton::clicked, this, &PunchPress::onHeightClicked);
 		connect(ui->pbtn_modelManager, &QPushButton::clicked, this, &PunchPress::onModelManager);
 		connect(ui->pbtn_exit, &QPushButton::clicked, this, &PunchPress::onExit);
 
@@ -241,6 +242,7 @@ namespace ui
 	{
 		// UI 层配置读取入口：后续可在此扩展光源、PLC 地址、模型参数等配置的读取
 		loadCameraConfig();
+		loadHeightConfig();
 	}
 
 	void PunchPress::loadCameraConfig()
@@ -259,6 +261,21 @@ namespace ui
 		ui->pbtn_gain1->setText(QString::number(cameraCfg_.gain1));
 		ui->pbtn_exposure2->setText(QString::number(cameraCfg_.exposureTime2));
 		ui->pbtn_gain2->setText(QString::number(cameraCfg_.gain2));
+		updateHeightButton();
+	}
+
+	void PunchPress::loadHeightConfig()
+	{
+		const auto& inf = app_.business().infrastructure();
+		if (!inf.config_module_)
+			return;
+
+		diffHeight_ = inf.config_module_->setCfg.diffHeight;
+	}
+
+	void PunchPress::updateHeightButton()
+	{
+		ui->pbtn_height->setText(QString::number(diffHeight_, 'f', 3));
 	}
 
 	bool PunchPress::inputIntegerParam(QPushButton* button, int& value, int min, int max)
@@ -359,6 +376,58 @@ namespace ui
 		if (!inputIntegerParam(ui->pbtn_gain2, cameraCfg_.gain2, 0, 100))
 			return;
 		applyGain(global::CameraIndex::Camera2, cameraCfg_.gain2, &Config::cameraCfg::gain2);
+	}
+
+	void PunchPress::onHeightClicked()
+	{
+		// 用户直接用数字键盘输入 mm 值（支持小数点）
+		QString input = QString::number(diffHeight_, 'f', 3);
+		rw::rqwu::NumberKeyboard::InputDataConfig cfg;
+		cfg.isUsingMin = true;
+		cfg.isUsingMax = true;
+		cfg.min = -100.0;
+		cfg.max = 100.0;
+		const auto result = rw::rqwu::NumberKeyboard::inputDataOnQPushButton(ui->pbtn_height, input, cfg);
+		if (result != rw::rqwu::NumberKeyboard::Accept)
+			return;
+
+		bool ok = false;
+		const double newValue = input.toDouble(&ok);
+		if (!ok)
+			return;
+		applyHeight(newValue);
+	}
+
+	void PunchPress::applyHeight(double value)
+	{
+		diffHeight_ = value;
+
+		auto& inf = app_.business().infrastructure();
+
+		// 持久化到 OSO 配置文件 setCfg.xml
+		if (inf.config_module_)
+		{
+			inf.config_module_->setCfg.diffHeight = value;
+			inf.config_module_->save();
+		}
+
+		// 同步到双相机拼接配置，供拼接算法使用
+		if (inf.two_camera_splice_module_)
+		{
+			inf.two_camera_splice_module_->twoCameraSpliceConfig.DiffHeight = value;
+			inf.two_camera_splice_module_->save();
+		}
+
+		// TODO: 当高度变化时，需要触发双相机拼接算法更新。
+		//       例如重新计算拼接映射图 (MapSingle1/MapSingle2)，
+		//       调用 infTool::TwoCameraSpliceInfTool::calibImage() 或类似方法。
+		// auto& infTool = app_.business().infTool();
+		// if (infTool.two_camera_splice_infTool_)
+		// {
+		//     // 重新标定或更新拼接参数
+		// }
+
+		updateHeightButton();
 	}
 
 	void PunchPress::showEvent(QShowEvent* e)

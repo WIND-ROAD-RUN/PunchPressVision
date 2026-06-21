@@ -63,6 +63,9 @@ namespace ui
 		void onExposure2Clicked();
 		void onGain2Clicked();
 
+		// 高度参数（双相机拼接）
+		void onHeightClicked();
+
 		// 系统
 		void onExit();
 
@@ -84,6 +87,9 @@ namespace ui
 		void loadConfigs();
 		void loadCameraConfig();
 		void updateCameraParamButtons();
+		void loadHeightConfig();
+		void updateHeightButton();
+		void applyHeight(double value);
 
 		// 弹出数字键盘编辑整数参数（带范围校验）
 		bool inputIntegerParam(QPushButton* button, int& value, int min, int max);
@@ -107,5 +113,6 @@ namespace ui
 
 		// 本地缓存的 UI 所需配置
 		Config::cameraCfg cameraCfg_;
+		double diffHeight_{ 0.0 };
 	};
 }

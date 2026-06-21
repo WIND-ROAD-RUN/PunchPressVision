@@ -30,6 +30,8 @@ namespace inf
 				global::joinPath(ConfigModulePath.RootPath, ConfigModulePath.cameraCfgName);
 			const std::string plcPath =
 				global::joinPath(ConfigModulePath.RootPath, ConfigModulePath.plcAddressCfgName);
+			const std::string setCfgPath =
+				global::joinPath(ConfigModulePath.RootPath, ConfigModulePath.setCfgName);
 
 			// 不存在时以默认值写入，保证后续 load 有文件可读
 			storageContext_->ensureFileExistsSafe(
@@ -38,6 +40,8 @@ namespace inf
 				cameraPath, static_cast<rw::oso::ObjectStoreAssembly>(cameraCfg));
 			storageContext_->ensureFileExistsSafe(
 				plcPath, static_cast<rw::oso::ObjectStoreAssembly>(plcAddressCfg));
+			storageContext_->ensureFileExistsSafe(
+				setCfgPath, static_cast<rw::oso::ObjectStoreAssembly>(setCfg));
 
 			// 反序列化；失败时保留默认值（静默降级）
 			bool ok = false;
@@ -54,6 +58,11 @@ namespace inf
 			auto loadedPlc = storageContext_->loadSafeToType<Config::PlcAddressCfg>(plcPath, ok);
 			if (ok)
 				plcAddressCfg = loadedPlc;
+
+			ok = false;
+			auto loadedSet = storageContext_->loadSafeToType<Config::SetCfg>(setCfgPath, ok);
+			if (ok)
+				setCfg = loadedSet;
 
 			// visionCfg 采用手写 IO（含 Halcon/几何类型），单独加载
 			visionCfg.load(global::joinPath(ConfigModulePath.RootPath, ConfigModulePath.visionCfgName));
@@ -89,6 +98,9 @@ namespace inf
 			storageContext_->saveSafe(
 				static_cast<rw::oso::ObjectStoreAssembly>(plcAddressCfg),
 				global::joinPath(ConfigModulePath.RootPath, ConfigModulePath.plcAddressCfgName));
+			storageContext_->saveSafe(
+				static_cast<rw::oso::ObjectStoreAssembly>(setCfg),
+				global::joinPath(ConfigModulePath.RootPath, ConfigModulePath.setCfgName));
 
 			visionCfg.save(global::joinPath(ConfigModulePath.RootPath, ConfigModulePath.visionCfgName));
 		}

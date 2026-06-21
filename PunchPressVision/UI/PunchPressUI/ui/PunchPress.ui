@@ -575,6 +575,57 @@ QPushButton:pressed {
            </item>
           </layout>
          </item>
+         <item>
+          <layout class="QHBoxLayout" name="hLayout_height">
+           <item>
+            <widget class="QLabel" name="label_height">
+             <property name="styleSheet">
+              <string notr="true">QLabel {
+    font-size: 18px;
+    font-weight: bold;
+    color: rgb(85, 85, 85);
+    padding: 5px 5px;
+    border-bottom: 2px solid #cccccc;
+}</string>
+             </property>
+             <property name="text">
+              <string>高度(mm)</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pbtn_height">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QPushButton {
+    padding: 6px 14px;
+    border: 2px solid #CCC;
+    border-radius: 4px;
+    background-color: white;
+    color: #444;
+    font-size: 18px;
+}
+QPushButton:hover {
+    border-color: #999;
+    background-color: #F5F5F5;
+}
+QPushButton:pressed {
+    border-color: #777;
+    background-color: #EEE;
+}</string>
+             </property>
+             <property name="text">
+              <string>Value</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
         </layout>
        </widget>
       </item>

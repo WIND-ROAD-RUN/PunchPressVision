@@ -13,6 +13,7 @@ namespace inf
 		std::string cameraCfgName = "cameraCfg.xml";
 		std::string plcAddressCfgName = "plcAddressCfg.xml";
 		std::string visionCfgName = "visionCfg.json";
+		std::string setCfgName = "setCfg.xml";
 	public:
 
 	}ConfigModulePath;

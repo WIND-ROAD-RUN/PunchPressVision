@@ -7,6 +7,7 @@
 #include "infrastructure/ConfigModule/Config/cameraCfg.hpp"
 #include "infrastructure/ConfigModule/Config/baseCfg.hpp"
 #include "infrastructure/ConfigModule/Config/plcAddressCfg.hpp"
+#include "infrastructure/ConfigModule/Config/SetCfg.hpp"
 
 namespace rw::oso
 {
@@ -28,6 +29,7 @@ namespace inf
 		Config::cameraCfg cameraCfg;
 		Config::PlcAddressCfg plcAddressCfg;
 		Config::visionCfg visionCfg;
+		Config::SetCfg setCfg;
 	public:
 		void build() override;
 		void destroy() override;
