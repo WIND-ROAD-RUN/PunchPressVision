@@ -316,14 +316,13 @@ void ToolCalibDistortionWindow::onSetRotate()
     else
         cfg.rotateCount2 = value;
 
-    // 同步到 CameraModule（回调 lambda 读取的是 CameraModule 的 cameraCfg 副本）
+    // 同步到 CameraModule 的原子量（采集线程回调读取，线程安全）
     if (inf_.camera_module_)
     {
-        auto& camCfg = inf_.camera_module_->cameraCfg;
         if (idx == global::CameraIndex::Camera1)
-            camCfg.rotateCount1 = value;
+            inf_.camera_module_->rotateCount1_.store(value, std::memory_order_relaxed);
         else
-            camCfg.rotateCount2 = value;
+            inf_.camera_module_->rotateCount2_.store(value, std::memory_order_relaxed);
     }
 
     inf_.config_module_->save();

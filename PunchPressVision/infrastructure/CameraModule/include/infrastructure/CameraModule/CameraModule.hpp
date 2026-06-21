@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QString>
 
+#include <atomic>
 #include <memory>
 #include <unordered_map>
 
@@ -24,6 +25,10 @@ namespace inf
 		Config::cameraCfg cameraCfg;
 		// 相机 IP / PLC 等基础配置（由 ConfigModule 注入）
 		Config::BaseCfg baseCfg;
+
+		// 相机旋转次数（原子量：采集线程读取，UI线程写入，避免 data race）
+		std::atomic<int> rotateCount1_{ 0 };
+		std::atomic<int> rotateCount2_{ 0 };
 	public:
 		void build() override;
 		void destroy() override;

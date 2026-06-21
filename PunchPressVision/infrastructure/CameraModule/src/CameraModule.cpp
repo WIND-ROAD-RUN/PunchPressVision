@@ -28,6 +28,10 @@ namespace inf
 
 	void CameraModule::build()
 	{
+		// 从配置初始化旋转次数原子量（cameraCfg 由 infrastructure::build() 在调用本方法前赋值）
+		rotateCount1_.store(cameraCfg.rotateCount1, std::memory_order_relaxed);
+		rotateCount2_.store(cameraCfg.rotateCount2, std::memory_order_relaxed);
+
 		// 为两台相机创建被动采集控件，注册回调桥接到 callBackFunc 信号。
 		// 相机 IP 来自 baseCfg；未配置/无设备时连接失败仅告警，不阻塞启动。
 		struct CamInit
@@ -49,9 +53,10 @@ namespace inf
 			cam->setCallBackFuncPost(
 				[this, idx](rw::hoec::MatInfo& matInfo)
 				{
-					// 根据相机安装方向，对原始图像执行顺时针旋转
+					// 根据相机安装方向，对原始图像执行顺时针旋转（读取原子量，线程安全）
 					const int rotateCount = (idx == global::CameraIndex::Camera1)
-						? cameraCfg.rotateCount1 : cameraCfg.rotateCount2;
+						? rotateCount1_.load(std::memory_order_relaxed)
+						: rotateCount2_.load(std::memory_order_relaxed);
 					if (rotateCount > 0 && rotateCount <= 3 && !matInfo.mat.empty())
 					{
 						// cv::rotate code: 0=90°CW, 1=180°, 2=270°CW(90°CCW)
