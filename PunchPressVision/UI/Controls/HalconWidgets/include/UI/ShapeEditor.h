@@ -119,6 +119,9 @@ namespace ui
 		/// 获取内部 L2 控件，用于连接 zoomChanged 等信号
 		HalconInteractiveLabel* imageLabel() const { return imageLabel_; }
 
+		/// 强制刷新叠加层（Halcon 窗口懒创建就绪后需手动触发）
+		void refreshOverlay();
+
 	signals:
 		void roiChanged();
 		void maskChanged();
@@ -130,7 +133,6 @@ namespace ui
 		bool eventFilter(QObject* obj, QEvent* e) override;
 
 	private:
-		void refreshOverlay();
 		void drawAllROIs();
 		void drawAllMasks();
 		void drawCenterPoint();

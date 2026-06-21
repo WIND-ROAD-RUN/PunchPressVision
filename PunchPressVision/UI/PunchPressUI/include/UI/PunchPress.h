@@ -99,6 +99,7 @@ namespace ui
 
 		// 匹配范围：配置加载/显示/持久化
 		void loadMatchRegionConfig();
+		void deferredCreateMatchRegion();
 		void saveMatchRegion(const HalconCpp::HObject& region);
 		void drawMatchRegion();
 		void showDrawingToolbar(bool visible);

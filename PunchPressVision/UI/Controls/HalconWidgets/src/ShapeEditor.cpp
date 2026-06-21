@@ -3,6 +3,7 @@
 #include "UI/HalconInteractiveLabel.h"
 
 #include <QKeyEvent>
+#include <QDebug>
 #include <QMouseEvent>
 #include <QResizeEvent>
 
@@ -32,6 +33,12 @@ namespace ui
 		drawCenterPoint();
 		drawMarker();
 		drawMatchRegion();
+
+		static int frameCount = 0;
+		if (++frameCount <= 3)
+			qDebug() << "[ShapeEditor::displayImage] frame#" << frameCount
+				<< "hasMatchRegion=" << hasMatchRegion_
+				<< "imageReady=" << (imageLabel_ ? imageLabel_->isReady() : false);
 	}
 
 	// === HObject 导出 ===
@@ -656,7 +663,12 @@ namespace ui
 	void ShapeEditor::drawMatchRegion()
 	{
 		if (!hasMatchRegion_ || !imageLabel_ || !imageLabel_->isReady())
+		{
+			qDebug() << "[drawMatchRegion] early return: hasMR=" << hasMatchRegion_
+				<< "hasLabel=" << (imageLabel_ != nullptr)
+				<< "ready=" << (imageLabel_ ? imageLabel_->isReady() : false);
 			return;
+		}
 
 		try
 		{
@@ -664,14 +676,51 @@ namespace ui
 			HalconCpp::SetDraw(imageLabel_->halconHandle(), "margin");
 			HalconCpp::SetLineWidth(imageLabel_->halconHandle(), 2);
 			HalconCpp::DispObj(matchRegion_, imageLabel_->halconHandle());
+
+			static int drawCount = 0;
+			if (++drawCount <= 3) {
+				HalconCpp::HTuple r1, c1, r2, c2;
+				HalconCpp::SmallestRectangle1(matchRegion_, &r1, &c1, &r2, &c2);
+				qDebug() << "[drawMatchRegion] drew matchRegion #" << drawCount
+					<< "regionInit=" << matchRegion_.IsInitialized()
+					<< "rect=[" << r1[0].D() << c1[0].D() << r2[0].D() << c2[0].D() << "]"
+					<< "area=" << ((r2[0].D()-r1[0].D())*(c2[0].D()-c1[0].D()));
+			}
 		}
-		catch (...) {}
+		catch (const HalconCpp::HException& e) {
+			qDebug() << "[drawMatchRegion] Halcon exception:" << e.ErrorMessage();
+		}
+		catch (...) {
+			qDebug() << "[drawMatchRegion] Unknown exception during draw!";
+		}
 	}
 
 	void ShapeEditor::setMatchRegion(const HalconCpp::HObject& region)
 	{
-		matchRegion_ = region;
-		hasMatchRegion_ = region.IsInitialized();
+		if (region.IsInitialized())
+		{
+			// 诊断：检查传入的源 region
+			HalconCpp::HTuple sr1, sc1, sr2, sc2;
+			HalconCpp::SmallestRectangle1(region, &sr1, &sc1, &sr2, &sc2);
+			qDebug() << "[setMatchRegion] SOURCE rect:"
+				<< sr1[0].D() << sc1[0].D() << sr2[0].D() << sc2[0].D();
+
+			// 用 CopyObj 深拷贝，避免局部变量析构后底层句柄失效
+			HalconCpp::CopyObj(region, &matchRegion_, 1, 1);
+			hasMatchRegion_ = true;
+
+			// 诊断：检查拷贝后的 matchRegion_
+			HalconCpp::HTuple dr1, dc1, dr2, dc2;
+			HalconCpp::SmallestRectangle1(matchRegion_, &dr1, &dc1, &dr2, &dc2);
+			qDebug() << "[setMatchRegion] COPIED rect:"
+				<< dr1[0].D() << dc1[0].D() << dr2[0].D() << dc2[0].D();
+		}
+		else
+		{
+			matchRegion_ = HalconCpp::HObject();
+			hasMatchRegion_ = false;
+			qDebug() << "[setMatchRegion] source NOT initialized, clearing";
+		}
 		refreshOverlay();
 	}
 

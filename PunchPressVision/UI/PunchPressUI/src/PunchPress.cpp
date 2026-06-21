@@ -7,6 +7,7 @@
 #include "ui_PunchPress.h"
 
 #include <QButtonGroup>
+#include <QDebug>
 #include <QFont>
 #include <QGroupBox>
 #include <QHeaderView>
@@ -169,6 +170,25 @@ namespace ui
 		updateCameraParamButtons();
 		updateMatchRegionButton();
 
+		// 诊断：打印配置模块中的 setCfg 实际值
+		{
+			const auto& inf = app_.business().infrastructure();
+			if (inf.config_module_)
+			{
+				const auto& cfg = inf.config_module_->setCfg;
+				qDebug() << "[PunchPress::build] setCfg from config module:"
+					<< "valid=" << cfg.matchRegionValid
+					<< "row1=" << cfg.matchRegionRow1
+					<< "col1=" << cfg.matchRegionCol1
+					<< "row2=" << cfg.matchRegionRow2
+					<< "col2=" << cfg.matchRegionCol2;
+			}
+			else
+			{
+				qDebug() << "[PunchPress::build] config_module_ is NULL!";
+			}
+		}
+
 		// 启动检查（FR-001 ~ FR-004）
 		QString startupError;
 		if (!app_.performStartupCheck(&startupError))
@@ -305,12 +325,31 @@ namespace ui
 
 	void PunchPress::loadMatchRegionConfig()
 	{
+		// Halcon 引擎在首次 OpenWindow 之前未完全初始化，
+		// 此时 GenRectangle1 会返回空区域（即使 hardcode 坐标也一样）。
+		// 因此只在此处检查配置有效性，HObject 的创建推迟到
+		// showEvent() 中 Halcon 窗口就绪后执行 deferredCreateMatchRegion()。
+		const auto& inf = app_.business().infrastructure();
+		if (inf.config_module_ && inf.config_module_->setCfg.matchRegionValid)
+		{
+			qDebug() << "[loadMatchRegionConfig] matchRegion found in config, deferring HObject creation";
+		}
+	}
+
+	void PunchPress::deferredCreateMatchRegion()
+	{
+		// 在 Halcon 窗口已就绪后（showEvent 之后）被调用，
+		// 此时 GenRectangle1 才能正常创建非零面积的 region。
 		const auto& inf = app_.business().infrastructure();
 		if (!inf.config_module_)
 			return;
 
 		const auto& cfg = inf.config_module_->setCfg;
 		if (!cfg.matchRegionValid)
+			return;
+
+		// 若已通过 onDrawConfirm 等方式设置过，不重复创建
+		if (imageView_ && imageView_->hasMatchRegion())
 			return;
 
 		try
@@ -320,8 +359,17 @@ namespace ui
 				cfg.matchRegionRow1, cfg.matchRegionCol1,
 				cfg.matchRegionRow2, cfg.matchRegionCol2);
 			imageView_->setMatchRegion(region);
+
+			qDebug() << "[deferredCreateMatchRegion] Created matchRegion from config:"
+				<< "row1=" << cfg.matchRegionRow1
+				<< "col1=" << cfg.matchRegionCol1
+				<< "row2=" << cfg.matchRegionRow2
+				<< "col2=" << cfg.matchRegionCol2
+				<< "regionInit=" << region.IsInitialized();
 		}
-		catch (...) {}
+		catch (...) {
+			qDebug() << "[deferredCreateMatchRegion] EXCEPTION!";
+		}
 	}
 
 	void PunchPress::saveMatchRegion(const HalconCpp::HObject& region)
@@ -334,6 +382,7 @@ namespace ui
 
 		if (!region.IsInitialized())
 		{
+			qDebug() << "[saveMatchRegion] region not initialized, clearing valid flag";
 			cfg.matchRegionValid = false;
 		}
 		else
@@ -347,14 +396,24 @@ namespace ui
 				cfg.matchRegionCol1 = col1[0].D();
 				cfg.matchRegionRow2 = row2[0].D();
 				cfg.matchRegionCol2 = col2[0].D();
+
+				qDebug() << "[saveMatchRegion] Saving:"
+					<< "row1=" << cfg.matchRegionRow1
+					<< "col1=" << cfg.matchRegionCol1
+					<< "row2=" << cfg.matchRegionRow2
+					<< "col2=" << cfg.matchRegionCol2
+					<< "area=" << ((cfg.matchRegionRow2-cfg.matchRegionRow1)*(cfg.matchRegionCol2-cfg.matchRegionCol1));
 			}
 			catch (...)
 			{
+				qDebug() << "[saveMatchRegion] SmallestRectangle1 failed!";
 				cfg.matchRegionValid = false;
 			}
 		}
 
+		qDebug() << "[saveMatchRegion] Calling config_module_->save()...";
 		inf.config_module_->save();
+		qDebug() << "[saveMatchRegion] Save complete. matchRegionValid=" << cfg.matchRegionValid;
 	}
 
 	void PunchPress::drawMatchRegion()
@@ -411,17 +470,43 @@ namespace ui
 		}
 		else
 		{
-			ui->pbtn_matchRegion->setText(QStringLiteral("绘制识别范围"));
-			ui->pbtn_matchRegion->setStyleSheet(QStringLiteral(
-				"QPushButton {"
-				"  padding: 6px 14px;"
-				"  border: 2px solid #CCC;"
-				"  border-radius: 4px;"
-				"  background-color: white;"
-				"  color: #444;"
-				"  font-size: 18px;"
-				"}"));
-			ui->pbtn_matchRegion->setEnabled(true);
+			// 检查配置中是否有已持久化的匹配范围（HObject 可能尚未创建）
+			bool configHasMatchRegion = false;
+			{
+				const auto& inf = app_.business().infrastructure();
+				if (inf.config_module_ && inf.config_module_->setCfg.matchRegionValid)
+					configHasMatchRegion = true;
+			}
+
+			if (configHasMatchRegion)
+			{
+				ui->pbtn_matchRegion->setText(QStringLiteral("已设置 ✓"));
+				ui->pbtn_matchRegion->setStyleSheet(QStringLiteral(
+					"QPushButton {"
+					"  padding: 6px 14px;"
+					"  border: 2px solid #4CAF50;"
+					"  border-radius: 4px;"
+					"  background-color: white;"
+					"  color: #2E7D32;"
+					"  font-size: 18px;"
+					"  font-weight: bold;"
+					"}"));
+				ui->pbtn_matchRegion->setEnabled(true);
+			}
+			else
+			{
+				ui->pbtn_matchRegion->setText(QStringLiteral("绘制识别范围"));
+				ui->pbtn_matchRegion->setStyleSheet(QStringLiteral(
+					"QPushButton {"
+					"  padding: 6px 14px;"
+					"  border: 2px solid #CCC;"
+					"  border-radius: 4px;"
+					"  background-color: white;"
+					"  color: #444;"
+					"  font-size: 18px;"
+					"}"));
+				ui->pbtn_matchRegion->setEnabled(true);
+			}
 		}
 	}
 
@@ -668,7 +753,12 @@ namespace ui
 	void PunchPress::showEvent(QShowEvent* e)
 	{
 		QMainWindow::showEvent(e);
-		// HalconDisplayLabel 在首次 showEvent 时自动懒创建 Halcon 窗口
+		// Halcon 窗口在首次 showEvent 中懒创建。
+		// 由于 GenRectangle1 在 Halcon 窗口创建之前调用会返回空区域，
+		// 匹配范围的 HObject 创建被推迟到此处——Halcon 窗口已就绪后执行。
+		QMetaObject::invokeMethod(this, [this]() {
+			deferredCreateMatchRegion();
+		}, Qt::QueuedConnection);
 	}
 
 	void PunchPress::resizeEvent(QResizeEvent* e)
