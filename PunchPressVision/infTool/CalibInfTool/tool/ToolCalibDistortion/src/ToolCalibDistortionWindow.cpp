@@ -306,6 +306,7 @@ void ToolCalibDistortionWindow::onStartStop()
 
     if (isRunning_.load(std::memory_order_acquire))
     {
+       
         inf_.camera_module_->stopMonitor();
         isRunning_.store(false, std::memory_order_release);
         ui->startStopBtn->setText(QStringLiteral("开始采集"));
@@ -313,6 +314,7 @@ void ToolCalibDistortionWindow::onStartStop()
     }
     else
     {
+
         inf_.camera_module_->startMonitor();
         isRunning_.store(true, std::memory_order_release);
         ui->startStopBtn->setText(QStringLiteral("停止采集"));
