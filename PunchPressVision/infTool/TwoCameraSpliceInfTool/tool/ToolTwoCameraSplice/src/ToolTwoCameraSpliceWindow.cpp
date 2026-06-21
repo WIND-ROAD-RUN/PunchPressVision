@@ -12,15 +12,12 @@
 #include <QCloseEvent>
 #include <QDateTime>
 #include <QDir>
-#include <QEvent>
 #include <QInputDialog>
+#include <QMessageBox>
+#include <QShowEvent>
 #include <QStatusBar>
 
 #include <filesystem>
-#include <QLabel>
-#include <QMessageBox>
-#include <QResizeEvent>
-#include <QShowEvent>
 
 #include <opencv2/imgcodecs.hpp>
 
@@ -68,7 +65,7 @@ ToolTwoCameraSpliceWindow::ToolTwoCameraSpliceWindow(inf::infrastructure& inf, Q
 	calibTool_->build();
 	spliceTool_->build();
 
-	buildUi();
+	// HalconInteractiveLabel 由 .ui 提升后自动创建，无需 buildUi 替换
 	buildConnections();
 	initCaltabDescrPath();
 	syncConfigToUi();
@@ -80,46 +77,6 @@ ToolTwoCameraSpliceWindow::~ToolTwoCameraSpliceWindow()
 	spliceTool_->destroy();
 	calibTool_->destroy();
 	delete ui;
-}
-
-// ===================================================================
-// 将 .ui 中的 QLabel 占位符替换为 native QWidget（承载 Halcon 显示）
-// ===================================================================
-QWidget* ToolTwoCameraSpliceWindow::replaceLabel(const QString& labelName)
-{
-	auto* old = findChild<QLabel*>(labelName);
-	if (!old)
-		return nullptr;
-
-	auto* host = new QWidget(old->parentWidget());
-	host->setObjectName(old->objectName() + "_host");
-	host->setStyleSheet(QStringLiteral("background-color: #333;"));
-	host->setSizePolicy(old->sizePolicy());
-	host->setMinimumSize(old->minimumSize());
-	host->setMaximumSize(old->maximumSize());
-
-	// 关键：确保 Halcon OpenWindow 能拿到有效的 native 句柄
-	host->setAttribute(Qt::WA_NativeWindow, true);
-
-	// 宿主 resize 时立即同步 Halcon 窗体
-	host->installEventFilter(this);
-
-	if (auto* lay = old->parentWidget() ? old->parentWidget()->layout() : nullptr)
-		lay->replaceWidget(old, host);
-	else
-		host->setGeometry(old->geometry());
-
-	host->show();
-	old->hide();
-	old->deleteLater();
-	return host;
-}
-
-void ToolTwoCameraSpliceWindow::buildUi()
-{
-	hostCam1_     = replaceLabel(QStringLiteral("label_imgDisplay1"));
-	hostCam2_     = replaceLabel(QStringLiteral("label_imgDisplay2"));
-	hostStitched_ = replaceLabel(QStringLiteral("label_imgDisplay"));
 }
 
 // ===================================================================
@@ -244,133 +201,22 @@ void ToolTwoCameraSpliceWindow::applyCalibParams()
 }
 
 // ===================================================================
-// Halcon 窗口管理（UI 线程调用）
+// 事件 — HalconInteractiveLabel 自管理窗口生命周期与 resize
 // ===================================================================
-bool ToolTwoCameraSpliceWindow::ensureHalconWindow(DisplayWindow win)
-{
-	using namespace HalconCpp;
-
-	QWidget* host = nullptr;
-	HalconWin* hw = nullptr;
-
-	switch (win)
-	{
-	case DisplayWindow::Cam1:     host = hostCam1_;     hw = &winCam1_;     break;
-	case DisplayWindow::Cam2:     host = hostCam2_;     hw = &winCam2_;     break;
-	case DisplayWindow::Stitched: host = hostStitched_; hw = &winStitched_; break;
-	}
-
-	if (!host)
-		return false;
-
-	const int w = host->width();
-	const int h = host->height();
-	if (w <= 0 || h <= 0)
-		return false;
-
-	if (hw->hwnd.Length() == 0)
-	{
-		const Hlong winId = static_cast<Hlong>(host->winId());
-		OpenWindow(0, 0, w, h, winId, "visible", "", &hw->hwnd);
-		SetWindowAttr("background_color", "gray");
-		hw->hostSize = QSize(w, h);
-	}
-	else if (hw->hostSize.width() != w || hw->hostSize.height() != h)
-	{
-		SetWindowExtents(hw->hwnd, 0, 0, w, h);
-		hw->hostSize = QSize(w, h);
-		// resize 后重绘
-		if (hw->lastImage.IsInitialized())
-		{
-			HTuple iw, ih;
-			hw->lastImage.GetImageSize(&iw, &ih);
-			SetPart(hw->hwnd, 0, 0, ih[0].I() - 1, iw[0].I() - 1);
-			ClearWindow(hw->hwnd);
-			DispObj(hw->lastImage, hw->hwnd);
-		}
-	}
-
-	return true;
-}
-
-void ToolTwoCameraSpliceWindow::closeHalconWindows()
-{
-	using namespace HalconCpp;
-	if (winCam1_.hwnd.Length() > 0)     { CloseWindow(winCam1_.hwnd);     winCam1_.hwnd.Clear(); }
-	if (winCam2_.hwnd.Length() > 0)     { CloseWindow(winCam2_.hwnd);     winCam2_.hwnd.Clear(); }
-	if (winStitched_.hwnd.Length() > 0) { CloseWindow(winStitched_.hwnd); winStitched_.hwnd.Clear(); }
-}
-
-void ToolTwoCameraSpliceWindow::redrawDisplay(DisplayWindow win)
-{
-	using namespace HalconCpp;
-
-	HalconWin* hw = nullptr;
-	switch (win)
-	{
-	case DisplayWindow::Cam1:     hw = &winCam1_;     break;
-	case DisplayWindow::Cam2:     hw = &winCam2_;     break;
-	case DisplayWindow::Stitched: hw = &winStitched_; break;
-	}
-
-	if (!hw || hw->hwnd.Length() == 0)
-		return;
-
-	try
-	{
-		if (hw->lastImage.IsInitialized())
-		{
-			HTuple iw, ih;
-			hw->lastImage.GetImageSize(&iw, &ih);
-			SetPart(hw->hwnd, 0, 0, ih[0].I() - 1, iw[0].I() - 1);
-			ClearWindow(hw->hwnd);
-			DispObj(hw->lastImage, hw->hwnd);
-		}
-	}
-	catch (const HException&) {}
-}
-
-// ===================================================================
-// 事件
-// ===================================================================
-bool ToolTwoCameraSpliceWindow::eventFilter(QObject* watched, QEvent* event)
-{
-	if (event->type() == QEvent::Resize)
-	{
-		DisplayWindow win;
-		if (watched == hostCam1_)          win = DisplayWindow::Cam1;
-		else if (watched == hostCam2_)     win = DisplayWindow::Cam2;
-		else if (watched == hostStitched_) win = DisplayWindow::Stitched;
-		else return QMainWindow::eventFilter(watched, event);
-
-		if (ensureHalconWindow(win))
-			redrawDisplay(win);
-	}
-	return QMainWindow::eventFilter(watched, event);
-}
-
 void ToolTwoCameraSpliceWindow::showEvent(QShowEvent* event)
 {
 	QMainWindow::showEvent(event);
-	ensureHalconWindow(DisplayWindow::Cam1);
-	ensureHalconWindow(DisplayWindow::Cam2);
-	ensureHalconWindow(DisplayWindow::Stitched);
+	// HalconInteractiveLabel 在 showEvent 中懒创建 Halcon 窗口
 
 	if (inf_.camera_module_)
 		inf_.camera_module_->startMonitor();
-}
-
-void ToolTwoCameraSpliceWindow::resizeEvent(QResizeEvent* event)
-{
-	QMainWindow::resizeEvent(event);
-	// host resize 由 eventFilter 驱动，此处无需额外处理
 }
 
 void ToolTwoCameraSpliceWindow::closeEvent(QCloseEvent* event)
 {
 	if (inf_.camera_module_)
 		inf_.camera_module_->stopMonitor();
-	closeHalconWindows();
+	// HalconInteractiveLabel 在析构时自动关闭 Halcon 窗口
 	QMainWindow::closeEvent(event);
 }
 
@@ -386,14 +232,12 @@ void ToolTwoCameraSpliceWindow::onCameraFrame(rw::hoec::MatInfo matInfo, global:
 		rawMat1_   = matInfo.mat.clone();
 		cam1Image_ = cvMatToHImage(matInfo.mat);
 		cam1Ready_ = true;
-		winCam1_.lastImage = cam1Image_;
 		break;
 
 	case global::CameraIndex::Camera2:
 		rawMat2_   = matInfo.mat.clone();
 		cam2Image_ = cvMatToHImage(matInfo.mat);
 		cam2Ready_ = true;
-		winCam2_.lastImage = cam2Image_;
 		break;
 	}
 
@@ -407,15 +251,9 @@ void ToolTwoCameraSpliceWindow::onCameraFrame(rw::hoec::MatInfo matInfo, global:
 void ToolTwoCameraSpliceWindow::onDisplayFrame()
 {
 	if (cam1Ready_)
-	{
-		if (ensureHalconWindow(DisplayWindow::Cam1))
-			redrawDisplay(DisplayWindow::Cam1);
-	}
+		ui->label_imgDisplay1->displayImage(cam1Image_);
 	if (cam2Ready_)
-	{
-		if (ensureHalconWindow(DisplayWindow::Cam2))
-			redrawDisplay(DisplayWindow::Cam2);
-	}
+		ui->label_imgDisplay2->displayImage(cam2Image_);
 }
 
 // ===================================================================
@@ -686,12 +524,9 @@ void ToolTwoCameraSpliceWindow::btn_test_clicked()
 		return;
 	}
 
-	// 显示
+	// 显示拼接结果（HalconInteractiveLabel 自动处理缩放/平移）
 	HalconCpp::HImage stitchedHImage(stitched);
-	winStitched_.lastImage = stitchedHImage;
-	if (ensureHalconWindow(DisplayWindow::Stitched))
-		redrawDisplay(DisplayWindow::Stitched);
-
+	ui->label_imgDisplay->displayImage(stitchedHImage);
 
 	ui->lb_realPosition->setText(
 		QStringLiteral("拼接完成 | 矫正尺寸: %1 × %2 px")

@@ -25,9 +25,7 @@ public:
 
 protected:
 	void showEvent(QShowEvent* event) override;
-	void resizeEvent(QResizeEvent* event) override;
 	void closeEvent(QCloseEvent* event) override;
-	bool eventFilter(QObject* watched, QEvent* event) override;
 
 signals:
 	/// 请求 UI 线程刷新三路 Halcon 显示
@@ -61,20 +59,10 @@ private slots:
 	void btn_exit_clicked();
 
 private:
-	void buildUi();
 	void buildConnections();
 	void initCaltabDescrPath();
 	void syncConfigToUi();
 	void applyCalibParams();
-
-	// Halcon 窗口管理
-	enum class DisplayWindow { Cam1, Cam2, Stitched };
-	bool ensureHalconWindow(DisplayWindow win);
-	void closeHalconWindows();
-	void redrawDisplay(DisplayWindow win);
-
-	// 从 QLabel 占位符创建 native host 承载 Halcon 窗口
-	QWidget* replaceLabel(const QString& labelName);
 
 	// cv::Mat → HImage 转换
 	static HalconCpp::HImage cvMatToHImage(const cv::Mat& mat);
@@ -84,21 +72,6 @@ private:
 	std::unique_ptr<infTool::CalibInfTool> calibTool_;
 	std::unique_ptr<infTool::TwoCameraSpliceInfTool> spliceTool_;
 	Ui::ToolTwoCameraSpliceWindowClass* ui = nullptr;
-
-	// 显示窗口宿主
-	QWidget* hostCam1_ = nullptr;
-	QWidget* hostCam2_ = nullptr;
-	QWidget* hostStitched_ = nullptr;
-
-	// Halcon 窗口句柄 + 末帧缓存
-	struct HalconWin {
-		HalconCpp::HTuple hwnd;
-		HalconCpp::HImage lastImage;
-		QSize hostSize;
-	};
-	HalconWin winCam1_;
-	HalconWin winCam2_;
-	HalconWin winStitched_;
 
 	// 相机帧缓冲（采集线程写入，UI 线程读取）
 	cv::Mat rawMat1_;
