@@ -12,8 +12,6 @@
 #include "infrastructure/infrastructure.hpp"
 #include "rwul/hoecm/hoec_m.hpp"
 
-#include "DisplayView.hpp"
-
 namespace infTool { class CalibInfTool; }
 
 QT_BEGIN_NAMESPACE
@@ -32,7 +30,6 @@ protected:
     void showEvent(QShowEvent* event) override;
     void resizeEvent(QResizeEvent* event) override;
     void closeEvent(QCloseEvent* event) override;
-    bool eventFilter(QObject* watched, QEvent* event) override;
 
 private slots:
     void onCameraFrame(rw::hoec::MatInfo matInfo, global::CameraIndex cameraIndex);
@@ -54,7 +51,6 @@ signals:
     void originalFrameReady(HalconCpp::HImage image);
 
 private:
-    void buildUi();
     void buildConnections();
     void initBoardDescrPath();
     void cleanCalibImageDirs();
@@ -68,12 +64,6 @@ private:
     inf::infrastructure& inf_;
     std::unique_ptr<infTool::CalibInfTool> calibInfTool_;
     Ui::ToolCalibDistortionWindowClass* ui = nullptr;
-
-    QWidget* originalHost_ = nullptr;
-    QWidget* undistortedHost_ = nullptr;
-
-    DisplayView originalView_;
-    DisplayView undistortedView_;
 
     // Halcon 标定图像缓存
     std::vector<HalconCpp::HImage> capturedImages_;

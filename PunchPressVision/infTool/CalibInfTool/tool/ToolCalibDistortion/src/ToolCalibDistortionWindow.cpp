@@ -7,12 +7,10 @@
 
 #include <QApplication>
 #include <QCloseEvent>
-#include <QEvent>
 #include <QComboBox>
 #include <QDateTime>
 #include <QDir>
 #include <QFileDialog>
-#include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QResizeEvent>
@@ -66,9 +64,6 @@ ToolCalibDistortionWindow::ToolCalibDistortionWindow(inf::infrastructure& inf, Q
     // 初始化 Halcon 标定引擎
     calibInfTool_->build();
 
-    // 将 .ui 中的 QLabel 占位符替换为 native QWidget，承载 Halcon 窗口
-    buildUi();
-
     buildConnections();
     initBoardDescrPath();
     cleanCalibImageDirs();
@@ -79,44 +74,7 @@ ToolCalibDistortionWindow::ToolCalibDistortionWindow(inf::infrastructure& inf, Q
 ToolCalibDistortionWindow::~ToolCalibDistortionWindow()
 {
     calibInfTool_->destroy();
-    originalView_.close();
-    undistortedView_.close();
     delete ui;
-}
-
-// ===================================================================
-// 将 .ui 中的 QLabel 占位符替换为 native QWidget（承载 Halcon 窗口）
-// ===================================================================
-void ToolCalibDistortionWindow::buildUi()
-{
-    auto replaceLabel = [this](QLabel* old) -> QWidget*
-    {
-        auto* host = new QWidget(old->parentWidget());
-        host->setObjectName(old->objectName());
-        host->setStyleSheet(old->styleSheet());
-        host->setSizePolicy(old->sizePolicy());
-        host->setMinimumSize(old->minimumSize());
-        host->setMaximumSize(old->maximumSize());
-
-        // 确保 Halcon OpenWindow 能拿到有效的 native 句柄
-        host->setAttribute(Qt::WA_NativeWindow, true);
-
-        // 宿主 resize 时立即同步 Halcon 窗体
-        host->installEventFilter(this);
-
-        if (auto* lay = old->parentWidget() ? old->parentWidget()->layout() : nullptr)
-            lay->replaceWidget(old, host);
-        else
-            host->setGeometry(old->geometry());
-
-        host->show();
-        old->hide();
-        old->deleteLater();
-        return host;
-    };
-
-    originalHost_   = replaceLabel(ui->originalView);
-    undistortedHost_ = replaceLabel(ui->undistortedView);
 }
 
 // ===================================================================
@@ -171,30 +129,21 @@ void ToolCalibDistortionWindow::buildConnections()
 void ToolCalibDistortionWindow::showEvent(QShowEvent* event)
 {
     QMainWindow::showEvent(event);
-    // 首次显示时布局已计算完毕，宿主尺寸有效，打开 Halcon 窗口
-    originalView_.ensure(originalHost_);
-    undistortedView_.ensure(undistortedHost_);
-    originalView_.resizeToHost();
+    // HalconInteractiveLabel 在 showEvent 中懒创建 Halcon 窗口，
+    // 无需手动 ensure / resizeToHost
     refreshMarkedView();
-}
-
-bool ToolCalibDistortionWindow::eventFilter(QObject* watched, QEvent* event)
-{
-    if (event->type() == QEvent::Resize)
-    {
-        if (watched == originalHost_)
-            originalView_.resizeToHost();
-        else if (watched == undistortedHost_)
-            refreshMarkedView();
-    }
-    return QMainWindow::eventFilter(watched, event);
 }
 
 void ToolCalibDistortionWindow::resizeEvent(QResizeEvent* event)
 {
     QMainWindow::resizeEvent(event);
-    originalView_.resizeToHost();
-    refreshMarkedView();
+    // HalconInteractiveLabel 内部处理图像重绘；
+    // 右侧 XLD 叠加需手动恢复（Halcon ClearWindow 会擦除 XLD）
+    if (lastMarksXld_.IsInitialized() && ui->undistortedView->isReady())
+    {
+        HalconCpp::SetColor(ui->undistortedView->halconHandle(), "green");
+        HalconCpp::DispObj(lastMarksXld_, ui->undistortedView->halconHandle());
+    }
 }
 
 void ToolCalibDistortionWindow::closeEvent(QCloseEvent* event)
@@ -235,7 +184,7 @@ void ToolCalibDistortionWindow::onCameraFrame(rw::hoec::MatInfo matInfo, global:
 // ===================================================================
 void ToolCalibDistortionWindow::onOriginalDisplayFrame(HalconCpp::HImage image)
 {
-    originalView_.display(image);
+    ui->originalView->displayImage(image);
 }
 
 // ===================================================================
@@ -246,9 +195,12 @@ void ToolCalibDistortionWindow::refreshMarkedView()
     if (!lastMarkedImage_.IsInitialized())
         return;
 
-    undistortedView_.display(lastMarkedImage_);
+    ui->undistortedView->displayImage(lastMarkedImage_);
     if (lastMarksXld_.IsInitialized())
-        undistortedView_.overlayXld(lastMarksXld_);
+    {
+        HalconCpp::SetColor(ui->undistortedView->halconHandle(), "green");
+        HalconCpp::DispObj(lastMarksXld_, ui->undistortedView->halconHandle());
+    }
 }
 
 // ===================================================================
@@ -520,8 +472,7 @@ void ToolCalibDistortionWindow::onSaveCurrentFrame()
         lastMarkedImage_ = hImg;
         lastMarksXld_   = marksXld;
 
-        undistortedView_.display(lastMarkedImage_);
-        undistortedView_.overlayXld(lastMarksXld_);
+        refreshMarkedView();
 
         statusBar()->showMessage(
             QStringLiteral("已保存：%1（已加入标定图集，共 %2 张）")

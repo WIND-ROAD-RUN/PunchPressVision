@@ -1,5 +1,6 @@
 #include "CornerPreviewDialog.hpp"
 
+#include "UI/HalconInteractiveLabel.h"
 #include "infTool/CalibInfTool/CalibInfTool.hpp"
 #include "infrastructure/CalibConfigModule/Config/CalibConfig.hpp"
 
@@ -25,14 +26,12 @@ CornerPreviewDialog::CornerPreviewDialog(
     rootLayout->setContentsMargins(8, 8, 8, 8);
     rootLayout->setSpacing(8);
 
-    // Halcon 渲染宿主
-    viewHost_ = new QWidget(this);
-    viewHost_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    viewHost_->setMinimumSize(640, 480);
-    viewHost_->setStyleSheet(QStringLiteral("background-color: #333;"));
-    rootLayout->addWidget(viewHost_, 1);
-
-    displayView_.ensure(viewHost_);
+    // HalconInteractiveLabel 自管理 Halcon 窗口生命周期，支持滚轮缩放/拖拽平移
+    view_ = new ui::HalconInteractiveLabel(this);
+    view_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    view_->setMinimumSize(640, 480);
+    view_->setStyleSheet(QStringLiteral("background-color: #333;"));
+    rootLayout->addWidget(view_, 1);
 
     // 计数器
     counterLabel_ = new QLabel(this);
@@ -61,10 +60,7 @@ CornerPreviewDialog::CornerPreviewDialog(
     updateView();
 }
 
-CornerPreviewDialog::~CornerPreviewDialog()
-{
-    displayView_.close();
-}
+CornerPreviewDialog::~CornerPreviewDialog() = default;
 
 void CornerPreviewDialog::onPrev()
 {
@@ -104,19 +100,14 @@ void CornerPreviewDialog::updateView()
     prevBtn_->setEnabled(currentIndex_ > 0);
     nextBtn_->setEnabled(currentIndex_ + 1 < total);
 
-    refreshDisplay();
-}
-
-void CornerPreviewDialog::refreshDisplay()
-{
+    // 显示图像
     const auto& img = images_[currentIndex_];
     if (!img.IsInitialized())
         return;
 
-    // 显示原始图像
-    displayView_.display(img);
+    view_->displayImage(img);
 
-    // 尝试查找标定板标记并叠加 XLD
+    // 查找标定板标记并叠加 XLD
     bool isOk = false;
     HalconCpp::HObject marksXld, marksRegion;
     std::string err;
@@ -124,7 +115,8 @@ void CornerPreviewDialog::refreshDisplay()
 
     if (isOk)
     {
-        displayView_.overlayXld(marksXld);
+        HalconCpp::SetColor(view_->halconHandle(), "green");
+        HalconCpp::DispObj(marksXld, view_->halconHandle());
         setWindowTitle(
             QStringLiteral("Halcon 标定板标记点预览 — %1 / %2 (检测成功)")
                 .arg(currentIndex_ + 1).arg(images_.size()));
@@ -140,5 +132,22 @@ void CornerPreviewDialog::refreshDisplay()
 void CornerPreviewDialog::resizeEvent(QResizeEvent* event)
 {
     QDialog::resizeEvent(event);
-    displayView_.resizeToHost();
+    // HalconInteractiveLabel 内部处理图像重绘（ClearWindow + DispObj），
+    // 但 XLD 叠加会被擦除，需要重新查找并绘制。
+    if (!images_.empty() && currentIndex_ < images_.size())
+    {
+        const auto& img = images_[currentIndex_];
+        if (img.IsInitialized() && view_->isReady())
+        {
+            bool isOk = false;
+            HalconCpp::HObject marksXld, marksRegion;
+            std::string err;
+            calibTool_.drawCalibMarks(img, cfg_, isOk, marksXld, marksRegion, &err);
+            if (isOk)
+            {
+                HalconCpp::SetColor(view_->halconHandle(), "green");
+                HalconCpp::DispObj(marksXld, view_->halconHandle());
+            }
+        }
+    }
 }

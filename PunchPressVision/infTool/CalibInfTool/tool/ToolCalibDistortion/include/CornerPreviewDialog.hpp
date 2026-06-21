@@ -8,8 +8,7 @@
 
 #include "halconcpp/HalconCpp.h"
 
-#include "DisplayView.hpp"
-
+namespace ui { class HalconInteractiveLabel; }
 namespace infTool { class CalibInfTool; }
 namespace Config { class CalibConfigItem; }
 
@@ -17,7 +16,8 @@ namespace Config { class CalibConfigItem; }
  * @brief Halcon 标定板标记点预览对话框。
  *
  * 对每一张标定图像调用 CalibInfTool::drawCalibMarks()，
- * 使用 Halcon 窗口渲染图像并叠加 XLD 标记点。
+ * 使用 HalconInteractiveLabel 渲染图像并叠加 XLD 标记点，
+ * 支持鼠标滚轮缩放与拖拽平移。
  */
 class CornerPreviewDialog : public QDialog
 {
@@ -40,7 +40,6 @@ private slots:
 
 private:
     void updateView();
-    void refreshDisplay();
 
 private:
     infTool::CalibInfTool& calibTool_;
@@ -48,10 +47,8 @@ private:
     const std::vector<HalconCpp::HImage>& images_;
     size_t currentIndex_ = 0;
 
-    QWidget* viewHost_ = nullptr;
+    ui::HalconInteractiveLabel* view_ = nullptr;
     QLabel* counterLabel_ = nullptr;
     QPushButton* prevBtn_ = nullptr;
     QPushButton* nextBtn_ = nullptr;
-
-    DisplayView displayView_;
 };
