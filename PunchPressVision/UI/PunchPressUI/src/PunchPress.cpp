@@ -693,14 +693,28 @@ namespace ui
 			inf.two_camera_splice_module_->save();
 		}
 
-		// TODO: 当高度变化时，需要触发双相机拼接算法更新。
-		//       例如重新计算拼接映射图 (MapSingle1/MapSingle2)，
-		//       调用 infTool::TwoCameraSpliceInfTool::calibImage() 或类似方法。
-		// auto& infTool = app_.business().infTool();
-		// if (infTool.two_camera_splice_infTool_)
-		// {
-		//     // 重新标定或更新拼接参数
-		// }
+		// 高度变化后，若已有标定图像，重新计算拼接映射图 (MapSingle1/MapSingle2)
+		auto& infTool = app_.business().infTool();
+		if (inf.two_camera_splice_module_ && inf.calib_config_module_ && infTool.two_camera_splice_bun)
+		{
+			auto& spliceCfg = inf.two_camera_splice_module_->twoCameraSpliceConfig;
+			if (spliceCfg.camera1Piccture.IsInitialized() && spliceCfg.camera2Piccture.IsInitialized())
+			{
+				auto& calibCfg = inf.calib_config_module_->calibConfig;
+				std::string errorMsg;
+				const bool ok = infTool.two_camera_splice_bun->calibImage(
+					static_cast<HalconCpp::HObject>(spliceCfg.camera1Piccture),
+					static_cast<HalconCpp::HObject>(spliceCfg.camera2Piccture),
+					calibCfg.item(global::CameraIndex::Camera1),
+					calibCfg.item(global::CameraIndex::Camera2),
+					spliceCfg,
+					&errorMsg);
+				if (ok)
+				{
+					inf.two_camera_splice_module_->save();
+				}
+			}
+		}
 
 		updateHeightButton();
 	}

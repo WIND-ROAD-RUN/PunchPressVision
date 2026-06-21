@@ -19,7 +19,8 @@ int main(int argc, char* argv[])
 
 	inf::infrastructure inf;
 	inf.build();
-
+	inf.camera_module_->setFreeRunMode(global::CameraIndex::Camera1, 3);
+	inf.camera_module_->setFreeRunMode(global::CameraIndex::Camera2, 3);
 	ToolTwoCameraSpliceWindow wnd(inf);
 	wnd.show();
 
