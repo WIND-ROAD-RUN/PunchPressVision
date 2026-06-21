@@ -458,7 +458,7 @@ QPushButton:pressed {
 }</string>
             </property>
             <property name="text">
-             <string>删除模型</string>
+             <string>删除选中的模型</string>
             </property>
            </widget>
           </item>
