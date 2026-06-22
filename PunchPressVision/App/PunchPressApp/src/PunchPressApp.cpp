@@ -24,6 +24,7 @@ namespace app
 
 		// PLC 连接状态：ControlModule 信号 → App 信号（信号直连，无需中间槽）
 		auto& inf = business_.infrastructure();
+
 		if (inf.control_module_)
 		{
 			QObject::connect(inf.control_module_.get(), &inf::ControlModule::connectionStateChanged,
@@ -56,6 +57,7 @@ namespace app
 		if (business_.health_monitor_bun)
 			QObject::disconnect(business_.health_monitor_bun.get(), nullptr, this, nullptr);
 		auto& inf = business_.infrastructure();
+
 		if (inf.control_module_)
 			QObject::disconnect(inf.control_module_.get(), nullptr, this, nullptr);
 	}
@@ -64,6 +66,7 @@ namespace app
 	{
 		// 尝试连接 PLC（IP/端口来自基础配置）。无设备时连接失败仅告警。
 		auto& inf = business_.infrastructure();
+
 		if (inf.control_module_ && inf.config_module_)
 		{
 			const auto& base = inf.config_module_->baseCfg;
@@ -78,6 +81,7 @@ namespace app
 	void PunchPressApp::stop()
 	{
 		auto& inf = business_.infrastructure();
+
 		if (inf.control_module_)
 			inf.control_module_->disconnectPLC();
 	}
@@ -163,6 +167,7 @@ namespace app
 		global::CalibReadiness r;
 		const auto& inf = business_.infrastructure();
 
+
 		// 畸变矫正就绪：相机内参非空
 		if (inf.calib_config_module_)
 			r.distortionReady = inf.calib_config_module_->calibConfig.item(global::CameraIndex::Camera1).cameraParameters.Length() > 0;
@@ -188,6 +193,7 @@ namespace app
 			pr.loadedModelCount = business_.shape_mode_manager_bun->getLoadedModelCount();
 		}
 		const auto& inf = business_.infrastructure();
+
 		pr.plcConnected = inf.control_module_ ? inf.control_module_->isConnected() : false;
 		return pr;
 	}
@@ -198,6 +204,7 @@ namespace app
 	{
 		// 自由运行模式，3fps（FR-005）
 		auto& inf = business_.infrastructure();
+
 		if (!inf.camera_module_)
 			return false;
 		bool ok = inf.camera_module_->setFreeRunMode(global::CameraIndex::Camera1, 3.0);
@@ -209,6 +216,7 @@ namespace app
 	{
 		// 外部触发模式，Line0，30fps（FR-008）
 		auto& inf = business_.infrastructure();
+
 		if (!inf.camera_module_)
 			return false;
 		bool ok = inf.camera_module_->setTriggerMode(
@@ -222,6 +230,7 @@ namespace app
 	{
 		// 空闲/停止模式：触发模式（软件触发），不开始取流，由 switchToMode 统一停止 monitor
 		auto& inf = business_.infrastructure();
+
 		if (!inf.camera_module_)
 			return false;
 		bool ok = inf.camera_module_->setTriggerMode(
@@ -371,6 +380,19 @@ namespace app
 
 		// 写 PLC：每个匹配结果占一组寄存器（间隔 10），无效槽位清零
 		auto& inf = business_.infrastructure();
+		// 读取 m330 线圈决定 X 排序方向（true=升序，false=降序）
+		bool sortByXAsc = false;
+		if (inf.control_module_ && inf.control_module_->isConnected())
+		{
+			inf.control_module_->readCoil(330, sortByXAsc);
+		}
+		if (!allResults.empty())
+		{
+			std::sort(allResults.begin(), allResults.end(),
+				[sortByXAsc](const global::PositionResult& a, const global::PositionResult& b) {
+					return sortByXAsc ? (a.offsetX < b.offsetX) : (a.offsetX > b.offsetX);
+				});
+		}
 		if (inf.control_module_ && inf.control_module_->isConnected() && inf.config_module_)
 		{
 			const auto& plc = inf.config_module_->plcAddressCfg;

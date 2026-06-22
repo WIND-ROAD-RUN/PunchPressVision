@@ -1,0 +1,20 @@
+# Match the unique comment before processProductionFrame's inf declaration, skip to next line, then insert
+/写 PLC：每个匹配结果占一组寄存器/{
+n
+a\
+
+		// 读取 m330 线圈决定 X 排序方向（true=升序，false=降序）\
+		bool sortByXAsc = false;\
+		if (inf.control_module_ && inf.control_module_->isConnected())\
+		{\
+			inf.control_module_->readCoil(330, sortByXAsc);\
+		}\
+		if (!allResults.empty())\
+		{\
+			std::sort(allResults.begin(), allResults.end(),\
+				[sortByXAsc](const global::PositionResult& a, const global::PositionResult& b) {\
+					return sortByXAsc ? (a.offsetX < b.offsetX) : (a.offsetX > b.offsetX);\
+				});\
+		}\
+
+}
