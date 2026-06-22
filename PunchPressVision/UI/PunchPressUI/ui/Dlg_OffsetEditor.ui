@@ -54,14 +54,14 @@
       <item row="0" column="0">
        <widget class="QLabel" name="label_offsetX">
         <property name="text">
-         <string>X方向偏移 (mm):</string>
+         <string>左右偏移 (mm):</string>
         </property>
        </widget>
       </item>
       <item row="0" column="1">
        <widget class="QPushButton" name="btn_offsetX">
         <property name="toolTip">
-         <string>X 方向偏移 (mm)，范围 -9999.999 ~ 9999.999</string>
+         <string>左右偏移 (mm)，范围 -9999.999 ~ 9999.999</string>
         </property>
         <property name="styleSheet">
          <string notr="true">QPushButton {
@@ -86,14 +86,14 @@ QPushButton:hover {
       <item row="1" column="0">
        <widget class="QLabel" name="label_offsetY">
         <property name="text">
-         <string>Y方向偏移 (mm):</string>
+         <string>上下偏移 (mm):</string>
         </property>
        </widget>
       </item>
       <item row="1" column="1">
        <widget class="QPushButton" name="btn_offsetY">
         <property name="toolTip">
-         <string>Y 方向偏移 (mm)，范围 -9999.999 ~ 9999.999</string>
+         <string>上下偏移 (mm)，范围 -9999.999 ~ 9999.999</string>
         </property>
         <property name="styleSheet">
          <string notr="true">QPushButton {

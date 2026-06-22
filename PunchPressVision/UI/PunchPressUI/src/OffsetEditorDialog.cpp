@@ -78,16 +78,16 @@ namespace ui
 		// OffsetX
 		btnOffsetX_ = new QPushButton(QString::number(offsetX_, 'f', 3), this);
 		btnOffsetX_->setStyleSheet(btnStyle);
-		btnOffsetX_->setToolTip(QStringLiteral("X 方向偏移 (mm)，范围 -9999.999 ~ 9999.999"));
+		btnOffsetX_->setToolTip(QStringLiteral("左右偏移 (mm)，范围 -9999.999 ~ 9999.999"));
 		connect(btnOffsetX_, &QPushButton::clicked, this, &OffsetEditorDialog::onOffsetXClicked);
-		formLayout->addRow(QStringLiteral("X方向偏移 (mm):"), btnOffsetX_);
+		formLayout->addRow(QStringLiteral("左右偏移 (mm):"), btnOffsetX_);
 
 		// OffsetY
 		btnOffsetY_ = new QPushButton(QString::number(offsetY_, 'f', 3), this);
 		btnOffsetY_->setStyleSheet(btnStyle);
-		btnOffsetY_->setToolTip(QStringLiteral("Y 方向偏移 (mm)，范围 -9999.999 ~ 9999.999"));
+		btnOffsetY_->setToolTip(QStringLiteral("上下偏移 (mm)，范围 -9999.999 ~ 9999.999"));
 		connect(btnOffsetY_, &QPushButton::clicked, this, &OffsetEditorDialog::onOffsetYClicked);
-		formLayout->addRow(QStringLiteral("Y方向偏移 (mm):"), btnOffsetY_);
+		formLayout->addRow(QStringLiteral("上下偏移 (mm):"), btnOffsetY_);
 
 		// OffsetAngle
 		btnOffsetAngle_ = new QPushButton(QString::number(offsetAngle_, 'f', 3), this);

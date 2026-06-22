@@ -111,8 +111,8 @@ namespace ui
 		// 表头
 		QStringList headers;
 		headers << QStringLiteral("模型名称")
-			<< QStringLiteral("X方向偏移")
-			<< QStringLiteral("Y方向偏移")
+			<< QStringLiteral("左右偏移")
+			<< QStringLiteral("上下偏移")
 			<< QStringLiteral("角度偏移")
 			<< QStringLiteral("查找数量")
 			<< QStringLiteral("最低分数")
