@@ -109,6 +109,10 @@ void ToolCalibDistortionWindow::buildConnections()
     connect(ui->setRotateBtn, &QPushButton::clicked,
         this, &ToolCalibDistortionWindow::onSetRotate);
 
+    // 退出按钮
+    connect(ui->btn_exit, &QPushButton::clicked,
+        this, &ToolCalibDistortionWindow::onExit);
+
     // 相机回调使用 DirectConnection，在采集线程中处理图像并排队到 UI 线程显示
     if (inf_.camera_module_)
     {
@@ -155,6 +159,11 @@ void ToolCalibDistortionWindow::closeEvent(QCloseEvent* event)
         isRunning_.store(false);
     }
     event->accept();
+}
+
+void ToolCalibDistortionWindow::onExit()
+{
+    close();  // closeEvent 中统一处理停止采集等清理逻辑
 }
 
 // ===================================================================

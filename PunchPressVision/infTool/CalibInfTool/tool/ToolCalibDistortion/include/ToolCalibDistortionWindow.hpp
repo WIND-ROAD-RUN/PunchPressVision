@@ -41,6 +41,7 @@ private slots:
     void onSetRotate();
     void onStartStop();
     void onCameraSelected(int index);
+    void onExit();
 
     // Halcon 标定相关槽函数
     void onSaveCurrentFrame();
