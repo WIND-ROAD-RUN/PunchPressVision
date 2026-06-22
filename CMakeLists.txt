@@ -22,7 +22,7 @@ endif()
 # Release 模式：全屏无边框显示
 add_compile_definitions($<$<CONFIG:Release>:PPV_RELEASE_FULLSCREEN>)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/output/$<CONFIG>")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/output/$<CONFIG>/PunchPressVision")
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
