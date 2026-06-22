@@ -383,10 +383,11 @@ namespace app
 				for (size_t i = 0; i < allResults.size() && i < kMaxSlots; ++i)
 				{
 					const int base = plc.regOffsetX + static_cast<int>(i) * kRegSpacing;
-					inf.control_module_->writeFloat(base, static_cast<float>(1));
-					inf.control_module_->writeFloat(base + 2, static_cast<float>(1 ));
-					inf.control_module_->writeFloat(base + 4, static_cast<float>(1));
-					inf.control_module_->writeRegister(base + 6, 1);  // valid
+					const auto& r = allResults[i];
+					inf.control_module_->writeFloat(base,      static_cast<float>(r.offsetX * 100.0));
+					inf.control_module_->writeFloat(base + 2,  static_cast<float>(-r.offsetY * 100.0));
+					inf.control_module_->writeFloat(base + 4,  static_cast<float>(-r.angle   * 100.0));
+					inf.control_module_->writeRegister(base + 6, r.valid ? 1 : 0);  // valid
 				}
 
 				// 清空剩余槽位
