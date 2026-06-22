@@ -25,6 +25,9 @@
 #include <QLabel>
 #include <QResizeEvent>
 #include <QShowEvent>
+#include <QTimer>
+
+#include <algorithm>
 
 #include <opencv2/imgcodecs.hpp>
 
@@ -588,6 +591,9 @@ void ToolNinePointWindow::onDisplayFrame()
 
 			if (found && !results.isEmpty())
 			{
+				// 按 x(Col) 坐标从小到大排序，确保与实际位置一一对应（与 DlgJiudianbiaoding 一致）
+				std::sort(results.begin(), results.end(),
+					[](const RectangleResult& a, const RectangleResult& b) { return a.x < b.x; });
 				for (const auto& rect : results)
 				{
 					// 计算实际坐标（3x3网格）
@@ -1109,6 +1115,13 @@ void ToolNinePointWindow::clearNinePointResults()
 
 void ToolNinePointWindow::btn_ninePointCalibration_clicked()
 {
+	// 清空双相机缓存（防止回调中残留数据污染新一轮采集）
+	cam1Image_ = HalconCpp::HImage();
+	cam2Image_ = HalconCpp::HImage();
+	cam1Ready_ = false;
+	cam2Ready_ = false;
+
+	// 开始新一轮采集前：如果已有历史点，先确认是否清空
 	if (!pixPoints_.empty())
 	{
 		const auto ret = QMessageBox::question(this,
@@ -1117,11 +1130,27 @@ void ToolNinePointWindow::btn_ninePointCalibration_clicked()
 		if (ret != QMessageBox::Yes) return;
 		clearNinePointResults();
 	}
+	else
+	{
+		clearNinePointImages();
+		if (ui) ui->btn_ninePointCalibration->setEnabled(false);
+	}
 
 	applyCalibParams();
 
-	isJiuDianBiaoDing_ = true;
-	QMessageBox::information(this, QStringLiteral("提示"), QStringLiteral("准备完成，开始九点标定采集。"));
+	// 切换到硬触发模式（Line0），等待外部触发出图
+	if (inf_.camera_module_)
+	{
+		inf_.camera_module_->setTriggerMode(global::CameraIndex::Camera1, global::TriggerSource::Line0, 2.0);
+		inf_.camera_module_->setTriggerMode(global::CameraIndex::Camera2, global::TriggerSource::Line0, 2.0);
+	}
+
+	// 2s 后再进入九点标定状态（异步，不阻塞UI；等待相机回调切换完成）
+	QTimer::singleShot(2000, this, [this]()
+	{
+		isJiuDianBiaoDing_ = true;
+		QMessageBox::information(this, QStringLiteral("提示"), QStringLiteral("准备完成"));
+	});
 }
 
 void ToolNinePointWindow::btn_completeCalibration_clicked()
