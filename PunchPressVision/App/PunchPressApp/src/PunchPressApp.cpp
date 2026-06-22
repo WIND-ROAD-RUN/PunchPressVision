@@ -377,33 +377,26 @@ namespace app
 			constexpr int kRegSpacing = 10;   // 每组结果的寄存器间隔
 			constexpr size_t kMaxSlots = 50;  // 最大结果槽位数
 
-			// Lambda：把 float 拆成 2 个 uint16（BigEndian 字序：高字在前）
-			auto packFloatBE = [](float val) -> std::pair<uint16_t, uint16_t> {
-				uint32_t bits;
-				std::memcpy(&bits, &val, sizeof(bits));
-				return { static_cast<uint16_t>((bits >> 16) & 0xFFFF),
-				         static_cast<uint16_t>(bits & 0xFFFF) };
-			};
-
 			if (!allResults.empty())
 			{
-				// 写入有效结果（批量写入，每组 7 个寄存器）
+				// 写入有效结果
 				for (size_t i = 0; i < allResults.size() && i < kMaxSlots; ++i)
 				{
 					const int base = plc.regOffsetX + static_cast<int>(i) * kRegSpacing;
-					auto [xH, xL] = packFloatBE(static_cast<float>(allResults[i].offsetX * 100.0));
-					auto [yH, yL] = packFloatBE(static_cast<float>(allResults[i].offsetY * 100.0));
-					auto [aH, aL] = packFloatBE(static_cast<float>(allResults[i].angle * 100.0));
-					inf.control_module_->writeMultipleRegisters(base,
-						{ xH, xL, yH, yL, aH, aL, static_cast<uint16_t>(1) });
+					inf.control_module_->writeFloat(base, static_cast<float>(1));
+					inf.control_module_->writeFloat(base + 2, static_cast<float>(1 ));
+					inf.control_module_->writeFloat(base + 4, static_cast<float>(1));
+					inf.control_module_->writeRegister(base + 6, 1);  // valid
 				}
 
 				// 清空剩余槽位
 				for (size_t i = allResults.size(); i < kMaxSlots; ++i)
 				{
 					const int base = plc.regOffsetX + static_cast<int>(i) * kRegSpacing;
-					inf.control_module_->writeMultipleRegisters(base,
-						{ 0, 0, 0, 0, 0, 0, static_cast<uint16_t>(0) });
+					inf.control_module_->writeFloat(base,     0.0f);
+					inf.control_module_->writeFloat(base + 2, 0.0f);
+					inf.control_module_->writeFloat(base + 4, 0.0f);
+					inf.control_module_->writeRegister(base + 6, 0);
 				}
 
 				// 发送完成信号：有数据
@@ -422,6 +415,7 @@ namespace app
 				inf.control_module_->writeUInt32(plc.plcSoftwareOk, 2);
 			}
 		}
+
 
 
 		// 发出所有有效结果（供 UI tableWidget_info 显示）

@@ -8,7 +8,7 @@ namespace inf
 	namespace
 	{
 		// PLC 寄存器采用大端字序
-		constexpr rw::hoep::Endianness kByteOrder = rw::hoep::Endianness::BigEndian;
+		constexpr rw::hoep::Endianness kByteOrder = rw::hoep::Endianness::LittleEndian;
 	}
 
 	ControlModule::ControlModule() = default;
