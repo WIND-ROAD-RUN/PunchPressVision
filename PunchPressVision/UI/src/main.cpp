@@ -50,7 +50,12 @@ int main(int argc, char* argv[])
 	// ======================================================
 	// Phase 4: UI 显示
 	// ======================================================
+#ifdef PPV_RELEASE_FULLSCREEN
+	w.setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+	w.showFullScreen();
+#else
 	w.show();
+#endif
 
 	const int code = a.exec();
 

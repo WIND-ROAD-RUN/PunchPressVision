@@ -19,6 +19,9 @@ if(MSVC)
 	add_compile_options(/utf-8)
 endif()
 
+# Release 模式：全屏无边框显示
+add_compile_definitions($<$<CONFIG:Release>:PPV_RELEASE_FULLSCREEN>)
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/output/$<CONFIG>")
 
 set(CMAKE_AUTOMOC ON)

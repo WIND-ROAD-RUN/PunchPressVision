@@ -20,7 +20,12 @@ int main(int argc, char* argv[])
 	inf.build();
 
 	ToolNinePointWindow wnd(inf);
+#ifdef PPV_RELEASE_FULLSCREEN
+	wnd.setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+	wnd.showFullScreen();
+#else
 	wnd.show();
+#endif
 
 	const int rc = app.exec();
 

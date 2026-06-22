@@ -22,7 +22,12 @@ int main(int argc, char* argv[])
 	inf.camera_module_->setFreeRunMode(global::CameraIndex::Camera1, 3);
 	inf.camera_module_->setFreeRunMode(global::CameraIndex::Camera2, 3);
 	ToolTwoCameraSpliceWindow wnd(inf);
+#ifdef PPV_RELEASE_FULLSCREEN
+	wnd.setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+	wnd.showFullScreen();
+#else
 	wnd.show();
+#endif
 
 	const int rc = app.exec();
 
