@@ -28,6 +28,11 @@ namespace ui
 	{
 		setWindowTitle(QStringLiteral("设置参数 - %1").arg(modelName_));
 		setMinimumWidth(450);
+
+#ifdef PPV_RELEASE_FULLSCREEN
+		setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+#endif
+
 		buildUI();
 	}
 

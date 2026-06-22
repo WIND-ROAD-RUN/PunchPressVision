@@ -22,6 +22,10 @@ CornerPreviewDialog::CornerPreviewDialog(
     setWindowTitle(QStringLiteral("Halcon 标定板标记点预览"));
     resize(800, 600);
 
+#ifdef PPV_RELEASE_FULLSCREEN
+    setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+#endif
+
     auto* rootLayout = new QVBoxLayout(this);
     rootLayout->setContentsMargins(8, 8, 8, 8);
     rootLayout->setSpacing(8);

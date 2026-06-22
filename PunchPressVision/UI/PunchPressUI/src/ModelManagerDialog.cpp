@@ -34,6 +34,11 @@ namespace ui
 	{
 		ui->setupUi(this);
 
+#ifdef PPV_RELEASE_FULLSCREEN
+		setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+		setWindowState(windowState() | Qt::WindowFullScreen);
+#endif
+
 		// 默认按创建时间降序排列
 		ui->cbox_sort->setCurrentIndex(3);
 

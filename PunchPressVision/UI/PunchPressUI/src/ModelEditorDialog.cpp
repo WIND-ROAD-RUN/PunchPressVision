@@ -32,6 +32,11 @@ namespace ui
 	{
 		ui->setupUi(this);
 
+#ifdef PPV_RELEASE_FULLSCREEN
+		setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+		setWindowState(windowState() | Qt::WindowFullScreen);
+#endif
+
 		previousMode_ = app_.currentMode();
 		if (isModifyMode_)
 			app_.switchToMode(global::RunMode::Idle);        // 修改模式：相机不出图
