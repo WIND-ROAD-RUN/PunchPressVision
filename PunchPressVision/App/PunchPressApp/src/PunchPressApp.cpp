@@ -385,6 +385,7 @@ namespace app
 		if (inf.control_module_ && inf.control_module_->isConnected())
 		{
 			inf.control_module_->readCoil(330, sortByXAsc);
+			sortByXAsc = !sortByXAsc;
 		}
 		if (!allResults.empty())
 		{

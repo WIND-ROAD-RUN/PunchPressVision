@@ -831,7 +831,7 @@ namespace bun
 								HalconCpp::AffineTransPoint2d(invHomMat2D, 0.0, 0.0,
 									&basePixRow, &basePixCol);
 								HalconCpp::AffineTransPoint2d(invHomMat2D,
-									model.data.offsetY, model.data.offsetX,
+									-model.data.offsetY, model.data.offsetX,
 									&offsetPixRow, &offsetPixCol);
 
 								if (basePixRow.TupleLength() > 0 && basePixCol.TupleLength() > 0 &&
@@ -910,7 +910,7 @@ namespace bun
 
 						// 角度补偿（matchAngle 为 Halcon 弧度制，统一转为角度制存储）
 						constexpr double kRadToDeg = 180.0 / 3.14159265358979323846;
-						result.angle = matchAngle * kRadToDeg + model.data.offsetAngle;
+						result.angle = matchAngle * kRadToDeg - model.data.offsetAngle;
 
 						// 生成匹配轮廓 XLD（与 findShapemodel 一致），供主界面叠加显示
 						try
