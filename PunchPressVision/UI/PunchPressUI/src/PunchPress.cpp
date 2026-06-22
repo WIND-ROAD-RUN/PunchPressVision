@@ -19,6 +19,10 @@
 #include <QTableWidget>
 #include <QVBoxLayout>
 
+#include <filesystem>
+
+#include "infrastructure/CalibConfigModule/CalibConfigModulePath.hpp"
+
 #include "app/PunchPressApp.hpp"
 #include "Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp"
 #include "UI/ShapeEditor.h"
@@ -266,6 +270,7 @@ namespace ui
 		loadCameraConfig();
 		loadHeightConfig();
 		loadMatchRegionConfig();
+		loadCaltabDescrPath();
 	}
 
 	void PunchPress::loadCameraConfig()
@@ -293,7 +298,56 @@ namespace ui
 		if (!inf.config_module_)
 			return;
 
-		diffHeight_ = inf.config_module_->setCfg.diffHeight;
+		// config 存米，UI 显示毫米
+		diffHeight_ = inf.config_module_->setCfg.diffHeight * 1000.0;
+	}
+
+	void PunchPress::loadCaltabDescrPath()
+	{
+		// 自动发现标定板描述文件（.descr）
+		// 扫描 CalibConfigModule 目录，取第一个 .descr 文件
+		namespace fs = std::filesystem;
+		const auto& inf = app_.business().infrastructure();
+		if (!inf.two_camera_splice_module_)
+			return;
+
+		const std::string configDir = inf::CalibConfigModulePath.RootPath;
+		std::string foundPath;
+		std::error_code ec;
+
+		if (fs::exists(configDir, ec) && fs::is_directory(configDir, ec))
+		{
+			for (const auto& entry : fs::directory_iterator(configDir, ec))
+			{
+				if (entry.is_regular_file(ec)
+					&& entry.path().extension() == ".descr")
+				{
+					foundPath = entry.path().string();
+					break;
+				}
+			}
+		}
+
+		auto& spliceCfg = inf.two_camera_splice_module_->twoCameraSpliceConfig;
+
+		if (!foundPath.empty())
+		{
+			spliceCfg.caltabDescrPath = foundPath;
+			inf.two_camera_splice_module_->save();
+			statusBar()->showMessage(
+				QStringLiteral("标定板描述文件: %1").arg(QString::fromStdString(foundPath)));
+		}
+		else if (!spliceCfg.caltabDescrPath.empty())
+		{
+			statusBar()->showMessage(
+				QStringLiteral("标定板描述文件(已缓存): %1")
+					.arg(QString::fromStdString(spliceCfg.caltabDescrPath)));
+		}
+		else
+		{
+			statusBar()->showMessage(
+				QStringLiteral("CalibConfigModule 目录下未找到 .descr 描述文件"));
+		}
 	}
 
 	void PunchPress::updateHeightButton()
@@ -675,22 +729,21 @@ namespace ui
 
 	void PunchPress::applyHeight(double value)
 	{
+		// value 为 mm（用户输入），config/spliceCfg 存 m（Halcon 单位）
+		const double valueMeters = value / 1000.0;
 		diffHeight_ = value;
 
 		auto& inf = app_.business().infrastructure();
 
-		// 持久化到 OSO 配置文件 setCfg.xml
-		if (inf.config_module_)
-		{
-			inf.config_module_->setCfg.diffHeight = value;
-			inf.config_module_->save();
-		}
+		// 保存旧值（m），用于 map 重算失败时回滚
+		const double oldDiffHeight = inf.two_camera_splice_module_
+			? inf.two_camera_splice_module_->twoCameraSpliceConfig.DiffHeight
+			: valueMeters;
 
-		// 同步到双相机拼接配置，供拼接算法使用
+		// 同步到双相机拼接配置（m）
 		if (inf.two_camera_splice_module_)
 		{
-			inf.two_camera_splice_module_->twoCameraSpliceConfig.DiffHeight = value;
-			inf.two_camera_splice_module_->save();
+			inf.two_camera_splice_module_->twoCameraSpliceConfig.DiffHeight = valueMeters;
 		}
 
 		// 高度变化后，若已有标定图像，重新计算拼接映射图 (MapSingle1/MapSingle2)
@@ -709,11 +762,30 @@ namespace ui
 					calibCfg.item(global::CameraIndex::Camera2),
 					spliceCfg,
 					&errorMsg);
-				if (ok)
+				if (!ok)
 				{
-					inf.two_camera_splice_module_->save();
+					// 高度更新后 map 重算失败：回滚 DiffHeight 并提示用户
+					inf.two_camera_splice_module_->twoCameraSpliceConfig.DiffHeight = oldDiffHeight;
+					diffHeight_ = oldDiffHeight * 1000.0;
+					QString msg = QStringLiteral("重新计算拼接映射图失败");
+					if (!errorMsg.empty())
+						msg += QStringLiteral("\n") + QString::fromStdString(errorMsg);
+					rw::rqwu::MessageBox::warning(this, QStringLiteral("高度设置"), msg);
+					updateHeightButton();
+					return;
 				}
 			}
+		}
+
+		// 持久化：map 重算成功（或无标定图时直接用新高度）后统一保存
+		if (inf.config_module_)
+		{
+			inf.config_module_->setCfg.diffHeight = valueMeters;
+			inf.config_module_->save();
+		}
+		if (inf.two_camera_splice_module_)
+		{
+			inf.two_camera_splice_module_->save();
 		}
 
 		updateHeightButton();

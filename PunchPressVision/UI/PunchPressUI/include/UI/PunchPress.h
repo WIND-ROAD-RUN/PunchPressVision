@@ -97,6 +97,9 @@ namespace ui
 		void updateHeightButton();
 		void applyHeight(double value);
 
+		// 标定板描述文件自动发现
+		void loadCaltabDescrPath();
+
 		// 匹配范围：配置加载/显示/持久化
 		void loadMatchRegionConfig();
 		void deferredCreateMatchRegion();

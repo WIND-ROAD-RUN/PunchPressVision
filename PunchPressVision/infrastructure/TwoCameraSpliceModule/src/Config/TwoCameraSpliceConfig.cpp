@@ -121,6 +121,8 @@ namespace Config
 			ofs << "rectifiedWidth=" << rectWidth << '\n';
 			ofs << "rectifiedHeight=" << rectHeight << '\n';
 			ofs.close();
+			std::error_code ec;
+			fs::rename(tmp, filePath, ec);
 		}
 
 		bool readParamsSafe(const fs::path& filePath,
@@ -219,7 +221,7 @@ namespace Config
 			camera2Exposure = 0.0;
 			DiffHeight = 0.0;
 			OverlapInPercent = 0.0;
-			BorderInPercent = 0.0;
+			BorderInPercent = 7.0;
 			DistancePlates = 0.0;
 			pixTowWorld = 0.0;
 			rectifiedWidth = 0;

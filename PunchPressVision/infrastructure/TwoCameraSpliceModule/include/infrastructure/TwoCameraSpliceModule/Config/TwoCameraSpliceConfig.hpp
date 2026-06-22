@@ -21,7 +21,7 @@ namespace Config
 		double camera2Exposure{ 0 };  // camera 2 exposure time (us)
 		double DiffHeight{ 0 };       // height difference between plate and caliper
 		double OverlapInPercent{ 0 }; // overlap cropping percentage (default 70)
-		double BorderInPercent{ 0 };  // border percentage (default 7)
+		double BorderInPercent{ 7 };  // border percentage (default 7)
 		double DistancePlates{ 0 };   // distance between two calibration plates (default 0)
 
 		// Pixel equivalent (PixelSize, unit: meter/pixel)

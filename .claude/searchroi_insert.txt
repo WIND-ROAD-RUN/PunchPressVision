@@ -1,0 +1,5 @@
+			ofs << "searchRoiValid=" << (searchRoiValid ? 1 : 0) << '\n';
+			ofs << "searchRoiRow1=" << searchRoiRow1 << '\n';
+			ofs << "searchRoiCol1=" << searchRoiCol1 << '\n';
+			ofs << "searchRoiRow2=" << searchRoiRow2 << '\n';
+			ofs << "searchRoiCol2=" << searchRoiCol2 << '\n';

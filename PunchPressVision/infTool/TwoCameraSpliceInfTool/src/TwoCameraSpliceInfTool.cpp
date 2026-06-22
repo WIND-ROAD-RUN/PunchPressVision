@@ -66,6 +66,27 @@ namespace infTool
 			return false;
 		}
 
+		// 自动计算像素当量（若未设置）
+		// pixTowWorld = PixelSize × |tz| / Focus
+		if (spliceCfg.pixTowWorld == 0.0)
+		{
+			const auto& cp = cam1Calib.cameraParameters;
+			const auto& pose = cam1Calib.cameraPose;
+			if (cp.TupleLength() >= 13 && pose.TupleLength() >= 7)
+			{
+				constexpr double kPixelSizeM = 2.4e-06;
+				const double focus = cp[1].D();
+				const double tz = std::abs(pose[2].D());
+				if (focus > 0.0)
+					spliceCfg.pixTowWorld = kPixelSizeM * tz / focus;
+			}
+		}
+		if (spliceCfg.pixTowWorld == 0.0)
+		{
+			if (errorMsg) *errorMsg = "像素当量(pixTowWorld)为 0，相机标定参数无效";
+			return false;
+		}
+
 		// 局部变量声明
 		HalconCpp::HTuple hv_CalibDataID;
 		HalconCpp::HTuple hv_RowCoord1, hv_ColumnCoord1, hv_Index1, hv_Pose1;

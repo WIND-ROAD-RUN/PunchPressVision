@@ -29,29 +29,41 @@ namespace bun
 				return false;
 			}
 
-			// 1. 在 ROI 内裁剪模板图（若提供了 ROI）
+			// 1. 裁剪模板图：优先全局 matchRegion，否则用用户绘制的 ROI
 			HImage templateImage = req.trainingImage;
 			double findcenterX = 0.0, findcenterY = 0.0;
 			double centerX = 0.0, centerY = 0.0;
-			if (req.roi.IsInitialized())
+			HObject cropRegion;
+			bool hasCropRegion = false;
+			if (inf_.config_module_ && inf_.config_module_->setCfg.matchRegionValid)
 			{
-				HTuple area, row, col;
-				AreaCenter(req.roi, &area, &row, &col);
-				if (area.Length() > 0 && area[0].D() > 0)
+				const auto& cfg = inf_.config_module_->setCfg;
+				try
 				{
-					findcenterX = row[0].D();
-					centerX = col[0].D();
+					GenRectangle1(&cropRegion,
+						cfg.matchRegionRow1, cfg.matchRegionCol1,
+						cfg.matchRegionRow2, cfg.matchRegionCol2);
 					HObject reduced;
-					ReduceDomain(req.trainingImage, req.roi, &reduced);
+					ReduceDomain(req.trainingImage, cropRegion, &reduced);
 					templateImage = HImage(reduced);
+					hasCropRegion = true;
 				}
+				catch (...) {}
+			}
+			else if (req.roi.IsInitialized())
+			{
+				cropRegion = req.roi;
+				HObject reduced;
+				ReduceDomain(req.trainingImage, cropRegion, &reduced);
+				templateImage = HImage(reduced);
+				hasCropRegion = true;
 			}
 
-			// 若提供了屏蔽区域，从 ROI 中剔除
-			if (req.mask.IsInitialized())
+			// 若提供了屏蔽区域，从裁剪区域中剔除
+			if (req.mask.IsInitialized() && hasCropRegion)
 			{
 				HObject diff;
-				Difference(req.roi, req.mask, &diff);
+				Difference(cropRegion, req.mask, &diff);
 				HObject reduced;
 				ReduceDomain(req.trainingImage, diff, &reduced);
 				templateImage = HImage(reduced);
@@ -73,6 +85,7 @@ namespace bun
 				"auto",
 				"auto",
 				&modelID);
+			WriteImage(templateImage, "jpeg", 0, "C:/Users/zzw/Desktop/11");
 
 			// 3. 使用刚创建的模板在原图上验证匹配，作为创建成功的依据
 			HTuple matchRow, matchCol, matchAngle, matchScore;
@@ -80,7 +93,7 @@ namespace bun
 				modelID,
 				0,
 				HalconCpp::HTuple(360).TupleRad(),
-				0.5,    // MinScore
+				0.1,    // MinScore
 				1,      // NumMatches
 				0.5,    // MaxOverlap
 				"least_squares",
