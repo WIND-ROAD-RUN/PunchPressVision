@@ -29,8 +29,9 @@ namespace Config
 		double distance = 0.007;
 		double scale = 0.5;
 
-		int xdiantance = 400;
+		int xdiantance = 500;
 		int ydistance = 100;
+		double xoffset = 400;
 
 		void saveInDir(const std::string& dirPath);
 		void loadInDir(const std::string& dirPath);

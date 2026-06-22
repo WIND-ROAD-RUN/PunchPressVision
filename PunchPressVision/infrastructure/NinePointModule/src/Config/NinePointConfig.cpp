@@ -60,7 +60,7 @@ namespace Config
 			double cam1Exposure, double cam1Gain,
 			double cam2Exposure, double cam2Gain,
 			int xNumber, int yNumber, double distanceVal, double scaleVal,
-			int xDiantance, int yDistance)
+			int xDiantance, int yDistance, double xOffset)
 		{
 			fs::create_directories(filePath.parent_path());
 			fs::path tmp = filePath;
@@ -82,6 +82,7 @@ namespace Config
 			ofs << "scale=" << scaleVal << '\n';
 			ofs << "xdiantance=" << xDiantance << '\n';
 			ofs << "ydistance=" << yDistance << '\n';
+			ofs << "xoffset=" << xOffset << '\n';
 			ofs.close();
 			replaceFile(tmp, filePath);
 		}
@@ -92,7 +93,7 @@ namespace Config
 			double& cam1Exposure, double& cam1Gain,
 			double& cam2Exposure, double& cam2Gain,
 			int& xNumber, int& yNumber, double& distanceVal, double& scaleVal,
-			int& xDiantance, int& yDistance)
+			int& xDiantance, int& yDistance, double& xOffset)
 		{
 			if (!fs::exists(filePath))
 				return false;
@@ -140,6 +141,8 @@ namespace Config
 						xDiantance = std::stoi(value);
 					else if (key == "ydistance")
 						yDistance = std::stoi(value);
+					else if (key == "xoffset")
+						xOffset = std::stod(value);
 				}
 				catch (...)
 				{
@@ -161,7 +164,7 @@ namespace Config
 				camera1Exposure, camera1Gain,
 				camera2Exposure, camera2Gain,
 				xnumber, ynumber, distance, scale,
-				xdiantance, ydistance);
+				xdiantance, ydistance, xoffset);
 		}
 		catch (...)
 		{
@@ -186,15 +189,16 @@ namespace Config
 			ynumber = 7;
 			distance = 0.007;
 			scale = 0.5;
-			xdiantance = 400;
+			xdiantance = 500;
 			ydistance = 100;
+			xoffset = 400;
 			readTupleSafe(dir / kHomMat2DFile, outHomMat2D);
 			readParamsSafe(dir / kParamsFile,
 				MeasureLength1, MeasureLength2, MeasureThreshold, num_Measure,
 				camera1Exposure, camera1Gain,
 				camera2Exposure, camera2Gain,
 				xnumber, ynumber, distance, scale,
-				xdiantance, ydistance);
+				xdiantance, ydistance, xoffset);
 		}
 		catch (...)
 		{

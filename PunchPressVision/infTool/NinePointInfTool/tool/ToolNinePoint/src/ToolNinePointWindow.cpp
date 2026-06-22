@@ -260,7 +260,7 @@ void ToolNinePointWindow::applyCalibParams()
 		for (int col = 0; col < 3; ++col)
 		{
 			infTool::Point2D pt;
-			pt.x = cfg.xdiantance * col;
+			pt.x = cfg.xoffset + cfg.xdiantance * col;
 			pt.y = cfg.ydistance * row;
 			mechCoords.push_back(pt);
 		}
@@ -603,7 +603,7 @@ void ToolNinePointWindow::onDisplayFrame()
 					if (inf_.nine_point_module_)
 					{
 						const auto& cfg = inf_.nine_point_module_->ninePointConfig;
-						realX = static_cast<double>(cfg.xdiantance * (idx % 3));
+						realX = cfg.xoffset + static_cast<double>(cfg.xdiantance * (idx % 3));
 						realY = static_cast<double>(cfg.ydistance * (idx / 3));
 					}
 
