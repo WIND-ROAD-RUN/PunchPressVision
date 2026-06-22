@@ -33,4 +33,6 @@ target_include_directories(${InfTool_TARGET}
 
 add_library(infTool::${InfTool_TARGET} ALIAS ${InfTool_TARGET})
 
+if(BUILD_TESTING)
 add_subdirectory(./test)
+endif()

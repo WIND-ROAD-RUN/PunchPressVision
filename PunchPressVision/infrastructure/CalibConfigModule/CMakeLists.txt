@@ -31,4 +31,6 @@ target_include_directories(${Inf_TARGET}
 
 add_library(inf::${Inf_TARGET} ALIAS ${Inf_TARGET})
 
+if(BUILD_TESTING)
 add_subdirectory(./test)
+endif()

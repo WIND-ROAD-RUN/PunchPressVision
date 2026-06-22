@@ -6,6 +6,8 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/func.cmake)
 
 project(PunchPressVision VERSION 0.1 LANGUAGES CXX)
 
+include(CTest)
+
 list(APPEND CMAKE_PREFIX_PATH ${RWUL_DIR})
 
 set(CMAKE_CXX_STANDARD 17)

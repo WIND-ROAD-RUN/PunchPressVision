@@ -31,4 +31,6 @@ target_include_directories(${Bun_TARGET}
 
 add_library(bun::${Bun_TARGET} ALIAS ${Bun_TARGET})
 
+if(BUILD_TESTING)
 add_subdirectory(./test)
+endif()

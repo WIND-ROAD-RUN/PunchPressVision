@@ -31,4 +31,6 @@ target_link_libraries(${App_TARGET}
 
 add_library(app::${App_TARGET} ALIAS ${App_TARGET})
 
+if(BUILD_TESTING)
 add_subdirectory(./test)
+endif()
