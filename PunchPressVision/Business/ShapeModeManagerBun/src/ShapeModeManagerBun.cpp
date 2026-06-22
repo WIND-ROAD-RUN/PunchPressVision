@@ -85,7 +85,6 @@ namespace bun
 				"auto",
 				"auto",
 				&modelID);
-			WriteImage(templateImage, "jpeg", 0, "C:/Users/zzw/Desktop/11");
 
 			// 3. 使用刚创建的模板在原图上验证匹配，作为创建成功的依据
 			HTuple matchRow, matchCol, matchAngle, matchScore;
