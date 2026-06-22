@@ -20,13 +20,13 @@ namespace inf
 	// PLC 控制网关：封装 Modbus TCP 通信（rw::hoep::ModbusDevice）。
 	// 寄存器地址映射由 ConfigModule::plcAddressCfg 提供（oso 持久化），
 	// 默认值对应 LLD 附录：
-	//   regOffsetX          (40001) float  X 偏移量
-	//   regOffsetY          (40003) float  Y 偏移量
-	//   regAngle            (40005) float  旋转角度 Angle
-	//   regValid            (40007) int    定位结果有效标志
-	//   regNinePointArrived (40101) int    九点标定到位确认（PLC→系统）
-	//   regNinePointIndex   (40102) int    九点标定当前点位序号
-	//   regNinePointCoordsStart (40103~) float  九点点位机械坐标
+	//   regOffsetX          (6100) float  X 偏移量
+	//   regOffsetY          (6102) float  Y 偏移量
+	//   regAngle            (6104) float  旋转角度 Angle
+	//   regValid            (6106) int    定位结果有效标志
+	//   regNinePointArrived (6600) int    九点标定到位确认（PLC→系统）
+	//   regNinePointIndex   (6601) int    九点标定当前点位序号
+	//   regNinePointCoordsStart (6602~) float  九点点位机械坐标
 	class ControlModule
 		: public QObject, public global::IInfrastructure
 	{
@@ -50,6 +50,9 @@ namespace inf
 		// 浮点读写（占用 2 个寄存器）
 		bool writeFloat(int address, float value);
 		bool readFloat(int address, float& value);
+
+		// UInt32 读写（占用 2 个寄存器，LittleEndian）
+		bool writeUInt32(int address, uint32_t value);
 
 		// 批量寄存器读写（九点标定优化）
 		bool writeMultipleRegisters(int startAddr, const std::vector<uint16_t>& values);

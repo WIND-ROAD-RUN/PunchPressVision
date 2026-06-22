@@ -19,13 +19,14 @@ namespace Config {
         bool operator!=(const PlcAddressCfg& obj) const;
 
     public:
-        int regOffsetX{ 40001 };
-        int regOffsetY{ 40003 };
-        int regAngle{ 40005 };
-        int regValid{ 40007 };
-        int regNinePointArrived{ 40101 };
-        int regNinePointIndex{ 40102 };
-        int regNinePointCoordsStart{ 40103 };
+        int regOffsetX{ 6100 };
+        int regOffsetY{ 6102 };
+        int regAngle{ 6104 };
+        int regValid{ 6106 };
+        int regNinePointArrived{ 6600 };
+        int regNinePointIndex{ 6601 };
+        int regNinePointCoordsStart{ 6602 };
+        int plcSoftwareOk{ 6004 };
     };
 
     inline PlcAddressCfg::PlcAddressCfg(const rw::oso::ObjectStoreAssembly& assembly)
@@ -70,6 +71,11 @@ namespace Config {
             throw std::runtime_error("$variable$regNinePointCoordsStart is not found");
         }
         regNinePointCoordsStart = regNinePointCoordsStartItem->getValueAsInt();
+        auto plcSoftwareOkItem = rw::oso::ObjectStoreCoreToItem(assembly.getItem("$variable$plcSoftwareOk$"));
+        if (!plcSoftwareOkItem) {
+            throw std::runtime_error("$variable$plcSoftwareOk is not found");
+        }
+        plcSoftwareOk = plcSoftwareOkItem->getValueAsInt();
     }
 
     inline PlcAddressCfg::PlcAddressCfg(const PlcAddressCfg& obj)
@@ -81,6 +87,7 @@ namespace Config {
         regNinePointArrived = obj.regNinePointArrived;
         regNinePointIndex = obj.regNinePointIndex;
         regNinePointCoordsStart = obj.regNinePointCoordsStart;
+        plcSoftwareOk = obj.plcSoftwareOk;
     }
 
     inline PlcAddressCfg& PlcAddressCfg::operator=(const PlcAddressCfg& obj)
@@ -93,6 +100,7 @@ namespace Config {
             regNinePointArrived = obj.regNinePointArrived;
             regNinePointIndex = obj.regNinePointIndex;
             regNinePointCoordsStart = obj.regNinePointCoordsStart;
+            plcSoftwareOk = obj.plcSoftwareOk;
         }
         return *this;
     }
@@ -129,12 +137,16 @@ namespace Config {
         regNinePointCoordsStartItem->setName("$variable$regNinePointCoordsStart$");
         regNinePointCoordsStartItem->setValueFromInt(regNinePointCoordsStart);
         assembly.addItem(regNinePointCoordsStartItem);
+        auto plcSoftwareOkItem = std::make_shared<rw::oso::ObjectStoreItem>();
+        plcSoftwareOkItem->setName("$variable$plcSoftwareOk$");
+        plcSoftwareOkItem->setValueFromInt(plcSoftwareOk);
+        assembly.addItem(plcSoftwareOkItem);
         return assembly;
     }
 
     inline bool PlcAddressCfg::operator==(const PlcAddressCfg& obj) const
     {
-        return regOffsetX == obj.regOffsetX && regOffsetY == obj.regOffsetY && regAngle == obj.regAngle && regValid == obj.regValid && regNinePointArrived == obj.regNinePointArrived && regNinePointIndex == obj.regNinePointIndex && regNinePointCoordsStart == obj.regNinePointCoordsStart;
+        return regOffsetX == obj.regOffsetX && regOffsetY == obj.regOffsetY && regAngle == obj.regAngle && regValid == obj.regValid && regNinePointArrived == obj.regNinePointArrived && regNinePointIndex == obj.regNinePointIndex && regNinePointCoordsStart == obj.regNinePointCoordsStart && plcSoftwareOk == obj.plcSoftwareOk;
     }
 
     inline bool PlcAddressCfg::operator!=(const PlcAddressCfg& obj) const

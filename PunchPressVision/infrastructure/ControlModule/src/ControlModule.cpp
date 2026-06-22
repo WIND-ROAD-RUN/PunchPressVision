@@ -7,7 +7,7 @@ namespace inf
 {
 	namespace
 	{
-		// PLC 寄存器多采用大端字序；如现场不同在此调整。
+		// PLC 寄存器采用大端字序
 		constexpr rw::hoep::Endianness kByteOrder = rw::hoep::Endianness::BigEndian;
 	}
 
@@ -156,6 +156,24 @@ namespace inf
 			return modbusDevice_->readUInt16Registers(
 				static_cast<rw::hoep::Address16>(startAddr),
 				static_cast<rw::hoep::Quantity>(count), values);
+		}
+		catch (...)
+		{
+			return false;
+		}
+	}
+
+	bool ControlModule::writeUInt32(int address, uint32_t value)
+	{
+		if (!modbusDevice_)
+			return false;
+		try
+		{
+			// LittleEndian: 低16位在前
+			const uint16_t low  = static_cast<uint16_t>(value & 0xFFFF);
+			const uint16_t high = static_cast<uint16_t>((value >> 16) & 0xFFFF);
+			return modbusDevice_->writeUInt16Registers(
+				static_cast<rw::hoep::Address16>(address), { low, high });
 		}
 		catch (...)
 		{

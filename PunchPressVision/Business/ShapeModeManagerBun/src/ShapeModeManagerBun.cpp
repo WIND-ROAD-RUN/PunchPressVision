@@ -796,11 +796,16 @@ namespace bun
 					0.9,                                                // Greediness
 					&row, &column, &angle, &score);
 
-					if (score.Length() > 0 && score[0].D() >= model.data.minScore)
+					// 遍历所有匹配结果（NumMatches 可能返回多个）
+					const Hlong numFound = score.Length();
+					for (Hlong i = 0; i < numFound; ++i)
 					{
-						const double matchRow = row[0].D();
-						const double matchCol = column[0].D();
-						const double matchAngle = angle[0].D();
+						if (score[i].D() < model.data.minScore)
+							continue;
+
+						const double matchRow = row[i].D();
+						const double matchCol = column[i].D();
+						const double matchAngle = angle[i].D();
 
 						// 模板参考中心点（用于旋转/平移自定义点，与 findShapemodel 一致）
 						const double refRow = model.data.findCenterY;
@@ -826,7 +831,7 @@ namespace bun
 								HalconCpp::AffineTransPoint2d(invHomMat2D, 0.0, 0.0,
 									&basePixRow, &basePixCol);
 								HalconCpp::AffineTransPoint2d(invHomMat2D,
-									model.data.offsetX, model.data.offsetY,
+									model.data.offsetY, model.data.offsetX,
 									&offsetPixRow, &offsetPixCol);
 
 								if (basePixRow.TupleLength() > 0 && basePixCol.TupleLength() > 0 &&
@@ -882,7 +887,7 @@ namespace bun
 						// 自定义中心点的像素坐标（供上层绘图）
 						result.row = outRow;
 						result.column = outCol;
-						result.score = score[0].D();
+						result.score = score[i].D();
 
 						// 像素 → 世界坐标（九点标定）
 						double worldX = outCol, worldY = outRow;

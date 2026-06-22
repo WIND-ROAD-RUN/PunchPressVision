@@ -328,9 +328,9 @@ namespace app
 		const global::PositionResult& result,
 		inf::ControlModule& ctrl, const Config::PlcAddressCfg& plc)
 	{
-		ctrl.writeFloat(plc.regOffsetX, static_cast<float>(result.offsetX));
-		ctrl.writeFloat(plc.regOffsetY, static_cast<float>(result.offsetY));
-		ctrl.writeFloat(plc.regAngle, static_cast<float>(result.angle));
+		ctrl.writeFloat(plc.regOffsetX, static_cast<float>(result.offsetX * 100.0));
+		ctrl.writeFloat(plc.regOffsetY, static_cast<float>(result.offsetY * 100.0));
+		ctrl.writeFloat(plc.regAngle, static_cast<float>(result.angle * 100.0));
 		ctrl.writeRegister(plc.regValid, result.valid ? 1 : 0);
 	}
 
@@ -377,25 +377,52 @@ namespace app
 			constexpr int kRegSpacing = 10;   // 每组结果的寄存器间隔
 			constexpr size_t kMaxSlots = 50;  // 最大结果槽位数
 
-			for (size_t i = 0; i < allResults.size() && i < kMaxSlots; ++i)
-			{
-				const int base = plc.regOffsetX + static_cast<int>(i) * kRegSpacing;
-				inf.control_module_->writeFloat(base,     static_cast<float>(allResults[i].offsetX));
-				inf.control_module_->writeFloat(base + 2, static_cast<float>(allResults[i].offsetY));
-				inf.control_module_->writeFloat(base + 4, static_cast<float>(allResults[i].angle));
-				inf.control_module_->writeRegister(base + 6, 1);  // valid
-			}
+			// Lambda：把 float 拆成 2 个 uint16（BigEndian 字序：高字在前）
+			auto packFloatBE = [](float val) -> std::pair<uint16_t, uint16_t> {
+				uint32_t bits;
+				std::memcpy(&bits, &val, sizeof(bits));
+				return { static_cast<uint16_t>((bits >> 16) & 0xFFFF),
+				         static_cast<uint16_t>(bits & 0xFFFF) };
+			};
 
-			// 清空剩余槽位
-			for (size_t i = allResults.size(); i < kMaxSlots; ++i)
+			if (!allResults.empty())
 			{
-				const int base = plc.regOffsetX + static_cast<int>(i) * kRegSpacing;
-				inf.control_module_->writeFloat(base,     0.0f);
-				inf.control_module_->writeFloat(base + 2, 0.0f);
-				inf.control_module_->writeFloat(base + 4, 0.0f);
-				inf.control_module_->writeRegister(base + 6, 0);
+				// 写入有效结果（批量写入，每组 7 个寄存器）
+				for (size_t i = 0; i < allResults.size() && i < kMaxSlots; ++i)
+				{
+					const int base = plc.regOffsetX + static_cast<int>(i) * kRegSpacing;
+					auto [xH, xL] = packFloatBE(static_cast<float>(allResults[i].offsetX * 100.0));
+					auto [yH, yL] = packFloatBE(static_cast<float>(allResults[i].offsetY * 100.0));
+					auto [aH, aL] = packFloatBE(static_cast<float>(allResults[i].angle * 100.0));
+					inf.control_module_->writeMultipleRegisters(base,
+						{ xH, xL, yH, yL, aH, aL, static_cast<uint16_t>(1) });
+				}
+
+				// 清空剩余槽位
+				for (size_t i = allResults.size(); i < kMaxSlots; ++i)
+				{
+					const int base = plc.regOffsetX + static_cast<int>(i) * kRegSpacing;
+					inf.control_module_->writeMultipleRegisters(base,
+						{ 0, 0, 0, 0, 0, 0, static_cast<uint16_t>(0) });
+				}
+
+				// 发送完成信号：有数据
+				inf.control_module_->writeUInt32(plc.plcSoftwareOk, 1);
+			}
+			else
+			{
+				// 无匹配结果：清空所有槽位的 valid 标志
+				for (size_t i = 0; i < kMaxSlots; ++i)
+				{
+					const int base = plc.regOffsetX + static_cast<int>(i) * kRegSpacing;
+					inf.control_module_->writeRegister(base + 6, 0);
+				}
+
+				// 发送完成信号：无数据
+				inf.control_module_->writeUInt32(plc.plcSoftwareOk, 2);
 			}
 		}
+
 
 		// 发出所有有效结果（供 UI tableWidget_info 显示）
 		if (!allResults.empty())
@@ -438,13 +465,20 @@ namespace app
 				HalconCpp::SetPart(bufWin, 0, 0, imgH[0].I() - 1, imgW[0].I() - 1);
 				HalconCpp::DispObj(image, bufWin);
 
-				int colorIdx = 0;
+				// 同一模型的所有匹配用同一颜色，不同模型用不同颜色
+				std::map<std::string, int> modelColorMap;
 				for (const auto& m : matches)
 				{
 					if (!m.found) continue;
 
-					const char* color = kColors[colorIdx % kColorCount];
-					++colorIdx;
+					// 为每个模型分配唯一颜色索引
+					auto it = modelColorMap.find(m.modelId);
+					if (it == modelColorMap.end())
+					{
+						int idx = static_cast<int>(modelColorMap.size());
+						modelColorMap[m.modelId] = idx;
+					}
+					const char* color = kColors[modelColorMap[m.modelId] % kColorCount];
 
 					if (m.matchedContours.IsInitialized())
 					{

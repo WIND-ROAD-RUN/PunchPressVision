@@ -2,12 +2,13 @@ namespace Config{
 	class PlcAddressCfg
 	{
 	public:
-		regOffsetX : int : default = 40001;
-		regOffsetY : int : default = 40003;
-		regAngle : int : default = 40005;
-		regValid : int : default = 40007;
-		regNinePointArrived : int : default = 40101;
-		regNinePointIndex : int : default = 40102;
-		regNinePointCoordsStart : int : default = 40103;
+		regOffsetX : int : default = 6100;
+		regOffsetY : int : default = 6102;
+		regAngle : int : default = 6104;
+		regValid : int : default = 6106;
+		regNinePointArrived : int : default = 6600;
+		regNinePointIndex : int : default = 6601;
+		regNinePointCoordsStart : int : default = 6602;
+		plcSoftwareOk : int : default = 6004;
 	};
 }
