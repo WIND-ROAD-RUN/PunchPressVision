@@ -17,6 +17,8 @@ if(MSVC)
 	add_compile_options(/utf-8)
 endif()
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/output/$<CONFIG>")
+
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
