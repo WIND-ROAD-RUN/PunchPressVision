@@ -64,7 +64,7 @@ namespace ui
 		auto* hPreviews = new QHBoxLayout();
 		ui->vLayout_preview->addLayout(hPreviews);
 
-		auto createPreviewColumn = [this, hPreviews](const QString& title, QLabel*& outImageLabel) {
+		auto createPreviewColumn = [this, hPreviews](const QString& title, HalconInteractiveLabel*& outImageLabel) {
 			auto* vCol = new QVBoxLayout();
 
 			auto* titleLabel = new QLabel(title, this);
@@ -72,7 +72,7 @@ namespace ui
 				"font-size: 16px; font-weight: bold; color: rgb(85, 85, 85);"));
 			titleLabel->setAlignment(Qt::AlignCenter);
 
-			auto* imgLabel = new QLabel(this);
+			auto* imgLabel = new HalconInteractiveLabel(this);
 			imgLabel->setMinimumSize(200, 150);
 			imgLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 			imgLabel->setAlignment(Qt::AlignCenter);
@@ -316,18 +316,16 @@ namespace ui
 		setRow(r++, QStringLiteral("更新时间"), QString::fromStdString(info.getUpdateTime()));
 		setRow(r++, QStringLiteral("文件夹"),   QString::fromStdString(info.getFolderPath()));
 
-		// 三图预览：原图 / 标注图 / 模板图
-		previewOriginal_.ensure(labelImgOriginal_);
+		// 双图预览：原图 / 模板图（支持拖拽缩放）
 		if (data._originalImage.IsInitialized())
 		{
-			try { previewOriginal_.display(data._originalImage); }
+			try { labelImgOriginal_->displayImage(data._originalImage); }
 			catch (...) {}
 		}
 
-		previewTemplate_.ensure(labelImgTemplate_);
 		if (data._templateMatImage.IsInitialized())
 		{
-			try { previewTemplate_.display(data._templateMatImage); }
+			try { labelImgTemplate_->displayImage(data._templateMatImage); }
 			catch (...) {}
 		}
 

@@ -5,7 +5,7 @@
 #include <QPushButton>
 
 #include "halconcpp/HalconCpp.h"
-#include "UI/HalconView.h"
+#include "UI/HalconInteractiveLabel.h"
 #include "UI/ShapeModelListModel.h"
 
 QT_BEGIN_NAMESPACE
@@ -67,12 +67,9 @@ namespace ui
 		app::PunchPressApp& app_;
 		ShapeModelListModel* listModel_;
 		rw::rqwu::FullKeyboard* fullKeyboard_;
-		HalconView previewOriginal_;
-		HalconView previewTemplate_;
-
-		/// 动态创建的预览图像宿主 QLabel（不在 .ui 文件中）
-		QLabel* labelImgOriginal_{ nullptr };
-		QLabel* labelImgTemplate_{ nullptr };
+		/// 动态创建的预览图像控件（支持拖拽缩放，不在 .ui 文件中）
+		HalconInteractiveLabel* labelImgOriginal_{ nullptr };
+		HalconInteractiveLabel* labelImgTemplate_{ nullptr };
 
 		/// 动态创建的控件（不在 .ui 文件中）
 		QLabel* labelLoadedStatus_{ nullptr };

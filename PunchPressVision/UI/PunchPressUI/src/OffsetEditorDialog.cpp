@@ -3,9 +3,12 @@
 #include <QDialogButtonBox>
 #include <QFormLayout>
 #include <QGroupBox>
+#include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
 #include <QVBoxLayout>
+
+#include <QtMath>
 
 #include <rwul/rqwu/Keyboard/rqwu_NumberKeyboard.h>
 
@@ -27,7 +30,7 @@ namespace ui
 		, maxAngleDeg_(maxAngleDeg)
 	{
 		setWindowTitle(QStringLiteral("设置参数 - %1").arg(modelName_));
-		setMinimumWidth(450);
+		setMinimumWidth(520);
 
 #ifdef PPV_RELEASE_FULLSCREEN
 		setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
@@ -59,7 +62,7 @@ namespace ui
 		formLayout->setLabelAlignment(Qt::AlignRight | Qt::AlignVCenter);
 		formLayout->setSpacing(12);
 
-		// 按钮样式（统一）
+		// 数值按钮样式（统一）
 		const QString btnStyle = QStringLiteral(
 			"QPushButton {"
 			"  font-size: 18px;"
@@ -75,29 +78,80 @@ namespace ui
 			"  background-color: #E3F2FD;"
 			"}");
 
-		// OffsetX
-		btnOffsetX_ = new QPushButton(QString::number(offsetX_, 'f', 3), this);
-		btnOffsetX_->setStyleSheet(btnStyle);
-		btnOffsetX_->setToolTip(QStringLiteral("左右偏移 (mm)，范围 -9999.999 ~ 9999.999"));
+		// +/- 按钮样式（紧凑方形）
+		const QString stepBtnStyle = QStringLiteral(
+			"QPushButton {"
+			"  font-size: 20px; font-weight: bold;"
+			"  border: 2px solid #CCC;"
+			"  border-radius: 4px;"
+			"  background-color: #F0F0F0;"
+			"  color: #444;"
+			"  min-width: 44px; min-height: 44px;"
+			"  max-width: 44px; max-height: 44px;"
+			"}"
+			"QPushButton:hover {"
+			"  border-color: #2196F3;"
+			"  background-color: #E3F2FD;"
+			"}"
+			"QPushButton:pressed {"
+			"  background-color: #BBDEFB;"
+			"}"
+		);
+
+		// 辅助：创建一行 [−] [value] [+]
+		auto createStepRow = [&](const QString& labelText,
+			QPushButton*& valueBtn, QPushButton*& minusBtn, QPushButton*& plusBtn,
+			const QString& tooltip, double initVal, int decimals)
+		{
+			auto* hRow = new QHBoxLayout();
+			hRow->setSpacing(4);
+
+			minusBtn = new QPushButton(QStringLiteral("\xe2\x88\x92"), this);  // U+2212 MINUS SIGN
+			minusBtn->setStyleSheet(stepBtnStyle);
+			minusBtn->setToolTip(QStringLiteral("减小 0.1"));
+			hRow->addWidget(minusBtn);
+
+			valueBtn = new QPushButton(QString::number(initVal, 'f', decimals), this);
+			valueBtn->setStyleSheet(btnStyle);
+			valueBtn->setToolTip(tooltip);
+			hRow->addWidget(valueBtn);
+
+			plusBtn = new QPushButton(QStringLiteral("+"), this);
+			plusBtn->setStyleSheet(stepBtnStyle);
+			plusBtn->setToolTip(QStringLiteral("增大 0.1"));
+			hRow->addWidget(plusBtn);
+
+			formLayout->addRow(labelText, hRow);
+		};
+
+		// ---- 偏移量区域（带 +/- 步进） ----
+
+		createStepRow(QStringLiteral("左右偏移 (mm):"),
+			btnOffsetX_, btnMinusX_, btnPlusX_,
+			QStringLiteral("左右偏移 (mm)，范围 -9999.999 ~ 9999.999"),
+			offsetX_, 3);
 		connect(btnOffsetX_, &QPushButton::clicked, this, &OffsetEditorDialog::onOffsetXClicked);
-		formLayout->addRow(QStringLiteral("左右偏移 (mm):"), btnOffsetX_);
+		connect(btnMinusX_, &QPushButton::clicked, this, [this]() { onStepOffsetX(false); });
+		connect(btnPlusX_, &QPushButton::clicked, this, [this]() { onStepOffsetX(true); });
 
-		// OffsetY
-		btnOffsetY_ = new QPushButton(QString::number(offsetY_, 'f', 3), this);
-		btnOffsetY_->setStyleSheet(btnStyle);
-		btnOffsetY_->setToolTip(QStringLiteral("上下偏移 (mm)，范围 -9999.999 ~ 9999.999"));
+		createStepRow(QStringLiteral("上下偏移 (mm):"),
+			btnOffsetY_, btnMinusY_, btnPlusY_,
+			QStringLiteral("上下偏移 (mm)，范围 -9999.999 ~ 9999.999"),
+			offsetY_, 3);
 		connect(btnOffsetY_, &QPushButton::clicked, this, &OffsetEditorDialog::onOffsetYClicked);
-		formLayout->addRow(QStringLiteral("上下偏移 (mm):"), btnOffsetY_);
+		connect(btnMinusY_, &QPushButton::clicked, this, [this]() { onStepOffsetY(false); });
+		connect(btnPlusY_, &QPushButton::clicked, this, [this]() { onStepOffsetY(true); });
 
-		// OffsetAngle
-		btnOffsetAngle_ = new QPushButton(QString::number(offsetAngle_, 'f', 3), this);
-		btnOffsetAngle_->setStyleSheet(btnStyle);
-		btnOffsetAngle_->setToolTip(QStringLiteral("角度偏移 (°)，范围 -360.0 ~ 360.0"));
+		createStepRow(QStringLiteral("角度偏移 (\xc2\xb0):"),
+			btnOffsetAngle_, btnMinusAngle_, btnPlusAngle_,
+			QStringLiteral("角度偏移 (°)，范围 -360.0 ~ 360.0"),
+			offsetAngle_, 3);
 		connect(btnOffsetAngle_, &QPushButton::clicked, this, &OffsetEditorDialog::onOffsetAngleClicked);
-		formLayout->addRow(QStringLiteral("角度偏移 (°):"), btnOffsetAngle_);
+		connect(btnMinusAngle_, &QPushButton::clicked, this, [this]() { onStepOffsetAngle(false); });
+		connect(btnPlusAngle_, &QPushButton::clicked, this, [this]() { onStepOffsetAngle(true); });
 
 		// ---- 匹配参数分隔线 ----
-		auto* sepLabel = new QLabel(QStringLiteral("── 匹配参数 ──"), this);
+		auto* sepLabel = new QLabel(QStringLiteral("\xe2\x94\x80\xe2\x94\x80 匹配参数 \xe2\x94\x80\xe2\x94\x80"), this);
 		sepLabel->setStyleSheet("font-size: 14px; font-weight: bold; color: #2196F3; padding: 12px 0 4px 0;");
 		sepLabel->setAlignment(Qt::AlignCenter);
 		formLayout->addRow(sepLabel);
@@ -121,14 +175,14 @@ namespace ui
 		btnMinAngle_->setStyleSheet(btnStyle);
 		btnMinAngle_->setToolTip(QStringLiteral("角度搜索范围下限 (°)，范围 -360.0 ~ 360.0"));
 		connect(btnMinAngle_, &QPushButton::clicked, this, &OffsetEditorDialog::onMinAngleClicked);
-		formLayout->addRow(QStringLiteral("最低角度 (°):"), btnMinAngle_);
+		formLayout->addRow(QStringLiteral("最低角度 (\xc2\xb0):"), btnMinAngle_);
 
 		// 最高角度（度）
 		btnMaxAngle_ = new QPushButton(QString::number(maxAngleDeg_, 'f', 1), this);
 		btnMaxAngle_->setStyleSheet(btnStyle);
 		btnMaxAngle_->setToolTip(QStringLiteral("角度搜索范围上限 (°)，范围 -360.0 ~ 360.0"));
 		connect(btnMaxAngle_, &QPushButton::clicked, this, &OffsetEditorDialog::onMaxAngleClicked);
-		formLayout->addRow(QStringLiteral("最高角度 (°):"), btnMaxAngle_);
+		formLayout->addRow(QStringLiteral("最高角度 (\xc2\xb0):"), btnMaxAngle_);
 
 		rootLayout->addWidget(formGroup);
 		rootLayout->addStretch();
@@ -161,6 +215,21 @@ namespace ui
 		inputDoubleParam(btnOffsetAngle_, offsetAngle_, -360.0, 360.0, 3);
 	}
 
+	void OffsetEditorDialog::onStepOffsetX(bool plus)
+	{
+		applyStep(btnOffsetX_, offsetX_, plus ? 1.0 : -1.0, -9999.999, 9999.999, 3);
+	}
+
+	void OffsetEditorDialog::onStepOffsetY(bool plus)
+	{
+		applyStep(btnOffsetY_, offsetY_, plus ? 1.0 : -1.0, -9999.999, 9999.999, 3);
+	}
+
+	void OffsetEditorDialog::onStepOffsetAngle(bool plus)
+	{
+		applyStep(btnOffsetAngle_, offsetAngle_, plus ? 1.0 : -1.0, -360.0, 360.0, 3);
+	}
+
 	void OffsetEditorDialog::onOK()
 	{
 		accept();
@@ -169,6 +238,26 @@ namespace ui
 	void OffsetEditorDialog::onCancel()
 	{
 		reject();
+	}
+
+	void OffsetEditorDialog::applyStep(QPushButton* valueBtn, double& value,
+		double delta, double min, double max, int decimals)
+	{
+		double newValue = value + delta * kStep;
+
+		// 钳位
+		if (newValue < min) newValue = min;
+		if (newValue > max) newValue = max;
+
+		// 按小数位数舍入，避免浮点累积误差
+		const double scale = qPow(10.0, decimals);
+		newValue = qRound(newValue * scale) / scale;
+
+		if (qFuzzyCompare(newValue, value))
+			return;
+
+		value = newValue;
+		valueBtn->setText(QString::number(value, 'f', decimals));
 	}
 
 	bool OffsetEditorDialog::inputDoubleParam(QPushButton* button, double& value,

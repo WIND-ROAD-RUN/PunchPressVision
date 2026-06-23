@@ -10,6 +10,7 @@
 #include <QFont>
 #include <QGroupBox>
 #include <QHeaderView>
+#include <QHBoxLayout>
 #include <QLabel>
 #include <QLayout>
 #include <QMenu>
@@ -142,6 +143,7 @@ namespace ui
 
 		// 插入到右侧控制栏：gBox_tools 之后、gBox_table 之前（索引 3）
 		ui->vLayout_control->insertWidget(3, loadedModelsGroup_);
+
 
 		// 绘制工具栏初始隐藏
 		showDrawingToolbar(false);
@@ -301,6 +303,7 @@ namespace ui
 		// config 存米，UI 显示毫米
 		diffHeight_ = inf.config_module_->setCfg.diffHeight * 1000.0;
 	}
+
 
 	void PunchPress::loadCaltabDescrPath()
 	{
