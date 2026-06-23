@@ -7,6 +7,7 @@
 #include "ui_PunchPress.h"
 
 #include <QButtonGroup>
+#include <QDateTime>
 #include <QFont>
 #include <QGroupBox>
 #include <QHeaderView>
@@ -906,11 +907,11 @@ namespace ui
 
 			table->insertRow(0);
 
-			// 模型名称
-			auto* nameItem = new QTableWidgetItem(
-				QString::fromStdString(it->modelName));
-			nameItem->setFlags(nameItem->flags() & ~Qt::ItemIsEditable);
-			table->setItem(0, 0, nameItem);
+			// 时间
+			auto* timeItem = new QTableWidgetItem(
+				QDateTime::currentDateTime().toString(QStringLiteral("HH:mm:ss.zzz")));
+			timeItem->setFlags(timeItem->flags() & ~Qt::ItemIsEditable);
+			table->setItem(0, 0, timeItem);
 
 			// X (mm)
 			auto* xItem = new QTableWidgetItem(
@@ -953,7 +954,7 @@ namespace ui
 
 		table->setColumnCount(5);
 		table->setHorizontalHeaderLabels({
-			QStringLiteral("模型"),
+			QStringLiteral("时间"),
 			QStringLiteral("X(mm)"),
 			QStringLiteral("Y(mm)"),
 			QStringLiteral("角度(°)"),
