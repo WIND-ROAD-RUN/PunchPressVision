@@ -314,6 +314,7 @@ namespace ui
 		req.meanSize = meanSize_;
 
 		req.contrast = contrastAuto_ ? 0 : contrast_;
+		req.contrastAuto = contrastAuto_;
 		req.minContrast = minContrast_;
 
 		return req;

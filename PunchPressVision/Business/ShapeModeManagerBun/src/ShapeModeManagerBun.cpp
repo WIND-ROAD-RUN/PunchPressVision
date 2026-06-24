@@ -72,6 +72,7 @@ namespace bun
 			
 			
 			
+			//WriteImage(templateImage, "jpeg", 0, "C:/Users/zzw/Desktop/11");
 
 			// 2. 创建 Shape Model
 			HTuple modelID;
@@ -82,8 +83,8 @@ namespace bun
 				"auto",
 				"auto",
 				"use_polarity",
-				"auto",
-				"auto",
+				req.contrastAuto ? HalconCpp::HTuple("auto") : HalconCpp::HTuple(req.contrast),
+				req.contrastAuto ? HalconCpp::HTuple("auto") : HalconCpp::HTuple(req.minContrast),
 				&modelID);
 
 			// 3. 使用刚创建的模板在原图上验证匹配，作为创建成功的依据
@@ -776,6 +777,7 @@ namespace bun
 			{
 				// 对图像应用与创建模板时相同的预处理
 				HalconCpp::HImage processed = preprocessImage(image, model.data);
+				const HalconCpp::HImage processedForDisplay = processed;  // 保存预处理结果供 UI 显示
 
 				// 如果设置了匹配范围，限制搜索区域
 				if (inf_.config_module_ && inf_.config_module_->setCfg.matchRegionValid)
@@ -793,6 +795,10 @@ namespace bun
 					}
 					catch (...) {}
 				}
+
+
+				HalconCpp::WriteImage(processed, "jpeg", 0, "C:/Users/zzw/Desktop/11");
+
 
 				HalconCpp::HTuple row, column, angle, score;
 				HalconCpp::FindShapeModel(
@@ -896,6 +902,7 @@ namespace bun
 						result.found = true;
 						result.modelId = model.modelId;
 						result.modelName = model.modelName;
+						result.preprocessedImage = processedForDisplay;  // 预处理后的图像，供 UI 显示
 						// 自定义中心点的像素坐标（供上层绘图）
 						result.row = outRow;
 						result.column = outCol;

@@ -51,6 +51,7 @@ namespace bun
 		double angleExtent{ 90.0 };
 		int contrast{ 30 };
 		int minContrast{ 10 };
+		bool contrastAuto{ true };           // true = rbtn_auto 选中，Halcon 自动确定对比度
 		double minScore{ 0.5 };
 	};
 
@@ -71,6 +72,7 @@ namespace bun
 		double offsetY{ 0.0 };
 		bool found{ false };
 		HalconCpp::HObject matchedContours;  // 匹配后变换到位的轮廓 XLD（用于主界面显示）
+		HalconCpp::HImage preprocessedImage; // 预处理后的图像（通道提取+形态学运算，用于主界面显示）
 	};
 
 	/// <summary>

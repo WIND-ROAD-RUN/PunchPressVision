@@ -481,7 +481,11 @@ namespace app
 				HalconCpp::HTuple bufWin;
 				HalconCpp::OpenWindow(0, 0, imgW[0].I(), imgH[0].I(), 0, "buffer", "", &bufWin);
 				HalconCpp::SetPart(bufWin, 0, 0, imgH[0].I() - 1, imgW[0].I() - 1);
-				HalconCpp::DispObj(image, bufWin);
+				// 优先使用最佳匹配模型的预处理图像（灰度/单通道），回退到原始彩色图像
+			const HalconCpp::HImage& bgImage = (bestMatch != matches.end()
+				&& bestMatch->preprocessedImage.IsInitialized())
+				? bestMatch->preprocessedImage : image;
+			HalconCpp::DispObj(bgImage, bufWin);
 
 				// 同一模型的所有匹配用同一颜色，不同模型用不同颜色
 				std::map<std::string, int> modelColorMap;
