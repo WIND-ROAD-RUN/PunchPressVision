@@ -58,6 +58,7 @@ namespace app
 		void allPositionResultsReady(std::vector<global::PositionResult> results);
 		void cameraConnectionChanged(global::CameraIndex idx, bool connected, QString reason);
 		void plcConnectionChanged(bool connected);
+		void clearMainViewMatchRegion();
 
 	private slots:
 		void onFrameReady(HalconCpp::HImage image);

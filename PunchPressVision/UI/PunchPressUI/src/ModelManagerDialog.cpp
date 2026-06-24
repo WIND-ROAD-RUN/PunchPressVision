@@ -595,6 +595,7 @@ namespace ui
 
 	void ModelManagerDialog::onCreateModel()
 	{
+		app_.clearMainViewMatchRegion();
 		ModelEditorDialog dlg(app_, false, {}, this);
 		if (dlg.exec() == QDialog::Accepted)
 		{
@@ -614,6 +615,7 @@ namespace ui
 
 		// 编辑仅对焦点项生效
 		const std::string id = allModels_.at(selectedRow()).getId();
+		app_.clearMainViewMatchRegion();
 		ModelEditorDialog dlg(app_, true, id, this);
 		if (dlg.exec() == QDialog::Accepted)
 		{

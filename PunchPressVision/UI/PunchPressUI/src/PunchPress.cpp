@@ -212,6 +212,22 @@ namespace ui
 			this, &PunchPress::onPlcConnectionChanged, Qt::QueuedConnection);
 		connect(&app_, &app::PunchPressApp::startupCheckFailed,
 			this, &PunchPress::onStartupCheckFailed, Qt::QueuedConnection);
+		connect(&app_, &app::PunchPressApp::clearMainViewMatchRegion,
+			this, [this]()
+		{
+			if (imageView_)
+			{
+				imageView_->clearMatchRegion();
+				// 同步清除配置中的 matchRegion
+				auto& inf = app_.business().infrastructure();
+				if (inf.config_module_)
+				{
+					inf.config_module_->setCfg.matchRegionValid = false;
+					inf.config_module_->save();
+				}
+				updateMatchRegionButton();
+			}
+		}, Qt::QueuedConnection);
 
 		// UI 控件 → 槽
 		connect(ui->rbtn_debug, &QRadioButton::clicked, this, &PunchPress::onDebugClicked);

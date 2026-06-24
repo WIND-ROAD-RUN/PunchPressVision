@@ -368,10 +368,6 @@ namespace ui
 			modelCreated_ = true;
 			isModifyMode_ = true;  // 后续保存走更新逻辑，避免重复创建
 		}
-
-		// 创建/更新成功后清除界面上的绘制区域
-		if (shapeEditor_)
-			shapeEditor_->clearAll();
 	}
 
 	// ===== 相机参数 ============================================================
