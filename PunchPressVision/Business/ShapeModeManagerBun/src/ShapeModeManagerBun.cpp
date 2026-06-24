@@ -797,7 +797,7 @@ namespace bun
 				}
 
 
-				HalconCpp::WriteImage(processed, "jpeg", 0, "C:/Users/zzw/Desktop/11");
+			//	HalconCpp::WriteImage(processed, "jpeg", 0, "C:/Users/zzw/Desktop/11");
 
 
 				HalconCpp::HTuple row, column, angle, score;
