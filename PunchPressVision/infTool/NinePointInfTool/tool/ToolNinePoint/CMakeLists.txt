@@ -35,3 +35,11 @@ target_link_libraries(${Bun_TARGET} PRIVATE
 )
 
 add_windeployqt(${Bun_TARGET})
+
+# 将 build.version 复制到可执行文件输出目录，供运行时版本一致性检查
+add_custom_command(TARGET ${Bun_TARGET} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    ${CMAKE_BINARY_DIR}/build.version
+    $<TARGET_FILE_DIR:${Bun_TARGET}>
+    COMMENT "Copying build.version to output directory..."
+)

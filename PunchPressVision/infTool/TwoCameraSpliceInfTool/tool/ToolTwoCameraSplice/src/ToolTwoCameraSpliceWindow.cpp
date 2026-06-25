@@ -1,6 +1,7 @@
 #include "ToolTwoCameraSpliceWindow.hpp"
 #include "ui_ToolTwoCameraSpliceWindow.h"
 
+#include "global/BuildVersion.hpp"
 #include "infTool/TwoCameraSpliceInfTool/TwoCameraSpliceInfTool.hpp"
 #include "infTool/CalibInfTool/CalibInfTool.hpp"
 #include "infrastructure/infrastructure.hpp"
@@ -61,6 +62,9 @@ ToolTwoCameraSpliceWindow::ToolTwoCameraSpliceWindow(inf::infrastructure& inf, Q
 	, ui(new Ui::ToolTwoCameraSpliceWindowClass())
 {
 	ui->setupUi(this);
+
+	// 窗口标题附加版本号
+	setWindowTitle(QStringLiteral("双相机拼接标定工具 v%1").arg(QLatin1String(global::PPV_VERSION_STRING)));
 
 	calibTool_->build();
 	spliceTool_->build();

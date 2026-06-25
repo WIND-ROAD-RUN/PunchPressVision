@@ -1,0 +1,8 @@
+#pragma once
+
+namespace global {
+
+inline constexpr const char* PPV_VERSION_STRING = "@PPV_VERSION_STRING@";
+inline constexpr const char* PPV_BUILD_ID = "@PPV_BUILD_ID@";
+
+}

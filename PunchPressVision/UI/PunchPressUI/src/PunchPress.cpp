@@ -23,6 +23,7 @@
 
 #include <filesystem>
 
+#include "global/BuildVersion.hpp"
 #include "infrastructure/CalibConfigModule/CalibConfigModulePath.hpp"
 
 #include "app/PunchPressApp.hpp"
@@ -44,6 +45,26 @@ namespace ui
 		, app_(app)
 	{
 		ui->setupUi(this);
+
+		// 窗口标题附加版本号
+		setWindowTitle(QStringLiteral("PunchPressVision v%1").arg(QLatin1String(global::PPV_VERSION_STRING)));
+
+		// 右侧栏顶部：在标题行下方插入版号标签
+		{
+			auto* versionLabel = new QLabel(this);
+			versionLabel->setText(QStringLiteral("v%1  Build: %2")
+				.arg(QLatin1String(global::PPV_VERSION_STRING))
+				.arg(QLatin1String(global::PPV_BUILD_ID)));
+			versionLabel->setStyleSheet(QStringLiteral(
+				"QLabel {"
+				"  font-size: 12px;"
+				"  color: rgb(180, 180, 180);"
+				"  padding: 2px 8px;"
+				"}"));
+			versionLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+			// 插入到 hLayout_title 之后、line_head 之前（索引 1）
+			ui->vLayout_head->insertWidget(1, versionLabel);
+		}
 
 		// 按钮分组：隔离模式和光源两组 RadioButton 的互斥作用域
 		modeGroup_ = new QButtonGroup(this);
@@ -175,6 +196,9 @@ namespace ui
 		loadConfigs();
 		updateCameraParamButtons();
 		updateMatchRegionButton();
+
+		// 状态栏显示构建 ID（永久信息）
+		statusBar()->showMessage(QStringLiteral("Build: %1").arg(QLatin1String(global::PPV_BUILD_ID)));
 
 		// 启动检查（FR-001 ~ FR-004）
 		QString startupError;

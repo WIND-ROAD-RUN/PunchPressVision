@@ -21,9 +21,10 @@ set_target_properties(${global_TARGET} PROPERTIES
 	RELEASE_POSTFIX ""
 )
 
-target_include_directories(${global_TARGET} 
-	PUBLIC 
+target_include_directories(${global_TARGET}
+	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+		$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/PunchPressVision/global/include>  # 生成的 BuildVersion.hpp
 	PRIVATE
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/private/include>
 )
