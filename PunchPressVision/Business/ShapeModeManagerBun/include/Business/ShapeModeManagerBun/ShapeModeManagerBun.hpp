@@ -88,6 +88,17 @@ namespace bun
 	};
 
 	/// <summary>
+	/// 已加载模型的公开信息（供上层绘制屏蔽区域等，不暴露 Halcon 句柄）。
+	/// </summary>
+	struct LoadedModelInfo
+	{
+		std::string modelId;
+		std::string modelName;
+		bool hasMask{ false };
+		HalconCpp::HObject maskRegion;
+	};
+
+	/// <summary>
 	/// 用户可配置的模型偏移量。
 	/// 值从 ShapeModelData.offsetX/Y/Angle 读取，通过 model_params.txt 持久化。
 	/// </summary>
@@ -146,6 +157,7 @@ namespace bun
 		std::string currentModelId() const;
 		std::vector<std::string> getLoadedModelIds() const;
 		int getLoadedModelCount() const;
+		std::vector<LoadedModelInfo> getLoadedModelInfos() const;
 
 		// 模型偏移量（FR-035）
 		/// <summary>获取指定模型的用户偏移量。</summary>
