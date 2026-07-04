@@ -75,6 +75,10 @@ private:
 	void buildConnections();
 	void syncConfigToUi();
 	void applyCalibParams();
+
+	// 将两台相机切换到 Line0 硬触发并恢复取流；返回 false 时写入失败原因
+	bool switchBothCamerasToLine0(QString* error = nullptr);
+
 	void readImage();
 
 	// Halcon 窗口管理

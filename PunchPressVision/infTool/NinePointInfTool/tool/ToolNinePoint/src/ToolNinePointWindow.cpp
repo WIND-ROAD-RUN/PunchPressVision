@@ -273,6 +273,49 @@ void ToolNinePointWindow::applyCalibParams()
 }
 
 // ===================================================================
+// 相机触发模式切换
+// ===================================================================
+bool ToolNinePointWindow::switchBothCamerasToLine0(QString* error)
+{
+	if (!inf_.camera_module_)
+	{
+		if (error) *error = QStringLiteral("相机模块未初始化");
+		return false;
+	}
+
+	// 切换触发模式前必须先停止取流；部分相机 SDK 在取流状态下设置触发源不会生效。
+	inf_.camera_module_->stopMonitor();
+
+	bool ok = true;
+	QString errMsg;
+
+	auto setOne = [&](global::CameraIndex idx) -> bool
+	{
+		if (!inf_.camera_module_->isConnected(idx))
+		{
+			errMsg = QStringLiteral("相机%1未连接").arg(static_cast<int>(idx) + 1);
+			return false;
+		}
+		if (!inf_.camera_module_->setTriggerMode(idx, global::TriggerSource::Line0, 2.0))
+		{
+			errMsg = QStringLiteral("相机%1切换到 Line0 触发模式失败").arg(static_cast<int>(idx) + 1);
+			return false;
+		}
+		return true;
+	};
+
+	ok = setOne(global::CameraIndex::Camera1) && setOne(global::CameraIndex::Camera2);
+
+	// 无论设置是否成功都恢复取流，避免相机停留在停止状态
+	inf_.camera_module_->startMonitor();
+
+	if (!ok && error)
+		*error = errMsg;
+
+	return ok;
+}
+
+// ===================================================================
 // Halcon 窗口管理
 // ===================================================================
 bool ToolNinePointWindow::ensureHalconWindow()
@@ -1143,17 +1186,18 @@ void ToolNinePointWindow::btn_ninePointCalibration_clicked()
 	applyCalibParams();
 
 	// 切换到硬触发模式（Line0），等待外部触发出图
-	if (inf_.camera_module_)
+	QString err;
+	if (!switchBothCamerasToLine0(&err))
 	{
-		inf_.camera_module_->setTriggerMode(global::CameraIndex::Camera1, global::TriggerSource::Line0, 2.0);
-		inf_.camera_module_->setTriggerMode(global::CameraIndex::Camera2, global::TriggerSource::Line0, 2.0);
+		QMessageBox::warning(this, QStringLiteral("相机触发模式切换失败"), err);
+		return;
 	}
 
 	// 2s 后再进入九点标定状态（异步，不阻塞UI；等待相机回调切换完成）
 	QTimer::singleShot(2000, this, [this]()
 	{
 		isJiuDianBiaoDing_ = true;
-		QMessageBox::information(this, QStringLiteral("提示"), QStringLiteral("准备完成"));
+		QMessageBox::information(this, QStringLiteral("提示"), QStringLiteral("准备完成，等待外部触发"));
 	});
 }
 
