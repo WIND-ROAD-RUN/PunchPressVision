@@ -284,7 +284,7 @@ bool ToolNinePointWindow::switchBothCamerasToLine0(QString* error)
 	}
 
 	// 切换触发模式前必须先停止取流；部分相机 SDK 在取流状态下设置触发源不会生效。
-	inf_.camera_module_->stopMonitor();
+	//inf_.camera_module_->stopMonitor();
 
 	bool ok = true;
 	QString errMsg;
