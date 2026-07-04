@@ -159,6 +159,7 @@ namespace bun
 
 			// Mask 列表（逐个保存为 HObject，支持回撤）
 			outData._paintShieldRoiList = req._paintShieldRoiList;
+			outData.buildRecognitionMask();
 
 			// 生成标注图：在原始图像上叠加 ROI（白线）和 Mask（黑线）
 			if (!req._paintCreateRoiList.empty() || !req._paintShieldRoiList.empty())
@@ -521,6 +522,24 @@ namespace bun
 		return static_cast<int>(loadedModels_.size());
 	}
 
+	std::vector<LoadedModelInfo> ShapeModeManagerBun::getLoadedModelInfos() const
+	{
+		std::shared_lock<std::shared_mutex> lk(modelCacheMutex_);
+		std::vector<LoadedModelInfo> infos;
+		infos.reserve(loadedModels_.size());
+		for (const auto& m : loadedModels_)
+		{
+			LoadedModelInfo info;
+			info.modelId = m.modelId;
+			info.modelName = m.modelName;
+			info.hasMask = m.data._hasRecognitionMask;
+			if (info.hasMask)
+				info.maskRegion = m.data._recognitionMask;
+			infos.push_back(std::move(info));
+		}
+		return infos;
+	}
+
 	// ===== 模型偏移量 =====
 
 	ModelUserOffset ShapeModeManagerBun::getUserOffset(const std::string& modelId) const
@@ -796,6 +815,18 @@ namespace bun
 					catch (...) {}
 				}
 
+				// 当前模型独立的屏蔽区域：仅作用于该模型自身的识别
+				if (model.data._hasRecognitionMask && model.data._recognitionMask.IsInitialized())
+				{
+					try
+					{
+						HalconCpp::HImage masked;
+						HalconCpp::ReduceDomain(processed, model.data._recognitionMask, &masked);
+						processed = masked;
+					}
+					catch (...) { /* 屏蔽区异常时回退到未屏蔽图像，不阻断其他模型 */ }
+				}
+
 
 			//	HalconCpp::WriteImage(processed, "jpeg", 0, "C:/Users/zzw/Desktop/11");
 
@@ -1011,9 +1042,21 @@ namespace bun
 				req.contrast, req.minContrast,
 				&modelID);
 
-			// 3. 匹配测试
+			// 3. 匹配测试：与生产行为一致，对搜索图像应用相同屏蔽区域
+			HImage searchImage = req.trainingImage;
+			if (req.mask.IsInitialized())
+			{
+				try
+				{
+					HObject reduced;
+					ReduceDomain(req.trainingImage, req.mask, &reduced);
+					searchImage = HImage(reduced);
+				}
+				catch (...) {}
+			}
+
 			HTuple row, column, angle, score;
-			FindShapeModel(req.trainingImage, modelID,
+			FindShapeModel(searchImage, modelID,
 				HTuple(req.angleStart).TupleRad(), HTuple(req.angleExtent).TupleRad(),
 				0.3, 1, 0.5, "least_squares", 0, 0.9,
 				&row, &column, &angle, &score);
