@@ -318,6 +318,40 @@ namespace Config
 			}
 			return true;
 		}
+
+		void unionRoiList(const std::vector<HalconCpp::HObject>& roiList, HalconCpp::HObject& outUnion, bool& outHasUnion)
+		{
+			outUnion.Clear();
+			outHasUnion = false;
+			HalconCpp::HObject merged;
+			bool first = true;
+			for (const auto& obj : roiList)
+			{
+				if (!obj.IsInitialized())
+					continue;
+				if (first)
+				{
+					merged = obj;
+					first = false;
+				}
+				else
+				{
+					HalconCpp::HObject temp;
+					HalconCpp::Union2(merged, obj, &temp);
+					merged = temp;
+				}
+			}
+			if (!first)
+			{
+				outUnion = merged;
+				outHasUnion = true;
+			}
+		}
+	}
+
+	void ShapeModelData::buildRecognitionMask()
+	{
+		unionRoiList(_paintShieldRoiList, _recognitionMask, _hasRecognitionMask);
 	}
 
 	void ShapeModelData::loadInDir(const std::string& dir)
@@ -388,6 +422,9 @@ namespace Config
 			// 加载 XLD
 			readObjectSafe(dirPath / kFindCreateXldFile, _findCreateXldObj);
 			readObjectSafe(dirPath / kFindCreateXldSecondaryFile, _findCreateXldObj_Secondary);
+
+			// 构建识别阶段使用的合并屏蔽区
+			buildRecognitionMask();
 		}
 		catch (...)
 		{

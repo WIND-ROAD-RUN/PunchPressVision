@@ -1,6 +1,7 @@
 #include "ToolNinePointWindow.hpp"
 #include "ui_ToolNinePointWindow.h"
 
+#include "global/BuildVersion.hpp"
 #include "global/GlobalPath.hpp"
 #include "infTool/NinePointInfTool/NinePointInfTool.hpp"
 #include "infTool/TwoCameraSpliceInfTool/TwoCameraSpliceInfTool.hpp"
@@ -91,6 +92,9 @@ ToolNinePointWindow::ToolNinePointWindow(inf::infrastructure& inf, QWidget* pare
 	, ui(new Ui::ToolNinePointWindowClass())
 {
 	ui->setupUi(this);
+
+	// 窗口标题附加版本号
+	setWindowTitle(QStringLiteral("九点标定工具 v%1").arg(QLatin1String(global::PPV_VERSION_STRING)));
 
 	ninePointTool_->build();
 	calibTool_->build();

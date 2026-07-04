@@ -487,6 +487,21 @@ namespace app
 				? bestMatch->preprocessedImage : image;
 			HalconCpp::DispObj(bgImage, bufWin);
 
+				// 绘制所有已加载模型的屏蔽区域（红色 margin），每个模型仅作用于自身识别
+				try
+				{
+					auto loadedInfos = business_.shape_mode_manager_bun->getLoadedModelInfos();
+					HalconCpp::SetDraw(bufWin, "margin");
+					HalconCpp::SetColor(bufWin, "red");
+					HalconCpp::SetLineWidth(bufWin, 2);
+					for (const auto& info : loadedInfos)
+					{
+						if (info.hasMask && info.maskRegion.IsInitialized())
+							HalconCpp::DispObj(info.maskRegion, bufWin);
+					}
+				}
+				catch (...) {}
+
 				// 同一模型的所有匹配用同一颜色，不同模型用不同颜色
 				std::map<std::string, int> modelColorMap;
 				for (const auto& m : matches)

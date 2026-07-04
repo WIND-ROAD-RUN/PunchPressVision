@@ -6,6 +6,37 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/func.cmake)
 
 project(PunchPressVision VERSION 0.1 LANGUAGES CXX)
 
+# ======================================================
+# 版号机制：版本号 + 构建 ID（时间戳_git短哈希）
+# ======================================================
+set(PPV_VERSION_MAJOR 1)
+set(PPV_VERSION_MINOR 0)
+set(PPV_VERSION_PATCH 0)
+set(PPV_VERSION_BUILD 0)
+set(PPV_VERSION_STRING "${PPV_VERSION_MAJOR}.${PPV_VERSION_MINOR}.${PPV_VERSION_PATCH}.${PPV_VERSION_BUILD}")
+
+execute_process(
+    COMMAND git rev-parse --short HEAD
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_COMMIT_SHORT
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_QUIET
+)
+string(TIMESTAMP BUILD_TIMESTAMP "%Y%m%d_%H%M%S")
+if(GIT_COMMIT_SHORT)
+    set(PPV_BUILD_ID "${BUILD_TIMESTAMP}_${GIT_COMMIT_SHORT}")
+else()
+    set(PPV_BUILD_ID "${BUILD_TIMESTAMP}")
+endif()
+
+configure_file(
+    ${CMAKE_SOURCE_DIR}/PunchPressVision/global/include/global/BuildVersion.hpp.in
+    ${CMAKE_BINARY_DIR}/PunchPressVision/global/include/global/BuildVersion.hpp
+    @ONLY
+)
+
+file(WRITE ${CMAKE_BINARY_DIR}/build.version "${PPV_BUILD_ID}\n")
+
 include(CTest)
 
 list(APPEND CMAKE_PREFIX_PATH ${RWUL_DIR})

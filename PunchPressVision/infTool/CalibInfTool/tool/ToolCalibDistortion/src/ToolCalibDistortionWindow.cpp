@@ -2,6 +2,7 @@
 #include "ui_ToolCalibDistortionWindow.h"
 
 #include "CornerPreviewDialog.hpp"
+#include "global/BuildVersion.hpp"
 #include "infTool/CalibInfTool/CalibInfTool.hpp"
 #include "infrastructure/CalibConfigModule/CalibConfigModulePath.hpp"
 
@@ -60,6 +61,9 @@ ToolCalibDistortionWindow::ToolCalibDistortionWindow(inf::infrastructure& inf, Q
     , ui(new Ui::ToolCalibDistortionWindowClass())
 {
     ui->setupUi(this);
+
+    // 窗口标题附加版本号
+    setWindowTitle(QStringLiteral("畸变标定工具 v%1").arg(QLatin1String(global::PPV_VERSION_STRING)));
 
     // 初始化 Halcon 标定引擎
     calibInfTool_->build();

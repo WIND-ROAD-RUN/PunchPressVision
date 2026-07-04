@@ -24,6 +24,10 @@ namespace Config
 		std::vector<HalconCpp::HObject> _paintCreateRoiList;
 		std::vector<HalconCpp::HObject> _paintShieldRoiList;
 
+		// 识别阶段使用的合并屏蔽区（由 _paintShieldRoiList 构建）
+		HalconCpp::HObject _recognitionMask;
+		bool _hasRecognitionMask{ false };
+
 		// 存储找到的轮廓（XLD），用于显示/调试（DispObj）
 		HalconCpp::HObject _findCreateXldObj;
 		// 存储其他匹配轮廓（XLD），用于显示不同颜色（青色）
@@ -82,6 +86,7 @@ namespace Config
 	public:
 		void loadInDir(const std::string& dir);
 		void saveInDir(const std::string& dir);
+		void buildRecognitionMask();   // 合并 _paintShieldRoiList，生成识别阶段使用的屏蔽区
 	};
 
 	struct ShapeModelInfo
