@@ -296,9 +296,31 @@ namespace bun
 	bool ShapeModeManagerBun::updateModel(const std::string& id,
 		const CreateModelRequest& req, std::string* errorMsg)
 	{
+		// 修改模型时只更新模板及图像处理参数，保留原有偏移/旋转/匹配参数
+		Config::ShapeModelData oldData;
+		try
+		{
+			const auto oldItem = inf_.shape_model_manager_module_->getShapeModelItem(id);
+			oldData = oldItem.data;
+		}
+		catch (...)
+		{
+			if (errorMsg) *errorMsg = "无法加载原模型数据";
+			return false;
+		}
+
 		Config::ShapeModelData data;
 		if (!createModelInternal(req, data, errorMsg))
 			return false;
+
+		// 保留用户偏移量及匹配参数（修改模型界面不允许编辑这些值）
+		data.offsetX = oldData.offsetX;
+		data.offsetY = oldData.offsetY;
+		data.offsetAngle = oldData.offsetAngle;
+		data.findnumber = oldData.findnumber;
+		data.angleStart = oldData.angleStart;
+		data.angleExtent = oldData.angleExtent;
+		data.minScore = oldData.minScore;
 
 		inf_.shape_model_manager_module_->changeShapeModelItem(id, data);
 
