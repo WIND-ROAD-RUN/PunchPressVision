@@ -352,6 +352,7 @@ namespace ui
 
 	void ModelManagerDialog::onSearchInputClicked()
 	{
+		fullKeyboard_->setValue(QString());
 		const int ret = fullKeyboard_->exec();
 		if (ret != QDialog::Accepted)
 			return;
@@ -410,12 +411,16 @@ namespace ui
 		if (!index.isValid())
 			return;
 
+		const QString currentName = QString::fromStdString(
+			allModels_.at(index.row()).base_info.name);
+		fullKeyboard_->setValue(currentName);
+
 		const int ret = fullKeyboard_->exec();
 		if (ret != QDialog::Accepted)
 			return;
 
 		const QString newName = fullKeyboard_->getValue();
-		if (newName.isEmpty())
+		if (newName.isEmpty() || newName == currentName)
 			return;
 
 		auto& bun = app_.business().shape_mode_manager_bun;
@@ -510,15 +515,22 @@ namespace ui
 		if (ids.empty())
 			return;
 
+		const int row = selectedRow();
+		if (row < 0 || row >= allModels_.size())
+			return;
+
 		// 重命名仅对焦点项生效
-		const std::string id = allModels_.at(selectedRow()).getId();
+		const std::string id = allModels_.at(row).getId();
+		const QString currentName = QString::fromStdString(
+			allModels_.at(row).base_info.name);
+		fullKeyboard_->setValue(currentName);
 
 		const int ret = fullKeyboard_->exec();
 		if (ret != QDialog::Accepted)
 			return;
 
 		const QString newName = fullKeyboard_->getValue();
-		if (newName.isEmpty())
+		if (newName.isEmpty() || newName == currentName)
 			return;
 
 		auto& bun = app_.business().shape_mode_manager_bun;
