@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <QProcess>
+#include <QStandardPaths>
 #include <QStringList>
 
 #include "infrastructure/ControlModule/ControlModule.hpp"
@@ -351,6 +352,8 @@ namespace app
 			return;
 		}
 
+		
+		
 		try
 		{
 		// 多模型匹配：遍历所有已加载模型

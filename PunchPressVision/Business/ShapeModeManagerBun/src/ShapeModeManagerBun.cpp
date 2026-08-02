@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
+#include <QStandardPaths>
 
 #include <json/json.h>
 
@@ -780,7 +781,9 @@ namespace bun
 				MeanImage(result, &smoothed, size, size);
 				result = smoothed;
 			}
-
+			const QString savePath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation)
+				+ "/processProductionFrame.jpeg";
+			HalconCpp::WriteImage(image, "jpeg", 0, savePath.toLocal8Bit().constData());
 			return result;
 		}
 		catch (const HException&)
