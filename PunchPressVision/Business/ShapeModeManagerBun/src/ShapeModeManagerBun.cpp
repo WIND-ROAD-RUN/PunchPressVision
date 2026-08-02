@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
+#include <QDebug>
 #include <QStandardPaths>
 
 #include <json/json.h>
@@ -706,6 +707,17 @@ namespace bun
 			HTuple channels;
 			CountChannels(image, &channels);
 			const int channelType = data._createModelPreProcessType;
+
+			qDebug() << "[preprocessImage] 预处理参数:"
+					 << "channelType=" << channelType
+					 << "useOpening=" << data._createModelUseOpening
+					 << "openingRadius=" << data._createModelOpeningRadius
+					 << "useClosing=" << data._createModelUseClosing
+					 << "closingRadius=" << data._createModelClosingRadius
+					 << "useMean=" << data._createModelUseMean
+					 << "meanRadius=" << data._createModelMeanRadius
+					 << "channels=" << channels[0].I();
+
 			if (channels[0].I() >= 3)
 			{
 				switch (channelType)
@@ -783,7 +795,7 @@ namespace bun
 			}
 			const QString savePath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation)
 				+ "/processProductionFrame.jpeg";
-			HalconCpp::WriteImage(image, "jpeg", 0, savePath.toLocal8Bit().constData());
+			//HalconCpp::WriteImage(result, "jpeg", 0, savePath.toLocal8Bit().constData());
 			return result;
 		}
 		catch (const HException&)
