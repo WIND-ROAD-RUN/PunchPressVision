@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QDialog>
+#include <QFutureWatcher>
 
 #include "halconcpp/HalconCpp.h"
 #include "global/GlobalType.hpp"
@@ -55,6 +56,7 @@ namespace ui
 
 		// 操作
 		void onCreateModel();
+		void onTrainingFinished();
 		void onReadImage();
 		void onExit();
 
@@ -104,6 +106,12 @@ namespace ui
 		std::string modelId_;
 		bool modelLoaded_{ false };   ///< 确保 loadExistingModel 仅执行一次
 		bool modelCreated_{ false };  ///< 是否已成功创建/更新过模板
+
+		// 异步创建/修改模型
+		QFutureWatcher<bun::TrainShapeModelResult>* trainingWatcher_{ nullptr };
+		QDialog* progressDialog_{ nullptr };
+		bun::CreateModelRequest pendingRequest_;  ///< 异步训练期间的请求副本
+		bool isTraining_{ false };               ///< 防止重复触发
 
 		Config::cameraCfg cameraCfg_;
 

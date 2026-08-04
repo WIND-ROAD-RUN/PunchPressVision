@@ -19,16 +19,20 @@ namespace bun
 	{
 	}
 
-	bool ShapeModeManagerBun::createModelInternal(const CreateModelRequest& req,
-		Config::ShapeModelData& outData, std::string* errorMsg)
+	// ===== 纯静态训练函数（线程安全，无 QObject / 基础设施依赖）=====
+
+	TrainShapeModelResult ShapeModeManagerBun::trainShapeModel(
+		const CreateModelRequest& req,
+		const MatchRegionCfg& matchRegion)
 	{
 		using namespace HalconCpp;
+		TrainShapeModelResult result;
 		try
 		{
 			if (!req.trainingImage.IsInitialized())
 			{
-				if (errorMsg) *errorMsg = "训练图像未初始化";
-				return false;
+				result.errorMsg = "训练图像未初始化";
+				return result;
 			}
 
 			// 1. 裁剪模板图：优先全局 matchRegion，否则用用户绘制的 ROI
@@ -37,14 +41,13 @@ namespace bun
 			double centerX = 0.0, centerY = 0.0;
 			HObject cropRegion;
 			bool hasCropRegion = false;
-			if (inf_.config_module_ && inf_.config_module_->setCfg.matchRegionValid)
+			if (matchRegion.valid)
 			{
-				const auto& cfg = inf_.config_module_->setCfg;
 				try
 				{
 					GenRectangle1(&cropRegion,
-						cfg.matchRegionRow1, cfg.matchRegionCol1,
-						cfg.matchRegionRow2, cfg.matchRegionCol2);
+						matchRegion.row1, matchRegion.col1,
+						matchRegion.row2, matchRegion.col2);
 					HObject reduced;
 					ReduceDomain(req.trainingImage, cropRegion, &reduced);
 					templateImage = HImage(reduced);
@@ -70,11 +73,6 @@ namespace bun
 				ReduceDomain(req.trainingImage, diff, &reduced);
 				templateImage = HImage(reduced);
 			}
-
-			
-			
-			
-			//WriteImage(templateImage, "jpeg", 0, "C:/Users/zzw/Desktop/11");
 
 			// 2. 创建 Shape Model
 			HTuple modelID;
@@ -106,8 +104,8 @@ namespace bun
 			if (matchScore.Length() == 0 || matchScore[0].D() < 0.5)
 			{
 				ClearShapeModel(modelID);
-				if (errorMsg) *errorMsg = "模板创建后无法在图像中匹配到自身，请调整 ROI 或训练参数";
-				return false;
+				result.errorMsg = "模板创建后无法在图像中匹配到自身，请调整 ROI 或训练参数";
+				return result;
 			}
 
 			// 找到模型中心，作为模板中心点
@@ -124,10 +122,10 @@ namespace bun
 			{
 				centerX = findcenterX;
 				centerY = findcenterY;
-
-
 			}
+
 			// 4. 准备模型数据
+			Config::ShapeModelData& outData = result.data;
 			outData._templateMatImage = templateImage;
 			outData._originalImage = req.rawImage.IsInitialized() ? req.rawImage : req.trainingImage;
 			outData.hv_ModelID = modelID;
@@ -183,20 +181,19 @@ namespace bun
 			}
 
 			// 5. 提取模型轮廓并变换到匹配位置，供 UI 显示
-			HObject modelContours;
-			GetShapeModelContours(&modelContours, modelID, 1);
+			HObject modelContoursRaw;
+			GetShapeModelContours(&modelContoursRaw, modelID, 1);
 
 			HTuple homMat2D;
 			VectorAngleToRigid(0, 0, 0, matchRow[0], matchCol[0], matchAngle[0], &homMat2D);
 
 			HObject transformedContours;
-			AffineTransContourXld(modelContours, &transformedContours, homMat2D);
+			AffineTransContourXld(modelContoursRaw, &transformedContours, homMat2D);
 
 			outData._findCreateXldObj = transformedContours;
-			emit modelContoursFound(transformedContours);
+			result.contours = transformedContours;  // 通过返回值传递，不在此处 emit
 
 			// 6. 生成模板缩略图：在原图上叠加 ROI 区域轮廓与 ShapeModel 轮廓
-			//    使用固定大小缩略图窗口，使线宽相对图像内容保持可见
 			try
 			{
 				HImage displayImage = req.trainingImage;
@@ -205,7 +202,6 @@ namespace bun
 				const int imgWi = imgW[0].I(), imgHi = imgH[0].I();
 				if (imgWi > 0 && imgHi > 0)
 				{
-					// 缩略图最大边长（保持宽高比）
 					constexpr int kMaxThumb = 800;
 					int winW = imgWi, winH = imgHi;
 					if (imgWi > kMaxThumb || imgHi > kMaxThumb)
@@ -217,7 +213,6 @@ namespace bun
 						if (winH < 1) winH = 1;
 					}
 
-					// 单通道转 3 通道（Halcon 显示/保存需要 RGB）
 					HImage rgbImage;
 					Compose3(displayImage, displayImage, displayImage, &rgbImage);
 
@@ -226,7 +221,6 @@ namespace bun
 					SetPart(bufWin, 0, 0, imgHi - 1, imgWi - 1);
 					DispObj(rgbImage, bufWin);
 
-					// 绘制 ROI 区域轮廓（绿色，margin 模式只绘边框）
 					SetDraw(bufWin, "margin");
 					SetColor(bufWin, "green");
 					SetLineWidth(bufWin, 3);
@@ -236,7 +230,6 @@ namespace bun
 							DispObj(obj, bufWin);
 					}
 
-					// 绘制 Mask 区域轮廓（蓝色）
 					SetColor(bufWin, "blue");
 					SetLineWidth(bufWin, 3);
 					for (const auto& obj : req._paintShieldRoiList)
@@ -245,7 +238,6 @@ namespace bun
 							DispObj(obj, bufWin);
 					}
 
-					// 绘制 ShapeModel 轮廓（红色，填充模式）
 					SetDraw(bufWin, "fill");
 					SetColor(bufWin, "red");
 					SetLineWidth(bufWin, 4);
@@ -260,45 +252,61 @@ namespace bun
 				// 缩略图生成失败不阻断模型创建，保留模板原图
 			}
 
-			return true;
+			result.success = true;
+			return result;
 		}
 		catch (const HException& e)
 		{
-			if (errorMsg)
-				*errorMsg = std::string("创建模型失败: ") + e.ErrorMessage().Text();
-			return false;
+			result.errorMsg = std::string("创建模型失败: ") + e.ErrorMessage().Text();
+			return result;
 		}
 		catch (...)
 		{
-			if (errorMsg) *errorMsg = "创建模型发生未知错误";
-			return false;
+			result.errorMsg = "创建模型发生未知错误";
+			return result;
 		}
 	}
 
-	bool ShapeModeManagerBun::createModel(const CreateModelRequest& req,
-		Config::ShapeModelInfo& outInfo, std::string* errorMsg)
-	{
-		Config::ShapeModelData data;
-		if (!createModelInternal(req, data, errorMsg))
-			return false;
+	// ===== persistNewModel / persistUpdatedModel（主线程）=====
 
-		// 元数据
+	bool ShapeModeManagerBun::persistNewModel(
+		TrainShapeModelResult& result,
+		const CreateModelRequest& req,
+		Config::ShapeModelInfo& outInfo,
+		std::string* errorMsg)
+	{
+		if (!result.success)
+		{
+			if (errorMsg) *errorMsg = result.errorMsg;
+			return false;
+		}
+		// 发布轮廓信号（让 ShapeEditor 显示）
+		if (result.contours.IsInitialized())
+			emit modelContoursFound(result.contours);
+
 		Config::ShapeModelInfo::BaseInfo baseInfo;
 		baseInfo.name = req.name.isEmpty()
 			? inf_.shape_model_manager_module_->getCurrentTime_yyMMddHHmmsszzz()
 			: req.name.toStdString();
 
-		// 存储（生成 id/时间戳目录并落盘）
-		outInfo = inf_.shape_model_manager_module_->addShapeModelItem(data, baseInfo);
+		outInfo = inf_.shape_model_manager_module_->addShapeModelItem(
+			result.data, baseInfo);
 
 		emit modelListChanged();
 		return true;
 	}
 
-	bool ShapeModeManagerBun::updateModel(const std::string& id,
-		const CreateModelRequest& req, std::string* errorMsg)
+	bool ShapeModeManagerBun::persistUpdatedModel(
+		TrainShapeModelResult& result,
+		const std::string& id,
+		std::string* errorMsg)
 	{
-		// 修改模型时只更新模板及图像处理参数，保留原有偏移/旋转/匹配参数
+		if (!result.success)
+		{
+			if (errorMsg) *errorMsg = result.errorMsg;
+			return false;
+		}
+		// 加载旧数据以保留用户偏移量及匹配参数
 		Config::ShapeModelData oldData;
 		try
 		{
@@ -311,23 +319,60 @@ namespace bun
 			return false;
 		}
 
-		Config::ShapeModelData data;
-		if (!createModelInternal(req, data, errorMsg))
-			return false;
-
 		// 保留用户偏移量及匹配参数（修改模型界面不允许编辑这些值）
-		data.offsetX = oldData.offsetX;
-		data.offsetY = oldData.offsetY;
-		data.offsetAngle = oldData.offsetAngle;
-		data.findnumber = oldData.findnumber;
-		data.angleStart = oldData.angleStart;
-		data.angleExtent = oldData.angleExtent;
-		data.minScore = oldData.minScore;
+		result.data.offsetX = oldData.offsetX;
+		result.data.offsetY = oldData.offsetY;
+		result.data.offsetAngle = oldData.offsetAngle;
+		result.data.findnumber = oldData.findnumber;
+		result.data.angleStart = oldData.angleStart;
+		result.data.angleExtent = oldData.angleExtent;
+		result.data.minScore = oldData.minScore;
 
-		inf_.shape_model_manager_module_->changeShapeModelItem(id, data);
+		// 发布轮廓信号
+		if (result.contours.IsInitialized())
+			emit modelContoursFound(result.contours);
+
+		inf_.shape_model_manager_module_->changeShapeModelItem(id, result.data);
 
 		emit modelListChanged();
 		return true;
+	}
+
+
+	bool ShapeModeManagerBun::createModel(const CreateModelRequest& req,
+		Config::ShapeModelInfo& outInfo, std::string* errorMsg)
+	{
+		MatchRegionCfg matchRegion;
+		if (inf_.config_module_ && inf_.config_module_->setCfg.matchRegionValid)
+		{
+			const auto& cfg = inf_.config_module_->setCfg;
+			matchRegion.valid = true;
+			matchRegion.row1 = cfg.matchRegionRow1;
+			matchRegion.col1 = cfg.matchRegionCol1;
+			matchRegion.row2 = cfg.matchRegionRow2;
+			matchRegion.col2 = cfg.matchRegionCol2;
+		}
+
+		auto result = trainShapeModel(req, matchRegion);
+		return persistNewModel(result, req, outInfo, errorMsg);
+	}
+
+	bool ShapeModeManagerBun::updateModel(const std::string& id,
+		const CreateModelRequest& req, std::string* errorMsg)
+	{
+		MatchRegionCfg matchRegion;
+		if (inf_.config_module_ && inf_.config_module_->setCfg.matchRegionValid)
+		{
+			const auto& cfg = inf_.config_module_->setCfg;
+			matchRegion.valid = true;
+			matchRegion.row1 = cfg.matchRegionRow1;
+			matchRegion.col1 = cfg.matchRegionCol1;
+			matchRegion.row2 = cfg.matchRegionRow2;
+			matchRegion.col2 = cfg.matchRegionCol2;
+		}
+
+		auto result = trainShapeModel(req, matchRegion);
+		return persistUpdatedModel(result, id, errorMsg);
 	}
 
 	bool ShapeModeManagerBun::deleteModel(const std::string& id, std::string* errorMsg)

@@ -99,6 +99,30 @@ namespace bun
 	};
 
 	/// <summary>
+	/// 训练时使用的匹配区域配置快照（所有值复制，线程安全）。
+	/// </summary>
+	struct MatchRegionCfg
+	{
+		bool   valid{ false };
+		double row1{ 0.0 };
+		double col1{ 0.0 };
+		double row2{ 0.0 };
+		double col2{ 0.0 };
+	};
+
+	/// <summary>
+	/// 静态训练函数的返回值。包含完整的 ShapeModelData 和轮廓 XLD。
+	/// 纯数据类型，可安全跨线程传递。
+	/// </summary>
+	struct TrainShapeModelResult
+	{
+		bool   success{ false };
+		std::string errorMsg;
+		Config::ShapeModelData data;
+		HalconCpp::HObject contours;
+	};
+
+	/// <summary>
 	/// 用户可配置的模型偏移量。
 	/// 值从 ShapeModelData.offsetX/Y/Angle 读取，通过 model_params.txt 持久化。
 	/// </summary>
@@ -137,6 +161,24 @@ namespace bun
 			std::string* errorMsg = nullptr);
 		bool deleteModel(const std::string& id, std::string* errorMsg = nullptr);
 		bool renameModel(const std::string& id, const QString& newName,
+			std::string* errorMsg = nullptr);
+
+		/// <summary>纯静态训练函数。无 QObject / 基础设施依赖，可从任意线程调用。</summary>
+		static TrainShapeModelResult trainShapeModel(
+			const CreateModelRequest& req,
+			const MatchRegionCfg& matchRegion);
+
+		/// <summary>将训练结果持久化为新模型（主线程）。发射 modelContoursFound + modelListChanged。</summary>
+		bool persistNewModel(
+			TrainShapeModelResult& result,
+			const CreateModelRequest& req,
+			Config::ShapeModelInfo& outInfo,
+			std::string* errorMsg = nullptr);
+
+		/// <summary>将训练结果更新到已有模型（主线程）。保留旧 offset / 匹配参数。</summary>
+		bool persistUpdatedModel(
+			TrainShapeModelResult& result,
+			const std::string& id,
 			std::string* errorMsg = nullptr);
 
 		// 模型加载/卸载（多模型支持）
@@ -216,9 +258,6 @@ namespace bun
 		inf::infrastructure& inf_;
 		infTool::infTool& inf_tool_;
 
-		// 创建/更新模型共用的数据生成逻辑
-		bool createModelInternal(const CreateModelRequest& req,
-			Config::ShapeModelData& outData, std::string* errorMsg);
 
 		// 对图像应用与创建模板时相同的预处理（通道提取、开/闭运算、均值滤波）
 		HalconCpp::HImage preprocessImage(const HalconCpp::HImage& image,

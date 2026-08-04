@@ -9,6 +9,7 @@
 #include <QLabel>
 #include <QLayout>
 #include <QShowEvent>
+#include <QtConcurrent/QtConcurrentRun>
 
 #include "app/PunchPressApp.hpp"
 #include "Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp"
@@ -339,31 +340,136 @@ namespace ui
 		if (!biz.shape_mode_manager_bun || !lastFrame_.IsInitialized())
 			return;
 
-		const auto req = buildRequest(preprocessImage(lastFrame_), lastFrame_);
+		// 防止重复触发
+		if (isTraining_)
+			return;
 
+		// ===== Phase 1: 构建请求 + 捕获 matchRegion（主线程）=====
+		pendingRequest_ = buildRequest(preprocessImage(lastFrame_), lastFrame_);
+
+		bun::MatchRegionCfg matchRegion;
+		{
+			const auto& inf = biz.infrastructure();
+			if (inf.config_module_ && inf.config_module_->setCfg.matchRegionValid)
+			{
+				const auto& cfg = inf.config_module_->setCfg;
+				matchRegion.valid = true;
+				matchRegion.row1 = cfg.matchRegionRow1;
+				matchRegion.col1 = cfg.matchRegionCol1;
+				matchRegion.row2 = cfg.matchRegionRow2;
+				matchRegion.col2 = cfg.matchRegionCol2;
+			}
+		}
+
+		// ===== Phase 2: 显示进度对话框 =====
+		if (!progressDialog_)
+		{
+			progressDialog_ = new QDialog(this);
+			progressDialog_->setWindowTitle(QStringLiteral("请稍候"));
+			progressDialog_->setFixedSize(400, 120);
+			progressDialog_->setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint
+				| Qt::WindowTitleHint);
+			auto* layout = new QVBoxLayout(progressDialog_);
+			auto* label = new QLabel(QStringLiteral("正在创建模型，请稍候..."), progressDialog_);
+			label->setAlignment(Qt::AlignCenter);
+			QFont font = label->font();
+			font.setPointSize(16);
+			label->setFont(font);
+			layout->addWidget(label);
+		}
+		isTraining_ = true;
+		ui->btn_createShapeModel->setEnabled(false);
+		progressDialog_->show();
+
+		// ===== Phase 3: 异步调度训练 =====
+		if (!trainingWatcher_)
+		{
+			trainingWatcher_ = new QFutureWatcher<bun::TrainShapeModelResult>(this);
+			connect(trainingWatcher_, &QFutureWatcher<bun::TrainShapeModelResult>::finished,
+				this, &ModelEditorDialog::onTrainingFinished);
+		}
+
+		// 按值捕获所有参数，确保线程安全
+		const auto req = pendingRequest_;
+		auto future = QtConcurrent::run(
+			[req, matchRegion]() -> bun::TrainShapeModelResult {
+				return bun::ShapeModeManagerBun::trainShapeModel(req, matchRegion);
+			});
+		trainingWatcher_->setFuture(future);
+	}
+
+	// ===== 异步训练完成回调 ======================================================
+
+	void ModelEditorDialog::onTrainingFinished()
+	{
+		// 关闭进度对话框
+		if (progressDialog_)
+		{
+			progressDialog_->close();
+			progressDialog_->deleteLater();
+			progressDialog_ = nullptr;
+		}
+		ui->btn_createShapeModel->setEnabled(true);
+		isTraining_ = false;
+
+		// 获取训练结果（捕获异常以防线程内未捕获的异常传播）
+		bun::TrainShapeModelResult result;
+		try
+		{
+			result = trainingWatcher_->future().result();
+		}
+		catch (const std::exception& e)
+		{
+			rw::rqwu::MessageBox::warning(this,
+				QStringLiteral("错误"),
+				QStringLiteral("训练线程异常: %1").arg(QString::fromStdString(e.what())));
+			return;
+		}
+		catch (...)
+		{
+			rw::rqwu::MessageBox::warning(this,
+				QStringLiteral("错误"),
+				QStringLiteral("训练线程发生未知异常"));
+			return;
+		}
+
+		if (!result.success)
+		{
+			rw::rqwu::MessageBox::warning(this,
+				isModifyMode_ ? QStringLiteral("修改模型") : QStringLiteral("创建模型"),
+				QString::fromStdString(result.errorMsg));
+			return;
+		}
+
+		// ===== 主线程持久化 + 信号发射 =====
+		auto& biz = app_.business();
 		std::string err;
 		if (isModifyMode_)
 		{
-			if (!biz.shape_mode_manager_bun->updateModel(modelId_, req, &err))
+			if (!biz.shape_mode_manager_bun->persistUpdatedModel(result, modelId_, &err))
 			{
-				rw::rqwu::MessageBox::warning(this, QStringLiteral("修改模型"),
+				rw::rqwu::MessageBox::warning(this,
+					QStringLiteral("修改模型"),
 					QString::fromStdString(err));
 				return;
 			}
-			rw::rqwu::MessageBox::information(this, QStringLiteral("修改模型"),
+			rw::rqwu::MessageBox::information(this,
+				QStringLiteral("修改模型"),
 				QStringLiteral("模型已更新"));
 			modelCreated_ = true;
 		}
 		else
 		{
 			Config::ShapeModelInfo outInfo;
-			if (!biz.shape_mode_manager_bun->createModel(req, outInfo, &err))
+			if (!biz.shape_mode_manager_bun->persistNewModel(result, pendingRequest_, outInfo, &err))
 			{
-				rw::rqwu::MessageBox::warning(this, QStringLiteral("创建模型"),
+				rw::rqwu::MessageBox::warning(this,
+					QStringLiteral("创建模型"),
 					QString::fromStdString(err));
 				return;
 			}
-			rw::rqwu::MessageBox::information(this, QStringLiteral("创建模型"),
+			rw::rqwu::MessageBox::information(this,
+				QStringLiteral("创建模型"),
 				QStringLiteral("模型已保存"));
 			modelId_ = outInfo.getId();
 			modelCreated_ = true;
