@@ -78,8 +78,8 @@ namespace ui
 			"  background-color: #E3F2FD;"
 			"}");
 
-		// +/- 按钮样式（紧凑方形）
-		const QString stepBtnStyle = QStringLiteral(
+		// +/- 步进按钮样式（窄版，用于符号按钮）
+		const QString stepBtnStyleNarrow = QStringLiteral(
 			"QPushButton {"
 			"  font-size: 20px; font-weight: bold;"
 			"  border: 2px solid #CCC;"
@@ -98,17 +98,38 @@ namespace ui
 			"}"
 		);
 
-		// 辅助：创建一行 [−] [value] [+]
+		// +/- 步进按钮样式（宽版，用于中文方向按钮）
+		const QString stepBtnStyleWide = QStringLiteral(
+			"QPushButton {"
+			"  font-size: 16px; font-weight: bold;"
+			"  border: 2px solid #CCC;"
+			"  border-radius: 4px;"
+			"  background-color: #F0F0F0;"
+			"  color: #444;"
+			"  min-width: 56px; min-height: 44px;"
+			"}"
+			"QPushButton:hover {"
+			"  border-color: #2196F3;"
+			"  background-color: #E3F2FD;"
+			"}"
+			"QPushButton:pressed {"
+			"  background-color: #BBDEFB;"
+			"}"
+		);
+
+		// 辅助：创建一行 [减/左/下] [value] [加/右/上]
 		auto createStepRow = [&](const QString& labelText,
 			QPushButton*& valueBtn, QPushButton*& minusBtn, QPushButton*& plusBtn,
+			const QString& minusText, const QString& plusText,
+			const QString& minusTip, const QString& plusTip,
 			const QString& tooltip, double initVal, int decimals)
 		{
 			auto* hRow = new QHBoxLayout();
 			hRow->setSpacing(4);
 
-			minusBtn = new QPushButton(QStringLiteral("\xe2\x88\x92"), this);  // U+2212 MINUS SIGN
-			minusBtn->setStyleSheet(stepBtnStyle);
-			minusBtn->setToolTip(QStringLiteral("减小 0.1"));
+			minusBtn = new QPushButton(minusText, this);
+			minusBtn->setStyleSheet(stepBtnStyleWide);
+			minusBtn->setToolTip(minusTip);
 			hRow->addWidget(minusBtn);
 
 			valueBtn = new QPushButton(QString::number(initVal, 'f', decimals), this);
@@ -116,18 +137,20 @@ namespace ui
 			valueBtn->setToolTip(tooltip);
 			hRow->addWidget(valueBtn);
 
-			plusBtn = new QPushButton(QStringLiteral("+"), this);
-			plusBtn->setStyleSheet(stepBtnStyle);
-			plusBtn->setToolTip(QStringLiteral("增大 0.1"));
+			plusBtn = new QPushButton(plusText, this);
+			plusBtn->setStyleSheet(stepBtnStyleWide);
+			plusBtn->setToolTip(plusTip);
 			hRow->addWidget(plusBtn);
 
 			formLayout->addRow(labelText, hRow);
 		};
 
-		// ---- 偏移量区域（带 +/- 步进） ----
+		// ---- 偏移量区域（带方向步进按钮） ----
 
 		createStepRow(QStringLiteral("左右偏移 (mm):"),
 			btnOffsetX_, btnMinusX_, btnPlusX_,
+			QStringLiteral("向左"), QStringLiteral("向右"),
+			QStringLiteral("向左偏移 0.1mm"), QStringLiteral("向右偏移 0.1mm"),
 			QStringLiteral("左右偏移 (mm)，范围 -9999.999 ~ 9999.999"),
 			offsetX_, 3);
 		connect(btnOffsetX_, &QPushButton::clicked, this, &OffsetEditorDialog::onOffsetXClicked);
@@ -136,6 +159,8 @@ namespace ui
 
 		createStepRow(QStringLiteral("上下偏移 (mm):"),
 			btnOffsetY_, btnMinusY_, btnPlusY_,
+			QStringLiteral("向下"), QStringLiteral("向上"),
+			QStringLiteral("向下偏移 0.1mm"), QStringLiteral("向上偏移 0.1mm"),
 			QStringLiteral("上下偏移 (mm)，范围 -9999.999 ~ 9999.999"),
 			offsetY_, 3);
 		connect(btnOffsetY_, &QPushButton::clicked, this, &OffsetEditorDialog::onOffsetYClicked);
@@ -144,6 +169,8 @@ namespace ui
 
 		createStepRow(QStringLiteral("角度偏移 (\xc2\xb0):"),
 			btnOffsetAngle_, btnMinusAngle_, btnPlusAngle_,
+			QStringLiteral("左转"), QStringLiteral("右转"),
+			QStringLiteral("向左旋转 0.1\xc2\xb0"), QStringLiteral("向右旋转 0.1\xc2\xb0"),
 			QStringLiteral("角度偏移 (°)，范围 -360.0 ~ 360.0"),
 			offsetAngle_, 3);
 		connect(btnOffsetAngle_, &QPushButton::clicked, this, &OffsetEditorDialog::onOffsetAngleClicked);
