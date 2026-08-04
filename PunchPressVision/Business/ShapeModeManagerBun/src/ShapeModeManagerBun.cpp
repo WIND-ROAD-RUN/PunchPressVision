@@ -827,6 +827,8 @@ namespace bun
 
 		std::shared_lock<std::shared_mutex> lk(modelCacheMutex_);
 
+		HalconCpp::HImage fallbackPreprocessedImage;  // 无匹配时供 UI 显示的预处理图
+
 		for (const auto& model : loadedModels_)
 		{
 			try
@@ -834,6 +836,10 @@ namespace bun
 				// 对图像应用与创建模板时相同的预处理
 				HalconCpp::HImage processed = preprocessImage(image, model.data);
 				const HalconCpp::HImage processedForDisplay = processed;  // 保存预处理结果供 UI 显示
+
+				// 保存第一个模型的预处理结果，供无匹配时 UI 显示
+				if (!fallbackPreprocessedImage.IsInitialized())
+					fallbackPreprocessedImage = processedForDisplay;
 
 				// 如果设置了匹配范围，限制搜索区域
 				if (inf_.config_module_ && inf_.config_module_->setCfg.matchRegionValid)
@@ -1031,6 +1037,15 @@ namespace bun
 				// 单个模型匹配失败不中断其余模型的匹配
 				continue;
 			}
+		}
+
+		// 即使没有匹配到，也返回预处理后的图像供 UI 显示
+		if (results.empty() && fallbackPreprocessedImage.IsInitialized())
+		{
+			MatchResult r;
+			r.found = false;
+			r.preprocessedImage = fallbackPreprocessedImage;
+			results.push_back(r);
 		}
 
 		return results;

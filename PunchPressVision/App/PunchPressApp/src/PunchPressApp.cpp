@@ -544,7 +544,11 @@ namespace app
 		}
 		else
 		{
-			// 无匹配结果：发出无效结果信号（状态栏清除）
+			// 无匹配结果：优先使用预处理图像进行显示
+			if (!matches.empty() && matches[0].preprocessedImage.IsInitialized())
+				displayImage = matches[0].preprocessedImage;
+
+			// 发出无效结果信号（状态栏清除）
 			global::PositionResult result;
 			emit positionResultReady(result);
 		}
