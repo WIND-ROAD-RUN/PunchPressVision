@@ -140,6 +140,7 @@ namespace bun
 
 			// 图像预处理参数
 			outData._createModelPreProcessType = req.imageChannelType;
+			outData._SingleChannelType = req.imageChannelType;
 			outData._createModelUseOpening = req.useOpening;
 			outData._createModelOpeningRadius = req.openingSize;
 			outData._createModelUseClosing = req.useClosing;
