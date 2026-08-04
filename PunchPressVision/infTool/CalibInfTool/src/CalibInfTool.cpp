@@ -8,51 +8,53 @@ namespace infTool
 {
 	namespace PRIVATE
 	{
+		/// <summary>
+		/// 将 cv::Mat 转换为 Halcon HImage（深拷贝，Halcon 自管内存）。
+		/// 与 CameraImgConvert::cvMatToHImage 行为一致，确保返回的 HImage
+		/// 不依赖 cv::Mat 数据生命周期，可安全跨线程传递。
+		/// </summary>
 		HalconCpp::HImage cvMatToHImage(const cv::Mat& mat)
 		{
-			// 检查输入 cv::Mat 是否为空
 			if (mat.empty())
 			{
 				throw std::invalid_argument("Input cv::Mat is empty.");
 			}
 
-			// 获取 cv::Mat 的宽度、高度和通道数
-			int width = mat.cols;
-			int height = mat.rows;
-			int channels = mat.channels();
+			const int width = mat.cols;
+			const int height = mat.rows;
+			const int channels = mat.channels();
 
-			HalconCpp::HImage hImage;
+			// 确保数据连续，否则需要 clone
+			cv::Mat continuousMat = mat.isContinuous() ? mat : mat.clone();
 
-			// 根据 cv::Mat 的通道数生成对应的 HImage
 			if (channels == 1)
 			{
-				// 单通道灰度图像
-				hImage.GenImage1("byte", width, height, const_cast<void*>(static_cast<const void*>(mat.data)));
+				if (continuousMat.type() == CV_8UC1)
+				{
+					HalconCpp::HImage temp;
+					HalconCpp::GenImage1(&temp, "byte", width, height,
+						reinterpret_cast<Hlong>(continuousMat.data));
+					return temp.CopyImage();  // 深拷贝，脱离 cv::Mat 生命周期
+				}
+				throw std::invalid_argument("Unsupported single-channel cv::Mat type.");
 			}
 			else if (channels == 3)
 			{
-				// 三通道彩色图像，OpenCV 默认存储顺序为 BGR
-				hImage.GenImageInterleaved(
-					const_cast<void*>(static_cast<const void*>(mat.data)), // PixelPointer
-					"bgr",                                                // ColorFormat
-					width,                                                 // OriginalWidth
-					height,                                                // OriginalHeight
-					0,                                                     // Alignment
-					"byte",                                                // Type
-					width,                                                 // ImageWidth
-					height,                                                // ImageHeight
-					0,                                                     // StartRow
-					0,                                                     // StartColumn
-					8,                                                     // BitsPerChannel
-					0                                                      // BitShift
-				);
+				if (continuousMat.type() == CV_8UC3)
+				{
+					HalconCpp::HImage temp;
+					HalconCpp::GenImageInterleaved(&temp,
+						reinterpret_cast<Hlong>(continuousMat.data), "bgr",
+						width, height, 0, "byte", width, height, 0, 0, -1, 0);
+					return temp.CopyImage();  // 深拷贝，脱离 cv::Mat 生命周期
+				}
+				throw std::invalid_argument("Unsupported 3-channel cv::Mat type.");
 			}
 			else
 			{
-				throw std::invalid_argument("Unsupported cv::Mat format. Only 1-channel and 3-channel images are supported.");
+				throw std::invalid_argument(
+					"Unsupported cv::Mat format. Only 1-channel and 3-channel images are supported.");
 			}
-
-			return hImage;
 		}
 	}
 
@@ -68,7 +70,7 @@ namespace infTool
 		calibrateFromImages(himages, /*focalLengthMm*/ 8.0, /*plateThicknessMm*/ 0.0,
 			item, /*referenceIndex*/ 0, &err);
 	}
-	
+
 	bool CalibInfTool::calibrateFromImages(const std::vector<HalconCpp::HImage>& himages,
 		double focalLengthMm,
 		double plateThicknessMm,
@@ -324,22 +326,29 @@ namespace infTool
 		global::CameraIndex cameraIndex)
 	{
 		using namespace HalconCpp;
-		auto& item = inf_.calib_config_module_->calibConfig.item(cameraIndex);
 
-		// 未标定或输入无效时原样返回，确保流水线不中断
-		if (!himage.IsInitialized() || item.cameraParameters.Length() == 0)
+		// 输入无效时原样返回（此时 hImage 由 cvMatToHImage 深拷贝生成，生命周期独立）
+		if (!himage.IsInitialized())
+			return himage;
+
+		// 从配置读取相机标定参数并做本地拷贝，缩小工作线程与主线程的竞态窗口
+		auto& item = inf_.calib_config_module_->calibConfig.item(cameraIndex);
+		HTuple camParams = item.cameraParameters;  // 拷贝到局部变量，后续全部使用局部副本
+
+		// 未标定时原样返回，确保流水线不中断
+		if (camParams.Length() == 0)
 			return himage;
 
 		try
 		{
 			// 生成无畸变（理想）相机参数
 			HTuple camParRectified;
-			ChangeRadialDistortionCamPar("fixed", item.cameraParameters, 0, &camParRectified);
+			ChangeRadialDistortionCamPar("fixed", camParams, 0, &camParRectified);
 
 			// 执行畸变矫正（Region 传空对象表示对整图处理）
 			HObject rectified;
 			ChangeRadialDistortionImage(himage, HObject(), &rectified,
-				item.cameraParameters, camParRectified);
+				camParams, camParRectified);
 			return HImage(rectified);
 		}
 		catch (const HException&)
@@ -357,7 +366,7 @@ namespace infTool
 	{
 		if (!matInfo.mat.empty())
 		{
-			// cv::Mat → HImage
+			// cv::Mat → HImage（深拷贝，HImage 自管内存，不依赖 matInfo 生命周期）
 			auto hImage = PRIVATE::cvMatToHImage(matInfo.mat);
 
 			// 畸变矫正（有标定参数则矫正，否则透传原图）
