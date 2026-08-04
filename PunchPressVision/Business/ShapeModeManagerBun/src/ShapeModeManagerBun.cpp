@@ -957,13 +957,18 @@ namespace bun
 					catch (...) {}
 				}
 
-				// 当前模型独立的屏蔽区域：仅作用于该模型自身的识别
+				// 当前模型独立的屏蔽区域：从搜索域中排除屏蔽区
 				if (model.data._hasRecognitionMask && model.data._recognitionMask.IsInitialized())
 				{
 					try
 					{
+						HalconCpp::HObject currentDomain;
+						HalconCpp::GetDomain(processed, &currentDomain);
+						HalconCpp::HObject searchRegion;
+						HalconCpp::Difference(currentDomain, model.data._recognitionMask,
+							&searchRegion);
 						HalconCpp::HImage masked;
-						HalconCpp::ReduceDomain(processed, model.data._recognitionMask, &masked);
+						HalconCpp::ReduceDomain(processed, searchRegion, &masked);
 						processed = masked;
 					}
 					catch (...) { /* 屏蔽区异常时回退到未屏蔽图像，不阻断其他模型 */ }
@@ -1193,14 +1198,18 @@ namespace bun
 				req.contrast, req.minContrast,
 				&modelID);
 
-			// 3. 匹配测试：与生产行为一致，对搜索图像应用相同屏蔽区域
+			// 3. 匹配测试：从搜索域中排除屏蔽区
 			HImage searchImage = req.trainingImage;
 			if (req.mask.IsInitialized())
 			{
 				try
 				{
+					HObject fullDomain;
+					GetDomain(req.trainingImage, &fullDomain);
+					HObject searchRegion;
+					Difference(fullDomain, req.mask, &searchRegion);
 					HObject reduced;
-					ReduceDomain(req.trainingImage, req.mask, &reduced);
+					ReduceDomain(req.trainingImage, searchRegion, &reduced);
 					searchImage = HImage(reduced);
 				}
 				catch (...) {}
