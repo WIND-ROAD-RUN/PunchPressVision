@@ -287,7 +287,7 @@ namespace ui
 		Config::ShapeModelData data;
 		data.loadInDir(info.getFolderPath());
 
-		constexpr int kRowCount = 9;
+		constexpr int kRowCount = 10;
 		ui->tableWidget_modelInfo->setRowCount(kRowCount);
 		ui->tableWidget_modelInfo->setColumnCount(2);
 		ui->tableWidget_modelInfo->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
@@ -313,10 +313,14 @@ namespace ui
 			QStringLiteral("%1 / %2")
 				.arg(static_cast<int>(data._paintCreateRoiList.size()))
 				.arg(static_cast<int>(data._paintShieldRoiList.size())));
-		setRow(r++, QStringLiteral("曝光 / 增益"),
+		setRow(r++, QStringLiteral("曝光1 / 增益1"),
 			QStringLiteral("%1 / %2")
 				.arg(data._createModelExposureTime, 0, 'f', 0)
 				.arg(data._createModelGain, 0, 'f', 0));
+		setRow(r++, QStringLiteral("曝光2 / 增益2"),
+			QStringLiteral("%1 / %2")
+				.arg(data._createModelExposureTime2, 0, 'f', 0)
+				.arg(data._createModelGain2, 0, 'f', 0));
 		setRow(r++, QStringLiteral("创建时间"), QString::fromStdString(info.getCreateTime()));
 		setRow(r++, QStringLiteral("更新时间"), QString::fromStdString(info.getUpdateTime()));
 		setRow(r++, QStringLiteral("文件夹"),   QString::fromStdString(info.getFolderPath()));
@@ -502,7 +506,7 @@ namespace ui
 			rw::rqwu::MessageBox::warning(this, QStringLiteral("加载模型"), msg);
 
 		refreshLoadedState();
-	// 自动分配曝光（检测冲突，必要时弹窗）
+		// 自动分配曝光（检测冲突，必要时弹窗）
 		autoApplyExposure(ids, failedIds);
 	}
 
@@ -534,13 +538,15 @@ namespace ui
 		if (successIds.empty())
 			return;
 
-		// 收集每个成功加载模型的 (名称, 曝光, 增益)
+		// 收集每个成功加载模型的 (名称, 曝光1, 增益1, 曝光2, 增益2)
 		struct ModelCamInfo
 		{
 			std::string id;
 			QString name;
-			double exposure;
-			double gain;
+			double exposure1;
+			double gain1;
+			double exposure2;
+			double gain2;
 		};
 		std::vector<ModelCamInfo> infos;
 
@@ -557,8 +563,10 @@ namespace ui
 				ModelCamInfo info;
 				info.id = id;
 				info.name = QString::fromStdString(item.info.base_info.name);
-				info.exposure = item.data._createModelExposureTime;
-				info.gain = item.data._createModelGain;
+				info.exposure1 = item.data._createModelExposureTime;
+				info.gain1 = item.data._createModelGain;
+				info.exposure2 = item.data._createModelExposureTime2;
+				info.gain2 = item.data._createModelGain2;
 				infos.push_back(info);
 			}
 			catch (...) {}
@@ -566,13 +574,17 @@ namespace ui
 		if (infos.empty())
 			return;
 
-		// 检查是否所有模型的曝光/增益一致
-		const double firstExp = infos.front().exposure;
-		const double firstGain = infos.front().gain;
+		// 检查是否所有模型的曝光/增益一致（四路参数全部相同）
+		const double firstExp1 = infos.front().exposure1;
+		const double firstGain1 = infos.front().gain1;
+		const double firstExp2 = infos.front().exposure2;
+		const double firstGain2 = infos.front().gain2;
 		const bool allSame = std::all_of(infos.begin(), infos.end(),
 			[&](const ModelCamInfo& info) {
-				return std::abs(info.exposure - firstExp) < 0.5 &&
-					std::abs(info.gain - firstGain) < 0.5;
+				return std::abs(info.exposure1 - firstExp1) < 0.5 &&
+					std::abs(info.gain1 - firstGain1) < 0.5 &&
+					std::abs(info.exposure2 - firstExp2) < 0.5 &&
+					std::abs(info.gain2 - firstGain2) < 0.5;
 			});
 
 		if (allSame)
@@ -600,10 +612,12 @@ namespace ui
 		{
 			const auto& info = infos[i];
 			auto* radio = new QRadioButton(
-				QStringLiteral("%1  (曝光: %2 μs, 增益: %3)")
+				QStringLiteral("%1  (曝光: %2/%5 μs, 增益: %3/%6)")
 					.arg(info.name)
-					.arg(info.exposure, 0, 'f', 0)
-					.arg(info.gain, 0, 'f', 0),
+					.arg(info.exposure1, 0, 'f', 0)
+					.arg(info.gain1, 0, 'f', 0)
+					.arg(info.exposure2, 0, 'f', 0)
+					.arg(info.gain2, 0, 'f', 0),
 				&dlg);
 			radio->setStyleSheet("font-size: 16px; padding: 6px 0;");
 			if (i == 0)

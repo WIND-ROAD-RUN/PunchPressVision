@@ -59,6 +59,8 @@ namespace Config
 		// 创建模板时的曝光、增益、光源
 		double _createModelExposureTime = 0.0;
 		double _createModelGain = 0.0;
+		double _createModelExposureTime2 = 0.0;   // Camera2 曝光
+		double _createModelGain2 = 0.0;           // Camera2 增益
 		bool upperLight = false;
 		bool lowerLight = false;
 

@@ -305,6 +305,8 @@ namespace ui
 		}
 		req.exposure = static_cast<double>(cameraCfg_.exposureTime1);
 		req.gain = static_cast<double>(cameraCfg_.gain1);
+		req.exposure2 = static_cast<double>(cameraCfg_.exposureTime2);
+		req.gain2 = static_cast<double>(cameraCfg_.gain2);
 
 		req.imageChannelType = ui->comboBox_ImageType->currentIndex();
 		req.useOpening = ui->ckb_opening->isChecked();
@@ -893,6 +895,37 @@ namespace ui
 		updateContrastVisibility();
 		ui->btn_contrast->setText(QString::number(contrast_));
 		ui->btn_mincontrast->setText(QString::number(minContrast_));
+
+		// 恢复相机参数（Camera1 + Camera2）
+		if (data._createModelExposureTime > 0.0)
+		{
+			cameraCfg_.exposureTime1 = static_cast<int>(data._createModelExposureTime);
+			ui->btn_baoguang1->setText(QString::number(cameraCfg_.exposureTime1));
+		}
+		if (data._createModelGain > 0.0)
+		{
+			cameraCfg_.gain1 = static_cast<int>(data._createModelGain);
+			ui->btn_zengyi1->setText(QString::number(cameraCfg_.gain1));
+		}
+		if (data._createModelExposureTime2 > 0.0)
+		{
+			cameraCfg_.exposureTime2 = static_cast<int>(data._createModelExposureTime2);
+			ui->btn_baoguang2->setText(QString::number(cameraCfg_.exposureTime2));
+		}
+		if (data._createModelGain2 > 0.0)
+		{
+			cameraCfg_.gain2 = static_cast<int>(data._createModelGain2);
+			ui->btn_zengyi2->setText(QString::number(cameraCfg_.gain2));
+		}
+		// 将恢复的参数写入相机硬件
+		applyExposure(global::CameraIndex::Camera1, cameraCfg_.exposureTime1,
+			&Config::cameraCfg::exposureTime1);
+		applyExposure(global::CameraIndex::Camera2, cameraCfg_.exposureTime2,
+			&Config::cameraCfg::exposureTime2);
+		applyGain(global::CameraIndex::Camera1, cameraCfg_.gain1,
+			&Config::cameraCfg::gain1);
+		applyGain(global::CameraIndex::Camera2, cameraCfg_.gain2,
+			&Config::cameraCfg::gain2);
 	}
 
 	// ===== 读取图片 ============================================================

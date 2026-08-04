@@ -34,6 +34,8 @@ namespace bun
 		QString name;                        // 模型名称（空则用时间戳）
 		double exposure{ 0.0 };
 		double gain{ 0.0 };
+		double exposure2{ 0.0 };   // Camera2
+		double gain2{ 0.0 };       // Camera2
 		bool upperLight{ false };
 		bool lowerLight{ false };
 

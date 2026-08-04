@@ -173,6 +173,7 @@ namespace Config
 			int findNumber,
 			int singleChannelType,
 			double createModelExposureTime, double createModelGain,
+			double createModelExposureTime2, double createModelGain2,
 			bool upperLight, bool lowerLight,
 			bool createModelUseOpening, int createModelOpeningRadius,
 			bool createModelUseClosing, int createModelClosingRadius,
@@ -199,6 +200,8 @@ namespace Config
 			ofs << "singleChannelType=" << singleChannelType << '\n';
 			ofs << "createModelExposureTime=" << createModelExposureTime << '\n';
 			ofs << "createModelGain=" << createModelGain << '\n';
+			ofs << "createModelExposureTime2=" << createModelExposureTime2 << '\n';
+			ofs << "createModelGain2=" << createModelGain2 << '\n';
 			ofs << "upperLight=" << (upperLight ? 1 : 0) << '\n';
 			ofs << "lowerLight=" << (lowerLight ? 1 : 0) << '\n';
 			ofs << "createModelUseOpening=" << (createModelUseOpening ? 1 : 0) << '\n';
@@ -232,6 +235,7 @@ namespace Config
 			int& findNumber,
 			int& singleChannelType,
 			double& createModelExposureTime, double& createModelGain,
+			double& createModelExposureTime2, double& createModelGain2,
 			bool& upperLight, bool& lowerLight,
 			bool& createModelUseOpening, int& createModelOpeningRadius,
 			bool& createModelUseClosing, int& createModelClosingRadius,
@@ -282,6 +286,10 @@ namespace Config
 						createModelExposureTime = std::stod(value);
 					else if (key == "createModelGain")
 						createModelGain = std::stod(value);
+					else if (key == "createModelExposureTime2")
+						createModelExposureTime2 = std::stod(value);
+					else if (key == "createModelGain2")
+						createModelGain2 = std::stod(value);
 					else if (key == "upperLight")
 						upperLight = std::stoi(value) != 0;
 					else if (key == "lowerLight")
@@ -369,6 +377,7 @@ namespace Config
 				findnumber,
 				_SingleChannelType,
 				_createModelExposureTime, _createModelGain,
+				_createModelExposureTime2, _createModelGain2,
 				upperLight, lowerLight,
 				_createModelUseOpening, _createModelOpeningRadius,
 				_createModelUseClosing, _createModelClosingRadius,
@@ -447,6 +456,7 @@ namespace Config
 				findnumber,
 				_SingleChannelType,
 				_createModelExposureTime, _createModelGain,
+				_createModelExposureTime2, _createModelGain2,
 				upperLight, lowerLight,
 				_createModelUseOpening, _createModelOpeningRadius,
 				_createModelUseClosing, _createModelClosingRadius,

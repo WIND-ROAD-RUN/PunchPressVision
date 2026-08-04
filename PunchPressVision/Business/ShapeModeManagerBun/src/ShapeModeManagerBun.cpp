@@ -131,6 +131,8 @@ namespace bun
 			outData.hv_ModelID = modelID;
 			outData._createModelExposureTime = req.exposure;
 			outData._createModelGain = req.gain;
+			outData._createModelExposureTime2 = req.exposure2;
+			outData._createModelGain2 = req.gain2;
 			outData.upperLight = req.upperLight;
 			outData.lowerLight = req.lowerLight;
 			outData.centerX = centerX;
@@ -543,23 +545,26 @@ namespace bun
 				return false;
 			}
 
-			// 曝光/增益为 0 表示模型创建时未设置，跳过
-			const double exposure = d._createModelExposureTime;
-			const double gain = d._createModelGain;
-			if (exposure <= 0.0 && gain <= 0.0)
+			// Camera1 曝光/增益
+			const double exposure1 = d._createModelExposureTime;
+			const double gain1 = d._createModelGain;
+			// Camera2 曝光/增益（可能为 0，兼容旧模型数据）
+			const double exposure2 = d._createModelExposureTime2;
+			const double gain2 = d._createModelGain2;
+
+			if (exposure1 <= 0.0 && gain1 <= 0.0
+				&& exposure2 <= 0.0 && gain2 <= 0.0)
 				return true;  // 无有效值，不算失败
 
 			bool ok = true;
-			if (exposure > 0.0)
-			{
-				ok &= inf_.camera_module_->setExposure(global::CameraIndex::Camera1, exposure);
-				ok &= inf_.camera_module_->setExposure(global::CameraIndex::Camera2, exposure);
-			}
-			if (gain > 0.0)
-			{
-				ok &= inf_.camera_module_->setGain(global::CameraIndex::Camera1, gain);
-				ok &= inf_.camera_module_->setGain(global::CameraIndex::Camera2, gain);
-			}
+			if (exposure1 > 0.0)
+				ok &= inf_.camera_module_->setExposure(global::CameraIndex::Camera1, exposure1);
+			if (gain1 > 0.0)
+				ok &= inf_.camera_module_->setGain(global::CameraIndex::Camera1, gain1);
+			if (exposure2 > 0.0)
+				ok &= inf_.camera_module_->setExposure(global::CameraIndex::Camera2, exposure2);
+			if (gain2 > 0.0)
+				ok &= inf_.camera_module_->setGain(global::CameraIndex::Camera2, gain2);
 
 			if (!ok && errorMsg)
 				*errorMsg = "写入相机曝光/增益失败";
