@@ -189,6 +189,12 @@ namespace bun
 			std::string* errorMsg = nullptr);
 		/// <summary>加载单个模型（兼容旧接口），内部委托 loadModels({id})。</summary>
 		bool loadModel(const std::string& id, std::string* errorMsg = nullptr);
+		/// <summary>
+		/// 将指定模型的曝光/增益写入相机硬件（Camera1 + Camera2 统一设置）。
+		/// 用于加载模型时恢复创建时的相机参数。
+		/// </summary>
+		bool applyModelCameraSettings(const std::string& modelId,
+			std::string* errorMsg = nullptr);
 		/// <summary>卸载所有已加载模型并释放 Halcon 句柄。</summary>
 		void unloadAllModels();
 		/// <summary>卸载指定模型。返回 true 表示成功移除。</summary>

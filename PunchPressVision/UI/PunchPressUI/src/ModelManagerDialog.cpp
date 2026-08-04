@@ -11,8 +11,13 @@
 #include <QListView>
 #include <QHeaderView>
 #include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QRadioButton>
+#include <QButtonGroup>
+#include <QLabel>
 
 #include <algorithm>
+#include <cmath>
 #include <set>
 
 #include "app/PunchPressApp.hpp"
@@ -497,6 +502,8 @@ namespace ui
 			rw::rqwu::MessageBox::warning(this, QStringLiteral("加载模型"), msg);
 
 		refreshLoadedState();
+	// 自动分配曝光（检测冲突，必要时弹窗）
+		autoApplyExposure(ids, failedIds);
 	}
 
 	void ModelManagerDialog::onUnloadAll()
@@ -507,6 +514,127 @@ namespace ui
 
 		bun->unloadAllModels();
 		refreshLoadedState();
+	}
+
+	void ModelManagerDialog::autoApplyExposure(const std::vector<std::string>& loadedIds,
+		const std::vector<std::string>& failedIds)
+	{
+		auto& bun = app_.business().shape_mode_manager_bun;
+		if (!bun)
+			return;
+
+		// 过滤出加载成功的模型 ID
+		std::set<std::string> failedSet(failedIds.begin(), failedIds.end());
+		std::vector<std::string> successIds;
+		for (const auto& id : loadedIds)
+		{
+			if (failedSet.find(id) == failedSet.end())
+				successIds.push_back(id);
+		}
+		if (successIds.empty())
+			return;
+
+		// 收集每个成功加载模型的 (名称, 曝光, 增益)
+		struct ModelCamInfo
+		{
+			std::string id;
+			QString name;
+			double exposure;
+			double gain;
+		};
+		std::vector<ModelCamInfo> infos;
+
+		auto& smmRef = app_.business().infrastructure().shape_model_manager_module_;
+		if (!smmRef)
+			return;
+		auto* smm = smmRef.get();
+
+		for (const auto& id : successIds)
+		{
+			try
+			{
+				auto item = smm->getShapeModelItem(id);
+				ModelCamInfo info;
+				info.id = id;
+				info.name = QString::fromStdString(item.info.base_info.name);
+				info.exposure = item.data._createModelExposureTime;
+				info.gain = item.data._createModelGain;
+				infos.push_back(info);
+			}
+			catch (...) {}
+		}
+		if (infos.empty())
+			return;
+
+		// 检查是否所有模型的曝光/增益一致
+		const double firstExp = infos.front().exposure;
+		const double firstGain = infos.front().gain;
+		const bool allSame = std::all_of(infos.begin(), infos.end(),
+			[&](const ModelCamInfo& info) {
+				return std::abs(info.exposure - firstExp) < 0.5 &&
+					std::abs(info.gain - firstGain) < 0.5;
+			});
+
+		if (allSame)
+		{
+			// 全部一致 → 静默应用
+			bun->applyModelCameraSettings(infos.front().id);
+			return;
+		}
+
+		// 存在冲突 → 弹窗让用户选择
+		QDialog dlg(this);
+		dlg.setWindowTitle(QStringLiteral("相机参数冲突"));
+		dlg.setMinimumWidth(480);
+		auto* layout = new QVBoxLayout(&dlg);
+
+		auto* hint = new QLabel(QStringLiteral(
+			"检测到多个模型的曝光/增益设置不一致，\n"
+			"请选择应用哪个模型的相机参数："));
+		hint->setStyleSheet("font-size: 15px; color: #E65100; padding: 8px 0;");
+		layout->addWidget(hint);
+
+		auto* group = new QButtonGroup(&dlg);
+		auto* groupLayout = new QVBoxLayout();
+		for (size_t i = 0; i < infos.size(); ++i)
+		{
+			const auto& info = infos[i];
+			auto* radio = new QRadioButton(
+				QStringLiteral("%1  (曝光: %2 μs, 增益: %3)")
+					.arg(info.name)
+					.arg(info.exposure, 0, 'f', 0)
+					.arg(info.gain, 0, 'f', 0),
+				&dlg);
+			radio->setStyleSheet("font-size: 16px; padding: 6px 0;");
+			if (i == 0)
+				radio->setChecked(true);
+			group->addButton(radio, static_cast<int>(i));
+			groupLayout->addWidget(radio);
+		}
+		layout->addLayout(groupLayout);
+
+		auto* btnLayout = new QHBoxLayout();
+		btnLayout->addStretch();
+		auto* btnApply = new QPushButton(QStringLiteral("应用"), &dlg);
+		btnApply->setStyleSheet(
+			"QPushButton { font-size: 16px; padding: 8px 24px; font-weight: bold; }");
+		auto* btnSkip = new QPushButton(QStringLiteral("跳过"), &dlg);
+		btnSkip->setStyleSheet(
+			"QPushButton { font-size: 16px; padding: 8px 24px; }");
+		btnLayout->addWidget(btnApply);
+		btnLayout->addWidget(btnSkip);
+		layout->addLayout(btnLayout);
+
+		QObject::connect(btnApply, &QPushButton::clicked, &dlg, &QDialog::accept);
+		QObject::connect(btnSkip, &QPushButton::clicked, &dlg, &QDialog::reject);
+
+		if (dlg.exec() == QDialog::Accepted)
+		{
+			const int idx = group->checkedId();
+			if (idx >= 0 && idx < static_cast<int>(infos.size()))
+				bun->applyModelCameraSettings(infos[idx].id);
+		}
+		// 用户点"跳过"→ 不操作
 	}
 
 	void ModelManagerDialog::onRenameModel()

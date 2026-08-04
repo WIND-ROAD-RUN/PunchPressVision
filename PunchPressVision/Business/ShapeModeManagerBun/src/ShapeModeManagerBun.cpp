@@ -529,6 +529,54 @@ namespace bun
 		return loadModels({id}, nullptr, errorMsg);
 	}
 
+	bool ShapeModeManagerBun::applyModelCameraSettings(const std::string& modelId,
+		std::string* errorMsg)
+	{
+		try
+		{
+			auto item = inf_.shape_model_manager_module_->getShapeModelItem(modelId);
+			const auto& d = item.data;
+
+			if (!inf_.camera_module_)
+			{
+				if (errorMsg) *errorMsg = "CameraModule 不可用";
+				return false;
+			}
+
+			// 曝光/增益为 0 表示模型创建时未设置，跳过
+			const double exposure = d._createModelExposureTime;
+			const double gain = d._createModelGain;
+			if (exposure <= 0.0 && gain <= 0.0)
+				return true;  // 无有效值，不算失败
+
+			bool ok = true;
+			if (exposure > 0.0)
+			{
+				ok &= inf_.camera_module_->setExposure(global::CameraIndex::Camera1, exposure);
+				ok &= inf_.camera_module_->setExposure(global::CameraIndex::Camera2, exposure);
+			}
+			if (gain > 0.0)
+			{
+				ok &= inf_.camera_module_->setGain(global::CameraIndex::Camera1, gain);
+				ok &= inf_.camera_module_->setGain(global::CameraIndex::Camera2, gain);
+			}
+
+			if (!ok && errorMsg)
+				*errorMsg = "写入相机曝光/增益失败";
+			return ok;
+		}
+		catch (const std::exception& e)
+		{
+			if (errorMsg) *errorMsg = e.what();
+			return false;
+		}
+		catch (...)
+		{
+			if (errorMsg) *errorMsg = "应用模型相机参数时发生未知错误";
+			return false;
+		}
+	}
+
 	void ShapeModeManagerBun::unloadAllModels()
 	{
 		{
@@ -1290,7 +1338,12 @@ namespace bun
 			}
 
 			if (!ids.empty())
+			{
 				loadModels(ids);
+				// 启动自动恢复时静默应用第一个模型的曝光/增益（不弹窗）
+				if (!loadedModels_.empty())
+					applyModelCameraSettings(loadedModels_.front().modelId);
+			}
 		}
 		catch (...)
 		{

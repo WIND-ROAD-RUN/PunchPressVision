@@ -62,6 +62,9 @@ namespace ui
 		/// <summary>返回当前选中的所有模型 ID。</summary>
 		std::vector<std::string> selectedModelIds() const;
 		int selectedRow() const;
+	/// <summary>加载模型后自动检测曝光冲突，弹窗或静默应用相机参数。</summary>
+	void autoApplyExposure(const std::vector<std::string>& loadedIds,
+		const std::vector<std::string>& failedIds);
 
 		Ui::DlgModelManagerClass* ui;
 		app::PunchPressApp& app_;
