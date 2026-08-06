@@ -35,27 +35,14 @@ namespace bun
 				return result;
 			}
 
-			// 1. 裁剪模板图：优先全局 matchRegion，否则用用户绘制的 ROI
+			// 1. 裁剪模板图：仅使用用户绘制的 ROI，不受主界面识别范围影响
+			//    （识别范围仅在生产匹配时限制搜索域，训练时应学到完整特征）
 			HImage templateImage = req.trainingImage;
 			double findcenterX = 0.0, findcenterY = 0.0;
 			double centerX = 0.0, centerY = 0.0;
 			HObject cropRegion;
 			bool hasCropRegion = false;
-			if (matchRegion.valid)
-			{
-				try
-				{
-					GenRectangle1(&cropRegion,
-						matchRegion.row1, matchRegion.col1,
-						matchRegion.row2, matchRegion.col2);
-					HObject reduced;
-					ReduceDomain(req.trainingImage, cropRegion, &reduced);
-					templateImage = HImage(reduced);
-					hasCropRegion = true;
-				}
-				catch (...) {}
-			}
-			else if (req.roi.IsInitialized())
+			if (req.roi.IsInitialized())
 			{
 				cropRegion = req.roi;
 				HObject reduced;
@@ -346,14 +333,10 @@ namespace bun
 		Config::ShapeModelInfo& outInfo, std::string* errorMsg)
 	{
 		MatchRegionCfg matchRegion;
-		if (inf_.config_module_ && inf_.config_module_->setCfg.matchRegionValid)
+		if (inf_.config_module_ && !inf_.config_module_->matchRegions.empty())
 		{
-			const auto& cfg = inf_.config_module_->setCfg;
 			matchRegion.valid = true;
-			matchRegion.row1 = cfg.matchRegionRow1;
-			matchRegion.col1 = cfg.matchRegionCol1;
-			matchRegion.row2 = cfg.matchRegionRow2;
-			matchRegion.col2 = cfg.matchRegionCol2;
+			matchRegion.regions = inf_.config_module_->matchRegions;
 		}
 
 		auto result = trainShapeModel(req, matchRegion);
@@ -364,14 +347,10 @@ namespace bun
 		const CreateModelRequest& req, std::string* errorMsg)
 	{
 		MatchRegionCfg matchRegion;
-		if (inf_.config_module_ && inf_.config_module_->setCfg.matchRegionValid)
+		if (inf_.config_module_ && !inf_.config_module_->matchRegions.empty())
 		{
-			const auto& cfg = inf_.config_module_->setCfg;
 			matchRegion.valid = true;
-			matchRegion.row1 = cfg.matchRegionRow1;
-			matchRegion.col1 = cfg.matchRegionCol1;
-			matchRegion.row2 = cfg.matchRegionRow2;
-			matchRegion.col2 = cfg.matchRegionCol2;
+			matchRegion.regions = inf_.config_module_->matchRegions;
 		}
 
 		auto result = trainShapeModel(req, matchRegion);
@@ -940,19 +919,21 @@ namespace bun
 				if (!fallbackPreprocessedImage.IsInitialized())
 					fallbackPreprocessedImage = processedForDisplay;
 
-				// 如果设置了匹配范围，限制搜索区域
-				if (inf_.config_module_ && inf_.config_module_->setCfg.matchRegionValid)
+				// 如果设置了匹配范围（多个区域 Union 合并），限制搜索区域
+				if (inf_.config_module_ && !inf_.config_module_->matchRegions.empty())
 				{
 					try
 					{
-						const auto& cfg = inf_.config_module_->setCfg;
-						HalconCpp::HObject matchRegion;
-						HalconCpp::GenRectangle1(&matchRegion,
-							cfg.matchRegionRow1, cfg.matchRegionCol1,
-							cfg.matchRegionRow2, cfg.matchRegionCol2);
-						HalconCpp::HImage reduced;
-						HalconCpp::ReduceDomain(processed, matchRegion, &reduced);
-						processed = reduced;
+						MatchRegionCfg mrc;
+						mrc.valid = true;
+						mrc.regions = inf_.config_module_->matchRegions;
+						HalconCpp::HObject joined = mrc.unionRegion();
+						if (joined.IsInitialized())
+						{
+							HalconCpp::HImage reduced;
+							HalconCpp::ReduceDomain(processed, joined, &reduced);
+							processed = reduced;
+						}
 					}
 					catch (...) {}
 				}
@@ -1319,6 +1300,33 @@ namespace bun
 		{
 			// 持久化失败不应影响正常流程
 		}
+	}
+
+	HalconCpp::HObject MatchRegionCfg::unionRegion() const
+	{
+		HalconCpp::HObject result;
+		if (!valid || regions.empty())
+			return result;
+		try
+		{
+			// 将第一个坐标矩形转换为 HObject
+			HalconCpp::GenRectangle1(&result,
+				regions[0].row1, regions[0].col1,
+				regions[0].row2, regions[0].col2);
+			// Union 合并后续矩形
+			for (size_t i = 1; i < regions.size(); ++i)
+			{
+				HalconCpp::HObject r;
+				HalconCpp::GenRectangle1(&r,
+					regions[i].row1, regions[i].col1,
+					regions[i].row2, regions[i].col2);
+				HalconCpp::HObject merged;
+				HalconCpp::Union2(result, r, &merged);
+				result = merged;
+			}
+		}
+		catch (...) {}
+		return result;
 	}
 
 	void ShapeModeManagerBun::loadLastLoadedModels()

@@ -655,7 +655,7 @@ namespace ui
 
 	void ShapeEditor::drawMatchRegion()
 	{
-		if (!hasMatchRegion_ || !imageLabel_ || !imageLabel_->isReady())
+		if (matchRegions_.empty() || !imageLabel_ || !imageLabel_->isReady())
 			return;
 
 		try
@@ -663,30 +663,50 @@ namespace ui
 			HalconCpp::SetColor(imageLabel_->halconHandle(), "#00BCD4");  // cyan
 			HalconCpp::SetDraw(imageLabel_->halconHandle(), "margin");
 			HalconCpp::SetLineWidth(imageLabel_->halconHandle(), 2);
-			HalconCpp::DispObj(matchRegion_, imageLabel_->halconHandle());
+			for (const auto& r : matchRegions_)
+			{
+				if (r.IsInitialized())
+					HalconCpp::DispObj(r, imageLabel_->halconHandle());
+			}
 		}
 		catch (...) {}
 	}
 
 	void ShapeEditor::setMatchRegion(const HalconCpp::HObject& region)
 	{
+		matchRegions_.clear();
+		if (region.IsInitialized())
+			matchRegions_.push_back(region);
+		refreshOverlay();
+	}
+
+	void ShapeEditor::setMatchRegions(const std::vector<HalconCpp::HObject>& regions)
+	{
+		matchRegions_ = regions;
+		refreshOverlay();
+	}
+
+	void ShapeEditor::addMatchRegion(const HalconCpp::HObject& region)
+	{
 		if (region.IsInitialized())
 		{
-			HalconCpp::CopyObj(region, &matchRegion_, 1, 1);
-			hasMatchRegion_ = true;
+			matchRegions_.push_back(region);
+			refreshOverlay();
 		}
-		else
+	}
+
+	void ShapeEditor::removeLastMatchRegion()
+	{
+		if (!matchRegions_.empty())
 		{
-			matchRegion_ = HalconCpp::HObject();
-			hasMatchRegion_ = false;
+			matchRegions_.pop_back();
+			refreshOverlay();
 		}
-		refreshOverlay();
 	}
 
 	void ShapeEditor::clearMatchRegion()
 	{
-		hasMatchRegion_ = false;
-		matchRegion_ = HalconCpp::HObject();
+		matchRegions_.clear();
 		refreshOverlay();
 	}
 

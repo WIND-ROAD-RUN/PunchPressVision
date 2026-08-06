@@ -109,12 +109,15 @@ namespace ui
 
 		/// 设置匹配范围（只读显示，cyan 色边框）
 		void setMatchRegion(const HalconCpp::HObject& region);
+	void setMatchRegions(const std::vector<HalconCpp::HObject>& regions);
+	void addMatchRegion(const HalconCpp::HObject& region);
+	void removeLastMatchRegion();
 		/// 清除匹配范围
 		void clearMatchRegion();
 		/// 是否已设置匹配范围
-		bool hasMatchRegion() const { return hasMatchRegion_; }
+		bool hasMatchRegion() const { return !matchRegions_.empty(); }
 		/// 获取当前匹配范围
-		HalconCpp::HObject matchRegion() const { return matchRegion_; }
+	const std::vector<HalconCpp::HObject>& matchRegions() const { return matchRegions_; }
 
 		/// 获取内部 L2 控件，用于连接 zoomChanged 等信号
 		HalconInteractiveLabel* imageLabel() const { return imageLabel_; }
@@ -187,8 +190,7 @@ namespace ui
 		bool showModelContours_{ false };
 
 		// 匹配范围（持久化只读显示，cyan 色边框）
-		HalconCpp::HObject matchRegion_;
-		bool hasMatchRegion_{ false };
+		std::vector<HalconCpp::HObject> matchRegions_;
 
 		// displayImage 重入哨兵
 		bool displaying_{ false };

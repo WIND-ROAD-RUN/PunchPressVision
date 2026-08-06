@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 #include "global/GlobalInterface.hpp"
 #include "Config/VisionCfg.hpp"
@@ -16,6 +17,15 @@ namespace rw::oso
 
 namespace inf
 {
+	/// 匹配范围矩形坐标（不依赖 Halcon 类型）
+	struct MatchRegionRect
+	{
+		double row1{ 0.0 };
+		double col1{ 0.0 };
+		double row2{ 0.0 };
+		double col2{ 0.0 };
+	};
+
 	class ConfigModule
 		: public global::IInfrastructure
 	{
@@ -30,6 +40,13 @@ namespace inf
 		Config::PlcAddressCfg plcAddressCfg;
 		Config::visionCfg visionCfg;
 		Config::SetCfg setCfg;
+
+		// 多识别范围（JSON 文件管理，独立于 OSO）
+		std::vector<MatchRegionRect> matchRegions;
+		void loadMatchRegions(const std::string& configDir);
+		void saveMatchRegions(const std::string& configDir);
+		void migrateFromLegacyMatchRegion();  // 旧单矩形 → 新多区域
+
 	public:
 		void build() override;
 		void destroy() override;

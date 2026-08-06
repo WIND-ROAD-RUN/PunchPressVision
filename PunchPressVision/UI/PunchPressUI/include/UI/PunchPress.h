@@ -8,6 +8,7 @@
 #include "global/GlobalType.hpp"
 #include "global/GlobalResult.hpp"
 #include "infrastructure/ConfigModule/Config/cameraCfg.hpp"
+#include "infrastructure/ConfigModule/ConfigModule.hpp"
 #include "UI/ShapeEditor.h"
 
 QT_BEGIN_NAMESPACE
@@ -67,6 +68,8 @@ namespace ui
 
 		// 匹配范围绘制
 		void onMatchRegionClicked();
+		void onAddRegionClicked();
+		void onDelRegionClicked();
 		void onDrawConfirm();
 		void onDrawCancel();
 		void onDrawClear();
@@ -133,8 +136,10 @@ namespace ui
 
 		// 绘制模式状态
 		bool drawingMode_{ false };
+		bool isAddingRegion_{ false };  // true=添加新区域模式, false=整体编辑模式
 		global::RunMode previousMode_{ global::RunMode::Idle };
-		HalconCpp::HObject originalMatchRegion_;  // 取消时恢复用
+		std::vector<inf::MatchRegionRect> originalMatchRegions_;  // 取消时恢复用
+		std::vector<inf::MatchRegionRect> matchRegions_;          // 运行时区域列表
 
 		// 本地缓存的 UI 所需配置
 		Config::cameraCfg cameraCfg_;

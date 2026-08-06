@@ -2,17 +2,126 @@
 #include "infrastructure/ConfigModule/ConfigModulePath.hpp"
 
 #include <filesystem>
+#include <fstream>
+
+#include <json/json.h>
 
 #include "rwul/oso/oso_StorageContext.hpp"
 
 namespace inf
 {
+	namespace
+	{
+		namespace fs = std::filesystem;
+
+		constexpr const char* kMatchRegionsFile = "match_regions.json";
+		constexpr const char* kBackupDir = "backup";
+
+		void writeJsonSafe(const fs::path& filePath, const Json::Value& root)
+		{
+			fs::create_directories(filePath.parent_path());
+			fs::path tmp = filePath;
+			tmp += ".tmp";
+			{
+				std::ofstream ofs(tmp);
+				if (!ofs)
+					return;
+				Json::StreamWriterBuilder builder;
+				builder["indentation"] = "  ";
+				std::unique_ptr<Json::StreamWriter> writer(builder.newStreamWriter());
+				writer->write(root, &ofs);
+			}
+			std::error_code ec;
+			fs::rename(tmp, filePath, ec);
+		}
+
+		bool readJsonSafe(const fs::path& filePath, Json::Value& root)
+		{
+			if (!fs::exists(filePath))
+				return false;
+			std::ifstream ifs(filePath);
+			if (!ifs)
+				return false;
+			Json::CharReaderBuilder builder;
+			JSONCPP_STRING errs;
+			return Json::parseFromStream(builder, ifs, &root, &errs);
+		}
+	}
+
 	ConfigModule::ConfigModule()
 	{
 	}
 
 	ConfigModule::~ConfigModule()
 	{
+	}
+
+	void ConfigModule::loadMatchRegions(const std::string& configDir)
+	{
+		matchRegions.clear();
+		try
+		{
+			const fs::path filePath = fs::path(configDir) / kMatchRegionsFile;
+			Json::Value root;
+			if (!readJsonSafe(filePath, root) || !root.isArray())
+				return;
+
+			for (const auto& item : root)
+			{
+				MatchRegionRect r;
+				r.row1 = item.get("row1", 0.0).asDouble();
+				r.col1 = item.get("col1", 0.0).asDouble();
+				r.row2 = item.get("row2", 0.0).asDouble();
+				r.col2 = item.get("col2", 0.0).asDouble();
+				matchRegions.push_back(r);
+			}
+		}
+		catch (...) {}
+	}
+
+	void ConfigModule::saveMatchRegions(const std::string& configDir)
+	{
+		try
+		{
+			Json::Value root(Json::arrayValue);
+			for (const auto& r : matchRegions)
+			{
+				Json::Value item;
+				item["row1"] = r.row1;
+				item["col1"] = r.col1;
+				item["row2"] = r.row2;
+				item["col2"] = r.col2;
+				root.append(item);
+			}
+
+			const fs::path dir(configDir);
+			const fs::path filePath = dir / kMatchRegionsFile;
+			writeJsonSafe(filePath, root);
+
+			// 备份
+			const fs::path backupDir = dir / kBackupDir;
+			std::error_code ec;
+			fs::create_directories(backupDir, ec);
+			if (!ec && fs::exists(filePath))
+				fs::copy_file(filePath, backupDir / kMatchRegionsFile,
+					fs::copy_options::overwrite_existing, ec);
+		}
+		catch (...) {}
+	}
+
+	void ConfigModule::migrateFromLegacyMatchRegion()
+	{
+		if (!setCfg.matchRegionValid || !matchRegions.empty())
+			return;
+
+		MatchRegionRect r;
+		r.row1 = setCfg.matchRegionRow1;
+		r.col1 = setCfg.matchRegionCol1;
+		r.row2 = setCfg.matchRegionRow2;
+		r.col2 = setCfg.matchRegionCol2;
+		matchRegions.push_back(r);
+
+		setCfg.matchRegionValid = false;
 	}
 
 	void ConfigModule::build()
@@ -66,6 +175,12 @@ namespace inf
 
 			// visionCfg 采用手写 IO（含 Halcon/几何类型），单独加载
 			visionCfg.load(global::joinPath(ConfigModulePath.RootPath, ConfigModulePath.visionCfgName));
+
+			// 加载多识别范围
+			loadMatchRegions(ConfigModulePath.RootPath);
+
+			// 向后兼容：旧单矩形迁移
+			migrateFromLegacyMatchRegion();
 		}
 		catch (...)
 		{
@@ -103,6 +218,9 @@ namespace inf
 				global::joinPath(ConfigModulePath.RootPath, ConfigModulePath.setCfgName));
 
 			visionCfg.save(global::joinPath(ConfigModulePath.RootPath, ConfigModulePath.visionCfgName));
+
+			// 保存多识别范围
+			saveMatchRegions(ConfigModulePath.RootPath);
 		}
 		catch (...)
 		{

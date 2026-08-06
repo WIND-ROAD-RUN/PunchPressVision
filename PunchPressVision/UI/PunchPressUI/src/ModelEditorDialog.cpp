@@ -352,14 +352,10 @@ namespace ui
 		bun::MatchRegionCfg matchRegion;
 		{
 			const auto& inf = biz.infrastructure();
-			if (inf.config_module_ && inf.config_module_->setCfg.matchRegionValid)
+			if (inf.config_module_ && !inf.config_module_->matchRegions.empty())
 			{
-				const auto& cfg = inf.config_module_->setCfg;
 				matchRegion.valid = true;
-				matchRegion.row1 = cfg.matchRegionRow1;
-				matchRegion.col1 = cfg.matchRegionCol1;
-				matchRegion.row2 = cfg.matchRegionRow2;
-				matchRegion.col2 = cfg.matchRegionCol2;
+				matchRegion.regions = inf.config_module_->matchRegions;
 			}
 		}
 

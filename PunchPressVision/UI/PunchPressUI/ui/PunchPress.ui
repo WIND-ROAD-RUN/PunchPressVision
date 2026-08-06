@@ -675,6 +675,50 @@ QPushButton:pressed {
              </property>
             </widget>
            </item>
+           <item>
+            <widget class="QPushButton" name="pbtn_addRegion">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>100</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QPushButton { padding: 6px 10px; border: 2px solid #2196F3; border-radius: 4px; background-color: white; color: #1976D2; font-size: 16px; font-weight: bold; } QPushButton:hover { background-color: #E3F2FD; }</string>
+             </property>
+             <property name="text">
+              <string>+ 添加</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pbtn_delRegion">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>80</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QPushButton { padding: 6px 10px; border: 2px solid #F44336; border-radius: 4px; background-color: white; color: #D32F2F; font-size: 16px; font-weight: bold; } QPushButton:hover { background-color: #FFEBEE; }</string>
+             </property>
+             <property name="text">
+              <string>- 删除</string>
+             </property>
+            </widget>
+           </item>
           </layout>
          </item>
          <item>

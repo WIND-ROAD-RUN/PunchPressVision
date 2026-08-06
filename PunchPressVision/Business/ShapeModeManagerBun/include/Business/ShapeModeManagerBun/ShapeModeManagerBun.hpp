@@ -102,14 +102,14 @@ namespace bun
 
 	/// <summary>
 	/// 训练时使用的匹配区域配置快照（所有值复制，线程安全）。
+	/// 支持多个识别范围。
 	/// </summary>
 	struct MatchRegionCfg
 	{
-		bool   valid{ false };
-		double row1{ 0.0 };
-		double col1{ 0.0 };
-		double row2{ 0.0 };
-		double col2{ 0.0 };
+		bool valid{ false };
+		std::vector<inf::MatchRegionRect> regions;
+		/// <summary>将所有区域 Union 合并为单个 Halcon 区域对象。</summary>
+		HalconCpp::HObject unionRegion() const;
 	};
 
 	/// <summary>

@@ -25,6 +25,7 @@
 
 #include "global/BuildVersion.hpp"
 #include "infrastructure/CalibConfigModule/CalibConfigModulePath.hpp"
+#include "infrastructure/ConfigModule/ConfigModulePath.hpp"
 
 #include "app/PunchPressApp.hpp"
 #include "Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp"
@@ -262,6 +263,8 @@ namespace ui
 		connect(ui->pbtn_gain2, &QPushButton::clicked, this, &PunchPress::onGain2Clicked);
 		connect(ui->pbtn_height, &QPushButton::clicked, this, &PunchPress::onHeightClicked);
 		connect(ui->pbtn_matchRegion, &QPushButton::clicked, this, &PunchPress::onMatchRegionClicked);
+		connect(ui->pbtn_addRegion, &QPushButton::clicked, this, &PunchPress::onAddRegionClicked);
+		connect(ui->pbtn_delRegion, &QPushButton::clicked, this, &PunchPress::onDelRegionClicked);
 		connect(ui->pbtn_drawConfirm, &QPushButton::clicked, this, &PunchPress::onDrawConfirm);
 		connect(ui->pbtn_drawCancel, &QPushButton::clicked, this, &PunchPress::onDrawCancel);
 		connect(ui->pbtn_clearRegion, &QPushButton::clicked, this, &PunchPress::onDrawClear);
@@ -411,29 +414,34 @@ namespace ui
 	void PunchPress::deferredCreateMatchRegion()
 	{
 		// Halcon 引擎在首次 OpenWindow 之前未完全初始化，
-		// GenRectangle1 此时会返回空区域，因此 HObject 创建
 		// 推迟到 showEvent 之后（Halcon 窗口已就绪）。
 		const auto& inf = app_.business().infrastructure();
 		if (!inf.config_module_)
 			return;
 
-		const auto& cfg = inf.config_module_->setCfg;
-		if (!cfg.matchRegionValid)
+		const auto& rects = inf.config_module_->matchRegions;
+		if (rects.empty())
 			return;
 
 		// 若已通过 onDrawConfirm 等方式设置过，不重复创建
 		if (imageView_ && imageView_->hasMatchRegion())
 			return;
 
-		try
+		// 转换为 HObject 列表
+		std::vector<HalconCpp::HObject> hRegions;
+		for (const auto& r : rects)
 		{
-			HalconCpp::HObject region;
-			HalconCpp::GenRectangle1(&region,
-				cfg.matchRegionRow1, cfg.matchRegionCol1,
-				cfg.matchRegionRow2, cfg.matchRegionCol2);
-			imageView_->setMatchRegion(region);
+			try
+			{
+				HalconCpp::HObject obj;
+				HalconCpp::GenRectangle1(&obj, r.row1, r.col1, r.row2, r.col2);
+				if (obj.IsInitialized())
+					hRegions.push_back(obj);
+			}
+			catch (...) {}
 		}
-		catch (...) {}
+		matchRegions_ = rects;
+		imageView_->setMatchRegions(hRegions);
 	}
 
 	void PunchPress::saveMatchRegion(const HalconCpp::HObject& region)
@@ -508,7 +516,8 @@ namespace ui
 		}
 		else if (imageView_ && imageView_->hasMatchRegion())
 		{
-			ui->pbtn_matchRegion->setText(QStringLiteral("已设置 ✓"));
+			const int count = static_cast<int>(imageView_->matchRegions().size());
+			ui->pbtn_matchRegion->setText(QStringLiteral("范围(%1) ✓").arg(count));
 			ui->pbtn_matchRegion->setStyleSheet(QStringLiteral(
 				"QPushButton {"
 				"  padding: 6px 14px;"
@@ -520,20 +529,18 @@ namespace ui
 				"  font-weight: bold;"
 				"}"));
 			ui->pbtn_matchRegion->setEnabled(true);
+			ui->pbtn_delRegion->setVisible(true);
 		}
 		else
 		{
-			// 检查配置中是否有已持久化的匹配范围（HObject 可能尚未创建）
-			bool configHasMatchRegion = false;
-			{
-				const auto& inf = app_.business().infrastructure();
-				if (inf.config_module_ && inf.config_module_->setCfg.matchRegionValid)
-					configHasMatchRegion = true;
-			}
+			// 检查配置中是否有已持久化的匹配范围
+			const auto& inf = app_.business().infrastructure();
+			const bool configHas = inf.config_module_ && !inf.config_module_->matchRegions.empty();
 
-			if (configHasMatchRegion)
+			if (configHas)
 			{
-				ui->pbtn_matchRegion->setText(QStringLiteral("已设置 ✓"));
+				const int count = static_cast<int>(inf.config_module_->matchRegions.size());
+				ui->pbtn_matchRegion->setText(QStringLiteral("范围(%1) ✓").arg(count));
 				ui->pbtn_matchRegion->setStyleSheet(QStringLiteral(
 					"QPushButton {"
 					"  padding: 6px 14px;"
@@ -545,6 +552,7 @@ namespace ui
 					"  font-weight: bold;"
 					"}"));
 				ui->pbtn_matchRegion->setEnabled(true);
+				ui->pbtn_delRegion->setVisible(true);
 			}
 			else
 			{
@@ -559,6 +567,7 @@ namespace ui
 					"  font-size: 18px;"
 					"}"));
 				ui->pbtn_matchRegion->setEnabled(true);
+				ui->pbtn_delRegion->setVisible(false);
 			}
 		}
 	}
@@ -573,17 +582,27 @@ namespace ui
 		// 1. 保存现场
 		previousMode_ = app_.currentMode();
 		drawingMode_ = true;
+		isAddingRegion_ = false;
 
-		// 保存原始 matchRegion（取消时恢复用）
-		originalMatchRegion_.Clear();
-		if (imageView_->hasMatchRegion())
+		// 保存原始区域（取消时恢复用）
+		originalMatchRegions_ = matchRegions_;
+		imageView_->clearMatchRegion();
+		imageView_->clearROI();
+		// 将所有现有区域转为绿色可编辑 ROI
+		if (!matchRegions_.empty())
 		{
-			originalMatchRegion_ = imageView_->matchRegion();
-			imageView_->clearMatchRegion();                         // 移除 cyan 只读显示
-			imageView_->setRoiObjects({ originalMatchRegion_ });    // 转为绿色可编辑 ROI
+			std::vector<HalconCpp::HObject> hRegions;
+			for (const auto& r : matchRegions_)
+			{
+				HalconCpp::HObject obj;
+				HalconCpp::GenRectangle1(&obj, r.row1, r.col1, r.row2, r.col2);
+				if (obj.IsInitialized())
+					hRegions.push_back(obj);
+			}
+			imageView_->setRoiObjects(hRegions);
 		}
 
-		// 2. 切换运行模式：先停流再以 FreeRun 起流
+		// 2. 切换运行模式
 		app_.switchToMode(global::RunMode::Idle);
 		app_.switchToMode(global::RunMode::DrawMatchRegion);
 
@@ -595,22 +614,115 @@ namespace ui
 		updateMatchRegionButton();
 	}
 
-	void PunchPress::onDrawConfirm()
+	void PunchPress::onAddRegionClicked()
 	{
-		// 取出所有 ROI 并合并（取最后一个有效矩形作为匹配范围）
-		auto roi = imageView_->roi();
+		if (drawingMode_)
+			return;
+
+		// 1. 保存现场
+		previousMode_ = app_.currentMode();
+		drawingMode_ = true;
+		isAddingRegion_ = true;
+
+		originalMatchRegions_ = matchRegions_;
+		imageView_->clearROI();
+
+		// 2. 切换运行模式
+		app_.switchToMode(global::RunMode::Idle);
+		app_.switchToMode(global::RunMode::DrawMatchRegion);
+
+		// 3. 进入 RectangleROI 绘制工具
+		imageView_->setTool(ShapeEditor::Tool::RectangleROI);
+
+		// 4. UI 更新
+		showDrawingToolbar(true);
+		updateMatchRegionButton();
+	}
+
+	void PunchPress::onDelRegionClicked()
+	{
+		if (drawingMode_ || matchRegions_.empty())
+			return;
+
+		matchRegions_.pop_back();
+		imageView_->removeLastMatchRegion();
 
 		// 持久化
-		saveMatchRegion(roi);
+		auto& inf = app_.business().infrastructure();
+		if (inf.config_module_)
+		{
+			inf.config_module_->matchRegions = matchRegions_;
+			inf.config_module_->saveMatchRegions(inf::ConfigModulePath.RootPath);
+		}
+		updateMatchRegionButton();
+	}
+
+	void PunchPress::onDrawConfirm()
+	{
+		// 取出所有 ROI 对象列表
+		auto roiObjs = imageView_->roiObjects();
+		if (roiObjs.empty())
+		{
+			exitDrawMode();
+			return;
+		}
+
+		auto& inf = app_.business().infrastructure();
+
+		// 将 HObject 转换为 MatchRegionRect 坐标列表
+		std::vector<inf::MatchRegionRect> rects;
+		for (const auto& obj : roiObjs)
+		{
+			if (!obj.IsInitialized())
+				continue;
+			try
+			{
+				HalconCpp::HTuple r1, c1, r2, c2;
+				HalconCpp::SmallestRectangle1(obj, &r1, &c1, &r2, &c2);
+				inf::MatchRegionRect mr;
+				mr.row1 = r1[0].D();
+				mr.col1 = c1[0].D();
+				mr.row2 = r2[0].D();
+				mr.col2 = c2[0].D();
+				rects.push_back(mr);
+			}
+			catch (...) {}
+		}
+
+		if (isAddingRegion_)
+		{
+			// 添加模式：追加到已有列表
+			for (const auto& r : rects)
+				matchRegions_.push_back(r);
+		}
+		else
+		{
+			// 编辑模式：全量替换
+			matchRegions_ = std::move(rects);
+		}
+
+		// 持久化
+		if (inf.config_module_)
+		{
+			inf.config_module_->matchRegions = matchRegions_;
+			inf.config_module_->saveMatchRegions(inf::ConfigModulePath.RootPath);
+		}
 
 		// 退出绘制模式
 		exitDrawMode();
 
-		// 显示确认后保存的范围
-		if (roi.IsInitialized())
+		// 显示所有已保存的区域（转换为 HObject）
+		imageView_->clearROI();
 		{
-			imageView_->clearROI();
-			imageView_->setMatchRegion(roi);
+			std::vector<HalconCpp::HObject> hRegions;
+			for (const auto& r : matchRegions_)
+			{
+				HalconCpp::HObject obj;
+				HalconCpp::GenRectangle1(&obj, r.row1, r.col1, r.row2, r.col2);
+				if (obj.IsInitialized())
+					hRegions.push_back(obj);
+			}
+			imageView_->setMatchRegions(hRegions);
 		}
 	}
 
@@ -618,8 +730,18 @@ namespace ui
 	{
 		// 清除 ROI，恢复之前的匹配范围
 		imageView_->clearROI();
-		if (originalMatchRegion_.IsInitialized())
-			imageView_->setMatchRegion(originalMatchRegion_);
+		matchRegions_ = originalMatchRegions_;
+		{
+			std::vector<HalconCpp::HObject> hRegions;
+			for (const auto& r : matchRegions_)
+			{
+				HalconCpp::HObject obj;
+				HalconCpp::GenRectangle1(&obj, r.row1, r.col1, r.row2, r.col2);
+				if (obj.IsInitialized())
+					hRegions.push_back(obj);
+			}
+			imageView_->setMatchRegions(hRegions);
+		}
 
 		exitDrawMode();
 	}
@@ -644,7 +766,8 @@ namespace ui
 		// 隐藏绘制工具栏
 		showDrawingToolbar(false);
 		drawingMode_ = false;
-		originalMatchRegion_.Clear();
+		isAddingRegion_ = false;
+		originalMatchRegions_.clear();
 
 		// 恢复之前的运行模式
 		app_.switchToMode(previousMode_);
