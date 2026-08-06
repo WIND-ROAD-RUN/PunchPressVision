@@ -23,8 +23,6 @@ namespace Config
 			return s;
 		}
 
-	
-
 		void writeImageSafe(const HalconCpp::HObject& image, const fs::path& filePath, const char* format)
 		{
 			fs::create_directories(filePath.parent_path());
@@ -38,9 +36,12 @@ namespace Config
 				catch (...) {}
 				return;
 			}
+			// 先写 .tmp 再原子 rename，防止断电截断
 			fs::path tmp = filePath;
-			
+			tmp += ".tmp";
 			HalconCpp::HImage(image).WriteImage(format, 0, tmp.string().c_str());
+			std::error_code ec;
+			fs::rename(tmp, filePath, ec);
 		}
 
 		bool readImageSafe(const fs::path& filePath, HalconCpp::HObject& image)
@@ -71,9 +72,12 @@ namespace Config
 				catch (...) {}
 				return;
 			}
+			// 先写 .tmp 再原子 rename，防止断电截断
 			fs::path tmp = filePath;
-			
+			tmp += ".tmp";
 			HalconCpp::WriteObject(obj, tmp.string().c_str());
+			std::error_code ec;
+			fs::rename(tmp, filePath, ec);
 		}
 
 		bool readObjectSafe(const fs::path& filePath, HalconCpp::HObject& obj)
@@ -121,6 +125,7 @@ namespace Config
 			ofs << "rectifiedWidth=" << rectWidth << '\n';
 			ofs << "rectifiedHeight=" << rectHeight << '\n';
 			ofs.close();
+			// NTFS rename 原子替换，不先 remove 避免断电丢失窗口
 			std::error_code ec;
 			fs::rename(tmp, filePath, ec);
 		}
@@ -184,6 +189,21 @@ namespace Config
 			}
 			return true;
 		}
+
+		constexpr const char* kBackupDir = "backup";
+
+		// 将文件复制到备份目录（.tmp + rename 保证备份写入原子性）
+		void backupFile(const fs::path& srcFile, const fs::path& backupDir)
+		{
+			std::error_code ec;
+			fs::create_directories(backupDir, ec);
+			if (ec) return;
+			const fs::path dst = backupDir / srcFile.filename();
+			const fs::path tmp = backupDir / (srcFile.filename().string() + ".tmp");
+			fs::copy_file(srcFile, tmp, fs::copy_options::overwrite_existing, ec);
+			if (!ec)
+				fs::rename(tmp, dst, ec);
+		}
 	}
 
 	void TwoCameraSpliceCfg::saveInDir(const std::string& dirPath)
@@ -214,6 +234,24 @@ namespace Config
 		try
 		{
 			const fs::path dir(dirPath);
+
+			auto tryLoadFromDir = [](const fs::path& d,
+				HalconCpp::HObject& pic1, HalconCpp::HObject& pic2,
+				HalconCpp::HObject& map1, HalconCpp::HObject& map2,
+				std::string& caltab, double& c1g, double& c1e, double& c2g, double& c2e,
+				double& dh, double& op, double& bp, double& dp, double& pw,
+				int& rw, int& rh) -> bool
+			{
+				readImageSafe(d / kCamera1ImageFile, pic1);
+				readImageSafe(d / kCamera2ImageFile, pic2);
+				readObjectSafe(d / kMapSingle1File,  map1);
+				readObjectSafe(d / kMapSingle2File,  map2);
+				readParamsSafe(d / kParamsFile,
+					caltab, c1g, c1e, c2g, c2e,
+					dh, op, bp, dp, pw, rw, rh);
+				return map1.IsInitialized();  // 核心判断：MapSingle1 就绪即整体就绪
+			};
+
 			caltabDescrPath.clear();
 			camera1Gain = 0.0;
 			camera1Exposure = 0.0;
@@ -226,17 +264,35 @@ namespace Config
 			pixTowWorld = 0.0;
 			rectifiedWidth = 0;
 			rectifiedHeight = 0;
-			readImageSafe(dir / kCamera1ImageFile, camera1Piccture);
-			readImageSafe(dir / kCamera2ImageFile, camera2Piccture);
-			readObjectSafe(dir / kMapSingle1File,  MapSingle1);
-			readObjectSafe(dir / kMapSingle2File,  MapSingle2);
-			readParamsSafe(dir / kParamsFile,
-				caltabDescrPath,
-				camera1Gain, camera1Exposure,
-				camera2Gain, camera2Exposure,
+
+			// 先尝试主目录
+			if (tryLoadFromDir(dir,
+				camera1Piccture, camera2Piccture, MapSingle1, MapSingle2,
+				caltabDescrPath, camera1Gain, camera1Exposure, camera2Gain, camera2Exposure,
 				DiffHeight, OverlapInPercent, BorderInPercent, DistancePlates,
-				pixTowWorld,
-				rectifiedWidth, rectifiedHeight);
+				pixTowWorld, rectifiedWidth, rectifiedHeight))
+			{
+				// 开机启动时加载成功 → 备份到 backup/ 供下次断电恢复
+				const fs::path bkDir = dir / kBackupDir;
+				backupFile(dir / kCamera1ImageFile, bkDir);
+				backupFile(dir / kCamera2ImageFile, bkDir);
+				backupFile(dir / kMapSingle1File,   bkDir);
+				backupFile(dir / kMapSingle2File,   bkDir);
+				backupFile(dir / kParamsFile,       bkDir);
+				return;
+			}
+
+			// 主文件损坏或缺失 → 从 backup/ 恢复
+			const fs::path backupDir = dir / kBackupDir;
+			if (tryLoadFromDir(backupDir,
+				camera1Piccture, camera2Piccture, MapSingle1, MapSingle2,
+				caltabDescrPath, camera1Gain, camera1Exposure, camera2Gain, camera2Exposure,
+				DiffHeight, OverlapInPercent, BorderInPercent, DistancePlates,
+				pixTowWorld, rectifiedWidth, rectifiedHeight))
+			{
+				// 恢复后立即写回主目录
+				saveInDir(dirPath);
+			}
 		}
 		catch (...)
 		{

@@ -12,13 +12,26 @@ namespace Config
 		namespace fs = std::filesystem;
 
 		constexpr const char* kCalibConfigFile = "calib_config.json";
+		constexpr const char* kBackupDir = "backup";
 
 		void replaceFile(const fs::path& tmp, const fs::path& target)
 		{
+			// NTFS 上 rename 原子替换，不先 remove 避免断电丢失窗口
 			std::error_code ec;
-			if (fs::exists(target, ec))
-				fs::remove(target, ec);
 			fs::rename(tmp, target, ec);
+		}
+
+		// 将文件复制到备份目录（.tmp + rename 保证备份写入也不被断电截断）
+		void backupFile(const fs::path& srcFile, const fs::path& backupDir)
+		{
+			std::error_code ec;
+			fs::create_directories(backupDir, ec);
+			if (ec) return;
+			const fs::path dst = backupDir / srcFile.filename();
+			const fs::path tmp = backupDir / (srcFile.filename().string() + ".tmp");
+			fs::copy_file(srcFile, tmp, fs::copy_options::overwrite_existing, ec);
+			if (!ec)
+				replaceFile(tmp, dst);
 		}
 
 		// HTuple 元素可能是 double 或 string，逐个序列化到 JSON 数组
@@ -116,6 +129,7 @@ namespace Config
 			const fs::path dir(dirPath);
 			fs::create_directories(dir);
 
+			const fs::path targetFile = dir / kCalibConfigFile;
 			const fs::path tmp = dir / (std::string(kCalibConfigFile) + ".tmp");
 			{
 				std::ofstream ofs(tmp);
@@ -126,7 +140,7 @@ namespace Config
 				std::unique_ptr<Json::StreamWriter> writer(builder.newStreamWriter());
 				writer->write(root, &ofs);
 			}
-			replaceFile(tmp, dir / kCalibConfigFile);
+			replaceFile(tmp, targetFile);
 		}
 		catch (...)
 		{
@@ -138,25 +152,25 @@ namespace Config
 	{
 		try
 		{
-			_calibConfigMap.clear();
-
-			const fs::path filePath = fs::path(dirPath) / kCalibConfigFile;
-			if (!fs::exists(filePath))
-				return;
-
-			std::ifstream ifs(filePath);
-			if (!ifs)
-				return;
-
-			Json::CharReaderBuilder builder;
-			JSONCPP_STRING errs;
-			Json::Value root;
-			if (!Json::parseFromStream(builder, ifs, &root, &errs))
-				return;
-
-			// 新格式: { "Camera1": {...}, "Camera2": {...} }
-			if (root.isObject())
+			auto tryLoadFrom = [this](const fs::path& file) -> bool
 			{
+				if (!fs::exists(file))
+					return false;
+
+				std::ifstream ifs(file);
+				if (!ifs)
+					return false;
+
+				Json::CharReaderBuilder builder;
+				JSONCPP_STRING errs;
+				Json::Value root;
+				if (!Json::parseFromStream(builder, ifs, &root, &errs))
+					return false;
+
+				if (!root.isObject())
+					return false;
+
+				_calibConfigMap.clear();
 				for (auto it = root.begin(); it != root.end(); ++it)
 				{
 					const global::CameraIndex idx = keyToCameraIndex(it.key().asString());
@@ -164,6 +178,26 @@ namespace Config
 					jsonToItem(*it, item);
 					_calibConfigMap[idx] = std::move(item);
 				}
+				return !_calibConfigMap.empty();
+			};
+
+			const fs::path dir(dirPath);
+			const fs::path primaryFile = dir / kCalibConfigFile;
+
+			// 先尝试主文件
+			if (tryLoadFrom(primaryFile))
+			{
+				// 开机启动时加载成功 → 备份到 backup/ 供下次断电恢复
+				backupFile(primaryFile, dir / kBackupDir);
+				return;
+			}
+
+			// 主文件损坏或缺失 → 尝试从 backup/ 恢复
+			const fs::path backupFilePath = dir / kBackupDir / kCalibConfigFile;
+			if (tryLoadFrom(backupFilePath))
+			{
+				// 恢复成功，立即写回主文件
+				saveInDir(dirPath);
 			}
 		}
 		catch (...)

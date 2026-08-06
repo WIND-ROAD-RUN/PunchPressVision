@@ -20,14 +20,26 @@ namespace Config
 			return s;
 		}
 
+		constexpr const char* kBackupDir = "backup";
+
 		void replaceFile(const fs::path& tmp, const fs::path& target)
 		{
-			if (fs::exists(target))
-			{
-				try { fs::remove(target); }
-				catch (...) {}
-			}
-			fs::rename(tmp, target);
+			// NTFS 上 rename 原子替换，不先 remove 避免断电丢失窗口
+			std::error_code ec;
+			fs::rename(tmp, target, ec);
+		}
+
+		// 将文件复制到备份目录（.tmp + rename 保证备份写入原子性）
+		void backupFile(const fs::path& srcFile, const fs::path& backupDir)
+		{
+			std::error_code ec;
+			fs::create_directories(backupDir, ec);
+			if (ec) return;
+			const fs::path dst = backupDir / srcFile.filename();
+			const fs::path tmp = backupDir / (srcFile.filename().string() + ".tmp");
+			fs::copy_file(srcFile, tmp, fs::copy_options::overwrite_existing, ec);
+			if (!ec)
+				replaceFile(tmp, dst);
 		}
 
 		void writeTupleSafe(const fs::path& filePath, const HalconCpp::HTuple& tuple)
@@ -177,6 +189,24 @@ namespace Config
 		try
 		{
 			const fs::path dir(dirPath);
+
+			auto tryLoadTuple = [](const fs::path& file, HalconCpp::HTuple& tuple) -> bool
+			{
+				tuple.Clear();
+				return readTupleSafe(file, tuple) && tuple.Length() >= 6;
+			};
+
+			auto tryLoadParams = [](const fs::path& file,
+				double& ml1, double& ml2, double& mt, double& nm,
+				double& c1e, double& c1g, double& c2e, double& c2g,
+				int& xn, int& yn, double& dist, double& scl,
+				int& xd, int& yd, double& xo) -> bool
+			{
+				return readParamsSafe(file, ml1, ml2, mt, nm, c1e, c1g, c2e, c2g,
+					xn, yn, dist, scl, xd, yd, xo);
+			};
+
+			// 设置默认值
 			MeasureLength1 = 100.0;
 			MeasureLength2 = 50.0;
 			MeasureThreshold = 1.0;
@@ -192,13 +222,40 @@ namespace Config
 			xdiantance = 500;
 			ydistance = 100;
 			xoffset = 400;
-			readTupleSafe(dir / kHomMat2DFile, outHomMat2D);
-			readParamsSafe(dir / kParamsFile,
+
+			outHomMat2D.Clear();
+
+			// 先尝试主目录
+			bool primaryOk = tryLoadTuple(dir / kHomMat2DFile, outHomMat2D);
+			tryLoadParams(dir / kParamsFile,
 				MeasureLength1, MeasureLength2, MeasureThreshold, num_Measure,
-				camera1Exposure, camera1Gain,
-				camera2Exposure, camera2Gain,
-				xnumber, ynumber, distance, scale,
-				xdiantance, ydistance, xoffset);
+				camera1Exposure, camera1Gain, camera2Exposure, camera2Gain,
+				xnumber, ynumber, distance, scale, xdiantance, ydistance, xoffset);
+
+			if (primaryOk)
+			{
+				// 开机启动时加载成功 → 备份到 backup/ 供下次断电恢复
+				const fs::path backupDir = dir / kBackupDir;
+				backupFile(dir / kHomMat2DFile, backupDir);
+				backupFile(dir / kParamsFile,   backupDir);
+				return;
+			}
+
+			// 主文件损坏或缺失 → 从 backup/ 恢复
+			const fs::path backupDir = dir / kBackupDir;
+			HalconCpp::HTuple backupTuple;
+			if (!tryLoadTuple(backupDir / kHomMat2DFile, backupTuple))
+				return;
+
+			// 恢复主参数
+			outHomMat2D = backupTuple;
+			tryLoadParams(backupDir / kParamsFile,
+				MeasureLength1, MeasureLength2, MeasureThreshold, num_Measure,
+				camera1Exposure, camera1Gain, camera2Exposure, camera2Gain,
+				xnumber, ynumber, distance, scale, xdiantance, ydistance, xoffset);
+
+			// 恢复后立即写回主目录
+			saveInDir(dirPath);
 		}
 		catch (...)
 		{
