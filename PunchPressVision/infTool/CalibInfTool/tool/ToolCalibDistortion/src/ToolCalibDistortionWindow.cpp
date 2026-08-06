@@ -180,8 +180,11 @@ void ToolCalibDistortionWindow::onCameraFrame(rw::hoec::MatInfo matInfo, global:
 
     try
     {
-        // 缓存当前原始帧（cv::Mat 用于保存文件）
-        lastRawMat_ = matInfo.mat.clone();
+        // 缓存当前原始帧（cv::Mat 用于保存文件，加锁保护 UI 线程并发读取）
+        {
+            std::lock_guard<std::mutex> lock(lastRawMatMutex_);
+            lastRawMat_ = matInfo.mat.clone();
+        }
 
         // 左侧：原始图像
         emit originalFrameReady(cvMatToHImage(matInfo.mat));
@@ -424,7 +427,14 @@ void ToolCalibDistortionWindow::cleanCalibImageDirs()
 // ===================================================================
 void ToolCalibDistortionWindow::onSaveCurrentFrame()
 {
-    if (lastRawMat_.empty())
+    // 加锁深拷贝 lastRawMat_，防止相机线程并发写入导致野指针闪退
+    cv::Mat rawMatCopy;
+    {
+        std::lock_guard<std::mutex> lock(lastRawMatMutex_);
+        rawMatCopy = lastRawMat_.clone();
+    }
+
+    if (rawMatCopy.empty())
     {
         QMessageBox::warning(this, QStringLiteral("保存失败"),
             QStringLiteral("当前没有可保存的帧"));
@@ -443,7 +453,7 @@ void ToolCalibDistortionWindow::onSaveCurrentFrame()
     std::filesystem::create_directories(saveDir, ec);
 
     // 先转为 HImage 并通过 drawCalibMarks 校验标定板是否可识别
-    HalconCpp::HImage hImg = cvMatToHImage(lastRawMat_);
+    HalconCpp::HImage hImg = cvMatToHImage(rawMatCopy);
     if (!hImg.IsInitialized())
     {
         QMessageBox::warning(this, QStringLiteral("保存失败"),
@@ -477,7 +487,7 @@ void ToolCalibDistortionWindow::onSaveCurrentFrame()
         .arg(QDateTime::currentDateTime().toString(QStringLiteral("yyyyMMdd_hhmmss_zzz")));
     const QString path = QDir(QString::fromStdString(saveDir)).filePath(filename);
 
-    if (cv::imwrite(path.toStdString(), lastRawMat_))
+    if (cv::imwrite(path.toStdString(), rawMatCopy))
     {
         capturedImages_.push_back(hImg);
 

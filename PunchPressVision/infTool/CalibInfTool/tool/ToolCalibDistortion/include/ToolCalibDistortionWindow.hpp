@@ -2,6 +2,7 @@
 
 #include <atomic>
 #include <memory>
+#include <mutex>
 #include <vector>
 
 #include <QMainWindow>
@@ -77,5 +78,6 @@ private:
     std::atomic_bool isRunning_{ false };
 
     cv::Mat lastRawMat_;
+    std::mutex lastRawMatMutex_;     // 保护 lastRawMat_ 的跨线程访问
     QString lastCalibDir_;
 };
