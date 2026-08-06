@@ -499,6 +499,12 @@ namespace ui
 
 	void PunchPress::updateMatchRegionButton()
 	{
+		// pbtn_matchRegion 仅作状态显示，不可点击
+		ui->pbtn_matchRegion->setEnabled(false);
+
+		const int count = static_cast<int>(matchRegions_.size());
+		const bool hasRegions = count > 0;
+
 		if (drawingMode_)
 		{
 			ui->pbtn_matchRegion->setText(QStringLiteral("● 绘制中..."));
@@ -512,63 +518,33 @@ namespace ui
 				"  font-size: 18px;"
 				"  font-weight: bold;"
 				"}"));
-			ui->pbtn_matchRegion->setEnabled(false);  // 绘制中，禁止重复进入
 		}
-		else if (imageView_ && imageView_->hasMatchRegion())
+		else if (hasRegions)
 		{
-			const int count = static_cast<int>(imageView_->matchRegions().size());
-			ui->pbtn_matchRegion->setText(QStringLiteral("范围(%1) ✓").arg(count));
+			ui->pbtn_matchRegion->setText(QStringLiteral("识别范围: %1 个").arg(count));
 			ui->pbtn_matchRegion->setStyleSheet(QStringLiteral(
 				"QPushButton {"
 				"  padding: 6px 14px;"
 				"  border: 2px solid #4CAF50;"
 				"  border-radius: 4px;"
-				"  background-color: white;"
+				"  background-color: #E8F5E9;"
 				"  color: #2E7D32;"
 				"  font-size: 18px;"
 				"  font-weight: bold;"
 				"}"));
-			ui->pbtn_matchRegion->setEnabled(true);
-			ui->pbtn_delRegion->setVisible(true);
 		}
 		else
 		{
-			// 检查配置中是否有已持久化的匹配范围
-			const auto& inf = app_.business().infrastructure();
-			const bool configHas = inf.config_module_ && !inf.config_module_->matchRegions.empty();
-
-			if (configHas)
-			{
-				const int count = static_cast<int>(inf.config_module_->matchRegions.size());
-				ui->pbtn_matchRegion->setText(QStringLiteral("范围(%1) ✓").arg(count));
-				ui->pbtn_matchRegion->setStyleSheet(QStringLiteral(
-					"QPushButton {"
-					"  padding: 6px 14px;"
-					"  border: 2px solid #4CAF50;"
-					"  border-radius: 4px;"
-					"  background-color: white;"
-					"  color: #2E7D32;"
-					"  font-size: 18px;"
-					"  font-weight: bold;"
-					"}"));
-				ui->pbtn_matchRegion->setEnabled(true);
-				ui->pbtn_delRegion->setVisible(true);
-			}
-			else
-			{
-				ui->pbtn_matchRegion->setText(QStringLiteral("绘制识别范围"));
-				ui->pbtn_matchRegion->setStyleSheet(QStringLiteral(
-					"QPushButton {"
-					"  padding: 6px 14px;"
-					"  border: 2px solid #CCC;"
-					"  border-radius: 4px;"
-					"  background-color: white;"
-					"  color: #444;"
-					"  font-size: 18px;"
-					"}"));
-				ui->pbtn_matchRegion->setEnabled(true);
-				ui->pbtn_delRegion->setVisible(false);
-			}
+			ui->pbtn_matchRegion->setText(QStringLiteral("识别范围: 0 个"));
+			ui->pbtn_matchRegion->setStyleSheet(QStringLiteral(
+				"QPushButton {"
+				"  padding: 6px 14px;"
+				"  border: 2px solid #DDD;"
+				"  border-radius: 4px;"
+				"  background-color: #FAFAFA;"
+				"  color: #999;"
+				"  font-size: 18px;"
+				"}"));
 		}
 	}
 

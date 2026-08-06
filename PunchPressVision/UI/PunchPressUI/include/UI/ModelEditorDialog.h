@@ -83,6 +83,8 @@ namespace ui
 		void loadExistingModel(const std::string& id);
 		/// 根据已加载模型的数据恢复界面参数
 		void restoreParamsFromModel(const Config::ShapeModelData& data);
+		/// 退出时将中心点等非训练参数直接写入已保存模型，无需重新训练
+		void saveCenterPointToModel();
 
 		HalconCpp::HImage preprocessImage(const HalconCpp::HImage& image) const;
 

@@ -958,7 +958,15 @@ namespace ui
 				QStringLiteral("是否创建模板？\n\n选择\"是\"保存模板后退出，选择\"否\"直接退出。"))
 				== rw::rqwu::MessageBox::StandardButton::Yes)
 			{
-				onCreateModel();
+				if (modelCreated_)
+				{
+					// 已创建过模板，只更新中心点等非训练参数，无需重新训练
+					saveCenterPointToModel();
+				}
+				else
+				{
+					onCreateModel();
+				}
 				accept();
 			}
 			else
@@ -968,6 +976,41 @@ namespace ui
 			return;
 		}
 		accept();
+	}
+
+	void ModelEditorDialog::saveCenterPointToModel()
+	{
+		if (modelId_.empty() || !shapeEditor_)
+			return;
+
+		auto& biz = app_.business();
+		if (!biz.shape_mode_manager_bun)
+			return;
+
+		const auto& inf = biz.infrastructure();
+		if (!inf.shape_model_manager_module_)
+			return;
+
+		try
+		{
+			auto item = inf.shape_model_manager_module_->getShapeModelItem(modelId_);
+			auto& data = item.data;
+
+			if (shapeEditor_->hasCenterPoint())
+			{
+				data.centerX = shapeEditor_->centerPoint().x();
+				data.centerY = shapeEditor_->centerPoint().y();
+			}
+
+			// 同时更新相机参数（用户可能在创建后调整了曝光/增益）
+			data._createModelExposureTime = static_cast<double>(cameraCfg_.exposureTime1);
+			data._createModelGain = static_cast<double>(cameraCfg_.gain1);
+			data._createModelExposureTime2 = static_cast<double>(cameraCfg_.exposureTime2);
+			data._createModelGain2 = static_cast<double>(cameraCfg_.gain2);
+
+			inf.shape_model_manager_module_->changeShapeModelItem(modelId_, data);
+		}
+		catch (...) {}
 	}
 bool ModelEditorDialog::requireImage(const QString& action) const
 {
