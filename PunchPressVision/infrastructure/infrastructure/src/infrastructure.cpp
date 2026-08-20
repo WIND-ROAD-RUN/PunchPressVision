@@ -1,4 +1,5 @@
 #include "infrastructure/infrastructure.hpp"
+#include "infrastructure/ConfigSnapshot.hpp"
 
 namespace inf
 {
@@ -29,6 +30,9 @@ namespace inf
 
 	void infrastructure::build()
 	{
+		// 0. 配置恢复：主数据目录关键文件丢失/损坏时，先从快照目录恢复
+		restoreConfigSnapshotIfNeeded();
+
 		// 1. 配置最先构建（其他模块依赖配置）
 		config_module_->build();
 
@@ -44,6 +48,9 @@ namespace inf
 
 		// 4. 模型管理器
 		shape_model_manager_module_->build();
+
+		// 4.1 全部配置/模型加载完成：把当前配置增量同步到快照目录
+		updateConfigSnapshot();
 
 		// 5. PLC 控制网关
 		control_module_->build();
