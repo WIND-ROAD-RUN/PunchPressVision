@@ -4,6 +4,15 @@
 #include <fstream>
 #include <string>
 
+#include <QDebug>
+
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#endif
+
 namespace Config
 {
 	namespace
@@ -24,9 +33,35 @@ namespace Config
 
 		void replaceFile(const fs::path& tmp, const fs::path& target)
 		{
-			// NTFS 上 rename 原子替换，不先 remove 避免断电丢失窗口
+			// NTFS 上 rename 原子替换，不先 remove 避免断电丢失窗口。
+			// 注意：Windows 上 fs::rename 在目标已存在时会失败（非 POSIX 语义），
+			// 失败时退回 MoveFileExW 强制替换，再兜底 remove+rename，
+			// 避免 .tmp 残留、新参数永远不生效。
 			std::error_code ec;
 			fs::rename(tmp, target, ec);
+			if (!ec)
+				return;
+
+#ifdef _WIN32
+			if (::MoveFileExW(tmp.c_str(), target.c_str(),
+				MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH) != 0)
+				return;
+#endif
+
+			qWarning() << "[NinePointConfig] rename失败:"
+				<< QString::fromStdString(tmp.string()) << "->"
+				<< QString::fromStdString(target.string())
+				<< "错误:" << QString::fromStdString(ec.message());
+
+			fs::remove(target, ec);
+			ec.clear();
+			fs::rename(tmp, target, ec);
+			if (ec)
+			{
+				qWarning() << "[NinePointConfig] 兜底rename仍失败:"
+					<< QString::fromStdString(target.string())
+					<< "错误:" << QString::fromStdString(ec.message());
+			}
 		}
 
 		// 将文件复制到备份目录（.tmp + rename 保证备份写入原子性）

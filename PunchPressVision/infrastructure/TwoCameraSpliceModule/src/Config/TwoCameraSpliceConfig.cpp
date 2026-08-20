@@ -2,12 +2,56 @@
 
 #include <filesystem>
 #include <fstream>
+#include <functional>
 #include <string>
+
+#include <QDebug>
+
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#endif
 namespace Config
 {
 	namespace
 	{
 		namespace fs = std::filesystem;
+
+		// Windows 上 fs::rename 在目标已存在时会失败（ERROR_ALREADY_EXISTS），
+		// 不具备 POSIX 的原子替换语义；失败时退回 MoveFileExW 强制替换，
+		// 再兜底 remove+rename，避免 .tmp 残留、新参数永远不生效。
+		bool replaceFile(const fs::path& tmp, const fs::path& target)
+		{
+			std::error_code ec;
+			fs::rename(tmp, target, ec);
+			if (!ec)
+				return true;
+
+#ifdef _WIN32
+			if (::MoveFileExW(tmp.c_str(), target.c_str(),
+				MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH) != 0)
+				return true;
+#endif
+
+			qWarning() << "[TwoCameraSpliceCfg] rename失败:"
+				<< QString::fromStdString(tmp.string()) << "->"
+				<< QString::fromStdString(target.string())
+				<< "错误:" << QString::fromStdString(ec.message());
+
+			fs::remove(target, ec);
+			ec.clear();
+			fs::rename(tmp, target, ec);
+			if (ec)
+			{
+				qWarning() << "[TwoCameraSpliceCfg] 兜底rename仍失败:"
+					<< QString::fromStdString(target.string())
+					<< "错误:" << QString::fromStdString(ec.message());
+				return false;
+			}
+			return true;
+		}
 
 		constexpr const char* kCamera1ImageFile = "camera1_picture.bmp";
 		constexpr const char* kCamera2ImageFile = "camera2_picture.bmp";
@@ -40,8 +84,7 @@ namespace Config
 			fs::path tmp = filePath;
 			tmp += ".tmp";
 			HalconCpp::HImage(image).WriteImage(format, 0, tmp.string().c_str());
-			std::error_code ec;
-			fs::rename(tmp, filePath, ec);
+			replaceFile(tmp, filePath);
 		}
 
 		bool readImageSafe(const fs::path& filePath, HalconCpp::HObject& image)
@@ -76,8 +119,7 @@ namespace Config
 			fs::path tmp = filePath;
 			tmp += ".tmp";
 			HalconCpp::WriteObject(obj, tmp.string().c_str());
-			std::error_code ec;
-			fs::rename(tmp, filePath, ec);
+			replaceFile(tmp, filePath);
 		}
 
 		bool readObjectSafe(const fs::path& filePath, HalconCpp::HObject& obj)
@@ -126,8 +168,7 @@ namespace Config
 			ofs << "rectifiedHeight=" << rectHeight << '\n';
 			ofs.close();
 			// NTFS rename 原子替换，不先 remove 避免断电丢失窗口
-			std::error_code ec;
-			fs::rename(tmp, filePath, ec);
+			replaceFile(tmp, filePath);
 		}
 
 		bool readParamsSafe(const fs::path& filePath,
@@ -192,6 +233,57 @@ namespace Config
 
 		constexpr const char* kBackupDir = "backup";
 
+		// 启动时调和残留的 .tmp（上次保存中断或旧版本 rename 静默失败的产物）。
+		// 每次保存都是"先写 tmp、再 rename"，因此 tmp 必然不旧于 target：
+		// - target 缺失：tmp 是唯一副本，直接收养（完成未竟的 rename）；
+		// - target 存在且 tmp 能完整读出：tmp 更新，收养；
+		// - target 存在但 tmp 已损坏（写一半断电截断）：删除 tmp，保留完好的
+		//   target；若 target 也读不出，后续加载自然会走 backup/ 恢复；
+		// - 收养失败（文件被杀软等占用）：保留 tmp，下次启动再试。
+		void reconcileTmpFile(const fs::path& target,
+			const std::function<bool(const fs::path&)>& validate)
+		{
+			std::error_code ec;
+			fs::path tmp = target;
+			tmp += ".tmp";
+			if (!fs::exists(tmp, ec))
+				return;
+
+			const bool targetExists = fs::exists(target, ec);
+			if (!targetExists || validate(tmp))
+			{
+				qWarning() << "[TwoCameraSpliceCfg] 发现残留tmp，收养为正式文件:"
+					<< QString::fromStdString(tmp.string());
+				if (!replaceFile(tmp, target))
+					qWarning() << "[TwoCameraSpliceCfg] tmp收养失败，保留待下次启动处理:"
+						<< QString::fromStdString(tmp.string());
+				return;
+			}
+			qWarning() << "[TwoCameraSpliceCfg] 发现损坏的tmp，删除:"
+				<< QString::fromStdString(tmp.string());
+			fs::remove(tmp, ec);
+		}
+
+		void reconcileTmpDir(const fs::path& dir)
+		{
+			std::error_code ec;
+			if (!fs::is_directory(dir, ec))
+				return;
+			reconcileTmpFile(dir / kCamera1ImageFile, [](const fs::path& p) {
+				HalconCpp::HObject img; return readImageSafe(p, img); });
+			reconcileTmpFile(dir / kCamera2ImageFile, [](const fs::path& p) {
+				HalconCpp::HObject img; return readImageSafe(p, img); });
+			reconcileTmpFile(dir / kMapSingle1File, [](const fs::path& p) {
+				HalconCpp::HObject obj; return readObjectSafe(p, obj); });
+			reconcileTmpFile(dir / kMapSingle2File, [](const fs::path& p) {
+				HalconCpp::HObject obj; return readObjectSafe(p, obj); });
+			reconcileTmpFile(dir / kParamsFile, [](const fs::path& p) {
+				std::string caltab; double c1g, c1e, c2g, c2e, dh, op, bp, dp, pw;
+				int rw, rh;
+				return readParamsSafe(p, caltab, c1g, c1e, c2g, c2e,
+					dh, op, bp, dp, pw, rw, rh); });
+		}
+
 		// 将文件复制到备份目录（.tmp + rename 保证备份写入原子性）
 		void backupFile(const fs::path& srcFile, const fs::path& backupDir)
 		{
@@ -202,12 +294,20 @@ namespace Config
 			const fs::path tmp = backupDir / (srcFile.filename().string() + ".tmp");
 			fs::copy_file(srcFile, tmp, fs::copy_options::overwrite_existing, ec);
 			if (!ec)
-				fs::rename(tmp, dst, ec);
+				replaceFile(tmp, dst);
 		}
 	}
 
 	void TwoCameraSpliceCfg::saveInDir(const std::string& dirPath)
 	{
+		qDebug() << "[TwoCameraSpliceCfg] 保存拼接参数, 目录:" << QString::fromStdString(dirPath)
+			<< "| map1Init=" << MapSingle1.IsInitialized()
+			<< "map2Init=" << MapSingle2.IsInitialized()
+			<< "cam1ImgInit=" << camera1Piccture.IsInitialized()
+			<< "cam2ImgInit=" << camera2Piccture.IsInitialized()
+			<< "| caltab=" << QString::fromStdString(caltabDescrPath)
+			<< "pixTowWorld=" << pixTowWorld
+			<< "rectified=" << rectifiedWidth << "x" << rectifiedHeight;
 		try
 		{
 			const fs::path dir(dirPath);
@@ -222,18 +322,29 @@ namespace Config
 				DiffHeight, OverlapInPercent, BorderInPercent, DistancePlates,
 				pixTowWorld,
 				rectifiedWidth, rectifiedHeight);
+			qDebug() << "[TwoCameraSpliceCfg] 保存完成:" << QString::fromStdString(dirPath);
+		}
+		catch (const std::exception& e)
+		{
+			qWarning() << "[TwoCameraSpliceCfg] 保存异常:" << e.what();
 		}
 		catch (...)
 		{
-			// Ignore save errors to avoid crashing the application.
+			qWarning() << "[TwoCameraSpliceCfg] 保存发生未知异常";
 		}
 	}
 
 	void TwoCameraSpliceCfg::loadInDir(const std::string& dirPath)
 	{
+		qDebug() << "[TwoCameraSpliceCfg] 加载拼接参数, 目录:" << QString::fromStdString(dirPath);
 		try
 		{
 			const fs::path dir(dirPath);
+
+			// 加载前先调和残留的 .tmp（主目录与 backup 都要处理），
+			// 保证后续读到的是最新且完整的数据
+			reconcileTmpDir(dir);
+			reconcileTmpDir(dir / kBackupDir);
 
 			auto tryLoadFromDir = [](const fs::path& d,
 				HalconCpp::HObject& pic1, HalconCpp::HObject& pic2,
@@ -242,13 +353,24 @@ namespace Config
 				double& dh, double& op, double& bp, double& dp, double& pw,
 				int& rw, int& rh) -> bool
 			{
-				readImageSafe(d / kCamera1ImageFile, pic1);
-				readImageSafe(d / kCamera2ImageFile, pic2);
-				readObjectSafe(d / kMapSingle1File,  map1);
-				readObjectSafe(d / kMapSingle2File,  map2);
-				readParamsSafe(d / kParamsFile,
+				const bool img1Ok  = readImageSafe(d / kCamera1ImageFile, pic1);
+				const bool img2Ok  = readImageSafe(d / kCamera2ImageFile, pic2);
+				const bool map1Ok  = readObjectSafe(d / kMapSingle1File,  map1);
+				const bool map2Ok  = readObjectSafe(d / kMapSingle2File,  map2);
+				const bool paramsOk = readParamsSafe(d / kParamsFile,
 					caltab, c1g, c1e, c2g, c2e,
 					dh, op, bp, dp, pw, rw, rh);
+				qDebug() << "[TwoCameraSpliceCfg] 尝试从" << QString::fromStdString(d.string()) << "加载:"
+					<< "cam1图=" << img1Ok << "cam2图=" << img2Ok
+					<< "map1=" << map1Ok << "map2=" << map2Ok
+					<< "params=" << paramsOk
+					<< "| caltab=" << QString::fromStdString(caltab)
+					<< "cam1Gain=" << c1g << "cam1Exposure=" << c1e
+					<< "cam2Gain=" << c2g << "cam2Exposure=" << c2e
+					<< "DiffHeight=" << dh << "Overlap%=" << op
+					<< "Border%=" << bp << "DistancePlates=" << dp
+					<< "pixTowWorld=" << pw
+					<< "rectified=" << rw << "x" << rh;
 				return map1.IsInitialized();  // 核心判断：MapSingle1 就绪即整体就绪
 			};
 
@@ -272,6 +394,7 @@ namespace Config
 				DiffHeight, OverlapInPercent, BorderInPercent, DistancePlates,
 				pixTowWorld, rectifiedWidth, rectifiedHeight))
 			{
+				qDebug() << "[TwoCameraSpliceCfg] 主目录加载成功，备份到backup/";
 				// 开机启动时加载成功 → 备份到 backup/ 供下次断电恢复
 				const fs::path bkDir = dir / kBackupDir;
 				backupFile(dir / kCamera1ImageFile, bkDir);
@@ -282,6 +405,7 @@ namespace Config
 				return;
 			}
 
+			qWarning() << "[TwoCameraSpliceCfg] 主目录加载失败（map1未就绪），尝试从backup/恢复";
 			// 主文件损坏或缺失 → 从 backup/ 恢复
 			const fs::path backupDir = dir / kBackupDir;
 			if (tryLoadFromDir(backupDir,
@@ -290,13 +414,22 @@ namespace Config
 				DiffHeight, OverlapInPercent, BorderInPercent, DistancePlates,
 				pixTowWorld, rectifiedWidth, rectifiedHeight))
 			{
+				qDebug() << "[TwoCameraSpliceCfg] 从backup恢复成功，写回主目录";
 				// 恢复后立即写回主目录
 				saveInDir(dirPath);
 			}
+			else
+			{
+				qWarning() << "[TwoCameraSpliceCfg] 无可用拼接参数：主目录与backup均缺失或损坏";
+			}
+		}
+		catch (const std::exception& e)
+		{
+			qWarning() << "[TwoCameraSpliceCfg] 加载异常:" << e.what();
 		}
 		catch (...)
 		{
-			// Ignore load errors; missing files keep the default values.
+			qWarning() << "[TwoCameraSpliceCfg] 加载发生未知异常";
 		}
 	}
 }
