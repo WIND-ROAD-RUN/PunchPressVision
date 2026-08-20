@@ -4,6 +4,7 @@
 #include <fstream>
 #include <functional>
 #include <string>
+#include <vector>
 
 #include <QDebug>
 
@@ -60,6 +61,18 @@ namespace Config
 		constexpr const char* kParamsFile = "two_camera_splice_params.txt";
 		constexpr const char* kCameraImageFormat = "bmp";
 
+		// 实测 Halcon 24.11 的扩展名规则：WriteImage/WriteObject 在文件名
+		// 不以"该格式可识别的扩展名"结尾时会自动追加（x.bmp.tmp 会被写成
+		// x.bmp.tmp.bmp，x.hobj.tmp 会被写成 x.hobj.tmp.hobj）。
+		// 因此给 Halcon 的临时文件名必须把 .tmp 插在扩展名之前
+		// （camera1_picture.tmp.bmp），保证实际写出的文件名可预测，
+		// 后续 replaceFile 才能找到它。
+		fs::path halconTmpPath(const fs::path& target)
+		{
+			return target.parent_path() /
+				(target.stem().string() + ".tmp" + target.extension().string());
+		}
+
 		std::string trimCr(const std::string& s)
 		{
 			if (!s.empty() && s.back() == '\r')
@@ -80,9 +93,10 @@ namespace Config
 				catch (...) {}
 				return;
 			}
-			// 先写 .tmp 再原子 rename，防止断电截断
-			fs::path tmp = filePath;
-			tmp += ".tmp";
+			// 先写临时文件再原子 rename，防止断电截断。
+			// 注意必须用 halconTmpPath：直接传 x.bmp.tmp 会被 Halcon
+			// 追加扩展名写成 x.bmp.tmp.bmp，导致 rename 找不到源文件。
+			const fs::path tmp = halconTmpPath(filePath);
 			HalconCpp::HImage(image).WriteImage(format, 0, tmp.string().c_str());
 			replaceFile(tmp, filePath);
 		}
@@ -115,9 +129,9 @@ namespace Config
 				catch (...) {}
 				return;
 			}
-			// 先写 .tmp 再原子 rename，防止断电截断
-			fs::path tmp = filePath;
-			tmp += ".tmp";
+			// 先写临时文件再原子 rename，防止断电截断（同上用 halconTmpPath，
+			// 否则 WriteObject 会把 x.hobj.tmp 写成 x.hobj.tmp.hobj）
+			const fs::path tmp = halconTmpPath(filePath);
 			HalconCpp::WriteObject(obj, tmp.string().c_str());
 			replaceFile(tmp, filePath);
 		}
@@ -233,35 +247,47 @@ namespace Config
 
 		constexpr const char* kBackupDir = "backup";
 
-		// 启动时调和残留的 .tmp（上次保存中断或旧版本 rename 静默失败的产物）。
-		// 每次保存都是"先写 tmp、再 rename"，因此 tmp 必然不旧于 target：
-		// - target 缺失：tmp 是唯一副本，直接收养（完成未竟的 rename）；
-		// - target 存在且 tmp 能完整读出：tmp 更新，收养；
-		// - target 存在但 tmp 已损坏（写一半断电截断）：删除 tmp，保留完好的
-		//   target；若 target 也读不出，后续加载自然会走 backup/ 恢复；
-		// - 收养失败（文件被杀软等占用）：保留 tmp，下次启动再试。
+		// 启动时调和残留的临时文件（上次保存中断或旧版本 bug 的产物）。
+		// 可能存在的残留形态（按数据新旧优先级）：
+		// 1) x.bmp.tmp.bmp —— 旧版本把 x.bmp.tmp 传给 Halcon 被自动追加扩展名的产物，
+		//    内容是旧版本每次保存写入的最新完整数据（rename 因源名不符从未生效）；
+		// 2) x.tmp.bmp     —— 现行 halconTmpPath 命名，崩溃在 write 与 rename 之间的残留；
+		// 3) x.bmp.tmp     —— 精确写名者（ofstream/WriteTuple/copy_file）的残留。
+		// 策略：第一个能完整读出的残留收养为正式文件（它一定不旧于正式文件），
+		// 其余残留（损坏或重复）删除；收养失败（被占用）则保留待下次启动。
 		void reconcileTmpFile(const fs::path& target,
 			const std::function<bool(const fs::path&)>& validate)
 		{
-			std::error_code ec;
-			fs::path tmp = target;
-			tmp += ".tmp";
-			if (!fs::exists(tmp, ec))
-				return;
-
-			const bool targetExists = fs::exists(target, ec);
-			if (!targetExists || validate(tmp))
+			std::vector<fs::path> candidates;
+			const std::string ext = target.extension().string();
+			if (!ext.empty())
 			{
-				qWarning() << "[TwoCameraSpliceCfg] 发现残留tmp，收养为正式文件:"
-					<< QString::fromStdString(tmp.string());
-				if (!replaceFile(tmp, target))
-					qWarning() << "[TwoCameraSpliceCfg] tmp收养失败，保留待下次启动处理:"
-						<< QString::fromStdString(tmp.string());
-				return;
+				candidates.push_back(target.string() + ".tmp" + ext);
+				candidates.push_back(halconTmpPath(target));
 			}
-			qWarning() << "[TwoCameraSpliceCfg] 发现损坏的tmp，删除:"
-				<< QString::fromStdString(tmp.string());
-			fs::remove(tmp, ec);
+			candidates.push_back(target.string() + ".tmp");
+
+			std::error_code ec;
+			bool adopted = false;
+			for (const auto& cand : candidates)
+			{
+				if (!fs::exists(cand, ec))
+					continue;
+				if (!adopted && validate(cand))
+				{
+					qWarning() << "[TwoCameraSpliceCfg] 发现残留tmp，收养为正式文件:"
+						<< QString::fromStdString(cand.string());
+					if (replaceFile(cand, target))
+						adopted = true;
+					else
+						qWarning() << "[TwoCameraSpliceCfg] tmp收养失败，保留待下次启动处理:"
+							<< QString::fromStdString(cand.string());
+					continue;
+				}
+				qWarning() << "[TwoCameraSpliceCfg] 清理多余/损坏的tmp:"
+					<< QString::fromStdString(cand.string());
+				fs::remove(cand, ec);
+			}
 		}
 
 		void reconcileTmpDir(const fs::path& dir)

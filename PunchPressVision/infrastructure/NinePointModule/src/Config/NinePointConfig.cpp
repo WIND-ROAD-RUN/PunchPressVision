@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <fstream>
+#include <functional>
 #include <string>
 
 #include <QDebug>
@@ -198,6 +199,42 @@ namespace Config
 			}
 			return true;
 		}
+		// 启动时调和残留的 .tmp（旧版本 rename 静默失败/崩溃中断的产物）。
+		// tmp 是每次保存先写的，必然不旧于正式文件：能完整读出则收养为正式文件
+		//（恢复旧版本保存了但没生效的最新标定），损坏则删除。
+		void reconcileTmpFile(const fs::path& target,
+			const std::function<bool(const fs::path&)>& validate)
+		{
+			std::error_code ec;
+			const fs::path tmp = target.string() + ".tmp";
+			if (!fs::exists(tmp, ec))
+				return;
+			if (validate(tmp))
+			{
+				qWarning() << "[NinePointConfig] 发现残留tmp，收养为正式文件:"
+					<< QString::fromStdString(tmp.string());
+				replaceFile(tmp, target);
+				return;
+			}
+			qWarning() << "[NinePointConfig] 发现损坏的tmp，删除:"
+				<< QString::fromStdString(tmp.string());
+			fs::remove(tmp, ec);
+		}
+
+		void reconcileTmpDir(const fs::path& dir)
+		{
+			std::error_code ec;
+			if (!fs::is_directory(dir, ec))
+				return;
+			reconcileTmpFile(dir / kHomMat2DFile, [](const fs::path& p) {
+				HalconCpp::HTuple t;
+				return readTupleSafe(p, t) && t.Length() >= 6; });
+			reconcileTmpFile(dir / kParamsFile, [](const fs::path& p) {
+				double ml1, ml2, mt, nm, c1e, c1g, c2e, c2g, dist, scl, xo;
+				int xn, yn, xd, yd;
+				return readParamsSafe(p, ml1, ml2, mt, nm, c1e, c1g, c2e, c2g,
+					xn, yn, dist, scl, xd, yd, xo); });
+		}
 	}
 
 	void NinePointCfg::saveInDir(const std::string& dirPath)
@@ -224,6 +261,11 @@ namespace Config
 		try
 		{
 			const fs::path dir(dirPath);
+
+			// 加载前先调和残留的 .tmp（主目录与 backup 都要处理），
+			// 恢复旧版本保存了但 rename 未生效的最新标定
+			reconcileTmpDir(dir);
+			reconcileTmpDir(dir / kBackupDir);
 
 			auto tryLoadTuple = [](const fs::path& file, HalconCpp::HTuple& tuple) -> bool
 			{

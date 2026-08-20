@@ -8,6 +8,13 @@
 
 #include "rwul/oso/oso_StorageContext.hpp"
 
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#endif
+
 namespace inf
 {
 	namespace
@@ -16,6 +23,27 @@ namespace inf
 
 		constexpr const char* kMatchRegionsFile = "match_regions.json";
 		constexpr const char* kBackupDir = "backup";
+
+		// Windows 上 fs::rename 在目标已存在时会失败（非 POSIX 原子替换语义），
+		// 失败时退回 MoveFileExW 强制替换，再兜底 remove+rename，
+		// 避免 .tmp 残留、正式文件永远不更新。
+		void replaceFile(const fs::path& tmp, const fs::path& target)
+		{
+			std::error_code ec;
+			fs::rename(tmp, target, ec);
+			if (!ec)
+				return;
+
+#ifdef _WIN32
+			if (::MoveFileExW(tmp.c_str(), target.c_str(),
+				MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH) != 0)
+				return;
+#endif
+
+			fs::remove(target, ec);
+			ec.clear();
+			fs::rename(tmp, target, ec);
+		}
 
 		void writeJsonSafe(const fs::path& filePath, const Json::Value& root)
 		{
@@ -31,8 +59,7 @@ namespace inf
 				std::unique_ptr<Json::StreamWriter> writer(builder.newStreamWriter());
 				writer->write(root, &ofs);
 			}
-			std::error_code ec;
-			fs::rename(tmp, filePath, ec);
+			replaceFile(tmp, filePath);
 		}
 
 		bool readJsonSafe(const fs::path& filePath, Json::Value& root)
@@ -62,6 +89,19 @@ namespace inf
 		try
 		{
 			const fs::path filePath = fs::path(configDir) / kMatchRegionsFile;
+
+			// 旧版本 rename 静默失败会留下含最新数据的 .tmp，能解析则收养
+			const fs::path tmp = filePath.string() + ".tmp";
+			std::error_code ec;
+			if (fs::exists(tmp, ec))
+			{
+				Json::Value tmpRoot;
+				if (readJsonSafe(tmp, tmpRoot))
+					replaceFile(tmp, filePath);
+				else
+					fs::remove(tmp, ec);
+			}
+
 			Json::Value root;
 			if (!readJsonSafe(filePath, root) || !root.isArray())
 				return;

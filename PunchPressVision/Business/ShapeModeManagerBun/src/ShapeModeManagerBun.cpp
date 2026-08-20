@@ -11,6 +11,13 @@
 
 #include "global/GlobalPath.hpp"
 
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#endif
+
 namespace bun
 {
 	ShapeModeManagerBun::ShapeModeManagerBun(inf::infrastructure& inf, infTool::infTool& infTool)
@@ -1282,7 +1289,9 @@ namespace bun
 					root.append(m.modelId);
 			}
 
-			// 原子写入：先写 .tmp，再重命名
+			// 原子写入：先写 .tmp，再重命名。
+			// Windows 上 fs::rename 在目标已存在时会失败（非 POSIX 语义），
+			// 需退回 MoveFileExW 强制替换，否则 .tmp 残留、正式文件永远不更新。
 			const std::string tmpPath = filePath + ".tmp";
 			{
 				std::ofstream ofs(tmpPath, std::ios::out | std::ios::trunc);
@@ -1294,7 +1303,23 @@ namespace bun
 				writer->write(root, &ofs);
 				ofs << '\n';
 			}
-			std::filesystem::rename(tmpPath, filePath);
+			std::error_code ec;
+			std::filesystem::rename(tmpPath, filePath, ec);
+#ifdef _WIN32
+			if (ec)
+			{
+				if (::MoveFileExW(std::filesystem::path(tmpPath).c_str(),
+					std::filesystem::path(filePath).c_str(),
+					MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH) != 0)
+					ec.clear();
+			}
+#endif
+			if (ec)
+			{
+				std::filesystem::remove(filePath, ec);
+				ec.clear();
+				std::filesystem::rename(tmpPath, filePath, ec);
+			}
 		}
 		catch (...)
 		{
@@ -1334,6 +1359,42 @@ namespace bun
 		try
 		{
 			const std::string filePath = global::path::configDir() + "last_loaded_models.json";
+
+			// 旧版本 rename 失败会留下含最新数据的 .tmp，能解析则收养
+			const std::string tmpPath = filePath + ".tmp";
+			std::error_code tmpEc;
+			if (std::filesystem::exists(tmpPath, tmpEc))
+			{
+				bool parseOk = false;
+				{
+					std::ifstream ifs(tmpPath);
+					Json::Value tmpRoot;
+					Json::CharReaderBuilder builder;
+					builder["collectComments"] = false;
+					std::string errs;
+					parseOk = ifs && Json::parseFromStream(builder, ifs, &tmpRoot, &errs);
+				}
+				if (parseOk)
+				{
+					std::filesystem::rename(tmpPath, filePath, tmpEc);
+#ifdef _WIN32
+					if (tmpEc)
+					{
+						if (::MoveFileExW(std::filesystem::path(tmpPath).c_str(),
+							std::filesystem::path(filePath).c_str(),
+							MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH) != 0)
+							tmpEc.clear();
+					}
+#endif
+					// 收养失败（被占用）则保留，下次启动再试
+				}
+				else
+				{
+					// 已损坏（写一半断电），删除
+					std::filesystem::remove(tmpPath, tmpEc);
+				}
+			}
+
 			if (!std::filesystem::exists(filePath))
 				return;
 

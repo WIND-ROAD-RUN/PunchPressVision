@@ -2,7 +2,18 @@
 
 #include <filesystem>
 #include <fstream>
+#include <functional>
+#include <vector>
 #include <json/json.h>
+
+#include <QDebug>
+
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#endif
 
 namespace Config
 {
@@ -25,14 +36,47 @@ namespace Config
 		constexpr const char* kJpegFormat = "jpeg";
 		constexpr int kJpegQuality = 90;
 
-		void replaceFile(const fs::path& tmp, const fs::path& target)
+		// Windows 上 fs::rename 在目标已存在时会失败（非 POSIX 原子替换语义），
+		// 失败时退回 MoveFileExW 强制替换，再兜底 remove+rename。
+		bool replaceFile(const fs::path& tmp, const fs::path& target)
 		{
-			if (fs::exists(target))
+			std::error_code ec;
+			fs::rename(tmp, target, ec);
+			if (!ec)
+				return true;
+
+#ifdef _WIN32
+			if (::MoveFileExW(tmp.c_str(), target.c_str(),
+				MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH) != 0)
+				return true;
+#endif
+
+			qWarning() << "[ShapeModelItem] rename失败:"
+				<< QString::fromStdString(tmp.string()) << "->"
+				<< QString::fromStdString(target.string())
+				<< "错误:" << QString::fromStdString(ec.message());
+
+			fs::remove(target, ec);
+			ec.clear();
+			fs::rename(tmp, target, ec);
+			if (ec)
 			{
-				try { fs::remove(target); }
-				catch (...) {}
+				qWarning() << "[ShapeModelItem] 兜底rename仍失败:"
+					<< QString::fromStdString(target.string())
+					<< "错误:" << QString::fromStdString(ec.message());
+				return false;
 			}
-			fs::rename(tmp, target);
+			return true;
+		}
+
+		// 实测 Halcon 24.11：WriteImage/WriteObject 在文件名不以该格式可识别的
+		// 扩展名结尾时会自动追加（x.jpg.tmp 会被写成 x.jpg.tmp.jpg）。
+		// 给 Halcon 的临时文件名必须把 .tmp 插在扩展名之前（x.tmp.jpg），
+		// 保证实际写出的文件名可预测。
+		fs::path halconTmpPath(const fs::path& target)
+		{
+			return target.parent_path() /
+				(target.stem().string() + ".tmp" + target.extension().string());
 		}
 
 		bool readJsonSafe(const fs::path& filePath, Json::Value& root)
@@ -81,8 +125,11 @@ namespace Config
 				HalconCpp::HImage fullImage;
 				HalconCpp::FullDomain(HalconCpp::HImage(image), &fullImage);
 				fs::create_directories(filePath.parent_path());
-				fs::path tmp = filePath;
+				// 临时名必须把 .tmp 插在扩展名之前，否则 Halcon 会再追加一个
+				// .jpg（x.jpg.tmp → x.jpg.tmp.jpg），rename 找不到源文件
+				const fs::path tmp = halconTmpPath(filePath);
 				fullImage.WriteImage(kJpegFormat, 0, tmp.string().c_str());
+				replaceFile(tmp, filePath);
 			}
 			catch (...) {}
 		}
@@ -107,9 +154,14 @@ namespace Config
 			if (!obj.IsInitialized())
 				return;
 			fs::create_directories(filePath.parent_path());
-			fs::path tmp = filePath;
-			try { HalconCpp::WriteObject(obj, tmp.string().c_str()); }
-			catch (...) { return; }
+			// 同上：x.hobj.tmp 会被 WriteObject 写成 x.hobj.tmp.hobj
+			const fs::path tmp = halconTmpPath(filePath);
+			try
+			{
+				HalconCpp::WriteObject(obj, tmp.string().c_str());
+				replaceFile(tmp, filePath);
+			}
+			catch (...) {}
 		}
 
 		bool readObjectSafe(const fs::path& filePath, HalconCpp::HObject& obj)
@@ -327,6 +379,50 @@ namespace Config
 			return true;
 		}
 
+		// 启动时调和残留的临时文件。残留形态（按数据新旧优先级）：
+		// 1) x.jpg.tmp.jpg —— 旧版本把 x.jpg.tmp 传给 Halcon 被自动追加扩展名的产物
+		//    （旧版 replaceFile 先删了正式文件、rename 又失败，此残留是唯一数据）；
+		// 2) x.tmp.jpg     —— 现行 halconTmpPath 命名，崩溃在 write 与 rename 之间；
+		// 3) x.jpg.tmp     —— 精确写名者（ofstream/WriteTuple）的残留。
+		// 第一个能完整读出的收养为正式文件，其余删除；收养失败（被占用）保留待下次。
+		void reconcileTmpFile(const fs::path& target,
+			const std::function<bool(const fs::path&)>& validate)
+		{
+			std::vector<fs::path> candidates;
+			const std::string ext = target.extension().string();
+			if (!ext.empty())
+			{
+				candidates.push_back(target.string() + ".tmp" + ext);
+				candidates.push_back(halconTmpPath(target));
+			}
+			candidates.push_back(target.string() + ".tmp");
+
+			std::error_code ec;
+			bool adopted = false;
+			for (const auto& cand : candidates)
+			{
+				if (!fs::exists(cand, ec))
+					continue;
+				if (!adopted && validate(cand))
+				{
+					qWarning() << "[ShapeModelItem] 发现残留tmp，收养为正式文件:"
+						<< QString::fromStdString(cand.string());
+					if (replaceFile(cand, target))
+						adopted = true;
+					continue;
+				}
+				qWarning() << "[ShapeModelItem] 清理多余/损坏的tmp:"
+					<< QString::fromStdString(cand.string());
+				fs::remove(cand, ec);
+			}
+		}
+
+		bool fileNonEmpty(const fs::path& p)
+		{
+			std::error_code ec;
+			return fs::is_regular_file(p, ec) && fs::file_size(p, ec) > 0;
+		}
+
 		void unionRoiList(const std::vector<HalconCpp::HObject>& roiList, HalconCpp::HObject& outUnion, bool& outHasUnion)
 		{
 			outUnion.Clear();
@@ -367,6 +463,15 @@ namespace Config
 		try
 		{
 			const fs::path dirPath(dir);
+
+			// 加载前调和残留临时文件（恢复旧版本保存了但 rename 未生效的图像/参数）
+			reconcileTmpFile(dirPath / kTemplateImageFile, [](const fs::path& p) {
+				HalconCpp::HImage img; return readImageSafe(p, img); });
+			reconcileTmpFile(dirPath / kOriginalImageFile, [](const fs::path& p) {
+				HalconCpp::HImage img; return readImageSafe(p, img); });
+			reconcileTmpFile(dirPath / kAnnotatedImageFile, [](const fs::path& p) {
+				HalconCpp::HImage img; return readImageSafe(p, img); });
+			reconcileTmpFile(dirPath / kParamsFile, fileNonEmpty);
 
 			// 加载基本参数
 			readParamsSafe(dirPath / kParamsFile,
@@ -535,6 +640,9 @@ namespace Config
 		{
 			const fs::path dirPath(dir);
 			folder_path_ = dirPath.string();
+
+			reconcileTmpFile(dirPath / kModelInfoFile, [](const fs::path& p) {
+				Json::Value v; return readJsonSafe(p, v); });
 
 			Json::Value root;
 			if (!readJsonSafe(dirPath / kModelInfoFile, root))
