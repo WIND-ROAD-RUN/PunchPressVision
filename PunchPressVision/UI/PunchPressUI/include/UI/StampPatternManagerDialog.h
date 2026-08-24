@@ -20,7 +20,7 @@ namespace ui
 	/// <summary>
 	/// 套版（StampPattern）图库管理对话框。
 	/// 左侧套版列表，右侧预览 + 详情 + 操作。
-	/// 支持导入自定义图片、重命名、删除。
+	/// 支持导入 CAD DXF 图纸与自定义图片、重命名、删除。
 	/// </summary>
 	class StampPatternManagerDialog : public QDialog
 	{

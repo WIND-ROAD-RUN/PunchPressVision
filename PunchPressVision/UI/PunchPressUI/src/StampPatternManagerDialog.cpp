@@ -13,9 +13,13 @@
 #include <QVBoxLayout>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QDir>
+#include <QStandardPaths>
+#include <QUuid>
 
 #include "app/PunchPressApp.hpp"
 #include "Business/StampPatternBun/StampPatternBun.hpp"
+#include "UI/DxfRegionSelectDialog.h"
 
 #ifdef MessageBox
 #undef MessageBox
@@ -166,7 +170,19 @@ namespace ui
 		{
 			if (item.data._patternImage.IsInitialized())
 			{
-				try { labelImgPreview_->displayImage(item.data._patternImage); }
+				// 4 通道 RGBA 在 Halcon 窗口中仅显示第一通道（红十字所在 R 通道），
+				// 合成 RGB 三通道预览才能看到蓝色线条
+				try
+				{
+					HalconCpp::HImage preview = item.data._patternImage;
+					if (preview.CountChannels().I() == 4)
+					{
+						HalconCpp::HImage r, g, b, a;
+						HalconCpp::Decompose4(preview, &r, &g, &b, &a);
+						HalconCpp::Compose3(r, g, b, &preview);
+					}
+					labelImgPreview_->displayImage(preview);
+				}
 				catch (...) {}
 			}
 			else
@@ -194,18 +210,46 @@ namespace ui
 	void StampPatternManagerDialog::onImport()
 	{
 		const QString filePath = QFileDialog::getOpenFileName(this,
-			QStringLiteral("选择套版图片"),
+			QStringLiteral("选择套版文件"),
 			QString(),
-			QStringLiteral("图片 (*.png *.bmp *.jpg *.jpeg *.tif *.tiff)"));
+			QStringLiteral("套版文件 (*.dxf *.png *.bmp *.jpg *.jpeg *.tif *.tiff);;CAD 图纸 (*.dxf);;图片 (*.png *.bmp *.jpg *.jpeg *.tif *.tiff)"));
 		if (filePath.isEmpty())
 			return;
+
+		// DXF 图纸：先弹区域选择对话框（多图案图纸框选所需部分），
+		// 确定后将选中轮廓渲染为临时 RGBA PNG，再走统一图片导入
+		std::string importPath = filePath.toStdString();
+		QString tempPng;
+		if (filePath.endsWith(QStringLiteral(".dxf"), Qt::CaseInsensitive))
+		{
+			DxfRegionSelectDialog dlg(filePath, this);
+			if (dlg.exec() != QDialog::Accepted)
+				return;
+
+			tempPng = QDir(QStandardPaths::writableLocation(QStandardPaths::TempLocation))
+				.filePath(QStringLiteral("ppv_dxf_%1.png")
+					.arg(QUuid::createUuid().toString(QUuid::WithoutBraces)));
+			if (!inf::renderDxfContoursToRgbaPng(dlg.selectedContours(), tempPng.toStdString()))
+			{
+				rw::rqwu::MessageBox::warning(this,
+					QStringLiteral("导入失败"),
+					QStringLiteral("DXF 渲染失败，请检查图纸内容。"));
+				QFile::remove(tempPng);
+				return;
+			}
+			importPath = tempPng.toStdString();
+		}
 
 		// 默认名称 = 文件名（去扩展名）
 		const QString defaultName = QFileInfo(filePath).completeBaseName();
 
 		fullKeyboard_->setValue(defaultName);
 		if (fullKeyboard_->exec() != QDialog::Accepted)
+		{
+			if (!tempPng.isEmpty())
+				QFile::remove(tempPng);
 			return;
+		}
 
 		QString name = fullKeyboard_->getValue().trimmed();
 		if (name.isEmpty())
@@ -213,15 +257,23 @@ namespace ui
 
 		auto& bun = app_.business().stamp_pattern_bun;
 		if (!bun)
+		{
+			if (!tempPng.isEmpty())
+				QFile::remove(tempPng);
 			return;
+		}
 
 		const Config::StampPatternInfo info = bun->importPattern(
-			filePath.toStdString(), name.toStdString());
+			importPath, name.toStdString());
+
+		if (!tempPng.isEmpty())
+			QFile::remove(tempPng);
+
 		if (info.getId().empty())
 		{
 			rw::rqwu::MessageBox::warning(this,
 				QStringLiteral("导入失败"),
-				QStringLiteral("无法导入所选图片，请检查文件是否为有效图片。"));
+				QStringLiteral("无法导入所选文件，请检查文件是否为有效图片或 CAD DXF 图纸。"));
 			return;
 		}
 

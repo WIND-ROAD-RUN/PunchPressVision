@@ -21,6 +21,7 @@ target_link_libraries(${Inf_TARGET}
 	PUBLIC Halcon
 	PUBLIC JsonCpp::JsonCpp
 	PUBLIC Qt::Core
+	PUBLIC Qt::Gui
 )
 
 target_include_directories(${Inf_TARGET}

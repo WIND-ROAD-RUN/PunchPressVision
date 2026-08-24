@@ -30,7 +30,7 @@ namespace bun
 		explicit StampPatternBun(inf::infrastructure& inf);
 
 		// ---------- 图库 CRUD（转发到基础设施 StampPatternModule） ----------
-		/// <summary>导入用户图片（原始字节复制，保留透明通道）。失败返回空 info（id 为空）。</summary>
+		/// <summary>导入套版文件（图片原始字节复制保留透明通道；CAD DXF 图纸渲染为 RGBA 图片）。失败返回空 info（id 为空）。</summary>
 		Config::StampPatternInfo importPattern(const std::string& sourceImagePath, const std::string& name);
 		/// <summary>删除套版。若已加载则先卸载。</summary>
 		void deletePattern(const std::string& id);

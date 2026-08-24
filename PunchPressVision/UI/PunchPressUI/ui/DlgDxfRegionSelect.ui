@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DlgDxfRegionSelectClass</class>
+ <widget class="QDialog" name="DlgDxfRegionSelectClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1400</width>
+    <height>800</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>选择 DXF 套版区域</string>
+  </property>
+  <layout class="QVBoxLayout" name="vLayout_root" stretch="1,0">
+   <item>
+    <widget class="QGroupBox" name="gBox_imgPreview">
+     <property name="styleSheet">
+      <string notr="true">QGroupBox {
+    font-size: 20px;
+    font-weight: bold;
+    background-color: rgb(181, 181, 181);
+    border: 1px solid #e0e0e0;
+    border-radius: 15px;
+    padding-top: 28px;
+}
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    left: 10px;
+    top: 4px;
+    padding: 0 5px;
+    color: #2c3e50;
+}</string>
+     </property>
+     <property name="title">
+      <string>预览（点击"绘制区域"后左键拖拽框选需要的图案；可绘制多个区域）</string>
+     </property>
+     <layout class="QVBoxLayout" name="vLayout_preview">
+      <item>
+       <widget class="QLabel" name="label_imgPreview">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>320</width>
+          <height>240</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="hLayout_actions">
+     <item>
+      <widget class="QPushButton" name="pbtn_draw">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>56</height>
+        </size>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+    padding: 6px 14px;
+    border: 2px solid #CCC;
+    border-radius: 4px;
+    background-color: white;
+    color: #444;
+    font-size: 20px;
+}
+QPushButton:hover {
+    border-color: #999;
+    background-color: #F5F5F5;
+}
+QPushButton:checked {
+    border-color: #FF9800;
+    background-color: #FF9800;
+    color: white;
+    font-weight: bold;
+}</string>
+       </property>
+       <property name="text">
+        <string>绘制区域</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pbtn_undo">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>56</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+    padding: 6px 14px;
+    border: 2px solid #CCC;
+    border-radius: 4px;
+    background-color: white;
+    color: #444;
+    font-size: 20px;
+}
+QPushButton:hover {
+    border-color: #999;
+    background-color: #F5F5F5;
+}
+QPushButton:pressed {
+    border-color: #777;
+    background-color: #EEE;
+}</string>
+       </property>
+       <property name="text">
+        <string>撤回</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pbtn_confirm">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>56</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+    padding: 6px 14px;
+    border: 2px solid #2196F3;
+    border-radius: 4px;
+    background-color: #2196F3;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+}
+QPushButton:hover {
+    border-color: #1565C0;
+    background-color: #1565C0;
+}
+QPushButton:pressed {
+    border-color: #0D47A1;
+    background-color: #0D47A1;
+}</string>
+       </property>
+       <property name="text">
+        <string>确定</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pbtn_cancel">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>56</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+    padding: 6px 14px;
+    border: 2px solid #CCC;
+    border-radius: 4px;
+    background-color: white;
+    color: #444;
+    font-size: 20px;
+}
+QPushButton:hover {
+    border-color: #999;
+    background-color: #F5F5F5;
+}
+QPushButton:pressed {
+    border-color: #777;
+    background-color: #EEE;
+}</string>
+       </property>
+       <property name="text">
+        <string>取消</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

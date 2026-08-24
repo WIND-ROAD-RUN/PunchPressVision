@@ -131,7 +131,19 @@ namespace ui
 		const Config::StampPatternItem item = bun->getPatternItem(allPatterns_.at(row).getId());
 		if (item.data._patternImage.IsInitialized())
 		{
-			try { labelImgPreview_->displayImage(item.data._patternImage); }
+			// 4 通道 RGBA 在 Halcon 窗口中仅显示第一通道（红十字所在 R 通道），
+			// 合成 RGB 三通道预览才能看到蓝色线条
+			try
+			{
+				HalconCpp::HImage preview = item.data._patternImage;
+				if (preview.CountChannels().I() == 4)
+				{
+					HalconCpp::HImage r, g, b, a;
+					HalconCpp::Decompose4(preview, &r, &g, &b, &a);
+					HalconCpp::Compose3(r, g, b, &preview);
+				}
+				labelImgPreview_->displayImage(preview);
+			}
 			catch (...) {}
 		}
 		else

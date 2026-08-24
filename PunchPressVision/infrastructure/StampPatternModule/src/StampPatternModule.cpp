@@ -1,5 +1,6 @@
 #include "infrastructure/StampPatternModule/StampPatternModule.hpp"
 #include "infrastructure/StampPatternModule/StampPatternModulePath.hpp"
+#include "infrastructure/StampPatternModule/DxfPatternRenderer.hpp"
 
 #include <QDateTime>
 #include <QUuid>
@@ -9,6 +10,18 @@
 
 namespace inf
 {
+    namespace
+    {
+        // 判断文件是否为 CAD DXF 图纸（按扩展名，忽略大小写）
+        bool isDxfFile(const std::string& path)
+        {
+            std::string ext = std::filesystem::path(path).extension().string();
+            std::transform(ext.begin(), ext.end(), ext.begin(),
+                [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+            return ext == ".dxf";
+        }
+    }
+
     StampPatternModule::StampPatternModule()
     {
     }
@@ -69,8 +82,13 @@ namespace inf
             // 先落 info + 默认参数（建立目录并写元数据）
             item.saveInDir(info.getFolderPath());
 
-            // 原始复制用户图片（保留透明通道）；失败则回滚刚创建的目录
-            if (!Config::copyImageFile(sourceImagePath, info.getFolderPath() + "/" + Config::kPatternImageFileName))
+            // 写入套版图片；失败则回滚刚创建的目录。
+            // DXF 图纸：解析轮廓并渲染为 RGBA 图片；普通图片：原始字节复制（保留透明通道）
+            const std::string imageDst = info.getFolderPath() + "/" + Config::kPatternImageFileName;
+            const bool imageOk = isDxfFile(sourceImagePath)
+                ? renderDxfToRgbaPng(sourceImagePath, imageDst)
+                : Config::copyImageFile(sourceImagePath, imageDst);
+            if (!imageOk)
             {
                 const fs::path dirPath(info.getFolderPath());
                 if (fs::exists(dirPath))

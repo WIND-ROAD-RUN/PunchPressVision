@@ -26,7 +26,8 @@ namespace inf
     public:
         void readAllStampPatternInfos();
     public:
-        // 增：导入用户图片（原始字节复制，保留透明通道），返回生成的 info；失败返回空 info
+        // 增：导入套版文件，返回生成的 info；失败返回空 info。
+        // 支持普通图片（原始字节复制，保留透明通道）与 CAD DXF 图纸（渲染为 RGBA 图片）。
         Config::StampPatternInfo importStampPattern(const std::string& sourceImagePath, const std::string& name);
         // 删
         void deleteStampPattern(const std::string& id);
