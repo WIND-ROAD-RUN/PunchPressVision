@@ -76,6 +76,9 @@ namespace ui
 		stampAlpha_ = alpha;
 		hasStampPattern_ = true;
 		stampDragging_ = false;
+		// 已定义中心点时，套版中心（图中心红十字）需与中心点重合
+		if (hasCenterPoint_)
+			alignStampCenterTo(centerPoint_);
 		refreshOverlay();
 	}
 
@@ -112,6 +115,63 @@ namespace ui
 		HalconCpp::HomMat2dRotate(h, angle, 0.0, 0.0, &h);
 		HalconCpp::HomMat2dTranslate(h, row, col, &h);
 		return h;
+	}
+
+	void ShapeEditor::alignStampCenterTo(const QPointF& imagePoint)
+	{
+		if (!hasStampPattern_ || !stampPatternImage_.IsInitialized())
+			return;
+
+		try
+		{
+			// 套版图中心（渲染时红十字固定在包围盒中心，即图像中心）
+			const double pr = stampPatternImage_.Height().D() / 2.0;
+			const double pc = stampPatternImage_.Width().D() / 2.0;
+
+			// 用不含平移的变换（缩放→旋转）求图案中心的落点，
+			// 平移量 = 目标点 - 落点，使图案中心精确对齐目标点
+			const HalconCpp::HTuple h = stampHomMat2D(0.0, 0.0, stampAngle_, stampScale_);
+			HalconCpp::HTuple r, c;
+			HalconCpp::AffineTransPoint2d(h, pr, pc, &r, &c);
+			if (r.TupleLength() > 0 && c.TupleLength() > 0)
+			{
+				stampRow_ = imagePoint.y() - r[0].D();
+				stampCol_ = imagePoint.x() - c[0].D();
+			}
+		}
+		catch (...) {}
+	}
+
+	QPointF ShapeEditor::stampCenterImagePoint() const
+	{
+		if (!hasStampPattern_ || !stampPatternImage_.IsInitialized())
+			return QPointF();
+
+		try
+		{
+			const double pr = stampPatternImage_.Height().D() / 2.0;
+			const double pc = stampPatternImage_.Width().D() / 2.0;
+			const HalconCpp::HTuple h = stampHomMat2D(stampRow_, stampCol_, stampAngle_, stampScale_);
+			HalconCpp::HTuple r, c;
+			HalconCpp::AffineTransPoint2d(h, pr, pc, &r, &c);
+			if (r.TupleLength() > 0 && c.TupleLength() > 0)
+				return QPointF(c[0].D(), r[0].D());
+		}
+		catch (...) {}
+		return QPointF();
+	}
+
+	void ShapeEditor::setStampOffsetFromCenter(double dRow, double dCol, double angleRad)
+	{
+		if (!hasStampPattern_ || !hasCenterPoint_)
+			return;
+
+		// 先更新旋转角（alignStampCenterTo 使用当前角度计算落点），
+		// 再把套版中心放置到 中心点 + 位移 处
+		stampAngle_ = angleRad;
+		alignStampCenterTo(QPointF(centerPoint_.x() + dCol, centerPoint_.y() + dRow));
+		refreshOverlay();
+		emit stampPatternChanged();
 	}
 
 	HalconCpp::HImage ShapeEditor::compositeStamp(const HalconCpp::HImage& base,
@@ -263,8 +323,25 @@ namespace ui
 
 	void ShapeEditor::setCenterPoint(const QPointF& point)
 	{
+		const bool hadCenter = hasCenterPoint_;
+		const QPointF oldPoint = centerPoint_;
 		centerPoint_ = point;
 		hasCenterPoint_ = true;
+		if (hasStampPattern_)
+		{
+			if (hadCenter)
+			{
+				// 中心点平移时套版整体跟随，保持与中心点的相对位移（偏移量不变）
+				stampRow_ += point.y() - oldPoint.y();
+				stampCol_ += point.x() - oldPoint.x();
+			}
+			else
+			{
+				// 首次定义中心点：套版中心与其重合（偏移量归零）
+				alignStampCenterTo(point);
+			}
+			emit stampPatternChanged();
+		}
 		refreshOverlay();
 		emit centerPointChanged();
 	}
@@ -536,10 +613,8 @@ namespace ui
 				}
 				else if (tool_ == Tool::CenterPoint)
 				{
-					centerPoint_ = widgetToImage(me->pos());
-					hasCenterPoint_ = true;
-					refreshOverlay();
-					emit centerPointChanged();
+					// 与 setCenterPoint 同一入口：套版跟随逻辑集中在一处
+					setCenterPoint(widgetToImage(me->pos()));
 					return true;
 				}
 				else if (tool_ == Tool::StampPattern && hasStampPattern_)

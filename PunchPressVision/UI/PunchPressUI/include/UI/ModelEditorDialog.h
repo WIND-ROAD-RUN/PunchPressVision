@@ -94,6 +94,15 @@ namespace ui
 		/// 将当前套版对齐参数写回套版库
 		void persistStampPatternAlignment();
 
+		/// 套版对齐变化时，由套版相对中心点的位移/旋转推导模型偏移量（mm/deg）
+		void syncOffsetsFromStamp();
+		/// 按当前偏移量重建套版位置（手动修改偏移量或加载模型后调用）
+		void applyOffsetsToStamp();
+		/// 刷新偏差补偿按钮显示
+		void updateOffsetButtons();
+		/// 九点标定矩阵（像素 -> 世界 mm）；无标定返回 false
+		bool ninePointHomMat2D(HalconCpp::HTuple& out) const;
+
 		HalconCpp::HImage preprocessImage(const HalconCpp::HImage& image) const;
 
 		// 构建 CreateModelRequest（供识别和创建共用）
@@ -134,5 +143,10 @@ namespace ui
 		bool contrastAuto_{ true };
 		int contrast_{ 30 };
 		int minContrast_{ 10 };
+
+		// 匹配结果偏差补偿（X/Y 单位 mm，角度单位 deg，生产匹配时叠加）
+		double offsetX_{ 0.0 };
+		double offsetY_{ 0.0 };
+		double offsetAngle_{ 0.0 };
 	};
 }

@@ -28,7 +28,10 @@ namespace inf
     public:
         // 增：导入套版文件，返回生成的 info；失败返回空 info。
         // 支持普通图片（原始字节复制，保留透明通道）与 CAD DXF 图纸（渲染为 RGBA 图片）。
-        Config::StampPatternInfo importStampPattern(const std::string& sourceImagePath, const std::string& name);
+        // fromDxf：源为 DXF 实际尺寸图纸时为 true（调用方经裁剪渲染成临时 PNG 后扩展名已丢失，
+        // 需显式告知），叠加时按九点标定换算像素尺寸。
+        Config::StampPatternInfo importStampPattern(const std::string& sourceImagePath, const std::string& name,
+            bool fromDxf = false);
         // 删
         void deleteStampPattern(const std::string& id);
         // 查：单个（含图片数据）

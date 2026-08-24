@@ -584,6 +584,11 @@ namespace app
 				if (!data._patternImage.IsInitialized())
 					continue;
 
+				// DXF 套版：图像素单位为实际尺寸(mm)，按九点标定换算为像素尺寸
+				if (data.fromDxf)
+					data.alignScale *= bun::StampPatternBun::pixelsPerWorldUnit(
+						business_.infrastructure());
+
 				// H_A: 套版图 -> 模板参考(训练)图像；H_rigid: 参考图像 -> 当前匹配位姿
 				const HalconCpp::HTuple H_A =
 					bun::StampPatternBun::buildAlignHomMat2D(data);

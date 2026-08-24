@@ -264,7 +264,7 @@ namespace ui
 		}
 
 		const Config::StampPatternInfo info = bun->importPattern(
-			importPath, name.toStdString());
+			importPath, name.toStdString(), !tempPng.isEmpty());
 
 		if (!tempPng.isEmpty())
 			QFile::remove(tempPng);

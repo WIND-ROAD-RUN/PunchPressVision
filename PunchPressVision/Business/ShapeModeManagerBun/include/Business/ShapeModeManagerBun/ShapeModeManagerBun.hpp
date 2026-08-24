@@ -32,6 +32,11 @@ namespace bun
 		QPointF centerPoint;                 // 手动指定的中心点（可选）
 		bool hasCenterPoint{ false };        // 是否使用手动中心点
 		std::string stampPatternId;          // 关联的套版 id（空 = 不使用套版）
+
+		// 匹配结果偏差补偿（生产匹配时叠加：X/Y 单位 mm，角度单位 deg）
+		double offsetX{ 0.0 };               // 左右偏差
+		double offsetY{ 0.0 };               // 上下偏差
+		double offsetAngle{ 0.0 };           // 旋转角度偏差
 		QString name;                        // 模型名称（空则用时间戳）
 		double exposure{ 0.0 };
 		double gain{ 0.0 };

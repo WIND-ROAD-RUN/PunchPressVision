@@ -153,6 +153,30 @@ namespace ui
 				ui->btn_mincontrast->setText(QString::number(minContrast_));
 		});
 
+		// 偏差补偿（匹配结果叠加：X/Y 单位 mm，角度单位 deg）
+		connect(ui->btn_offsetX, &QPushButton::clicked, this, [this]()
+		{
+			if (inputDoubleParam(ui->btn_offsetX, offsetX_, -1000.0, 1000.0, 2,
+				QStringLiteral("左右偏差(mm)")))
+				applyOffsetsToStamp();
+		});
+		connect(ui->btn_offsetY, &QPushButton::clicked, this, [this]()
+		{
+			if (inputDoubleParam(ui->btn_offsetY, offsetY_, -1000.0, 1000.0, 2,
+				QStringLiteral("上下偏差(mm)")))
+				applyOffsetsToStamp();
+		});
+		connect(ui->btn_offsetAngle, &QPushButton::clicked, this, [this]()
+		{
+			if (inputDoubleParam(ui->btn_offsetAngle, offsetAngle_, -180.0, 180.0, 2,
+				QStringLiteral("角度偏差(°)")))
+				applyOffsetsToStamp();
+		});
+
+		// 拖动/旋转套版 → 由套版相对中心点的位移推导模型偏移量（与主程序同一偏移量）
+		connect(shapeEditor_, &ShapeEditor::stampPatternChanged,
+			this, &ModelEditorDialog::syncOffsetsFromStamp);
+
 		// 预处理参数变化时刷新显示
 		connect(ui->comboBox_ImageType, QOverload<int>::of(&QComboBox::currentIndexChanged),
 			this, &ModelEditorDialog::refreshProcessedImage);
@@ -329,9 +353,16 @@ namespace ui
 			}
 
 			stampPatternId_ = id;
+			// DXF 套版：图素单位为实际尺寸(mm)，需乘上九点标定的像素/mm 才能与图像匹配
+			double scale = item.data.alignScale;
+			if (item.data.fromDxf)
+				scale *= bun::StampPatternBun::pixelsPerWorldUnit(
+					app_.business().infrastructure());
 			shapeEditor_->setStampPattern(item.data._patternImage,
 				item.data.alignRow, item.data.alignCol, item.data.alignAngle,
-				item.data.alignScale, item.data.alpha);
+				scale, item.data.alpha);
+			// 套版中心吸附到中心点后，由位移推导偏移量（初次为 0）
+			syncOffsetsFromStamp();
 		}
 		updateStampPatternStatus();
 	}
@@ -359,14 +390,107 @@ namespace ui
 		auto& bun = app_.business().stamp_pattern_bun;
 		if (!bun) return;
 
-		Config::StampPatternData data;
+		// 先取回库中现有数据，保留 fromDxf 等标记位
+		Config::StampPatternData data = bun->getPatternItem(stampPatternId_).data;
 		data.alignRow = shapeEditor_->stampRow();
 		data.alignCol = shapeEditor_->stampCol();
 		data.alignAngle = shapeEditor_->stampAngle();
-		data.alignScale = shapeEditor_->stampScale();
+		// DXF 套版：编辑器中的缩放 = alignScale × 像素/mm，写回时需除回，
+		// 保证库中 alignScale 始终是用户微调系数，与标定变化解耦
+		double scale = shapeEditor_->stampScale();
+		if (data.fromDxf)
+		{
+			const double k = bun::StampPatternBun::pixelsPerWorldUnit(
+				app_.business().infrastructure());
+			if (k > 1e-12)
+				scale /= k;
+		}
+		data.alignScale = scale;
 		data.alpha = shapeEditor_->stampAlpha();
 
 		bun->updatePatternData(stampPatternId_, data);
+	}
+
+	// ===== 偏移量 <-> 套版位置 同步 ==============================================
+
+	bool ModelEditorDialog::ninePointHomMat2D(HalconCpp::HTuple& out) const
+	{
+		const auto& inf = app_.business().infrastructure();
+		if (!inf.nine_point_module_)
+			return false;
+		const HalconCpp::HTuple& h = inf.nine_point_module_->ninePointConfig.outHomMat2D;
+		if (h.TupleLength() < 6)
+			return false;
+		out = h;
+		return true;
+	}
+
+	void ModelEditorDialog::syncOffsetsFromStamp()
+	{
+		if (!shapeEditor_ || !shapeEditor_->hasStampPattern() || !shapeEditor_->hasCenterPoint())
+			return;
+
+		using namespace HalconCpp;
+
+		// 角度偏差：套版旋转角即模型角度偏差（与 match() 中 result.angle 减去 offsetAngle 对应）
+		offsetAngle_ = shapeEditor_->stampAngle() * 180.0 / 3.14159265358979323846;
+
+		// 位置偏差：套版中心相对定义中心点的位移，经九点标定换算为 mm
+		HalconCpp::HTuple H;
+		if (ninePointHomMat2D(H))
+		{
+			try
+			{
+				const QPointF cp = shapeEditor_->centerPoint();
+				const QPointF sc = shapeEditor_->stampCenterImagePoint();
+				HTuple r0, c0, r1, c1;
+				AffineTransPoint2d(H, cp.y(), cp.x(), &r0, &c0);
+				AffineTransPoint2d(H, sc.y(), sc.x(), &r1, &c1);
+				// 与 ShapeModeManagerBun::match() 同一约定：
+				// world(row,col) = (-offsetY, offsetX)
+				offsetX_ = c1[0].D() - c0[0].D();
+				offsetY_ = -(r1[0].D() - r0[0].D());
+			}
+			catch (...) {}
+		}
+
+		updateOffsetButtons();
+	}
+
+	void ModelEditorDialog::applyOffsetsToStamp()
+	{
+		if (!shapeEditor_ || !shapeEditor_->hasStampPattern() || !shapeEditor_->hasCenterPoint())
+			return;
+
+		using namespace HalconCpp;
+
+		double dRow = 0.0, dCol = 0.0;
+		HalconCpp::HTuple H;
+		if (ninePointHomMat2D(H))
+		{
+			try
+			{
+				// 与 match() 同一约定：像素位移 = invH·(-offsetY, offsetX) - invH·(0,0)
+				HTuple invH;
+				HomMat2dInvert(H, &invH);
+				HTuple r0, c0, r1, c1;
+				AffineTransPoint2d(invH, 0.0, 0.0, &r0, &c0);
+				AffineTransPoint2d(invH, -offsetY_, offsetX_, &r1, &c1);
+				dRow = r1[0].D() - r0[0].D();
+				dCol = c1[0].D() - c0[0].D();
+			}
+			catch (...) {}
+		}
+
+		shapeEditor_->setStampOffsetFromCenter(dRow, dCol,
+			offsetAngle_ * 3.14159265358979323846 / 180.0);
+	}
+
+	void ModelEditorDialog::updateOffsetButtons()
+	{
+		ui->btn_offsetX->setText(QString::number(offsetX_, 'f', 2));
+		ui->btn_offsetY->setText(QString::number(offsetY_, 'f', 2));
+		ui->btn_offsetAngle->setText(QString::number(offsetAngle_, 'f', 2));
 	}
 
 	// ===== ROI 校验 ============================================================
@@ -431,6 +555,11 @@ namespace ui
 
 		// 关联当前叠加的套版（空 = 不使用）
 		req.stampPatternId = stampPatternId_;
+
+		// 偏差补偿（生产匹配找到中心点后叠加）
+		req.offsetX = offsetX_;
+		req.offsetY = offsetY_;
+		req.offsetAngle = offsetAngle_;
 
 		return req;
 	}
@@ -980,10 +1109,17 @@ namespace ui
 			if (patItem.data._patternImage.IsInitialized())
 			{
 				stampPatternId_ = data.stampPatternId;
+				// DXF 套版：图素单位为实际尺寸(mm)，需乘上九点标定的像素/mm
+				double scale = patItem.data.alignScale;
+				if (patItem.data.fromDxf)
+					scale *= bun::StampPatternBun::pixelsPerWorldUnit(
+						app_.business().infrastructure());
 				shapeEditor_->setStampPattern(patItem.data._patternImage,
 					patItem.data.alignRow, patItem.data.alignCol,
-					patItem.data.alignAngle, patItem.data.alignScale,
+					patItem.data.alignAngle, scale,
 					patItem.data.alpha);
+				// 模型存储的偏移量为权威值：按偏移量重建套版位置
+				applyOffsetsToStamp();
 			}
 		}
 		updateStampPatternStatus();
@@ -1032,6 +1168,14 @@ namespace ui
 		updateContrastVisibility();
 		ui->btn_contrast->setText(QString::number(contrast_));
 		ui->btn_mincontrast->setText(QString::number(minContrast_));
+
+		// 偏差补偿
+		offsetX_ = data.offsetX;
+		offsetY_ = data.offsetY;
+		offsetAngle_ = data.offsetAngle;
+		ui->btn_offsetX->setText(QString::number(offsetX_, 'f', 2));
+		ui->btn_offsetY->setText(QString::number(offsetY_, 'f', 2));
+		ui->btn_offsetAngle->setText(QString::number(offsetAngle_, 'f', 2));
 
 		// 恢复相机参数（Camera1 + Camera2）
 		if (data._createModelExposureTime > 0.0)
@@ -1151,6 +1295,11 @@ namespace ui
 
 			// 持久化套版关联（修改模式下可能更换了套版）
 			data.stampPatternId = stampPatternId_;
+
+			// 持久化偏差补偿（无需重新训练即可生效的参数）
+			data.offsetX = offsetX_;
+			data.offsetY = offsetY_;
+			data.offsetAngle = offsetAngle_;
 
 			inf.shape_model_manager_module_->changeShapeModelItem(modelId_, data);
 		}

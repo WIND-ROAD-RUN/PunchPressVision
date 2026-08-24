@@ -640,6 +640,174 @@ QPushButton:pressed {
              <item row="0" column="0">
               <layout class="QVBoxLayout" name="verticalLayout_10">
                <item>
+                <widget class="QGroupBox" name="groupBox_offset">
+                 <property name="title">
+                  <string>偏差补偿</string>
+                 </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_offset">
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_offsetX" stretch="1,1">
+                    <item>
+                     <widget class="QLabel" name="label_offsetX">
+                      <property name="styleSheet">
+                       <string notr="true">QLabel {
+       font-size: 24px;
+       font-weight: bold;
+       color:  rgb(141, 141, 141);
+       padding: 5px 5px;
+       border-bottom: 2px solid #cccccc;
+    }</string>
+                      </property>
+                      <property name="text">
+                       <string>左右偏差(mm)</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="btn_offsetX">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true">QPushButton {
+    padding: 6px 14px;
+    border: 2px solid #CCC;
+    border-radius: 4px;
+    background-color: white;
+    color: #444;
+    font-size: 18px;
+}
+
+QPushButton:hover {
+    border-color: #999;
+    background-color: #F5F5F5;
+}
+
+QPushButton:pressed {
+    border-color: #777;
+    background-color: #EEE;
+}</string>
+                      </property>
+                      <property name="text">
+                       <string>0.00</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_offsetY" stretch="1,1">
+                    <item>
+                     <widget class="QLabel" name="label_offsetY">
+                      <property name="styleSheet">
+                       <string notr="true">QLabel {
+       font-size: 24px;
+       font-weight: bold;
+       color:  rgb(141, 141, 141);
+       padding: 5px 5px;
+       border-bottom: 2px solid #cccccc;
+    }</string>
+                      </property>
+                      <property name="text">
+                       <string>上下偏差(mm)</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="btn_offsetY">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true">QPushButton {
+    padding: 6px 14px;
+    border: 2px solid #CCC;
+    border-radius: 4px;
+    background-color: white;
+    color: #444;
+    font-size: 18px;
+}
+
+QPushButton:hover {
+    border-color: #999;
+    background-color: #F5F5F5;
+}
+
+QPushButton:pressed {
+    border-color: #777;
+    background-color: #EEE;
+}</string>
+                      </property>
+                      <property name="text">
+                       <string>0.00</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_offsetAngle" stretch="1,1">
+                    <item>
+                     <widget class="QLabel" name="label_offsetAngle">
+                      <property name="styleSheet">
+                       <string notr="true">QLabel {
+       font-size: 24px;
+       font-weight: bold;
+       color:  rgb(141, 141, 141);
+       padding: 5px 5px;
+       border-bottom: 2px solid #cccccc;
+    }</string>
+                      </property>
+                      <property name="text">
+                       <string>角度偏差(°)</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="btn_offsetAngle">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true">QPushButton {
+    padding: 6px 14px;
+    border: 2px solid #CCC;
+    border-radius: 4px;
+    background-color: white;
+    color: #444;
+    font-size: 18px;
+}
+
+QPushButton:hover {
+    border-color: #999;
+    background-color: #F5F5F5;
+}
+
+QPushButton:pressed {
+    border-color: #777;
+    background-color: #EEE;
+}</string>
+                      </property>
+                      <property name="text">
+                       <string>0.00</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
                 <layout class="QVBoxLayout" name="verticalLayout_5">
                  <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_12">

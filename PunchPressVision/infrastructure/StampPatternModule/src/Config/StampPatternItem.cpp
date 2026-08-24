@@ -109,7 +109,8 @@ namespace Config
 		}
 
 		void writeParamsSafe(const fs::path& filePath,
-			double alignRow, double alignCol, double alignAngle, double alignScale, int alpha)
+			double alignRow, double alignCol, double alignAngle, double alignScale, int alpha,
+			bool fromDxf)
 		{
 			fs::create_directories(filePath.parent_path());
 			fs::path tmp = filePath;
@@ -122,6 +123,7 @@ namespace Config
 			ofs << "alignAngle=" << alignAngle << '\n';
 			ofs << "alignScale=" << alignScale << '\n';
 			ofs << "alpha=" << alpha << '\n';
+			ofs << "fromDxf=" << (fromDxf ? 1 : 0) << '\n';
 			ofs.close();
 			replaceFile(tmp, filePath);
 		}
@@ -134,7 +136,8 @@ namespace Config
 		}
 
 		bool readParamsSafe(const fs::path& filePath,
-			double& alignRow, double& alignCol, double& alignAngle, double& alignScale, int& alpha)
+			double& alignRow, double& alignCol, double& alignAngle, double& alignScale, int& alpha,
+			bool& fromDxf)
 		{
 			if (!fs::exists(filePath))
 				return false;
@@ -164,6 +167,8 @@ namespace Config
 						alignScale = std::stod(value);
 					else if (key == "alpha")
 						alpha = std::stoi(value);
+					else if (key == "fromDxf")
+						fromDxf = (std::stoi(value) != 0);
 				}
 				catch (...)
 				{
@@ -208,7 +213,7 @@ namespace Config
 
 			// 加载对齐/显示参数
 			readParamsSafe(dirPath / kParamsFile,
-				alignRow, alignCol, alignAngle, alignScale, alpha);
+				alignRow, alignCol, alignAngle, alignScale, alpha, fromDxf);
 
 			// 加载套版图片
 			readImageSafe(dirPath / kPatternImageFileName, _patternImage);
@@ -228,7 +233,7 @@ namespace Config
 			// 只持久化对齐/显示参数。图片文件由 importStampPattern 以原始字节复制写入，
 			// 不经过 Halcon 重新编码，确保透明通道（alpha）不被破坏。
 			writeParamsSafe(dirPath / kParamsFile,
-				alignRow, alignCol, alignAngle, alignScale, alpha);
+				alignRow, alignCol, alignAngle, alignScale, alpha, fromDxf);
 		}
 		catch (...)
 		{

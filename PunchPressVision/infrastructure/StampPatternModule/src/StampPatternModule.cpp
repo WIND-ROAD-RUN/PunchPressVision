@@ -63,7 +63,8 @@ namespace inf
         }
     }
 
-    Config::StampPatternInfo StampPatternModule::importStampPattern(const std::string& sourceImagePath, const std::string& name)
+    Config::StampPatternInfo StampPatternModule::importStampPattern(const std::string& sourceImagePath, const std::string& name,
+        bool fromDxf)
     {
         Config::StampPatternInfo info;
         try
@@ -79,6 +80,8 @@ namespace inf
 
             Config::StampPatternItem item;
             item.info = info;
+            // DXF 图纸（直接导入或经裁剪渲染为临时 PNG 导入）标记实际尺寸来源
+            item.data.fromDxf = fromDxf || isDxfFile(sourceImagePath);
             // 先落 info + 默认参数（建立目录并写元数据）
             item.saveInDir(info.getFolderPath());
 

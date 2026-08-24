@@ -30,8 +30,10 @@ namespace bun
 		explicit StampPatternBun(inf::infrastructure& inf);
 
 		// ---------- 图库 CRUD（转发到基础设施 StampPatternModule） ----------
-		/// <summary>导入套版文件（图片原始字节复制保留透明通道；CAD DXF 图纸渲染为 RGBA 图片）。失败返回空 info（id 为空）。</summary>
-		Config::StampPatternInfo importPattern(const std::string& sourceImagePath, const std::string& name);
+		/// <summary>导入套版文件（图片原始字节复制保留透明通道；CAD DXF 图纸渲染为 RGBA 图片）。失败返回空 info（id 为空）。
+		/// fromDxf：源为 DXF 实际尺寸图纸时为 true（经裁剪渲染成临时 PNG 后扩展名已丢失，需显式告知）。</summary>
+		Config::StampPatternInfo importPattern(const std::string& sourceImagePath, const std::string& name,
+			bool fromDxf = false);
 		/// <summary>删除套版。若已加载则先卸载。</summary>
 		void deletePattern(const std::string& id);
 		/// <summary>重命名套版。</summary>
@@ -64,6 +66,12 @@ namespace bun
 		/// 顺序为 缩放 -> 旋转 -> 平移（均围绕套版图原点），与 Halcon hom_mat2d_* 前乘语义一致。
 		/// </summary>
 		static HalconCpp::HTuple buildAlignHomMat2D(const Config::StampPatternData& data);
+
+		/// <summary>
+		/// 九点标定的像素/毫米比例（世界 1mm 对应的像素数，两轴平均）。
+		/// 无标定数据时返回 1.0。DXF 套版叠加时：effectiveScale = alignScale × pixelsPerWorldUnit。
+		/// </summary>
+		static double pixelsPerWorldUnit(inf::infrastructure& inf);
 
 		/// <summary>
 		/// 将 RGBA 套版图按 H_pat2base（套版图坐标 -> 基图坐标）变换并 alpha 混合叠加到基图上。

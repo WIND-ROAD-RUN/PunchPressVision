@@ -26,6 +26,11 @@ namespace Config
 		// 叠加透明度 0~255（255 = 完全不透明）
 		int alpha = 180;
 
+		// 是否来源于 CAD DXF 图纸。true 时套版图像素单位 = DXF 实际尺寸单位（mm），
+		// 叠加显示需按九点标定换算为像素尺寸（effectiveScale = alignScale × pixelsPerMm）；
+		// false 时套版图为普通图片，1 像素 = 1 像素。
+		bool fromDxf = false;
+
 	public:
 		void loadInDir(const std::string& dir);
 		void saveInDir(const std::string& dir);

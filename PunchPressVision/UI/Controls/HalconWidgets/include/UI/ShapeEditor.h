@@ -91,6 +91,12 @@ namespace ui
 		double stampScale() const { return stampScale_; }
 		int stampAlpha() const { return stampAlpha_; }
 
+		/// 套版中心（图中心红十字）当前在参考图像坐标中的位置；无套版时返回空点。
+		QPointF stampCenterImagePoint() const;
+		/// 将套版中心放置到 中心点 + (dRow, dCol) 处，并设置旋转角（弧度）。
+		/// 需已设置套版与中心点；用于按模型偏移量重建套版位置。
+		void setStampOffsetFromCenter(double dRow, double dCol, double angleRad);
+
 		// === 编辑操作 ===
 
 		/// 统一回撤：移除最近一次操作（ROI 或 Mask）
@@ -175,6 +181,9 @@ namespace ui
 
 		/// 依据 baseImage_ 与套版状态，将（合成后的）图像显示到 L2 控件。
 		void renderToLabel();
+
+		/// 重算套版平移量，使套版图中心与给定图像点重合（保持当前旋转/缩放）。
+		void alignStampCenterTo(const QPointF& imagePoint);
 
 		/// 构建套版对齐变换：套版图坐标 -> 参考(训练)图像坐标（缩放→旋转→平移）。
 		static HalconCpp::HTuple stampHomMat2D(double row, double col, double angle, double scale);

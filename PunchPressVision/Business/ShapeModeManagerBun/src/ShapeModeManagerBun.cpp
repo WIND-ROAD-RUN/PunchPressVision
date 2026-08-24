@@ -134,6 +134,9 @@ namespace bun
 			outData.findCenterX = findcenterX;
 			outData.findCenterY = findcenterY;
 			outData.stampPatternId = req.stampPatternId;
+			outData.offsetX = req.offsetX;
+			outData.offsetY = req.offsetY;
+			outData.offsetAngle = req.offsetAngle;
 
 			// 图像预处理参数
 			outData._createModelPreProcessType = req.imageChannelType;
@@ -317,10 +320,8 @@ namespace bun
 			return false;
 		}
 
-		// 保留用户偏移量及匹配参数（修改模型界面不允许编辑这些值）
-		result.data.offsetX = oldData.offsetX;
-		result.data.offsetY = oldData.offsetY;
-		result.data.offsetAngle = oldData.offsetAngle;
+		// 保留匹配参数（修改模型界面不允许编辑这些值；
+		// 偏移量 offsetX/Y/Angle 可在编辑界面修改，已由 req 携带，不再保留旧值）
 		result.data.findnumber = oldData.findnumber;
 		result.data.angleStart = oldData.angleStart;
 		result.data.angleExtent = oldData.angleExtent;

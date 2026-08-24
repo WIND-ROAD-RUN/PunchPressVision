@@ -1,5 +1,6 @@
 #include "Business/StampPatternBun/StampPatternBun.hpp"
 
+#include <cmath>
 #include <iostream>
 
 namespace
@@ -36,9 +37,10 @@ namespace bun
 
 	// ---------- 图库 CRUD ----------
 
-	Config::StampPatternInfo StampPatternBun::importPattern(const std::string& sourceImagePath, const std::string& name)
+	Config::StampPatternInfo StampPatternBun::importPattern(const std::string& sourceImagePath, const std::string& name,
+		bool fromDxf)
 	{
-		Config::StampPatternInfo info = inf_.stamp_pattern_module_->importStampPattern(sourceImagePath, name);
+		Config::StampPatternInfo info = inf_.stamp_pattern_module_->importStampPattern(sourceImagePath, name, fromDxf);
 		if (!info.getId().empty())
 			emit patternListChanged();
 		return info;
@@ -178,6 +180,37 @@ namespace bun
 		HalconCpp::HomMat2dRotate(h, data.alignAngle, 0.0, 0.0, &h);
 		HalconCpp::HomMat2dTranslate(h, data.alignRow, data.alignCol, &h);
 		return h;
+	}
+
+	double StampPatternBun::pixelsPerWorldUnit(inf::infrastructure& inf)
+	{
+		using namespace HalconCpp;
+		try
+		{
+			if (!inf.nine_point_module_)
+				return 1.0;
+			const auto& cfg = inf.nine_point_module_->ninePointConfig;
+			if (cfg.outHomMat2D.TupleLength() < 6)
+				return 1.0;
+
+			// outHomMat2D 为 像素 -> 世界(mm)；取其逆变换，测量世界单位向量对应的像素长度
+			HTuple invH;
+			HomMat2dInvert(cfg.outHomMat2D, &invH);
+
+			HTuple r0, c0, r1, c1, r2, c2;
+			AffineTransPoint2d(invH, 0.0, 0.0, &r0, &c0);
+			AffineTransPoint2d(invH, 1.0, 0.0, &r1, &c1);   // 世界 row 方向 1mm
+			AffineTransPoint2d(invH, 0.0, 1.0, &r2, &c2);   // 世界 col 方向 1mm
+
+			const double lenRow = std::hypot(r1[0].D() - r0[0].D(), c1[0].D() - c0[0].D());
+			const double lenCol = std::hypot(r2[0].D() - r0[0].D(), c2[0].D() - c0[0].D());
+			const double k = (lenRow + lenCol) / 2.0;
+			return (k > 1e-12) ? k : 1.0;
+		}
+		catch (...)
+		{
+			return 1.0;
+		}
 	}
 
 	HalconCpp::HImage StampPatternBun::compositeOverlay(const HalconCpp::HImage& base,
