@@ -11,6 +11,7 @@ namespace inf
 		two_camera_splice_module_ = std::make_unique<TwoCameraSpliceModule>();
 		camera_module_ = std::make_unique<CameraModule>();
 		shape_model_manager_module_ = std::make_unique<ShapeModelManagerModule>();
+		stamp_pattern_module_ = std::make_unique<StampPatternModule>();
 		control_module_ = std::make_unique<ControlModule>();
 		light_io_module_ = std::make_unique<LightIOModule>();
 	}
@@ -20,6 +21,7 @@ namespace inf
 		// 构造逆序显式 reset，确保依赖关系正确析构
 		light_io_module_.reset();
 		control_module_.reset();
+		stamp_pattern_module_.reset();
 		shape_model_manager_module_.reset();
 		camera_module_.reset();
 		two_camera_splice_module_.reset();
@@ -49,6 +51,9 @@ namespace inf
 		// 4. 模型管理器
 		shape_model_manager_module_->build();
 
+		// 4.0 套版图库管理器（独立图库，不依赖相机/配置）
+		stamp_pattern_module_->build();
+
 		// 4.1 全部配置/模型加载完成：把当前配置增量同步到快照目录
 		updateConfigSnapshot();
 
@@ -65,6 +70,7 @@ namespace inf
 		// 反向顺序销毁：后构建的先销毁
 		if (light_io_module_) light_io_module_->destroy();
 		if (control_module_) control_module_->destroy();
+		if (stamp_pattern_module_) stamp_pattern_module_->destroy();
 		if (shape_model_manager_module_) shape_model_manager_module_->destroy();
 		if (camera_module_) camera_module_->destroy();
 		if (two_camera_splice_module_) two_camera_splice_module_->destroy();

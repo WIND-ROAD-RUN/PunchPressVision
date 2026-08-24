@@ -31,6 +31,7 @@
 #include "Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp"
 #include "UI/ShapeEditor.h"
 #include "UI/ModelManagerDialog.h"
+#include "UI/StampPatternManagerDialog.h"
 #include "UI/OffsetEditorDialog.h"
 
 // 取消 Win32 MessageBox 宏，使用 rw::rqwu::MessageBox。
@@ -270,6 +271,7 @@ namespace ui
 		connect(ui->pbtn_clearRegion, &QPushButton::clicked, this, &PunchPress::onDrawClear);
 		connect(ui->pbtn_redraw, &QPushButton::clicked, this, &PunchPress::onDrawRedraw);
 		connect(ui->pbtn_modelManager, &QPushButton::clicked, this, &PunchPress::onModelManager);
+		connect(ui->pbtn_stampPattern, &QPushButton::clicked, this, &PunchPress::onStampPatternManager);
 		connect(ui->pbtn_exit, &QPushButton::clicked, this, &PunchPress::onExit);
 
 		// 模型加载/卸载 → 刷新右侧栏列表
@@ -1008,6 +1010,12 @@ namespace ui
 	void PunchPress::onModelManager()
 	{
 		ModelManagerDialog dlg(app_, this);
+		dlg.exec();
+	}
+
+	void PunchPress::onStampPatternManager()
+	{
+		StampPatternManagerDialog dlg(app_, this);
 		dlg.exec();
 	}
 

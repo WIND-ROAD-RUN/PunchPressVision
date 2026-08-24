@@ -23,6 +23,7 @@ target_link_libraries(${Bun_TARGET}
 		bun::ShapeModeManagerBun
 		bun::LightControlBun
 		bun::HealthMonitorBun
+		bun::StampPatternBun
 )
 
 set_target_properties(${Bun_TARGET} PROPERTIES

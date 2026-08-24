@@ -31,6 +31,7 @@ target_link_libraries(${Inf_TARGET}
 		inf::TwoCameraSpliceModule
 		inf::NinePointModule
 		inf::ShapeModelManagerModule
+		inf::StampPatternModule
 		inf::ControlModule
 		inf::LightIOModule
 

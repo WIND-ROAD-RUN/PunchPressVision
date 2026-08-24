@@ -16,11 +16,13 @@ namespace bun
 		shape_mode_manager_bun = std::make_unique<ShapeModeManagerBun>(inf_, *infTool_);
 		light_control_bun = std::make_unique<LightControlBun>(inf_, *infTool_);
 		health_monitor_bun = std::make_unique<HealthMonitorBun>(inf_);
+		stamp_pattern_bun = std::make_unique<StampPatternBun>(inf_);
 	}
 
 	Business::~Business()
 	{
 		// 构造逆序显式 reset，确保依赖关系正确析构
+		stamp_pattern_bun.reset();
 		health_monitor_bun.reset();
 		light_control_bun.reset();
 		shape_mode_manager_bun.reset();
@@ -36,10 +38,12 @@ namespace bun
 		if (shape_mode_manager_bun) shape_mode_manager_bun->build();
 		if (light_control_bun) light_control_bun->build();
 		if (health_monitor_bun) health_monitor_bun->build();
+		if (stamp_pattern_bun) stamp_pattern_bun->build();
 	}
 
 	void Business::destroy()
 	{
+		if (stamp_pattern_bun) stamp_pattern_bun->destroy();
 		if (health_monitor_bun) health_monitor_bun->destroy();
 		if (light_control_bun) light_control_bun->destroy();
 		if (shape_mode_manager_bun) shape_mode_manager_bun->destroy();
@@ -55,11 +59,13 @@ namespace bun
 		if (light_control_bun) light_control_bun->start();
 		// 健康监控最后启动（依赖其他组件已就绪）
 		if (health_monitor_bun) health_monitor_bun->start();
+		if (stamp_pattern_bun) stamp_pattern_bun->start();
 	}
 
 	void Business::stop()
 	{
 		// 健康监控最先停止（避免在资源关闭期间误报）
+		if (stamp_pattern_bun) stamp_pattern_bun->stop();
 		if (health_monitor_bun) health_monitor_bun->stop();
 		if (light_control_bun) light_control_bun->stop();
 		if (shape_mode_manager_bun) shape_mode_manager_bun->stop();

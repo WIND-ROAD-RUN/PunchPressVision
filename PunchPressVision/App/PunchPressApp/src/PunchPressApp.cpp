@@ -485,9 +485,12 @@ namespace app
 				HalconCpp::OpenWindow(0, 0, imgW[0].I(), imgH[0].I(), 0, "buffer", "", &bufWin);
 				HalconCpp::SetPart(bufWin, 0, 0, imgH[0].I() - 1, imgW[0].I() - 1);
 				// 优先使用最佳匹配模型的预处理图像（灰度/单通道），回退到原始彩色图像
-			const HalconCpp::HImage& bgImage = (bestMatch != matches.end()
+			const HalconCpp::HImage& bgImageSrc = (bestMatch != matches.end()
 				&& bestMatch->preprocessedImage.IsInitialized())
 				? bestMatch->preprocessedImage : image;
+			// 套版自动对齐叠加：按各匹配原始位姿将关联套版 alpha 混合到底图
+			const HalconCpp::HImage bgImage =
+				composeStampPatternOverlays(bgImageSrc, matches);
 			HalconCpp::DispObj(bgImage, bufWin);
 
 				// 绘制所有已加载模型的屏蔽区域（红色 margin），每个模型仅作用于自身识别
@@ -559,5 +562,45 @@ namespace app
 		{
 			emit frameReady(image);
 		}
+	}
+
+	HalconCpp::HImage PunchPressApp::composeStampPatternOverlays(
+		const HalconCpp::HImage& base,
+		const std::vector<bun::MatchResult>& matches)
+	{
+		HalconCpp::HImage img = base;
+		if (!business_.stamp_pattern_bun)
+			return img;
+
+		for (const auto& m : matches)
+		{
+			if (!m.found || m.stampPatternId.empty())
+				continue;
+			try
+			{
+				Config::StampPatternData data;
+				if (!business_.stamp_pattern_bun->getPatternData(m.stampPatternId, data))
+					continue;
+				if (!data._patternImage.IsInitialized())
+					continue;
+
+				// H_A: 套版图 -> 模板参考(训练)图像；H_rigid: 参考图像 -> 当前匹配位姿
+				const HalconCpp::HTuple H_A =
+					bun::StampPatternBun::buildAlignHomMat2D(data);
+				HalconCpp::HTuple H_rigid;
+				HalconCpp::VectorAngleToRigid(m.refRow, m.refCol, 0.0,
+					m.matchRow, m.matchCol, m.matchAngle, &H_rigid);
+				HalconCpp::HTuple H_pat2match;
+				HalconCpp::HomMat2dCompose(H_rigid, H_A, &H_pat2match);
+
+				img = bun::StampPatternBun::compositeOverlay(
+					img, data._patternImage, H_pat2match, data.alpha);
+			}
+			catch (...)
+			{
+				// 单个套版叠加失败不影响其他套版与主流程
+			}
+		}
+		return img;
 	}
 }

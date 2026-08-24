@@ -1,6 +1,7 @@
 #pragma once
 
 #include "infrastructure/ShapeModelManagerModule/ShapeModelManagerModule.hpp"
+#include "infrastructure/StampPatternModule/StampPatternModule.hpp"
 #include "infrastructure/CalibConfigModule/CalibConfigModule.hpp"
 #include "infrastructure/CameraModule/CameraModule.hpp"
 #include "infrastructure/ConfigModule/ConfigModule.hpp"
@@ -26,6 +27,7 @@ namespace inf
 		std::unique_ptr<NinePointModule> nine_point_module_;
 		std::unique_ptr<CameraModule> camera_module_;
 		std::unique_ptr<ShapeModelManagerModule> shape_model_manager_module_;
+		std::unique_ptr<StampPatternModule> stamp_pattern_module_;
 		std::unique_ptr<ControlModule> control_module_;
 		std::unique_ptr<LightIOModule> light_io_module_;
 	};

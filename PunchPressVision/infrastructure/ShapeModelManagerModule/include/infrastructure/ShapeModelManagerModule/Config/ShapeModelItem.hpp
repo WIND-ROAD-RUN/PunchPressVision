@@ -85,6 +85,9 @@ namespace Config
 
 		std::string modelPath{};
 
+	// 关联的套版 id（空 = 不使用套版）
+	std::string stampPatternId{};
+
 	public:
 		void loadInDir(const std::string& dir);
 		void saveInDir(const std::string& dir);

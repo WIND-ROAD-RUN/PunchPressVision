@@ -76,5 +76,9 @@ namespace app
 
 		// 工作模式图像处理（匹配 + 写 PLC）
 		void processProductionFrame(const HalconCpp::HImage& image);
+
+		// 套版自动对齐叠加：按各匹配原始位姿将关联套版 alpha 混合到底图（异常内部吞掉）
+		HalconCpp::HImage composeStampPatternOverlays(const HalconCpp::HImage& base,
+			const std::vector<bun::MatchResult>& matches);
 	};
 }

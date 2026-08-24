@@ -14,6 +14,8 @@
 #include "app/PunchPressApp.hpp"
 #include "Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp"
 #include "infrastructure/ShapeModelManagerModule/ShapeModelManagerModule.hpp"
+#include "Business/StampPatternBun/StampPatternBun.hpp"
+#include "UI/StampPatternPickerDialog.h"
 
 #ifdef MessageBox
 #undef MessageBox
@@ -58,6 +60,7 @@ namespace ui
 		loadCameraParams();
 		updateCameraParamButtons();
 		updateContrastVisibility();
+		updateStampPatternStatus();
 
 		// 修改模式：禁用读取新图片，确保一直编辑创建时的原始图
 		ui->btn_readImage->setEnabled(!isModifyMode_);
@@ -110,6 +113,12 @@ namespace ui
 			this, &ModelEditorDialog::onClearRegion);
 		connect(ui->btn_clearRegion2, &QPushButton::clicked,
 			this, &ModelEditorDialog::onUndo);
+
+		// 套版
+		connect(ui->btn_selectStampPattern, &QPushButton::clicked,
+			this, &ModelEditorDialog::onSelectStampPattern);
+		connect(ui->btn_stampPattern, &QPushButton::clicked,
+			this, &ModelEditorDialog::onAlignStampPattern);
 
 		// 相机参数
 		connect(ui->btn_zengyi1, &QPushButton::clicked,
@@ -260,6 +269,106 @@ namespace ui
 			shapeEditor_->undo();
 	}
 
+	// ===== 套版（StampPattern）叠加与对齐 ========================================
+
+	void ModelEditorDialog::updateStampPatternStatus()
+	{
+		QString text = QStringLiteral("当前未使用套版");
+		QString color = QStringLiteral("rgb(141, 141, 141)");
+		if (!stampPatternId_.empty())
+		{
+			auto& bun = app_.business().stamp_pattern_bun;
+			if (bun)
+			{
+				const Config::StampPatternItem item = bun->getPatternItem(stampPatternId_);
+				if (!item.info.getId().empty())
+				{
+					text = QStringLiteral("当前套版: %1")
+						.arg(QString::fromStdString(item.info.base_info.name));
+					color = QStringLiteral("#2196F3");
+				}
+			}
+		}
+		ui->label_stampPatternStatus->setText(text);
+		ui->label_stampPatternStatus->setStyleSheet(
+			QStringLiteral("QLabel { font-size: 20px; font-weight: bold; color: %1; padding: 5px 5px; }")
+				.arg(color));
+	}
+
+	void ModelEditorDialog::onSelectStampPattern()
+	{
+		if (!shapeEditor_) return;
+
+		// 切换前先保存当前套版的对齐参数
+		persistStampPatternAlignment();
+
+		StampPatternPickerDialog dlg(app_, this);
+		dlg.setInitialPatternId(stampPatternId_);
+		if (dlg.exec() != QDialog::Accepted)
+			return;
+
+		const std::string id = dlg.selectedPatternId();
+		if (id.empty())
+		{
+			stampPatternId_.clear();
+			shapeEditor_->clearStampPattern();
+			if (shapeEditor_->tool() == ShapeEditor::Tool::StampPattern)
+				shapeEditor_->setTool(ShapeEditor::Tool::View);
+		}
+		else
+		{
+			auto& bun = app_.business().stamp_pattern_bun;
+			if (!bun) return;
+
+			const Config::StampPatternItem item = bun->getPatternItem(id);
+			if (!item.data._patternImage.IsInitialized())
+			{
+				rw::rqwu::MessageBox::warning(this,
+					QStringLiteral("提示"), QStringLiteral("该套版缺少有效图片，无法叠加。"));
+				return;
+			}
+
+			stampPatternId_ = id;
+			shapeEditor_->setStampPattern(item.data._patternImage,
+				item.data.alignRow, item.data.alignCol, item.data.alignAngle,
+				item.data.alignScale, item.data.alpha);
+		}
+		updateStampPatternStatus();
+	}
+
+	void ModelEditorDialog::onAlignStampPattern()
+	{
+		if (!shapeEditor_) return;
+		if (!shapeEditor_->hasStampPattern())
+		{
+			rw::rqwu::MessageBox::information(this,
+				QStringLiteral("提示"), QStringLiteral("请先在列表中选择一个套版"));
+			return;
+		}
+		if (shapeEditor_->tool() == ShapeEditor::Tool::StampPattern)
+			shapeEditor_->setTool(ShapeEditor::Tool::View);
+		else
+			shapeEditor_->setTool(ShapeEditor::Tool::StampPattern);
+	}
+
+	void ModelEditorDialog::persistStampPatternAlignment()
+	{
+		if (stampPatternId_.empty() || !shapeEditor_ || !shapeEditor_->hasStampPattern())
+			return;
+
+		auto& bun = app_.business().stamp_pattern_bun;
+		if (!bun) return;
+
+		Config::StampPatternData data;
+		data.alignRow = shapeEditor_->stampRow();
+		data.alignCol = shapeEditor_->stampCol();
+		data.alignAngle = shapeEditor_->stampAngle();
+		data.alignScale = shapeEditor_->stampScale();
+		data.alpha = shapeEditor_->stampAlpha();
+
+		bun->updatePatternData(stampPatternId_, data);
+	}
+
 	// ===== ROI 校验 ============================================================
 
 	bool ModelEditorDialog::requireROI(const QString& action) const
@@ -320,6 +429,9 @@ namespace ui
 		req.contrastAuto = contrastAuto_;
 		req.minContrast = minContrast_;
 
+		// 关联当前叠加的套版（空 = 不使用）
+		req.stampPatternId = stampPatternId_;
+
 		return req;
 	}
 
@@ -337,6 +449,10 @@ namespace ui
 		}
 		if (!requireROI(QStringLiteral("创建模型")))
 			return;
+
+		// 若仍在套版对齐工具中，先写回对齐参数
+		if (shapeEditor_ && shapeEditor_->tool() == ShapeEditor::Tool::StampPattern)
+			persistStampPatternAlignment();
 
 		auto& biz = app_.business();
 		if (!biz.shape_mode_manager_bun || !lastFrame_.IsInitialized())
@@ -769,6 +885,10 @@ namespace ui
 
 	void ModelEditorDialog::onToolChanged(ShapeEditor::Tool tool)
 	{
+		// 离开套版对齐工具时，将编辑后的对齐参数写回套版库
+		if (lastTool_ == ShapeEditor::Tool::StampPattern && tool != ShapeEditor::Tool::StampPattern)
+			persistStampPatternAlignment();
+		lastTool_ = tool;
 		updateToolButtons(tool);
 	}
 
@@ -792,6 +912,11 @@ namespace ui
 			tool == ShapeEditor::Tool::CenterPoint
 				? QStringLiteral("退出定义")
 				: QStringLiteral("定义中心点"));
+
+		ui->btn_stampPattern->setText(
+			tool == ShapeEditor::Tool::StampPattern
+				? QStringLiteral("退出对齐")
+				: QStringLiteral("对齐套版"));
 	}
 
 	// ===== 修改模式：加载已有模型 ==============================================
@@ -846,6 +971,22 @@ namespace ui
 		// 恢复中心点
 		if (data.centerX != 0.0 || data.centerY != 0.0)
 			shapeEditor_->setCenterPoint(QPointF(data.centerX, data.centerY));
+
+		// 恢复关联的套版并叠加显示
+		if (!data.stampPatternId.empty() && biz.stamp_pattern_bun)
+		{
+			const Config::StampPatternItem patItem =
+				biz.stamp_pattern_bun->getPatternItem(data.stampPatternId);
+			if (patItem.data._patternImage.IsInitialized())
+			{
+				stampPatternId_ = data.stampPatternId;
+				shapeEditor_->setStampPattern(patItem.data._patternImage,
+					patItem.data.alignRow, patItem.data.alignCol,
+					patItem.data.alignAngle, patItem.data.alignScale,
+					patItem.data.alpha);
+			}
+		}
+		updateStampPatternStatus();
 	}
 
 	void ModelEditorDialog::restoreParamsFromModel(const Config::ShapeModelData& data)
@@ -1007,6 +1148,9 @@ namespace ui
 			data._createModelGain = static_cast<double>(cameraCfg_.gain1);
 			data._createModelExposureTime2 = static_cast<double>(cameraCfg_.exposureTime2);
 			data._createModelGain2 = static_cast<double>(cameraCfg_.gain2);
+
+			// 持久化套版关联（修改模式下可能更换了套版）
+			data.stampPatternId = stampPatternId_;
 
 			inf.shape_model_manager_module_->changeShapeModelItem(modelId_, data);
 		}

@@ -50,6 +50,8 @@ namespace ui
 
 		// 模型管理
 		void onModelManager();
+		/// <summary>打开套版（StampPattern）图库管理对话框。</summary>
+		void onStampPatternManager();
 		/// <summary>刷新右侧栏已加载模型表格。</summary>
 		void refreshLoadedModelsList();
 		/// <summary>双击表格行 → 打开偏移量编辑对话框。</summary>

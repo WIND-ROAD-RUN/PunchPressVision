@@ -232,7 +232,8 @@ namespace Config
 			bool createModelUseMean, int createModelMeanRadius,
 			double angleStart, double angleExtent,
 			int contrast, int minContrast, double minScore,
-			const std::string& modelPath)
+			const std::string& modelPath,
+			const std::string& stampPatternId)
 		{
 			fs::create_directories(filePath.parent_path());
 			fs::path tmp = filePath;
@@ -268,6 +269,7 @@ namespace Config
 			ofs << "minContrast=" << minContrast << '\n';
 			ofs << "minScore=" << minScore << '\n';
 			ofs << "modelPath=" << modelPath << '\n';
+			ofs << "stampPatternId=" << stampPatternId << '\n';
 			ofs.close();
 			replaceFile(tmp, filePath);
 		}
@@ -294,7 +296,8 @@ namespace Config
 			bool& createModelUseMean, int& createModelMeanRadius,
 			double& angleStart, double& angleExtent,
 			int& contrast, int& minContrast, double& minScore,
-			std::string& modelPath)
+			std::string& modelPath,
+			std::string& stampPatternId)
 		{
 			if (!fs::exists(filePath))
 				return false;
@@ -370,6 +373,8 @@ namespace Config
 						minScore = std::stod(value);
 					else if (key == "modelPath")
 						modelPath = value;
+					else if (key == "stampPatternId")
+						stampPatternId = value;
 				}
 				catch (...)
 				{
@@ -489,7 +494,8 @@ namespace Config
 				_createModelUseMean, _createModelMeanRadius,
 				angleStart, angleExtent,
 				contrast, minContrast, minScore,
-				modelPath);
+				modelPath,
+				stampPatternId);
 
 			// 加载图像
 			readImageSafe(dirPath / kTemplateImageFile, _templateMatImage);
@@ -568,7 +574,8 @@ namespace Config
 				_createModelUseMean, _createModelMeanRadius,
 				angleStart, angleExtent,
 				contrast, minContrast, minScore,
-				modelPath);
+				modelPath,
+				stampPatternId);
 
 			// 保存图像（逐个 try-catch 防止一个失败导致后续全部跳过）
 			if (_templateMatImage.IsInitialized())

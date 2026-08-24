@@ -31,6 +31,7 @@ namespace bun
 		std::vector<HalconCpp::HObject> _paintShieldRoiList;  // Mask 列表（逐个保存，支持回撤）
 		QPointF centerPoint;                 // 手动指定的中心点（可选）
 		bool hasCenterPoint{ false };        // 是否使用手动中心点
+		std::string stampPatternId;          // 关联的套版 id（空 = 不使用套版）
 		QString name;                        // 模型名称（空则用时间戳）
 		double exposure{ 0.0 };
 		double gain{ 0.0 };
@@ -75,6 +76,14 @@ namespace bun
 		bool found{ false };
 		HalconCpp::HObject matchedContours;  // 匹配后变换到位的轮廓 XLD（用于主界面显示）
 		HalconCpp::HImage preprocessedImage; // 预处理后的图像（通道提取+形态学运算，用于主界面显示）
+
+		// 套版自动对齐所需：原始匹配位姿（findShapeModel 返回，未含用户偏移）与模板参考中心
+		double matchRow{ 0.0 };   // 原始匹配行（像素）
+		double matchCol{ 0.0 };   // 原始匹配列（像素）
+		double matchAngle{ 0.0 }; // 原始匹配角度（弧度）
+		double refRow{ 0.0 };     // 模板参考中心行（findCenterY）
+		double refCol{ 0.0 };     // 模板参考中心列（findCenterX）
+		std::string stampPatternId; // 关联的套版 id（空 = 无）
 	};
 
 	/// <summary>

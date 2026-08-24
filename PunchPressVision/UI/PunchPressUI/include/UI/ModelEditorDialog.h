@@ -42,6 +42,10 @@ namespace ui
 		void onClearRegion();
 		void onUndo();
 
+		// 套版
+		void onSelectStampPattern();
+		void onAlignStampPattern();
+
 		// 相机参数
 		void onGain1Clicked();
 		void onExposure1Clicked();
@@ -85,6 +89,10 @@ namespace ui
 		void restoreParamsFromModel(const Config::ShapeModelData& data);
 		/// 退出时将中心点等非训练参数直接写入已保存模型，无需重新训练
 		void saveCenterPointToModel();
+		/// 更新套版状态标签（显示当前是否使用套版及套版名）
+		void updateStampPatternStatus();
+		/// 将当前套版对齐参数写回套版库
+		void persistStampPatternAlignment();
 
 		HalconCpp::HImage preprocessImage(const HalconCpp::HImage& image) const;
 
@@ -108,6 +116,8 @@ namespace ui
 		std::string modelId_;
 		bool modelLoaded_{ false };   ///< 确保 loadExistingModel 仅执行一次
 		bool modelCreated_{ false };  ///< 是否已成功创建/更新过模板
+		std::string stampPatternId_;                        ///< 当前叠加的套版 id（空 = 不使用）
+		ShapeEditor::Tool lastTool_{ ShapeEditor::Tool::View };  ///< 上一工具，用于退出套版对齐时写回
 
 		// 异步创建/修改模型
 		QFutureWatcher<bun::TrainShapeModelResult>* trainingWatcher_{ nullptr };

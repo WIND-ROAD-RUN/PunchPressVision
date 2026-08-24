@@ -133,6 +133,7 @@ namespace bun
 			outData.centerY = centerY;
 			outData.findCenterX = findcenterX;
 			outData.findCenterY = findcenterY;
+			outData.stampPatternId = req.stampPatternId;
 
 			// 图像预处理参数
 			outData._createModelPreProcessType = req.imageChannelType;
@@ -1073,6 +1074,14 @@ namespace bun
 						result.row = outRow;
 						result.column = outCol;
 						result.score = score[i].D();
+
+						// 原始匹配位姿 + 模板参考中心（供生产帧套版自动对齐叠加）
+						result.matchRow = matchRow;
+						result.matchCol = matchCol;
+						result.matchAngle = matchAngle;
+						result.refRow = model.data.findCenterY;
+						result.refCol = model.data.findCenterX;
+						result.stampPatternId = model.data.stampPatternId;
 
 						// 像素 → 世界坐标（九点标定）
 						double worldX = outCol, worldY = outRow;

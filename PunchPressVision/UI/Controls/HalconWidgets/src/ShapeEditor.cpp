@@ -5,6 +5,34 @@
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QResizeEvent>
+#include <QWheelEvent>
+
+#include <cmath>
+
+namespace
+{
+	// 单通道 alpha 混合：out = alpha * overlay + (1 - alpha) * base。
+	// 算法与 bun::StampPatternBun::compositeOverlay 保持一致，修改时需同步。
+	void blendChannel(const HalconCpp::HImage& overlay, const HalconCpp::HImage& base,
+		const HalconCpp::HImage& alpha, HalconCpp::HImage* out)
+	{
+		HalconCpp::HImage o, b, a;
+		HalconCpp::ConvertImageType(overlay, &o, "real");
+		HalconCpp::ConvertImageType(base, &b, "real");
+		HalconCpp::ConvertImageType(alpha, &a, "real");
+
+		// 1 - alpha
+		HalconCpp::HImage invA;
+		HalconCpp::ScaleImage(a, &invA, -1.0, 1.0);
+
+		HalconCpp::HImage t1, t2, sum;
+		HalconCpp::MultImage(o, a, &t1, 1.0, 0.0);      // overlay * alpha
+		HalconCpp::MultImage(b, invA, &t2, 1.0, 0.0);   // base * (1 - alpha)
+		HalconCpp::AddImage(t1, t2, &sum, 1.0, 0.0);
+
+		HalconCpp::ConvertImageType(sum, out, "byte");
+	}
+}
 
 namespace ui
 {
@@ -24,14 +52,127 @@ namespace ui
 
 	void ShapeEditor::displayImage(const HalconCpp::HImage& image)
 	{
+		baseImage_ = image;
 		displaying_ = true;
-		imageLabel_->displayImage(image);
+		renderToLabel();
 		displaying_ = false;
 		drawAllROIs();
 		drawAllMasks();
 		drawCenterPoint();
 		drawMarker();
 		drawMatchRegion();
+	}
+
+	// === 套版叠加与对齐编辑 ===
+
+	void ShapeEditor::setStampPattern(const HalconCpp::HImage& rgba, double row, double col,
+		double angle, double scale, int alpha)
+	{
+		stampPatternImage_ = rgba;
+		stampRow_ = row;
+		stampCol_ = col;
+		stampAngle_ = angle;
+		stampScale_ = scale;
+		stampAlpha_ = alpha;
+		hasStampPattern_ = true;
+		stampDragging_ = false;
+		refreshOverlay();
+	}
+
+	void ShapeEditor::clearStampPattern()
+	{
+		hasStampPattern_ = false;
+		stampPatternImage_ = HalconCpp::HImage();
+		stampDragging_ = false;
+		refreshOverlay();
+	}
+
+	void ShapeEditor::renderToLabel()
+	{
+		if (!imageLabel_ || !baseImage_.IsInitialized())
+			return;
+
+		if (hasStampPattern_ && stampPatternImage_.IsInitialized())
+		{
+			const HalconCpp::HTuple h =
+				stampHomMat2D(stampRow_, stampCol_, stampAngle_, stampScale_);
+			imageLabel_->displayImage(compositeStamp(baseImage_, stampPatternImage_, h, stampAlpha_));
+		}
+		else
+		{
+			imageLabel_->displayImage(baseImage_);
+		}
+	}
+
+	HalconCpp::HTuple ShapeEditor::stampHomMat2D(double row, double col, double angle, double scale)
+	{
+		HalconCpp::HTuple h;
+		HalconCpp::HomMat2dIdentity(&h);
+		HalconCpp::HomMat2dScale(h, scale, scale, 0.0, 0.0, &h);
+		HalconCpp::HomMat2dRotate(h, angle, 0.0, 0.0, &h);
+		HalconCpp::HomMat2dTranslate(h, row, col, &h);
+		return h;
+	}
+
+	HalconCpp::HImage ShapeEditor::compositeStamp(const HalconCpp::HImage& base,
+		const HalconCpp::HImage& patternRGBA, const HalconCpp::HTuple& H_pat2base, int alpha)
+	{
+		HalconCpp::HImage result = base;
+		try
+		{
+			// HomMat2D 为 6 元组（仿射 2x3）
+			if (!patternRGBA.IsInitialized() || H_pat2base.TupleLength() != 6)
+				return result;
+			if (patternRGBA.CountChannels().I() != 4)
+				return result;
+
+			HalconCpp::HImage R, G, B, A;
+			HalconCpp::Decompose4(patternRGBA, &R, &G, &B, &A);
+
+			HalconCpp::HImage baseRgb;
+			if (base.CountChannels().I() == 1)
+				HalconCpp::Compose3(base, base, base, &baseRgb);
+			else
+				baseRgb = base;
+
+			// affine_trans_image_size 使用"输出 -> 输入"的逆变换
+			HalconCpp::HTuple H_base2pat;
+			HalconCpp::HomMat2dInvert(H_pat2base, &H_base2pat);
+
+			const int w = baseRgb.Width().I();
+			const int h = baseRgb.Height().I();
+
+			HalconCpp::HImage Rt, Gt, Bt, At;
+			HalconCpp::AffineTransImageSize(R, &Rt, H_base2pat, "constant", w, h);
+			HalconCpp::AffineTransImageSize(G, &Gt, H_base2pat, "constant", w, h);
+			HalconCpp::AffineTransImageSize(B, &Bt, H_base2pat, "constant", w, h);
+			HalconCpp::AffineTransImageSize(A, &At, H_base2pat, "constant", w, h);
+
+			// 归一化 alpha（real 类型）：图像自身 alpha 通道 × 整体透明度 → [0,1]
+			HalconCpp::HImage alphaN;
+			const double globalAlpha = static_cast<double>(alpha) / 255.0;
+			HalconCpp::ConvertImageType(At, &alphaN, "real");                    // 0..255 → real
+			HalconCpp::ScaleImage(alphaN, &alphaN, globalAlpha / 255.0, 0.0);    // → 0..1
+
+			HalconCpp::HImage baseR, baseG, baseB;
+			HalconCpp::Decompose3(baseRgb, &baseR, &baseG, &baseB);
+
+			HalconCpp::HImage outR, outG, outB;
+			blendChannel(Rt, baseR, alphaN, &outR);
+			blendChannel(Gt, baseG, alphaN, &outG);
+			blendChannel(Bt, baseB, alphaN, &outB);
+
+			HalconCpp::Compose3(outR, outG, outB, &result);
+		}
+		catch (const HalconCpp::HException&)
+		{
+			result = base;
+		}
+		catch (...)
+		{
+			result = base;
+		}
+		return result;
 	}
 
 	// === HObject 导出 ===
@@ -311,6 +452,28 @@ namespace ui
 	{
 		switch (e->type())
 		{
+		case QEvent::Wheel:
+		{
+			if (tool_ != Tool::StampPattern || !hasStampPattern_)
+				break;
+			auto* we = static_cast<QWheelEvent*>(e);
+			const double steps = we->angleDelta().y() / 120.0;
+			if (we->modifiers() & Qt::ControlModifier)
+			{
+				// Ctrl+滚轮 → 缩放
+				stampScale_ = qBound(0.05, stampScale_ * std::pow(1.10, steps), 20.0);
+			}
+			else
+			{
+				// 滚轮 → 旋转（每格 1°）
+				constexpr double kDegToRad = 3.14159265358979323846 / 180.0;
+				stampAngle_ += steps * kDegToRad;
+			}
+			refreshOverlay();
+			emit stampPatternChanged();
+			return true;
+		}
+
 		case QEvent::MouseButtonPress:
 		{
 			auto* me = static_cast<QMouseEvent*>(e);
@@ -379,6 +542,15 @@ namespace ui
 					emit centerPointChanged();
 					return true;
 				}
+				else if (tool_ == Tool::StampPattern && hasStampPattern_)
+				{
+					// 左键拖动：平移套版
+					stampDragging_ = true;
+					stampDragAnchorWidget_ = me->pos();
+					stampDragStartRow_ = stampRow_;
+					stampDragStartCol_ = stampCol_;
+					return true;
+				}
 			}
 			else if (me->button() == Qt::RightButton)
 			{
@@ -415,6 +587,12 @@ namespace ui
 
 					refreshOverlay();
 					// 确认后返回 View，必须再次点击按钮才能进行下一次绘制
+					setTool(Tool::View);
+					return true;
+				}
+				if (tool_ == Tool::StampPattern)
+				{
+					stampDragging_ = false;
 					setTool(Tool::View);
 					return true;
 				}
@@ -466,11 +644,27 @@ namespace ui
 				refreshOverlay();
 				return true;
 			}
+			else if (tool_ == Tool::StampPattern && stampDragging_)
+			{
+				const QPointF imgCur = widgetToImage(me->pos());
+				const QPointF imgAnchor = widgetToImage(stampDragAnchorWidget_);
+				stampRow_ = stampDragStartRow_ + (imgCur.y() - imgAnchor.y());
+				stampCol_ = stampDragStartCol_ + (imgCur.x() - imgAnchor.x());
+				refreshOverlay();
+				emit stampPatternChanged();
+				return true;
+			}
 			break;
 		}
 
 		case QEvent::MouseButtonRelease:
 		{
+			auto* me = static_cast<QMouseEvent*>(e);
+			if (tool_ == Tool::StampPattern && me->button() == Qt::LeftButton)
+			{
+				stampDragging_ = false;
+				return true;
+			}
 			// 矩形绘制不再在左键释放时确认，改为右键确认
 			// 左键释放后预览保持，用户可继续调整或右键确认
 			break;
@@ -508,7 +702,7 @@ namespace ui
 		if (!imageLabel_ || !imageLabel_->isReady() || displaying_)
 			return;
 
-		imageLabel_->displayImage(imageLabel_->lastImage());
+		renderToLabel();
 		drawAllROIs();
 		drawAllMasks();
 		drawCenterPoint();

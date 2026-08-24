@@ -28,6 +28,7 @@ namespace ui
 			RectangleMask,  ///< 屏蔽区域（品红色矩形）
 			FreehandMask,   ///< 屏蔽区域（Halcon 自由绘制）
 			CenterPoint,    ///< 定义模板中心点
+			StampPattern,   ///< 套版对齐编辑（拖动平移 / 滚轮旋转 / Ctrl+滚轮缩放）
 		};
 
 		/// 操作类型，用于统一回撤栈
@@ -75,6 +76,20 @@ namespace ui
 		/// 设置手动中心点（修改模式时从已有模型恢复）
 		void setCenterPoint(const QPointF& point);
 		bool hasCenterPoint() const { return hasCenterPoint_; }
+
+		// === 套版（StampPattern）叠加与对齐编辑 ===
+
+		/// 设置套版叠加图（RGBA）与手动对齐参数。row/col 为参考(训练)图像坐标，angle 为弧度。
+		void setStampPattern(const HalconCpp::HImage& rgba, double row, double col, double angle, double scale, int alpha);
+		/// 清除套版叠加。
+		void clearStampPattern();
+		bool hasStampPattern() const { return hasStampPattern_; }
+		/// 当前编辑后的对齐参数（参考图像坐标）。
+		double stampRow() const { return stampRow_; }
+		double stampCol() const { return stampCol_; }
+		double stampAngle() const { return stampAngle_; }
+		double stampScale() const { return stampScale_; }
+		int stampAlpha() const { return stampAlpha_; }
 
 		// === 编辑操作 ===
 
@@ -130,6 +145,8 @@ namespace ui
 		void maskChanged();
 		void centerPointChanged();
 		void toolChanged(Tool tool);
+		/// 套版对齐参数被拖动/旋转/缩放编辑后发出。
+		void stampPatternChanged();
 
 	protected:
 		void resizeEvent(QResizeEvent* e) override;
@@ -156,6 +173,17 @@ namespace ui
 
 		QPointF widgetToImage(const QPoint& widgetPos) const;
 
+		/// 依据 baseImage_ 与套版状态，将（合成后的）图像显示到 L2 控件。
+		void renderToLabel();
+
+		/// 构建套版对齐变换：套版图坐标 -> 参考(训练)图像坐标（缩放→旋转→平移）。
+		static HalconCpp::HTuple stampHomMat2D(double row, double col, double angle, double scale);
+
+		/// 将 RGBA 套版图按变换 alpha 混合叠加到基图，失败时原样返回基图。
+		/// alpha 为整体透明度（0~255，255 完全不透明），与套版图自身 alpha 通道相乘。
+		static HalconCpp::HImage compositeStamp(const HalconCpp::HImage& base,
+			const HalconCpp::HImage& patternRGBA, const HalconCpp::HTuple& H_pat2base, int alpha);
+
 		HalconInteractiveLabel* imageLabel_{ nullptr };
 
 		Tool tool_{ Tool::View };
@@ -180,6 +208,18 @@ namespace ui
 
 		QPointF centerPoint_;
 		bool hasCenterPoint_{ false };
+
+		// 套版叠加：基图与 RGBA 套版图、手动对齐参数（参考图像坐标）
+		HalconCpp::HImage baseImage_;
+		HalconCpp::HImage stampPatternImage_;
+		bool hasStampPattern_{ false };
+		double stampRow_{ 0.0 }, stampCol_{ 0.0 }, stampAngle_{ 0.0 }, stampScale_{ 1.0 };
+		int stampAlpha_{ 180 };
+
+		// 套版拖动平移状态
+		bool stampDragging_{ false };
+		QPoint stampDragAnchorWidget_;
+		double stampDragStartRow_{ 0.0 }, stampDragStartCol_{ 0.0 };
 
 		// 识别标记
 		bool showMarker_{ false };
