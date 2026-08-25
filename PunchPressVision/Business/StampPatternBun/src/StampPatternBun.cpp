@@ -237,18 +237,26 @@ namespace bun
 			else
 				baseRgb = base;
 
-			// affine_trans_image_size 使用"输出 -> 输入"的逆变换
-			HalconCpp::HTuple H_base2pat;
-			HalconCpp::HomMat2dInvert(H_pat2base, &H_base2pat);
-
+			// affine_trans_image_size 的 HomMat2D 为"输入 -> 输出"变换，
+			// 直接传入即可（输出 domain = H·输入 domain，传逆矩阵会把
+			// domain 映到图像外导致全黑——实测验证）
 			const int w = baseRgb.Width().I();
 			const int h = baseRgb.Height().I();
 
 			HalconCpp::HImage Rt, Gt, Bt, At;
-			HalconCpp::AffineTransImageSize(R, &Rt, H_base2pat, "constant", w, h);
-			HalconCpp::AffineTransImageSize(G, &Gt, H_base2pat, "constant", w, h);
-			HalconCpp::AffineTransImageSize(B, &Bt, H_base2pat, "constant", w, h);
-			HalconCpp::AffineTransImageSize(A, &At, H_base2pat, "constant", w, h);
+			HalconCpp::AffineTransImageSize(R, &Rt, H_pat2base, "constant", w, h);
+			HalconCpp::AffineTransImageSize(G, &Gt, H_pat2base, "constant", w, h);
+			HalconCpp::AffineTransImageSize(B, &Bt, H_pat2base, "constant", w, h);
+			HalconCpp::AffineTransImageSize(A, &At, H_pat2base, "constant", w, h);
+
+			// 变换输出的 domain 只有套版包围盒大小，而 MultImage/AddImage 只在
+			// domain 交集上计算，不扩回全图会导致合成结果只剩套版区域
+			// （窗口 DispObj 只显示 domain 内的像素）。domain 外灰度为 0：
+			// alpha=0 即全透明，RGB 通道会被 alpha=0 屏蔽，扩展是安全的。
+			HalconCpp::FullDomain(Rt, &Rt);
+			HalconCpp::FullDomain(Gt, &Gt);
+			HalconCpp::FullDomain(Bt, &Bt);
+			HalconCpp::FullDomain(At, &At);
 
 			// 归一化 alpha（real 类型）：图像自身 alpha 通道 × 整体透明度 → [0,1]
 			// （与 ShapeEditor::compositeStamp 保持一致，修改时需同步）

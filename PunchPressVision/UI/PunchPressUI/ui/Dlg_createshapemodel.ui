@@ -646,7 +646,7 @@ QPushButton:pressed {
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_offset">
                   <item>
-                   <layout class="QHBoxLayout" name="horizontalLayout_offsetX" stretch="1,1">
+                   <layout class="QHBoxLayout" name="horizontalLayout_offsetX" stretch="2,3,1,1">
                     <item>
                      <widget class="QLabel" name="label_offsetX">
                       <property name="styleSheet">
@@ -659,7 +659,7 @@ QPushButton:pressed {
     }</string>
                       </property>
                       <property name="text">
-                       <string>左右偏差(mm)</string>
+                       <string>左右微调(mm)</string>
                       </property>
                      </widget>
                     </item>
@@ -696,10 +696,78 @@ QPushButton:pressed {
                       </property>
                      </widget>
                     </item>
+                    <item>
+                     <widget class="QPushButton" name="btn_offsetXSub">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true">QPushButton {
+    padding: 6px 4px;
+    border: 2px solid #CCC;
+    border-radius: 4px;
+    background-color: white;
+    color: #444;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+QPushButton:hover {
+    border-color: #999;
+    background-color: #F5F5F5;
+}
+
+QPushButton:pressed {
+    border-color: #777;
+    background-color: #EEE;
+}</string>
+                      </property>
+                      <property name="text">
+                       <string>-</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="btn_offsetXAdd">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true">QPushButton {
+    padding: 6px 4px;
+    border: 2px solid #CCC;
+    border-radius: 4px;
+    background-color: white;
+    color: #444;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+QPushButton:hover {
+    border-color: #999;
+    background-color: #F5F5F5;
+}
+
+QPushButton:pressed {
+    border-color: #777;
+    background-color: #EEE;
+}</string>
+                      </property>
+                      <property name="text">
+                       <string>+</string>
+                      </property>
+                     </widget>
+                    </item>
                    </layout>
                   </item>
                   <item>
-                   <layout class="QHBoxLayout" name="horizontalLayout_offsetY" stretch="1,1">
+                   <layout class="QHBoxLayout" name="horizontalLayout_offsetY" stretch="2,3,1,1">
                     <item>
                      <widget class="QLabel" name="label_offsetY">
                       <property name="styleSheet">
@@ -712,7 +780,7 @@ QPushButton:pressed {
     }</string>
                       </property>
                       <property name="text">
-                       <string>上下偏差(mm)</string>
+                       <string>上下微调(mm)</string>
                       </property>
                      </widget>
                     </item>
@@ -749,10 +817,78 @@ QPushButton:pressed {
                       </property>
                      </widget>
                     </item>
+                    <item>
+                     <widget class="QPushButton" name="btn_offsetYSub">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true">QPushButton {
+    padding: 6px 4px;
+    border: 2px solid #CCC;
+    border-radius: 4px;
+    background-color: white;
+    color: #444;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+QPushButton:hover {
+    border-color: #999;
+    background-color: #F5F5F5;
+}
+
+QPushButton:pressed {
+    border-color: #777;
+    background-color: #EEE;
+}</string>
+                      </property>
+                      <property name="text">
+                       <string>-</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="btn_offsetYAdd">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true">QPushButton {
+    padding: 6px 4px;
+    border: 2px solid #CCC;
+    border-radius: 4px;
+    background-color: white;
+    color: #444;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+QPushButton:hover {
+    border-color: #999;
+    background-color: #F5F5F5;
+}
+
+QPushButton:pressed {
+    border-color: #777;
+    background-color: #EEE;
+}</string>
+                      </property>
+                      <property name="text">
+                       <string>+</string>
+                      </property>
+                     </widget>
+                    </item>
                    </layout>
                   </item>
                   <item>
-                   <layout class="QHBoxLayout" name="horizontalLayout_offsetAngle" stretch="1,1">
+                   <layout class="QHBoxLayout" name="horizontalLayout_offsetAngle" stretch="2,3,1,1">
                     <item>
                      <widget class="QLabel" name="label_offsetAngle">
                       <property name="styleSheet">
@@ -799,6 +935,74 @@ QPushButton:pressed {
                       </property>
                       <property name="text">
                        <string>0.00</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="btn_offsetAngleSub">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true">QPushButton {
+    padding: 6px 4px;
+    border: 2px solid #CCC;
+    border-radius: 4px;
+    background-color: white;
+    color: #444;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+QPushButton:hover {
+    border-color: #999;
+    background-color: #F5F5F5;
+}
+
+QPushButton:pressed {
+    border-color: #777;
+    background-color: #EEE;
+}</string>
+                      </property>
+                      <property name="text">
+                       <string>-</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="btn_offsetAngleAdd">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true">QPushButton {
+    padding: 6px 4px;
+    border: 2px solid #CCC;
+    border-radius: 4px;
+    background-color: white;
+    color: #444;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+QPushButton:hover {
+    border-color: #999;
+    background-color: #F5F5F5;
+}
+
+QPushButton:pressed {
+    border-color: #777;
+    background-color: #EEE;
+}</string>
+                      </property>
+                      <property name="text">
+                       <string>+</string>
                       </property>
                      </widget>
                     </item>
@@ -1546,39 +1750,6 @@ QPushButton:pressed {
               </property>
               <property name="wordWrap">
                <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btn_stampPattern">
-<property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">QPushButton {
-    padding: 6px 14px;
-    border: 2px solid #CCC;
-    border-radius: 4px;
-    background-color: white;
-    color: #444;
-    font-size: 24px; 
-}
-
-QPushButton:hover {
-    border-color: #999;
-    background-color: #F5F5F5;
-}
-
-QPushButton:pressed {
-    border-color: #777;
-    background-color: #EEE;
-}</string>
-              </property>
-              <property name="text">
-               <string>对齐套版</string>
               </property>
              </widget>
             </item>

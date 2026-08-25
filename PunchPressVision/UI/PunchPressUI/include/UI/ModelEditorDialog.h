@@ -44,7 +44,6 @@ namespace ui
 
 		// 套版
 		void onSelectStampPattern();
-		void onAlignStampPattern();
 
 		// 相机参数
 		void onGain1Clicked();
@@ -96,7 +95,8 @@ namespace ui
 
 		/// 套版对齐变化时，由套版相对中心点的位移/旋转推导模型偏移量（mm/deg）
 		void syncOffsetsFromStamp();
-		/// 按当前偏移量重建套版位置（手动修改偏移量或加载模型后调用）
+		/// 应用偏移：X/Y 折入定义中心点（移动后的落点即新中心点，主程序不再叠加位置偏移）；
+		/// 角度作为套版旋转角保留（生产匹配仍减去该角度）
 		void applyOffsetsToStamp();
 		/// 刷新偏差补偿按钮显示
 		void updateOffsetButtons();

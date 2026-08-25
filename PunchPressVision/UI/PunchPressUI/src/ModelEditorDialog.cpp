@@ -11,6 +11,8 @@
 #include <QShowEvent>
 #include <QtConcurrent/QtConcurrentRun>
 
+#include <cmath>
+
 #include "app/PunchPressApp.hpp"
 #include "Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp"
 #include "infrastructure/ShapeModelManagerModule/ShapeModelManagerModule.hpp"
@@ -117,8 +119,6 @@ namespace ui
 		// 套版
 		connect(ui->btn_selectStampPattern, &QPushButton::clicked,
 			this, &ModelEditorDialog::onSelectStampPattern);
-		connect(ui->btn_stampPattern, &QPushButton::clicked,
-			this, &ModelEditorDialog::onAlignStampPattern);
 
 		// 相机参数
 		connect(ui->btn_zengyi1, &QPushButton::clicked,
@@ -176,6 +176,28 @@ namespace ui
 		// 拖动/旋转套版 → 由套版相对中心点的位移推导模型偏移量（与主程序同一偏移量）
 		connect(shapeEditor_, &ShapeEditor::stampPatternChanged,
 			this, &ModelEditorDialog::syncOffsetsFromStamp);
+
+		// 偏差微调按钮（步长 0.1mm / 0.1°），调整后套版中心实时跟随移动
+		auto nudgeOffset = [this](QPushButton* btn, double& value,
+			double delta, double minV, double maxV)
+		{
+			// 按 0.1 步长取整，避免浮点累加漂移
+			value = qBound(minV, std::round((value + delta) * 10.0) / 10.0, maxV);
+			btn->setText(QString::number(value, 'f', 2));
+			applyOffsetsToStamp();
+		};
+		connect(ui->btn_offsetXSub, &QPushButton::clicked, this, [this, nudgeOffset]()
+			{ nudgeOffset(ui->btn_offsetX, offsetX_, -0.1, -1000.0, 1000.0); });
+		connect(ui->btn_offsetXAdd, &QPushButton::clicked, this, [this, nudgeOffset]()
+			{ nudgeOffset(ui->btn_offsetX, offsetX_, 0.1, -1000.0, 1000.0); });
+		connect(ui->btn_offsetYSub, &QPushButton::clicked, this, [this, nudgeOffset]()
+			{ nudgeOffset(ui->btn_offsetY, offsetY_, -0.1, -1000.0, 1000.0); });
+		connect(ui->btn_offsetYAdd, &QPushButton::clicked, this, [this, nudgeOffset]()
+			{ nudgeOffset(ui->btn_offsetY, offsetY_, 0.1, -1000.0, 1000.0); });
+		connect(ui->btn_offsetAngleSub, &QPushButton::clicked, this, [this, nudgeOffset]()
+			{ nudgeOffset(ui->btn_offsetAngle, offsetAngle_, -0.1, -180.0, 180.0); });
+		connect(ui->btn_offsetAngleAdd, &QPushButton::clicked, this, [this, nudgeOffset]()
+			{ nudgeOffset(ui->btn_offsetAngle, offsetAngle_, 0.1, -180.0, 180.0); });
 
 		// 预处理参数变化时刷新显示
 		connect(ui->comboBox_ImageType, QOverload<int>::of(&QComboBox::currentIndexChanged),
@@ -367,21 +389,6 @@ namespace ui
 		updateStampPatternStatus();
 	}
 
-	void ModelEditorDialog::onAlignStampPattern()
-	{
-		if (!shapeEditor_) return;
-		if (!shapeEditor_->hasStampPattern())
-		{
-			rw::rqwu::MessageBox::information(this,
-				QStringLiteral("提示"), QStringLiteral("请先在列表中选择一个套版"));
-			return;
-		}
-		if (shapeEditor_->tool() == ShapeEditor::Tool::StampPattern)
-			shapeEditor_->setTool(ShapeEditor::Tool::View);
-		else
-			shapeEditor_->setTool(ShapeEditor::Tool::StampPattern);
-	}
-
 	void ModelEditorDialog::persistStampPatternAlignment()
 	{
 		if (stampPatternId_.empty() || !shapeEditor_ || !shapeEditor_->hasStampPattern())
@@ -464,26 +471,45 @@ namespace ui
 
 		using namespace HalconCpp;
 
-		double dRow = 0.0, dCol = 0.0;
-		HalconCpp::HTuple H;
-		if (ninePointHomMat2D(H))
+		// 位置偏移折入定义中心点：移动后的落点即新的定义中心点，
+		// 主程序匹配结果直接使用该中心点，不再叠加位置偏移
+		if (offsetX_ != 0.0 || offsetY_ != 0.0)
 		{
-			try
+			HalconCpp::HTuple H;
+			if (ninePointHomMat2D(H))
 			{
-				// 与 match() 同一约定：像素位移 = invH·(-offsetY, offsetX) - invH·(0,0)
-				HTuple invH;
-				HomMat2dInvert(H, &invH);
-				HTuple r0, c0, r1, c1;
-				AffineTransPoint2d(invH, 0.0, 0.0, &r0, &c0);
-				AffineTransPoint2d(invH, -offsetY_, offsetX_, &r1, &c1);
-				dRow = r1[0].D() - r0[0].D();
-				dCol = c1[0].D() - c0[0].D();
+				try
+				{
+					// 与 match() 同一约定：像素位移 = invH·(-offsetY, offsetX) - invH·(0,0)
+					HTuple invH;
+					HomMat2dInvert(H, &invH);
+					HTuple r0, c0, r1, c1;
+					AffineTransPoint2d(invH, 0.0, 0.0, &r0, &c0);
+					AffineTransPoint2d(invH, -offsetY_, offsetX_, &r1, &c1);
+					const double dRow = r1[0].D() - r0[0].D();
+					const double dCol = c1[0].D() - c0[0].D();
+					const QPointF cp = shapeEditor_->centerPoint();
+					// setCenterPoint 会让套版随中心点整体平移（保持二者重合）
+					shapeEditor_->setCenterPoint(QPointF(cp.x() + dCol, cp.y() + dRow));
+				}
+				catch (...) {}
 			}
-			catch (...) {}
+			else
+			{
+				rw::rqwu::MessageBox::warning(this,
+					QStringLiteral("提示"),
+					QStringLiteral("未检测到九点标定，位置偏差无法换算为像素，未生效。"));
+			}
+			offsetX_ = 0.0;
+			offsetY_ = 0.0;
 		}
 
-		shapeEditor_->setStampOffsetFromCenter(dRow, dCol,
+		// 角度偏移无法折入中心点：作为套版旋转角保留，
+		// 生产匹配 result.angle 仍会减去该值（中心保持重合）
+		shapeEditor_->setStampOffsetFromCenter(0.0, 0.0,
 			offsetAngle_ * 3.14159265358979323846 / 180.0);
+
+		updateOffsetButtons();
 	}
 
 	void ModelEditorDialog::updateOffsetButtons()
@@ -1041,11 +1067,6 @@ namespace ui
 			tool == ShapeEditor::Tool::CenterPoint
 				? QStringLiteral("退出定义")
 				: QStringLiteral("定义中心点"));
-
-		ui->btn_stampPattern->setText(
-			tool == ShapeEditor::Tool::StampPattern
-				? QStringLiteral("退出对齐")
-				: QStringLiteral("对齐套版"));
 	}
 
 	// ===== 修改模式：加载已有模型 ==============================================
