@@ -704,6 +704,7 @@ namespace ui
 
 		if (!result.success)
 		{
+			closeAfterTraining_ = false;
 			rw::rqwu::MessageBox::warning(this,
 				isModifyMode_ ? QStringLiteral("修改模型") : QStringLiteral("创建模型"),
 				QString::fromStdString(result.errorMsg));
@@ -717,6 +718,7 @@ namespace ui
 		{
 			if (!biz.shape_mode_manager_bun->persistUpdatedModel(result, modelId_, &err))
 			{
+				closeAfterTraining_ = false;
 				rw::rqwu::MessageBox::warning(this,
 					QStringLiteral("修改模型"),
 					QString::fromStdString(err));
@@ -732,6 +734,7 @@ namespace ui
 			Config::ShapeModelInfo outInfo;
 			if (!biz.shape_mode_manager_bun->persistNewModel(result, pendingRequest_, outInfo, &err))
 			{
+				closeAfterTraining_ = false;
 				rw::rqwu::MessageBox::warning(this,
 					QStringLiteral("创建模型"),
 					QString::fromStdString(err));
@@ -743,6 +746,13 @@ namespace ui
 			modelId_ = outInfo.getId();
 			modelCreated_ = true;
 			isModifyMode_ = true;  // 后续保存走更新逻辑，避免重复创建
+		}
+
+		// 退出时选择保存触发的训练：持久化成功后关闭对话框
+		if (closeAfterTraining_)
+		{
+			closeAfterTraining_ = false;
+			accept();
 		}
 	}
 
@@ -1256,6 +1266,11 @@ namespace ui
 
 	void ModelEditorDialog::onExit()
 	{
+		// 训练为异步执行，进行中禁止关闭：
+		// 对话框为栈对象，关闭即销毁会导致完成回调不再触发、保存丢失
+		if (isTraining_)
+			return;
+
 		// 修改模式或已创建过模板 → 弹窗询问是否保存；否则直接退出
 		if (isModifyMode_ || modelCreated_)
 		{
@@ -1270,12 +1285,18 @@ namespace ui
 				{
 					// 已创建过模板，只更新中心点等非训练参数，无需重新训练
 					saveCenterPointToModel();
+					accept();
 				}
 				else
 				{
+					// 训练异步执行：标记完成后关闭，由 onTrainingFinished 在
+					// 持久化成功后 accept()；若训练未能启动则保持对话框打开
+					closeAfterTraining_ = true;
 					onCreateModel();
+					if (!isTraining_)
+						closeAfterTraining_ = false;
 				}
-				accept();
+				return;
 			}
 			else
 			{

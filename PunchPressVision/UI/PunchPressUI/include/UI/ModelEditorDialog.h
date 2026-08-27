@@ -133,6 +133,7 @@ namespace ui
 		QDialog* progressDialog_{ nullptr };
 		bun::CreateModelRequest pendingRequest_;  ///< 异步训练期间的请求副本
 		bool isTraining_{ false };               ///< 防止重复触发
+		bool closeAfterTraining_{ false };       ///< 退出时选择保存：训练完成后再关闭对话框
 
 		Config::cameraCfg cameraCfg_;
 
