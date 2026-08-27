@@ -605,9 +605,9 @@ namespace ui
 		if (!requireROI(QStringLiteral("创建模型")))
 			return;
 
-		// 若仍在套版对齐工具中，先写回对齐参数
-		if (shapeEditor_ && shapeEditor_->tool() == ShapeEditor::Tool::StampPattern)
-			persistStampPatternAlignment();
+		// 关联了套版时，无论当前是否处于套版对齐工具，都把编辑器中的
+		// 对齐参数写回套版库（生产帧叠加直接读取库中的对齐参数）
+		persistStampPatternAlignment();
 
 		auto& biz = app_.business();
 		if (!biz.shape_mode_manager_bun || !lastFrame_.IsInitialized())
@@ -1264,6 +1264,8 @@ namespace ui
 				QStringLiteral("是否创建模板？\n\n选择\"是\"保存模板后退出，选择\"否\"直接退出。"))
 				== rw::rqwu::MessageBox::StandardButton::Yes)
 			{
+				// 退出保存时同步写回套版对齐参数（仅保存中心点的路径不会经过 onCreateModel）
+				persistStampPatternAlignment();
 				if (modelCreated_)
 				{
 					// 已创建过模板，只更新中心点等非训练参数，无需重新训练
