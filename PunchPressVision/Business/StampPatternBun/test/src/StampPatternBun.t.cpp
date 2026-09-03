@@ -232,6 +232,60 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
+	// diag2：验证 DispObj 显示时绘制方案（与 PunchPressApp::dispStampPatternOverlays 同逻辑）
+	if (argc > 1 && std::string(argv[1]) == "diag2")
+	{
+		// 底图灰度 100，便于区分"被套版覆盖"与"底图保留"
+		HalconCpp::HImage base;
+		HalconCpp::GenImageConst(&base, "byte", 128, 128);
+		HalconCpp::HObject dom;
+		HalconCpp::GetDomain(base, &dom);
+		HalconCpp::OverpaintRegion(base, dom, 100, "fill");
+
+		HalconCpp::HTuple H;
+		HalconCpp::HomMat2dIdentity(&H);
+		HalconCpp::HomMat2dTranslate(H, 40.0, 40.0, &H);
+
+		HalconCpp::HTuple win;
+		HalconCpp::OpenWindow(0, 0, 128, 128, 0, "buffer", "", &win);
+		HalconCpp::SetPart(win, 0, 0, 127, 127);
+		HalconCpp::DispObj(base, win);
+
+		// ---- 与 dispStampPatternOverlays 相同的绘制逻辑 ----
+		HalconCpp::HImage stampT;
+		HalconCpp::AffineTransImage(makeOpaqueRedRgba(32, 32), &stampT, H, "constant", "true");
+		HalconCpp::HImage R, G, B, A;
+		HalconCpp::Decompose4(stampT, &R, &G, &B, &A);
+		HalconCpp::HRegion alphaRegion;
+		HalconCpp::Threshold(A, &alphaRegion, 1.0, 255.0);
+		std::cout << "alpha area=" << alphaRegion.Area().D() << std::endl;
+		HalconCpp::HImage stampRgb;
+		HalconCpp::Compose3(R, G, B, &stampRgb);
+		HalconCpp::HImage stampVisible = stampRgb.ReduceDomain(alphaRegion);
+		HalconCpp::DispObj(stampVisible, win);
+
+		HalconCpp::HImage out;
+		HalconCpp::DumpWindowImage(&out, win);
+		HalconCpp::CloseWindow(win);
+
+		std::cout << "out channels=" << out.CountChannels().I() << std::endl;
+		const int probePts[][2] = {
+			{ 56, 56 },   // 套版中心 → 应红
+			{ 40, 40 },   // 套版左上 → 应红
+			{ 71, 71 },   // 套版右下 → 应红
+			{ 72, 72 },   // 套版外 1px → 应为底图灰 100
+			{ 10, 10 },   // 远处 → 底图灰 100
+		};
+		for (const auto& p : probePts)
+		{
+			HalconCpp::HTuple g = out.GetGrayval(p[0], p[1]);
+			std::cout << "gray(" << p[0] << "," << p[1] << ")=("
+				<< g[0].I() << (g.TupleLength() > 1 ? "," + std::to_string(g[1].I()) + "," + std::to_string(g[2].I()) : "")
+				<< ")" << std::endl;
+		}
+		return 0;
+	}
+
 	test::StampPatternBunTest::runBasicTest();
 
 	return 0;

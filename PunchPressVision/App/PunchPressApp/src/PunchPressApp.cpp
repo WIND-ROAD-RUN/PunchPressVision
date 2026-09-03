@@ -488,10 +488,10 @@ namespace app
 			const HalconCpp::HImage& bgImageSrc = (bestMatch != matches.end()
 				&& bestMatch->preprocessedImage.IsInitialized())
 				? bestMatch->preprocessedImage : image;
-			// 套版自动对齐叠加：按各匹配原始位姿将关联套版 alpha 混合到底图
-			const HalconCpp::HImage bgImage =
-				composeStampPatternOverlays(bgImageSrc, matches);
-			HalconCpp::DispObj(bgImage, bufWin);
+			HalconCpp::DispObj(bgImageSrc, bufWin);
+			// 套版自动对齐显示：按各匹配原始位姿将关联套版直接绘制到窗口
+			// （显示时绘制，随 DumpWindowImage 一次性读回，不做整图像素预合成）
+			dispStampPatternOverlays(bufWin, matches);
 
 				// 绘制所有已加载模型的屏蔽区域（红色 margin），每个模型仅作用于自身识别
 				try
@@ -564,13 +564,12 @@ namespace app
 		}
 	}
 
-	HalconCpp::HImage PunchPressApp::composeStampPatternOverlays(
-		const HalconCpp::HImage& base,
+	void PunchPressApp::dispStampPatternOverlays(
+		const HalconCpp::HTuple& win,
 		const std::vector<bun::MatchResult>& matches)
 	{
-		HalconCpp::HImage img = base;
 		if (!business_.stamp_pattern_bun)
-			return img;
+			return;
 
 		for (const auto& m : matches)
 		{
@@ -581,7 +580,7 @@ namespace app
 				Config::StampPatternData data;
 				if (!business_.stamp_pattern_bun->getPatternData(m.stampPatternId, data))
 					continue;
-				if (!data._patternImage.IsInitialized())
+				if (!data._patternImage.IsInitialized() || data.alpha <= 0)
 					continue;
 
 				// DXF 套版：图像素单位为实际尺寸(mm)，按九点标定换算为像素尺寸
@@ -598,14 +597,30 @@ namespace app
 				HalconCpp::HTuple H_pat2match;
 				HalconCpp::HomMat2dCompose(H_rigid, H_A, &H_pat2match);
 
-				img = bun::StampPatternBun::compositeOverlay(
-					img, data._patternImage, H_pat2match, data.alpha);
+				// 套版仿射到当前匹配位姿（输出 domain 位于图像绝对坐标）
+				// affine_trans_image 的 HomMat2D 为"输入 -> 输出"方向，直接传入；
+				// AdaptImageSize="true" 使输出图自适应变换后尺寸，避免平移后被裁剪
+				HalconCpp::HImage stampT;
+				HalconCpp::AffineTransImage(data._patternImage, &stampT,
+					H_pat2match, "constant", "true");
+
+				// 只显示图案本体（alpha > 0），透明背景不覆盖底图
+				HalconCpp::HImage R, G, B, A;
+				HalconCpp::Decompose4(stampT, &R, &G, &B, &A);
+				HalconCpp::HRegion alphaRegion;
+				HalconCpp::Threshold(A, &alphaRegion, 1.0, 255.0);
+				if (alphaRegion.Area().D() <= 0.0)
+					continue;
+
+				HalconCpp::HImage stampRgb;
+				HalconCpp::Compose3(R, G, B, &stampRgb);
+				HalconCpp::HImage stampVisible = stampRgb.ReduceDomain(alphaRegion);
+				HalconCpp::DispObj(stampVisible, win);
 			}
 			catch (...)
 			{
-				// 单个套版叠加失败不影响其他套版与主流程
+				// 单个套版绘制失败不影响其他套版与主流程
 			}
 		}
-		return img;
 	}
 }
