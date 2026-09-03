@@ -203,13 +203,13 @@ namespace app
 
 	bool PunchPressApp::configureCameraForDebug()
 	{
-		// 自由运行模式，3fps（FR-005）
+		// 自由运行模式，1fps（FR-005）
 		auto& inf = business_.infrastructure();
 
 		if (!inf.camera_module_)
 			return false;
-		bool ok = inf.camera_module_->setFreeRunMode(global::CameraIndex::Camera1, 3.0);
-		ok = inf.camera_module_->setFreeRunMode(global::CameraIndex::Camera2, 3.0) && ok;
+		bool ok = inf.camera_module_->setFreeRunMode(global::CameraIndex::Camera1, 1.0);
+		ok = inf.camera_module_->setFreeRunMode(global::CameraIndex::Camera2, 1.0) && ok;
 		return ok;
 	}
 
@@ -243,7 +243,7 @@ namespace app
 
 	bool PunchPressApp::configureCameraForCreateModel()
 	{
-		// 创建模型模式：自由运行模式，3fps，图像实时刷新到 ShapeEditor
+		// 创建模型模式：自由运行模式，1fps，图像实时刷新到 ShapeEditor
 		return configureCameraForDebug();
 	}
 
@@ -289,7 +289,7 @@ namespace app
 		case global::RunMode::Debug:       configureCameraForDebug(); break;
 		case global::RunMode::Production:  configureCameraForProduction(); break;
 		case global::RunMode::CreateModel: configureCameraForCreateModel(); break;
-		case global::RunMode::DrawMatchRegion: configureCameraForDebug(); break;  // 同 Debug：FreeRun 3fps
+		case global::RunMode::DrawMatchRegion: configureCameraForDebug(); break;  // 同 Debug：FreeRun 1fps
 		}
 
 		// 控制相机取流：Idle 模式必须停止 monitor；从 Idle 进入其他模式时需要开始取流
