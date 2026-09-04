@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include <QDialog>
 #include <QLabel>
 #include <QPushButton>
@@ -51,6 +53,8 @@ namespace ui
 		void onEditModel();
 		void onExit();
 		void onUnloadAll();
+		/// <summary>预览当前模型关联套版的叠加效果（套版按对齐参数叠加到模型原图）。</summary>
+		void onPreviewStamp();
 
 	private:
 		void buildConnections();
@@ -77,6 +81,12 @@ namespace ui
 		/// 动态创建的控件（不在 .ui 文件中）
 		QLabel* labelLoadedStatus_{ nullptr };
 		QPushButton* pbtnUnloadAll_{ nullptr };
+		QPushButton* pbtnPreviewStamp_{ nullptr };
+
+		/// 当前选中模型的套版关联状态（refreshModelDetail 中更新，供预览使用）
+		std::string currentStampPatternId_;
+		bool currentStampValid_{ false };
+		HalconCpp::HImage currentOriginalImage_;
 
 		QVector<Config::ShapeModelInfo> allModels_;
 	};

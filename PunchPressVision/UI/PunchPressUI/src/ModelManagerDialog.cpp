@@ -22,7 +22,9 @@
 
 #include "app/PunchPressApp.hpp"
 #include "Business/ShapeModeManagerBun/ShapeModeManagerBun.hpp"
+#include "Business/StampPatternBun/StampPatternBun.hpp"
 #include "infrastructure/ShapeModelManagerModule/Config/ShapeModelItem.hpp"
+#include "infrastructure/StampPatternModule/Config/StampPatternItem.hpp"
 #include "UI/ModelEditorDialog.h"
 
 #ifdef MessageBox
@@ -104,14 +106,22 @@ namespace ui
 		pbtnUnloadAll_->setStyleSheet(ui->pbtn_loadModel->styleSheet());
 		pbtnUnloadAll_->setMinimumHeight(44);
 
+		pbtnPreviewStamp_ = new QPushButton(QStringLiteral("预览套版"), this);
+		pbtnPreviewStamp_->setStyleSheet(ui->pbtn_loadModel->styleSheet());
+		pbtnPreviewStamp_->setMinimumHeight(44);
+		pbtnPreviewStamp_->setEnabled(false);
+
 		auto* statusBarLayout = new QHBoxLayout();
 		statusBarLayout->addWidget(labelLoadedStatus_);
 		statusBarLayout->addStretch();
+		statusBarLayout->addWidget(pbtnPreviewStamp_);
 		statusBarLayout->addWidget(pbtnUnloadAll_);
 		vLayout->insertLayout(kInsertPos, statusBarLayout);
 
 		connect(pbtnUnloadAll_, &QPushButton::clicked,
 			this, &ModelManagerDialog::onUnloadAll);
+		connect(pbtnPreviewStamp_, &QPushButton::clicked,
+			this, &ModelManagerDialog::onPreviewStamp);
 
 		buildConnections();
 	}
@@ -278,6 +288,11 @@ namespace ui
 		if (row < 0 || row >= allModels_.size())
 		{
 			ui->tableWidget_modelInfo->setRowCount(0);
+			currentStampPatternId_.clear();
+			currentStampValid_ = false;
+			currentOriginalImage_ = HalconCpp::HImage();
+			if (pbtnPreviewStamp_)
+				pbtnPreviewStamp_->setEnabled(false);
 			return;
 		}
 
@@ -287,25 +302,75 @@ namespace ui
 		Config::ShapeModelData data;
 		data.loadInDir(info.getFolderPath());
 
-		constexpr int kRowCount = 10;
+		// 解析套版关联状态（未使用 / 有效 / 悬空失效）
+		currentStampPatternId_ = data.stampPatternId;
+		currentOriginalImage_ = data._originalImage;
+		currentStampValid_ = false;
+		Config::StampPatternItem stampItem;
+		if (!currentStampPatternId_.empty())
+		{
+			auto& stampBun = app_.business().stamp_pattern_bun;
+			if (stampBun)
+			{
+				stampItem = stampBun->getPatternItem(currentStampPatternId_);
+				currentStampValid_ = !stampItem.info.getId().empty();
+			}
+		}
+		if (pbtnPreviewStamp_)
+			pbtnPreviewStamp_->setEnabled(currentStampValid_);
+
+		constexpr int kRowCount = 12;
 		ui->tableWidget_modelInfo->setRowCount(kRowCount);
 		ui->tableWidget_modelInfo->setColumnCount(2);
 		ui->tableWidget_modelInfo->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 		ui->tableWidget_modelInfo->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
 		ui->tableWidget_modelInfo->verticalHeader()->setVisible(true);
 
-		auto setRow = [&](int r, const QString& label, const QString& value)
+		auto setRow = [&](int r, const QString& label, const QString& value,
+			const QColor& valueColor = QColor())
 		{
 			auto* keyItem = new QTableWidgetItem(label);
 			keyItem->setFlags(keyItem->flags() & ~Qt::ItemIsEditable);
 			auto* valItem = new QTableWidgetItem(value);
 			valItem->setFlags(valItem->flags() & ~Qt::ItemIsEditable);
+			if (valueColor.isValid())
+				valItem->setForeground(QBrush(valueColor));
 			ui->tableWidget_modelInfo->setItem(r, 0, keyItem);
 			ui->tableWidget_modelInfo->setItem(r, 1, valItem);
 		};
 
+		constexpr double kRadToDeg = 180.0 / 3.14159265358979323846;
 		int r = 0;
 		setRow(r++, QStringLiteral("名称"),     QString::fromStdString(info.base_info.name));
+		// 套版关联：名称(编号) 蓝 / 未使用 灰 / 悬空引用（套版已删）橙
+		if (currentStampPatternId_.empty())
+		{
+			setRow(r++, QStringLiteral("套版"), QStringLiteral("未使用"), QColor(141, 141, 141));
+			setRow(r++, QStringLiteral("套版参数"), QStringLiteral("-"));
+		}
+		else if (currentStampValid_)
+		{
+			setRow(r++, QStringLiteral("套版"),
+				QStringLiteral("%1 (%2)")
+					.arg(QString::fromStdString(stampItem.info.base_info.name))
+					.arg(QString::fromStdString(currentStampPatternId_)),
+				QColor(QStringLiteral("#2196F3")));
+			setRow(r++, QStringLiteral("套版参数"),
+				QStringLiteral("透明度 %1，平移 %2/%3，旋转 %4°，缩放 %5%6")
+					.arg(stampItem.data.alpha)
+					.arg(stampItem.data.alignRow, 0, 'f', 1)
+					.arg(stampItem.data.alignCol, 0, 'f', 1)
+					.arg(stampItem.data.alignAngle * kRadToDeg, 0, 'f', 2)
+					.arg(stampItem.data.alignScale, 0, 'f', 3)
+					.arg(stampItem.data.fromDxf ? QStringLiteral(" (DXF)") : QString()));
+		}
+		else
+		{
+			setRow(r++, QStringLiteral("套版"),
+				QStringLiteral("已失效: %1").arg(QString::fromStdString(currentStampPatternId_)),
+				QColor(QStringLiteral("#E65100")));
+			setRow(r++, QStringLiteral("套版参数"), QStringLiteral("-"));
+		}
 		setRow(r++, QStringLiteral("图像通道"), channelName(data._SingleChannelType));
 		setRow(r++, QStringLiteral("预处理"),   preprocessSummary(data));
 		setRow(r++, QStringLiteral("对比度"),   contrastSummary(data));
@@ -518,6 +583,102 @@ namespace ui
 
 		bun->unloadAllModels();
 		refreshLoadedState();
+	}
+
+	void ModelManagerDialog::onPreviewStamp()
+	{
+		if (!currentStampValid_ || currentStampPatternId_.empty())
+			return;
+
+		auto& stampBun = app_.business().stamp_pattern_bun;
+		if (!stampBun)
+			return;
+
+		const Config::StampPatternItem item = stampBun->getPatternItem(currentStampPatternId_);
+		if (!item.data._patternImage.IsInitialized())
+		{
+			rw::rqwu::MessageBox::warning(this,
+				QStringLiteral("提示"), QStringLiteral("该套版缺少有效图片，无法预览。"));
+			return;
+		}
+
+		// 套版按对齐参数叠加到模型原图（参考位姿，即生产匹配命中位姿处的显示效果）；
+		// 无原图时退化为套版原始图案（RGBA -> RGB，4 通道直接显示仅 R 通道）
+		HalconCpp::HImage preview;
+		try
+		{
+			if (currentOriginalImage_.IsInitialized())
+			{
+				Config::StampPatternData d = item.data;
+				// DXF 套版：图素单位为实际尺寸(mm)，需乘九点标定的像素/mm
+				if (d.fromDxf)
+					d.alignScale *= bun::StampPatternBun::pixelsPerWorldUnit(
+						app_.business().infrastructure());
+				const HalconCpp::HTuple H = bun::StampPatternBun::buildAlignHomMat2D(d);
+				preview = bun::StampPatternBun::compositeOverlay(
+					currentOriginalImage_, item.data._patternImage, H, item.data.alpha);
+			}
+			else
+			{
+				preview = item.data._patternImage;
+				if (preview.CountChannels().I() == 4)
+				{
+					HalconCpp::HImage cr, cg, cb, ca;
+					HalconCpp::Decompose4(preview, &cr, &cg, &cb, &ca);
+					HalconCpp::Compose3(cr, cg, cb, &preview);
+				}
+			}
+		}
+		catch (...)
+		{
+			rw::rqwu::MessageBox::warning(this,
+				QStringLiteral("提示"), QStringLiteral("套版预览生成失败。"));
+			return;
+		}
+
+		const QString stampName = QString::fromStdString(item.info.base_info.name);
+		constexpr double kRadToDeg = 180.0 / 3.14159265358979323846;
+
+		QDialog dlg(this);
+		dlg.setWindowTitle(QStringLiteral("套版预览: %1").arg(stampName));
+		auto* layout = new QVBoxLayout(&dlg);
+
+		auto* imgLabel = new HalconInteractiveLabel(&dlg);
+		imgLabel->setMinimumSize(640, 480);
+		imgLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+		imgLabel->setAlignment(Qt::AlignCenter);
+		layout->addWidget(imgLabel, 1);
+
+		auto* infoLabel = new QLabel(
+			QStringLiteral("编号: %1    透明度: %2    平移(行/列): %3 / %4    旋转: %5°    缩放: %6%7")
+				.arg(QString::fromStdString(item.info.getId()))
+				.arg(item.data.alpha)
+				.arg(item.data.alignRow, 0, 'f', 1)
+				.arg(item.data.alignCol, 0, 'f', 1)
+				.arg(item.data.alignAngle * kRadToDeg, 0, 'f', 2)
+				.arg(item.data.alignScale, 0, 'f', 3)
+				.arg(item.data.fromDxf ? QStringLiteral(" (DXF)") : QString()),
+			&dlg);
+		infoLabel->setStyleSheet("font-size: 15px; color: #555; padding: 6px 0;");
+		layout->addWidget(infoLabel);
+
+		auto* btnLayout = new QHBoxLayout();
+		btnLayout->addStretch();
+		auto* btnClose = new QPushButton(QStringLiteral("关闭"), &dlg);
+		btnClose->setStyleSheet("QPushButton { font-size: 16px; padding: 8px 24px; }");
+		btnClose->setMinimumHeight(44);
+		btnLayout->addWidget(btnClose);
+		layout->addLayout(btnLayout);
+		QObject::connect(btnClose, &QPushButton::clicked, &dlg, &QDialog::accept);
+
+		if (preview.IsInitialized())
+		{
+			try { imgLabel->displayImage(preview); }
+			catch (...) {}
+		}
+
+		dlg.resize(960, 720);
+		dlg.exec();
 	}
 
 	void ModelManagerDialog::autoApplyExposure(const std::vector<std::string>& loadedIds,
