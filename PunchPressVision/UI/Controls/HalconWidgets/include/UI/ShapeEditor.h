@@ -80,6 +80,7 @@ namespace ui
 		// === 套版（StampPattern）叠加与对齐编辑 ===
 
 		/// 设置套版叠加图（RGBA）与手动对齐参数。row/col 为参考(训练)图像坐标，angle 为弧度。
+		/// alpha > 0 显示套版，<= 0 隐藏；套版以 DispObj 显示时绘制（不透明叠加，与生产显示一致）。
 		void setStampPattern(const HalconCpp::HImage& rgba, double row, double col, double angle, double scale, int alpha);
 		/// 清除套版叠加。
 		void clearStampPattern();
@@ -179,7 +180,7 @@ namespace ui
 
 		QPointF widgetToImage(const QPoint& widgetPos) const;
 
-		/// 依据 baseImage_ 与套版状态，将（合成后的）图像显示到 L2 控件。
+		/// 将 baseImage_ 显示到 L2 控件；套版不做像素预合成，由 drawStampPattern() 叠加。
 		void renderToLabel();
 
 		/// 重算套版平移量，使套版图中心与给定图像点重合（保持当前旋转/缩放）。
@@ -188,10 +189,13 @@ namespace ui
 		/// 构建套版对齐变换：套版图坐标 -> 参考(训练)图像坐标（缩放→旋转→平移）。
 		static HalconCpp::HTuple stampHomMat2D(double row, double col, double angle, double scale);
 
-		/// 将 RGBA 套版图按变换 alpha 混合叠加到基图，失败时原样返回基图。
-		/// alpha 为整体透明度（0~255，255 完全不透明），与套版图自身 alpha 通道相乘。
-		static HalconCpp::HImage compositeStamp(const HalconCpp::HImage& base,
-			const HalconCpp::HImage& patternRGBA, const HalconCpp::HTuple& H_pat2base, int alpha);
+		/// 将套版以显示时绘制（DispObj）方式叠加到当前视图。
+		/// 仿射结果按对齐参数缓存，视图缩放/平移只复用缓存做小图 DispObj，
+		/// 不触发全图像素合成（与 PunchPressApp::dispStampPatternOverlays 同策略）。
+		void drawStampPattern();
+
+		/// 重建套版显示缓存：仿射 RGBA 套版图（输出为包围盒大小），按 alpha>0 裁剪 domain。
+		void rebuildStampDisplayCache();
 
 		HalconInteractiveLabel* imageLabel_{ nullptr };
 
@@ -224,6 +228,15 @@ namespace ui
 		bool hasStampPattern_{ false };
 		double stampRow_{ 0.0 }, stampCol_{ 0.0 }, stampAngle_{ 0.0 }, stampScale_{ 1.0 };
 		int stampAlpha_{ 180 };
+
+		// 套版显示缓存（显示时绘制）：仅对齐参数或套版图版本变化时重建
+		HalconCpp::HImage stampDisplayObj_;      ///< 仿射 + domain 裁剪后的套版 RGB（domain 位于图像绝对坐标）
+		quint64 stampGeneration_{ 0 };           ///< 套版图/透明度版本号（setStampPattern/clearStampPattern 时递增）
+		bool stampCacheValid_{ false };
+		double cachedStampRow_{ 0.0 }, cachedStampCol_{ 0.0 };
+		double cachedStampAngle_{ 0.0 }, cachedStampScale_{ 1.0 };
+		int cachedStampAlpha_{ 0 };
+		quint64 cachedStampGeneration_{ 0 };
 
 		// 套版拖动平移状态
 		bool stampDragging_{ false };

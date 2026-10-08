@@ -123,6 +123,10 @@ namespace ui
 			overlay_->resize(e->size());
 			overlay_->raise();
 		}
+		// 尺寸变化后 applyView 已清窗重绘底图，通知外部同步重绘叠加层
+		// （套版/ROI/选区框等），避免 resize 后叠加层消失直到下次交互
+		if (windowCreated_ && lastImage_.IsInitialized())
+			emit viewChanged();
 	}
 
 	void HalconInteractiveLabel::displayImage(const HalconCpp::HImage& image)

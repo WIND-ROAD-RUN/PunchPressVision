@@ -9,31 +9,6 @@
 
 #include <cmath>
 
-namespace
-{
-	// 单通道 alpha 混合：out = alpha * overlay + (1 - alpha) * base。
-	// 算法与 bun::StampPatternBun::compositeOverlay 保持一致，修改时需同步。
-	void blendChannel(const HalconCpp::HImage& overlay, const HalconCpp::HImage& base,
-		const HalconCpp::HImage& alpha, HalconCpp::HImage* out)
-	{
-		HalconCpp::HImage o, b, a;
-		HalconCpp::ConvertImageType(overlay, &o, "real");
-		HalconCpp::ConvertImageType(base, &b, "real");
-		HalconCpp::ConvertImageType(alpha, &a, "real");
-
-		// 1 - alpha
-		HalconCpp::HImage invA;
-		HalconCpp::ScaleImage(a, &invA, -1.0, 1.0);
-
-		HalconCpp::HImage t1, t2, sum;
-		HalconCpp::MultImage(o, a, &t1, 1.0, 0.0);      // overlay * alpha
-		HalconCpp::MultImage(b, invA, &t2, 1.0, 0.0);   // base * (1 - alpha)
-		HalconCpp::AddImage(t1, t2, &sum, 1.0, 0.0);
-
-		HalconCpp::ConvertImageType(sum, out, "byte");
-	}
-}
-
 namespace ui
 {
 	ShapeEditor::ShapeEditor(QWidget* parent)
@@ -56,6 +31,7 @@ namespace ui
 		displaying_ = true;
 		renderToLabel();
 		displaying_ = false;
+		drawStampPattern();
 		drawAllROIs();
 		drawAllMasks();
 		drawCenterPoint();
@@ -76,6 +52,7 @@ namespace ui
 		stampAlpha_ = alpha;
 		hasStampPattern_ = true;
 		stampDragging_ = false;
+		++stampGeneration_;
 		// 已定义中心点时，套版中心（图中心红十字）需与中心点重合
 		if (hasCenterPoint_)
 			alignStampCenterTo(centerPoint_);
@@ -87,6 +64,9 @@ namespace ui
 		hasStampPattern_ = false;
 		stampPatternImage_ = HalconCpp::HImage();
 		stampDragging_ = false;
+		++stampGeneration_;
+		stampDisplayObj_ = HalconCpp::HImage();
+		stampCacheValid_ = false;
 		refreshOverlay();
 	}
 
@@ -95,16 +75,9 @@ namespace ui
 		if (!imageLabel_ || !baseImage_.IsInitialized())
 			return;
 
-		if (hasStampPattern_ && stampPatternImage_.IsInitialized())
-		{
-			const HalconCpp::HTuple h =
-				stampHomMat2D(stampRow_, stampCol_, stampAngle_, stampScale_);
-			imageLabel_->displayImage(compositeStamp(baseImage_, stampPatternImage_, h, stampAlpha_));
-		}
-		else
-		{
-			imageLabel_->displayImage(baseImage_);
-		}
+		// 套版不做像素预合成：底图直接显示，套版由 drawStampPattern() 以 DispObj
+		// 显示时绘制。视图缩放/平移仅重绘可见区域，不再触发 40MP 全图合成。
+		imageLabel_->displayImage(baseImage_);
 	}
 
 	HalconCpp::HTuple ShapeEditor::stampHomMat2D(double row, double col, double angle, double scale)
@@ -174,73 +147,72 @@ namespace ui
 		emit stampPatternChanged();
 	}
 
-	HalconCpp::HImage ShapeEditor::compositeStamp(const HalconCpp::HImage& base,
-		const HalconCpp::HImage& patternRGBA, const HalconCpp::HTuple& H_pat2base, int alpha)
+	void ShapeEditor::drawStampPattern()
 	{
-		HalconCpp::HImage result = base;
+		if (!hasStampPattern_ || !stampPatternImage_.IsInitialized() || stampAlpha_ <= 0)
+			return;
+		if (!imageLabel_ || !imageLabel_->isReady())
+			return;
+
+		// 仅对齐参数或套版图版本变化时重建缓存；视图缩放/平移不改这些量，
+		// 直接复用缓存做小图 DispObj，避免每次视图变化做全图合成
+		if (!stampCacheValid_
+			|| stampRow_ != cachedStampRow_ || stampCol_ != cachedStampCol_
+			|| stampAngle_ != cachedStampAngle_ || stampScale_ != cachedStampScale_
+			|| stampAlpha_ != cachedStampAlpha_
+			|| stampGeneration_ != cachedStampGeneration_)
+		{
+			rebuildStampDisplayCache();
+		}
+
+		if (!stampDisplayObj_.IsInitialized())
+			return;
+
 		try
 		{
-			// HomMat2D 为 6 元组（仿射 2x3）
-			if (!patternRGBA.IsInitialized() || H_pat2base.TupleLength() != 6)
-				return result;
-			if (patternRGBA.CountChannels().I() != 4)
-				return result;
-
-			HalconCpp::HImage R, G, B, A;
-			HalconCpp::Decompose4(patternRGBA, &R, &G, &B, &A);
-
-			HalconCpp::HImage baseRgb;
-			if (base.CountChannels().I() == 1)
-				HalconCpp::Compose3(base, base, base, &baseRgb);
-			else
-				baseRgb = base;
-
-			// affine_trans_image_size 的 HomMat2D 为"输入 -> 输出"变换，
-			// 直接传入即可（输出 domain = H·输入 domain，传逆矩阵会把
-			// domain 映到图像外导致全黑——实测验证）
-			const int w = baseRgb.Width().I();
-			const int h = baseRgb.Height().I();
-
-			HalconCpp::HImage Rt, Gt, Bt, At;
-			HalconCpp::AffineTransImageSize(R, &Rt, H_pat2base, "constant", w, h);
-			HalconCpp::AffineTransImageSize(G, &Gt, H_pat2base, "constant", w, h);
-			HalconCpp::AffineTransImageSize(B, &Bt, H_pat2base, "constant", w, h);
-			HalconCpp::AffineTransImageSize(A, &At, H_pat2base, "constant", w, h);
-
-			// 变换输出的 domain 只有套版包围盒大小，而 MultImage/AddImage 只在
-			// domain 交集上计算，不扩回全图会导致合成结果只剩套版区域
-			// （窗口 DispObj 只显示 domain 内的像素）。domain 外灰度为 0：
-			// alpha=0 即全透明，RGB 通道会被 alpha=0 屏蔽，扩展是安全的。
-			HalconCpp::FullDomain(Rt, &Rt);
-			HalconCpp::FullDomain(Gt, &Gt);
-			HalconCpp::FullDomain(Bt, &Bt);
-			HalconCpp::FullDomain(At, &At);
-
-			// 归一化 alpha（real 类型）：图像自身 alpha 通道 × 整体透明度 → [0,1]
-			HalconCpp::HImage alphaN;
-			const double globalAlpha = static_cast<double>(alpha) / 255.0;
-			HalconCpp::ConvertImageType(At, &alphaN, "real");                    // 0..255 → real
-			HalconCpp::ScaleImage(alphaN, &alphaN, globalAlpha / 255.0, 0.0);    // → 0..1
-
-			HalconCpp::HImage baseR, baseG, baseB;
-			HalconCpp::Decompose3(baseRgb, &baseR, &baseG, &baseB);
-
-			HalconCpp::HImage outR, outG, outB;
-			blendChannel(Rt, baseR, alphaN, &outR);
-			blendChannel(Gt, baseG, alphaN, &outG);
-			blendChannel(Bt, baseB, alphaN, &outB);
-
-			HalconCpp::Compose3(outR, outG, outB, &result);
+			HalconCpp::DispObj(stampDisplayObj_, imageLabel_->halconHandle());
 		}
-		catch (const HalconCpp::HException&)
+		catch (...) {}
+	}
+
+	void ShapeEditor::rebuildStampDisplayCache()
+	{
+		stampDisplayObj_ = HalconCpp::HImage();
+
+		try
 		{
-			result = base;
+			using namespace HalconCpp;
+
+			// 与 PunchPressApp::dispStampPatternOverlays 同逻辑：
+			// 仿射套版 RGBA 图（AdaptImageSize="true"，输出为变换后包围盒大小，
+			// domain 位于图像绝对坐标），按 alpha>0 裁剪 domain，透明背景不覆盖底图。
+			// affine_trans_image 的 HomMat2D 为"输入 -> 输出"方向，直接传入。
+			const HTuple h = stampHomMat2D(stampRow_, stampCol_, stampAngle_, stampScale_);
+
+			HImage stampT;
+			AffineTransImage(stampPatternImage_, &stampT, h, "constant", "true");
+
+			HImage R, G, B, A;
+			Decompose4(stampT, &R, &G, &B, &A);
+
+			HRegion alphaRegion;
+			Threshold(A, &alphaRegion, 1.0, 255.0);
+			if (alphaRegion.Area().D() > 0.0)
+			{
+				HImage rgb;
+				Compose3(R, G, B, &rgb);
+				stampDisplayObj_ = rgb.ReduceDomain(alphaRegion);
+			}
 		}
-		catch (...)
-		{
-			result = base;
-		}
-		return result;
+		catch (...) {}
+
+		cachedStampRow_ = stampRow_;
+		cachedStampCol_ = stampCol_;
+		cachedStampAngle_ = stampAngle_;
+		cachedStampScale_ = stampScale_;
+		cachedStampAlpha_ = stampAlpha_;
+		cachedStampGeneration_ = stampGeneration_;
+		stampCacheValid_ = true;
 	}
 
 	// === HObject 导出 ===
@@ -786,6 +758,7 @@ namespace ui
 			return;
 
 		renderToLabel();
+		drawStampPattern();
 		drawAllROIs();
 		drawAllMasks();
 		drawCenterPoint();

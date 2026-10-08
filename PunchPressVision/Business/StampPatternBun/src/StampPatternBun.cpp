@@ -356,7 +356,8 @@ namespace bun
 			HalconCpp::FullDomain(At, &At);
 
 			// 归一化 alpha（real 类型）：图像自身 alpha 通道 × 整体透明度 → [0,1]
-			// （与 ShapeEditor::compositeStamp 保持一致，修改时需同步）
+			// （编辑预览已改为 DispObj 显示时绘制，不做像素合成；本函数用于
+			// 需要合成结果落盘的场景）
 			HalconCpp::HImage alphaN;
 			const double globalAlpha = static_cast<double>(alpha) / 255.0;
 			HalconCpp::ConvertImageType(At, &alphaN, "real");
