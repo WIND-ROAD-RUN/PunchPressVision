@@ -444,6 +444,7 @@ namespace ui
 	{
 		roiObjects_.clear();
 		maskObjects_.clear();
+		matchRegions_.clear();
 		actionHistory_.clear();
 		hasCenterPoint_ = false;
 		drawing_ = false;
@@ -454,6 +455,7 @@ namespace ui
 		emit roiChanged();
 		emit maskChanged();
 		emit centerPointChanged();
+		emit matchRegionChanged();
 	}
 
 	void ShapeEditor::drawRecognitionMarker(double row, double col, double angle, double score)
@@ -509,6 +511,13 @@ namespace ui
 				emit maskChanged();
 			}
 			break;
+		case ActionType::MatchRegion:
+			if (!matchRegions_.empty())
+			{
+				matchRegions_.pop_back();
+				emit matchRegionChanged();
+			}
+			break;
 		}
 
 		drawing_ = false;
@@ -535,6 +544,10 @@ namespace ui
 
 	bool ShapeEditor::eventFilter(QObject* /*obj*/, QEvent* e)
 	{
+		// 识别范围与 ROI/Mask 共用矩形交互（拖拽/移动/缩放/右键确认）
+		const bool isRectTool = (tool_ == Tool::RectangleROI ||
+			tool_ == Tool::RectangleMask || tool_ == Tool::MatchRegion);
+
 		switch (e->type())
 		{
 		case QEvent::Wheel:
@@ -564,7 +577,7 @@ namespace ui
 			auto* me = static_cast<QMouseEvent*>(e);
 			if (me->button() == Qt::LeftButton)
 			{
-				if (tool_ == Tool::RectangleROI || tool_ == Tool::RectangleMask)
+				if (isRectTool)
 				{
 					const QPoint pos = me->pos();
 
@@ -638,7 +651,7 @@ namespace ui
 			else if (me->button() == Qt::RightButton)
 			{
 				// 右键确认绘制完成（Halcon draw 风格）
-				if ((tool_ == Tool::RectangleROI || tool_ == Tool::RectangleMask) && drawing_)
+				if (isRectTool && drawing_)
 				{
 					drawing_ = false;
 					dragMode_ = DragMode::None;
@@ -665,6 +678,12 @@ namespace ui
 								actionHistory_.append(ActionType::Mask);
 								emit maskChanged();
 							}
+							else if (tool_ == Tool::MatchRegion)
+							{
+								matchRegions_.push_back(obj);
+								actionHistory_.append(ActionType::MatchRegion);
+								emit matchRegionChanged();
+							}
 						}
 					}
 
@@ -687,7 +706,7 @@ namespace ui
 		{
 			auto* me = static_cast<QMouseEvent*>(e);
 
-			if ((tool_ == Tool::RectangleROI || tool_ == Tool::RectangleMask) && drawing_)
+			if (isRectTool && drawing_)
 			{
 				const QPoint delta = me->pos() - dragAnchor_;
 
@@ -932,7 +951,7 @@ namespace ui
 
 	void ShapeEditor::drawMatchRegion()
 	{
-		if (matchRegions_.empty() || !imageLabel_ || !imageLabel_->isReady())
+		if (!imageLabel_ || !imageLabel_->isReady())
 			return;
 
 		try
@@ -945,6 +964,16 @@ namespace ui
 				if (r.IsInitialized())
 					HalconCpp::DispObj(r, imageLabel_->halconHandle());
 			}
+
+			// 识别范围工具的进行中预览（与 ROI/Mask 预览一致）
+			if (drawing_ && tool_ == Tool::MatchRegion)
+			{
+				const QPointF p1 = widgetToImage(drawStartWidget_);
+				const QPointF p2 = widgetToImage(drawEndWidget_);
+				const QRectF rect = QRectF(p1, p2).normalized();
+				HalconCpp::DispRectangle1(imageLabel_->halconHandle(),
+					rect.top(), rect.left(), rect.bottom(), rect.right());
+			}
 		}
 		catch (...) {}
 	}
@@ -952,15 +981,28 @@ namespace ui
 	void ShapeEditor::setMatchRegion(const HalconCpp::HObject& region)
 	{
 		matchRegions_.clear();
+		actionHistory_.erase(
+			std::remove(actionHistory_.begin(), actionHistory_.end(), ActionType::MatchRegion),
+			actionHistory_.end());
 		if (region.IsInitialized())
+		{
 			matchRegions_.push_back(region);
+			actionHistory_.append(ActionType::MatchRegion);
+		}
 		refreshOverlay();
+		emit matchRegionChanged();
 	}
 
 	void ShapeEditor::setMatchRegions(const std::vector<HalconCpp::HObject>& regions)
 	{
 		matchRegions_ = regions;
+		actionHistory_.erase(
+			std::remove(actionHistory_.begin(), actionHistory_.end(), ActionType::MatchRegion),
+			actionHistory_.end());
+		for (size_t i = 0; i < regions.size(); ++i)
+			actionHistory_.append(ActionType::MatchRegion);
 		refreshOverlay();
+		emit matchRegionChanged();
 	}
 
 	void ShapeEditor::addMatchRegion(const HalconCpp::HObject& region)
@@ -968,7 +1010,9 @@ namespace ui
 		if (region.IsInitialized())
 		{
 			matchRegions_.push_back(region);
+			actionHistory_.append(ActionType::MatchRegion);
 			refreshOverlay();
+			emit matchRegionChanged();
 		}
 	}
 
@@ -977,14 +1021,21 @@ namespace ui
 		if (!matchRegions_.empty())
 		{
 			matchRegions_.pop_back();
+			if (!actionHistory_.isEmpty() && actionHistory_.last() == ActionType::MatchRegion)
+				actionHistory_.takeLast();
 			refreshOverlay();
+			emit matchRegionChanged();
 		}
 	}
 
 	void ShapeEditor::clearMatchRegion()
 	{
 		matchRegions_.clear();
+		actionHistory_.erase(
+			std::remove(actionHistory_.begin(), actionHistory_.end(), ActionType::MatchRegion),
+			actionHistory_.end());
 		refreshOverlay();
+		emit matchRegionChanged();
 	}
 
 	QPointF ShapeEditor::widgetToImage(const QPoint& widgetPos) const

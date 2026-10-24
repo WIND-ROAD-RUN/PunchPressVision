@@ -13,6 +13,7 @@
 #include <QVector>
 
 #include "global/GlobalInterface.hpp"
+#include "global/GlobalType.hpp"
 #include "infrastructure/infrastructure.hpp"
 #include "infTool/infTool.hpp"
 
@@ -32,6 +33,9 @@ namespace bun
 		QPointF centerPoint;                 // 手动指定的中心点（可选）
 		bool hasCenterPoint{ false };        // 是否使用手动中心点
 		std::string stampPatternId;          // 关联的套版 id（空 = 不使用套版）
+
+		// 识别范围（每模板独立，图像像素坐标；空 = 全图搜索）
+		std::vector<global::MatchRegionRect> matchRegions;
 
 		// 匹配结果偏差补偿（生产匹配时叠加：X/Y 单位 mm，角度单位 deg）
 		double offsetX{ 0.0 };               // 左右偏差
@@ -115,18 +119,6 @@ namespace bun
 	};
 
 	/// <summary>
-	/// 训练时使用的匹配区域配置快照（所有值复制，线程安全）。
-	/// 支持多个识别范围。
-	/// </summary>
-	struct MatchRegionCfg
-	{
-		bool valid{ false };
-		std::vector<inf::MatchRegionRect> regions;
-		/// <summary>将所有区域 Union 合并为单个 Halcon 区域对象。</summary>
-		HalconCpp::HObject unionRegion() const;
-	};
-
-	/// <summary>
 	/// 静态训练函数的返回值。包含完整的 ShapeModelData 和轮廓 XLD。
 	/// 纯数据类型，可安全跨线程传递。
 	/// </summary>
@@ -180,9 +172,7 @@ namespace bun
 			std::string* errorMsg = nullptr);
 
 		/// <summary>纯静态训练函数。无 QObject / 基础设施依赖，可从任意线程调用。</summary>
-		static TrainShapeModelResult trainShapeModel(
-			const CreateModelRequest& req,
-			const MatchRegionCfg& matchRegion);
+		static TrainShapeModelResult trainShapeModel(const CreateModelRequest& req);
 
 		/// <summary>将训练结果持久化为新模型（主线程）。发射 modelContoursFound + modelListChanged。</summary>
 		bool persistNewModel(
@@ -222,6 +212,16 @@ namespace bun
 		std::vector<std::string> getLoadedModelIds() const;
 		int getLoadedModelCount() const;
 		std::vector<LoadedModelInfo> getLoadedModelInfos() const;
+
+		/// <summary>所有已加载模型的识别范围汇总（供主界面只读叠加显示）。</summary>
+		std::vector<global::MatchRegionRect> loadedMatchRegions() const;
+
+		/// <summary>
+		/// 用最新数据同步已加载模型的内存缓存（若该模型已加载），并发射 modelListChanged。
+		/// 用于编辑器免训练保存路径（识别范围/中心点等非训练参数）后让生产匹配立即生效。
+		/// </summary>
+		void updateLoadedModelCache(const std::string& modelId,
+			const Config::ShapeModelData& data);
 
 		// 模型偏移量（FR-035）
 		/// <summary>获取指定模型的用户偏移量。</summary>

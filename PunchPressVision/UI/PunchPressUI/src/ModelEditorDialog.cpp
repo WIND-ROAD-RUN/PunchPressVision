@@ -109,6 +109,8 @@ namespace ui
 			this, &ModelEditorDialog::onPaintRegion);
 		connect(ui->btn_shiledRegion, &QPushButton::clicked,
 			this, &ModelEditorDialog::onPaintMask);
+		connect(ui->btn_paintMatchRegion, &QPushButton::clicked,
+			this, &ModelEditorDialog::onPaintMatchRegion);
 		connect(ui->btn_paintCenterPoint, &QPushButton::clicked,
 			this, &ModelEditorDialog::onPaintCenterPoint);
 		connect(ui->btn_clearRegion, &QPushButton::clicked,
@@ -286,6 +288,25 @@ namespace ui
 				shapeEditor_->setTool(ShapeEditor::Tool::FreehandMask);
 			else
 				shapeEditor_->setTool(ShapeEditor::Tool::RectangleMask);
+		}
+	}
+
+	void ModelEditorDialog::onPaintMatchRegion()
+	{
+		if (!shapeEditor_) return;
+		if (shapeEditor_->tool() == ShapeEditor::Tool::MatchRegion)
+		{
+			// 退出识别范围工具，保持停止采集（继续使用同一张图片）
+			shapeEditor_->setTool(ShapeEditor::Tool::View);
+		}
+		else
+		{
+			// 进入绘制前：检查图像是否就绪
+			if (!requireImage(QStringLiteral("绘制识别范围")))
+				return;
+			// 停止实时采集，当前帧保持显示
+			app_.switchToMode(global::RunMode::Idle);
+			shapeEditor_->setTool(ShapeEditor::Tool::MatchRegion);
 		}
 	}
 
@@ -533,6 +554,32 @@ namespace ui
 
 	// ===== 构建请求（识别和创建共用）===========================================
 
+	std::vector<global::MatchRegionRect> ModelEditorDialog::currentMatchRegions() const
+	{
+		std::vector<global::MatchRegionRect> rects;
+		if (!shapeEditor_)
+			return rects;
+
+		for (const auto& obj : shapeEditor_->matchRegions())
+		{
+			if (!obj.IsInitialized())
+				continue;
+			try
+			{
+				HalconCpp::HTuple r1, c1, r2, c2;
+				HalconCpp::SmallestRectangle1(obj, &r1, &c1, &r2, &c2);
+				global::MatchRegionRect mr;
+				mr.row1 = r1[0].D();
+				mr.col1 = c1[0].D();
+				mr.row2 = r2[0].D();
+				mr.col2 = c2[0].D();
+				rects.push_back(mr);
+			}
+			catch (...) {}
+		}
+		return rects;
+	}
+
 	bun::CreateModelRequest ModelEditorDialog::buildRequest(
 		const HalconCpp::HImage& preprocessedImage,
 		const HalconCpp::HImage& rawImage) const
@@ -540,6 +587,9 @@ namespace ui
 		bun::CreateModelRequest req;
 		req.trainingImage = preprocessedImage;
 		req.rawImage = rawImage;
+
+		// 识别范围（每模板独立；空 = 全图搜索）
+		req.matchRegions = currentMatchRegions();
 
 		if (shapeEditor_)
 		{
@@ -617,18 +667,8 @@ namespace ui
 		if (isTraining_)
 			return;
 
-		// ===== Phase 1: 构建请求 + 捕获 matchRegion（主线程）=====
+		// ===== Phase 1: 构建请求（主线程）=====
 		pendingRequest_ = buildRequest(preprocessImage(lastFrame_), lastFrame_);
-
-		bun::MatchRegionCfg matchRegion;
-		{
-			const auto& inf = biz.infrastructure();
-			if (inf.config_module_ && !inf.config_module_->matchRegions.empty())
-			{
-				matchRegion.valid = true;
-				matchRegion.regions = inf.config_module_->matchRegions;
-			}
-		}
 
 		// ===== Phase 2: 显示进度对话框 =====
 		if (!progressDialog_)
@@ -661,8 +701,8 @@ namespace ui
 		// 按值捕获所有参数，确保线程安全
 		const auto req = pendingRequest_;
 		auto future = QtConcurrent::run(
-			[req, matchRegion]() -> bun::TrainShapeModelResult {
-				return bun::ShapeModeManagerBun::trainShapeModel(req, matchRegion);
+			[req]() -> bun::TrainShapeModelResult {
+				return bun::ShapeModeManagerBun::trainShapeModel(req);
 			});
 		trainingWatcher_->setFuture(future);
 	}
@@ -1073,6 +1113,11 @@ namespace ui
 				? QStringLiteral("退出屏蔽")
 				: QStringLiteral("绘制屏蔽区域"));
 
+		ui->btn_paintMatchRegion->setText(
+			tool == ShapeEditor::Tool::MatchRegion
+				? QStringLiteral("退出绘制")
+				: QStringLiteral("绘制识别范围"));
+
 		ui->btn_paintCenterPoint->setText(
 			tool == ShapeEditor::Tool::CenterPoint
 				? QStringLiteral("退出定义")
@@ -1127,6 +1172,25 @@ namespace ui
 		// 恢复屏蔽区域
 		if (!data._paintShieldRoiList.empty())
 			shapeEditor_->setMaskObjects(data._paintShieldRoiList);
+
+		// 恢复该模板的识别范围（cyan 只读显示，可用「绘制识别范围」继续添加）
+		if (!data.matchRegions.empty())
+		{
+			std::vector<HalconCpp::HObject> hRegions;
+			for (const auto& r : data.matchRegions)
+			{
+				try
+				{
+					HalconCpp::HObject obj;
+					HalconCpp::GenRectangle1(&obj, r.row1, r.col1, r.row2, r.col2);
+					if (obj.IsInitialized())
+						hRegions.push_back(obj);
+				}
+				catch (...) {}
+			}
+			if (!hRegions.empty())
+				shapeEditor_->setMatchRegions(hRegions);
+		}
 
 		// 恢复中心点
 		if (data.centerX != 0.0 || data.centerY != 0.0)
@@ -1345,7 +1409,13 @@ namespace ui
 			data.offsetY = offsetY_;
 			data.offsetAngle = offsetAngle_;
 
+			// 识别范围同样无需重新训练即可生效
+			data.matchRegions = currentMatchRegions();
+
 			inf.shape_model_manager_module_->changeShapeModelItem(modelId_, data);
+
+			// 若该模型已加载，同步业务层缓存，生产匹配立即使用新识别范围
+			biz.shape_mode_manager_bun->updateLoadedModelCache(modelId_, data);
 		}
 		catch (...) {}
 	}
@@ -1365,7 +1435,8 @@ bool ModelEditorDialog::isInDrawingTool() const
 		return false;
 	const auto tool = shapeEditor_->tool();
 	return tool == ShapeEditor::Tool::RectangleROI || tool == ShapeEditor::Tool::FreehandROI ||
-	       tool == ShapeEditor::Tool::RectangleMask || tool == ShapeEditor::Tool::FreehandMask;
+	       tool == ShapeEditor::Tool::RectangleMask || tool == ShapeEditor::Tool::FreehandMask ||
+	       tool == ShapeEditor::Tool::MatchRegion;
 }
 
 } // namespace ui

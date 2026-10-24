@@ -38,6 +38,7 @@ namespace ui
 		// 形状编辑
 		void onPaintRegion();
 		void onPaintMask();
+		void onPaintMatchRegion();
 		void onPaintCenterPoint();
 		void onClearRegion();
 		void onUndo();
@@ -108,6 +109,9 @@ namespace ui
 		// 构建 CreateModelRequest（供识别和创建共用）
 		bun::CreateModelRequest buildRequest(const HalconCpp::HImage& preprocessedImage,
 		                                   const HalconCpp::HImage& rawImage) const;
+
+		// 编辑器中的识别范围 HObject 列表 → 矩形坐标列表（图像像素坐标）
+		std::vector<global::MatchRegionRect> currentMatchRegions() const;
 
 		// ROI 缺失提示
 		bool requireROI(const QString& action) const;

@@ -168,20 +168,14 @@ namespace ui
 		// 插入到右侧控制栏：gBox_tools 之后、gBox_table 之前（索引 3）
 		ui->vLayout_control->insertWidget(3, loadedModelsGroup_);
 
-
-		// 绘制工具栏初始隐藏
-		showDrawingToolbar(false);
-
-		// 监听 ShapeEditor 工具切换：绘制模式下右键确认后自动回到 View，
-		// 此时更新按钮状态提示用户可以"重新绘制"
-		connect(imageView_, &ShapeEditor::toolChanged, this, [this](ShapeEditor::Tool tool)
-		{
-			if (drawingMode_ && tool == ShapeEditor::Tool::View)
-			{
-				// 用户刚通过右键确认完成了一次绘制，tool 自动切回 View
-				updateMatchRegionButton();
-			}
-		});
+		// 识别范围改为按模板存储（模板编辑器中绘制），主界面不再提供绘制入口：
+		// 隐藏原绘制相关按钮；pbtn_matchRegion 保留为只读状态指示
+		ui->pbtn_addRegion->setVisible(false);
+		ui->pbtn_delRegion->setVisible(false);
+		ui->pbtn_redraw->setVisible(false);
+		ui->pbtn_clearRegion->setVisible(false);
+		ui->pbtn_drawCancel->setVisible(false);
+		ui->pbtn_drawConfirm->setVisible(false);
 	}
 
 	PunchPress::~PunchPress()
@@ -241,18 +235,8 @@ namespace ui
 		connect(&app_, &app::PunchPressApp::clearMainViewMatchRegion,
 			this, [this]()
 		{
-			if (imageView_)
-			{
-				imageView_->clearMatchRegion();
-				// 同步清除配置中的 matchRegion
-				auto& inf = app_.business().infrastructure();
-				if (inf.config_module_)
-				{
-					inf.config_module_->setCfg.matchRegionValid = false;
-					inf.config_module_->save();
-				}
-				updateMatchRegionButton();
-			}
+			// 识别范围已改为按模板存储，进入模板编辑器前刷新一次只读显示
+			refreshMatchRegionDisplay();
 		}, Qt::QueuedConnection);
 
 		// UI 控件 → 槽
@@ -263,13 +247,6 @@ namespace ui
 		connect(ui->pbtn_exposure2, &QPushButton::clicked, this, &PunchPress::onExposure2Clicked);
 		connect(ui->pbtn_gain2, &QPushButton::clicked, this, &PunchPress::onGain2Clicked);
 		connect(ui->pbtn_height, &QPushButton::clicked, this, &PunchPress::onHeightClicked);
-		connect(ui->pbtn_matchRegion, &QPushButton::clicked, this, &PunchPress::onMatchRegionClicked);
-		connect(ui->pbtn_addRegion, &QPushButton::clicked, this, &PunchPress::onAddRegionClicked);
-		connect(ui->pbtn_delRegion, &QPushButton::clicked, this, &PunchPress::onDelRegionClicked);
-		connect(ui->pbtn_drawConfirm, &QPushButton::clicked, this, &PunchPress::onDrawConfirm);
-		connect(ui->pbtn_drawCancel, &QPushButton::clicked, this, &PunchPress::onDrawCancel);
-		connect(ui->pbtn_clearRegion, &QPushButton::clicked, this, &PunchPress::onDrawClear);
-		connect(ui->pbtn_redraw, &QPushButton::clicked, this, &PunchPress::onDrawRedraw);
 		connect(ui->pbtn_modelManager, &QPushButton::clicked, this, &PunchPress::onModelManager);
 		connect(ui->pbtn_stampPattern, &QPushButton::clicked, this, &PunchPress::onStampPatternManager);
 		connect(ui->pbtn_exit, &QPushButton::clicked, this, &PunchPress::onExit);
@@ -288,6 +265,14 @@ namespace ui
 				this, &PunchPress::refreshLoadedModelsList);
 			connect(bun.get(), &bun::ShapeModeManagerBun::modelListChanged,
 				this, &PunchPress::refreshLoadedModelsList);
+
+			// 已加载集合或模板数据变化 → 刷新识别范围只读显示与状态按钮
+			connect(bun.get(), &bun::ShapeModeManagerBun::modelsLoaded,
+				this, &PunchPress::refreshMatchRegionDisplay);
+			connect(bun.get(), &bun::ShapeModeManagerBun::modelsUnloaded,
+				this, &PunchPress::refreshMatchRegionDisplay);
+			connect(bun.get(), &bun::ShapeModeManagerBun::modelListChanged,
+				this, &PunchPress::refreshMatchRegionDisplay);
 		}
 
 		// 初始化列表内容（模型可能在 build 之前已加载）
@@ -317,7 +302,6 @@ namespace ui
 		// UI 层配置读取入口：后续可在此扩展光源、PLC 地址、模型参数等配置的读取
 		loadCameraConfig();
 		loadHeightConfig();
-		loadMatchRegionConfig();
 		loadCaltabDescrPath();
 	}
 
@@ -404,99 +388,33 @@ namespace ui
 		ui->pbtn_height->setText(QString::number(diffHeight_, 'f', 3));
 	}
 
-	// ===== 匹配范围：配置加载 / 显示 / 持久化 =====
+	// ===== 识别范围：只读显示（按模板存储，模板编辑器中绘制）=====
 
-	void PunchPress::loadMatchRegionConfig()
+	void PunchPress::refreshMatchRegionDisplay()
 	{
-		// Halcon 引擎在首次 OpenWindow 之前未完全初始化，
-		// 此时 GenRectangle1 会返回空区域。
-		// HObject 的创建推迟到 showEvent() 之后的 deferredCreateMatchRegion()。
-	}
-
-	void PunchPress::deferredCreateMatchRegion()
-	{
-		// Halcon 引擎在首次 OpenWindow 之前未完全初始化，
-		// 推迟到 showEvent 之后（Halcon 窗口已就绪）。
-		const auto& inf = app_.business().infrastructure();
-		if (!inf.config_module_)
+		if (!imageView_)
 			return;
 
-		const auto& rects = inf.config_module_->matchRegions;
-		if (rects.empty())
-			return;
+		auto& biz = app_.business();
 
-		// 若已通过 onDrawConfirm 等方式设置过，不重复创建
-		if (imageView_ && imageView_->hasMatchRegion())
-			return;
-
-		// 转换为 HObject 列表
+		// 汇总所有已加载模板的识别范围（cyan 只读叠加显示）
 		std::vector<HalconCpp::HObject> hRegions;
-		for (const auto& r : rects)
+		if (biz.shape_mode_manager_bun)
 		{
-			try
+			for (const auto& r : biz.shape_mode_manager_bun->loadedMatchRegions())
 			{
-				HalconCpp::HObject obj;
-				HalconCpp::GenRectangle1(&obj, r.row1, r.col1, r.row2, r.col2);
-				if (obj.IsInitialized())
-					hRegions.push_back(obj);
+				try
+				{
+					HalconCpp::HObject obj;
+					HalconCpp::GenRectangle1(&obj, r.row1, r.col1, r.row2, r.col2);
+					if (obj.IsInitialized())
+						hRegions.push_back(obj);
+				}
+				catch (...) {}
 			}
-			catch (...) {}
 		}
-		matchRegions_ = rects;
 		imageView_->setMatchRegions(hRegions);
-	}
-
-	void PunchPress::saveMatchRegion(const HalconCpp::HObject& region)
-	{
-		auto& inf = app_.business().infrastructure();
-		if (!inf.config_module_)
-			return;
-
-		auto& cfg = inf.config_module_->setCfg;
-
-		if (!region.IsInitialized())
-		{
-			cfg.matchRegionValid = false;
-		}
-		else
-		{
-			try
-			{
-				HalconCpp::HTuple row1, col1, row2, col2;
-				HalconCpp::SmallestRectangle1(region, &row1, &col1, &row2, &col2);
-				cfg.matchRegionValid = true;
-				cfg.matchRegionRow1 = row1[0].D();
-				cfg.matchRegionCol1 = col1[0].D();
-				cfg.matchRegionRow2 = row2[0].D();
-				cfg.matchRegionCol2 = col2[0].D();
-			}
-			catch (...)
-			{
-				cfg.matchRegionValid = false;
-			}
-		}
-
-		inf.config_module_->save();
-	}
-
-	void PunchPress::drawMatchRegion()
-	{
-		// ShapeEditor 在 displayImage / refreshOverlay 中自动绘制 matchRegion_，
-		// 该方法保留供外部显式触发重绘（如 onFrameReady 后额外刷新）。
-		// 当前 ShapeEditor::displayImage() 已包含 drawMatchRegion() 调用，
-		// 故此处为空实现即可。
-	}
-
-	void PunchPress::showDrawingToolbar(bool visible)
-	{
-		// 绘制工具栏（重新绘制/清空/取消/确认）仅在绘制模式下可见
-		ui->pbtn_redraw->setVisible(visible);
-		ui->pbtn_clearRegion->setVisible(visible);
-		ui->pbtn_drawCancel->setVisible(visible);
-		ui->pbtn_drawConfirm->setVisible(visible);
-
-		// hLayout_drawTools 整体可见性由 contained widgets 决定；
-		// 父 layout 会随子 widget 显隐自动调整。
+		updateMatchRegionButton();
 	}
 
 	void PunchPress::updateMatchRegionButton()
@@ -504,24 +422,12 @@ namespace ui
 		// pbtn_matchRegion 仅作状态显示，不可点击
 		ui->pbtn_matchRegion->setEnabled(false);
 
-		const int count = static_cast<int>(matchRegions_.size());
-		const bool hasRegions = count > 0;
+		int count = 0;
+		auto& bun = app_.business().shape_mode_manager_bun;
+		if (bun)
+			count = static_cast<int>(bun->loadedMatchRegions().size());
 
-		if (drawingMode_)
-		{
-			ui->pbtn_matchRegion->setText(QStringLiteral("● 绘制中..."));
-			ui->pbtn_matchRegion->setStyleSheet(QStringLiteral(
-				"QPushButton {"
-				"  padding: 6px 14px;"
-				"  border: 2px solid #FF9800;"
-				"  border-radius: 4px;"
-				"  background-color: #FFF3E0;"
-				"  color: #E65100;"
-				"  font-size: 18px;"
-				"  font-weight: bold;"
-				"}"));
-		}
-		else if (hasRegions)
+		if (count > 0)
 		{
 			ui->pbtn_matchRegion->setText(QStringLiteral("识别范围: %1 个").arg(count));
 			ui->pbtn_matchRegion->setStyleSheet(QStringLiteral(
@@ -548,208 +454,6 @@ namespace ui
 				"  font-size: 18px;"
 				"}"));
 		}
-	}
-
-	// ===== 绘制模式：入口 / 确认 / 取消 / 清空 / 重绘 =====
-
-	void PunchPress::onMatchRegionClicked()
-	{
-		if (drawingMode_)
-			return;
-
-		// 1. 保存现场
-		previousMode_ = app_.currentMode();
-		drawingMode_ = true;
-		isAddingRegion_ = false;
-
-		// 保存原始区域（取消时恢复用）
-		originalMatchRegions_ = matchRegions_;
-		imageView_->clearMatchRegion();
-		imageView_->clearROI();
-		// 将所有现有区域转为绿色可编辑 ROI
-		if (!matchRegions_.empty())
-		{
-			std::vector<HalconCpp::HObject> hRegions;
-			for (const auto& r : matchRegions_)
-			{
-				HalconCpp::HObject obj;
-				HalconCpp::GenRectangle1(&obj, r.row1, r.col1, r.row2, r.col2);
-				if (obj.IsInitialized())
-					hRegions.push_back(obj);
-			}
-			imageView_->setRoiObjects(hRegions);
-		}
-
-		// 2. 切换运行模式
-		app_.switchToMode(global::RunMode::Idle);
-		app_.switchToMode(global::RunMode::DrawMatchRegion);
-
-		// 3. 进入 RectangleROI 绘制工具
-		imageView_->setTool(ShapeEditor::Tool::RectangleROI);
-
-		// 4. UI 更新
-		showDrawingToolbar(true);
-		updateMatchRegionButton();
-	}
-
-	void PunchPress::onAddRegionClicked()
-	{
-		if (drawingMode_)
-			return;
-
-		// 1. 保存现场
-		previousMode_ = app_.currentMode();
-		drawingMode_ = true;
-		isAddingRegion_ = true;
-
-		originalMatchRegions_ = matchRegions_;
-		imageView_->clearROI();
-
-		// 2. 切换运行模式
-		app_.switchToMode(global::RunMode::Idle);
-		app_.switchToMode(global::RunMode::DrawMatchRegion);
-
-		// 3. 进入 RectangleROI 绘制工具
-		imageView_->setTool(ShapeEditor::Tool::RectangleROI);
-
-		// 4. UI 更新
-		showDrawingToolbar(true);
-		updateMatchRegionButton();
-	}
-
-	void PunchPress::onDelRegionClicked()
-	{
-		if (drawingMode_ || matchRegions_.empty())
-			return;
-
-		matchRegions_.pop_back();
-		imageView_->removeLastMatchRegion();
-
-		// 持久化
-		auto& inf = app_.business().infrastructure();
-		if (inf.config_module_)
-		{
-			inf.config_module_->matchRegions = matchRegions_;
-			inf.config_module_->saveMatchRegions(inf::ConfigModulePath.RootPath);
-		}
-		updateMatchRegionButton();
-	}
-
-	void PunchPress::onDrawConfirm()
-	{
-		// 取出所有 ROI 对象列表
-		auto roiObjs = imageView_->roiObjects();
-		if (roiObjs.empty())
-		{
-			exitDrawMode();
-			return;
-		}
-
-		auto& inf = app_.business().infrastructure();
-
-		// 将 HObject 转换为 MatchRegionRect 坐标列表
-		std::vector<inf::MatchRegionRect> rects;
-		for (const auto& obj : roiObjs)
-		{
-			if (!obj.IsInitialized())
-				continue;
-			try
-			{
-				HalconCpp::HTuple r1, c1, r2, c2;
-				HalconCpp::SmallestRectangle1(obj, &r1, &c1, &r2, &c2);
-				inf::MatchRegionRect mr;
-				mr.row1 = r1[0].D();
-				mr.col1 = c1[0].D();
-				mr.row2 = r2[0].D();
-				mr.col2 = c2[0].D();
-				rects.push_back(mr);
-			}
-			catch (...) {}
-		}
-
-		if (isAddingRegion_)
-		{
-			// 添加模式：追加到已有列表
-			for (const auto& r : rects)
-				matchRegions_.push_back(r);
-		}
-		else
-		{
-			// 编辑模式：全量替换
-			matchRegions_ = std::move(rects);
-		}
-
-		// 持久化
-		if (inf.config_module_)
-		{
-			inf.config_module_->matchRegions = matchRegions_;
-			inf.config_module_->saveMatchRegions(inf::ConfigModulePath.RootPath);
-		}
-
-		// 退出绘制模式
-		exitDrawMode();
-
-		// 显示所有已保存的区域（转换为 HObject）
-		imageView_->clearROI();
-		{
-			std::vector<HalconCpp::HObject> hRegions;
-			for (const auto& r : matchRegions_)
-			{
-				HalconCpp::HObject obj;
-				HalconCpp::GenRectangle1(&obj, r.row1, r.col1, r.row2, r.col2);
-				if (obj.IsInitialized())
-					hRegions.push_back(obj);
-			}
-			imageView_->setMatchRegions(hRegions);
-		}
-	}
-
-	void PunchPress::onDrawCancel()
-	{
-		// 清除 ROI，恢复之前的匹配范围
-		imageView_->clearROI();
-		matchRegions_ = originalMatchRegions_;
-		{
-			std::vector<HalconCpp::HObject> hRegions;
-			for (const auto& r : matchRegions_)
-			{
-				HalconCpp::HObject obj;
-				HalconCpp::GenRectangle1(&obj, r.row1, r.col1, r.row2, r.col2);
-				if (obj.IsInitialized())
-					hRegions.push_back(obj);
-			}
-			imageView_->setMatchRegions(hRegions);
-		}
-
-		exitDrawMode();
-	}
-
-	void PunchPress::onDrawClear()
-	{
-		imageView_->clearROI();
-	}
-
-	void PunchPress::onDrawRedraw()
-	{
-		// 清除当前 ROI 并重新进入 RectangleROI 绘制
-		imageView_->clearROI();
-		imageView_->setTool(ShapeEditor::Tool::RectangleROI);
-	}
-
-	void PunchPress::exitDrawMode()
-	{
-		// 切回 View 工具
-		imageView_->setTool(ShapeEditor::Tool::View);
-
-		// 隐藏绘制工具栏
-		showDrawingToolbar(false);
-		drawingMode_ = false;
-		isAddingRegion_ = false;
-		originalMatchRegions_.clear();
-
-		// 恢复之前的运行模式
-		app_.switchToMode(previousMode_);
-		updateMatchRegionButton();
 	}
 
 	bool PunchPress::inputIntegerParam(QPushButton* button, int& value, int min, int max)
@@ -941,9 +645,9 @@ namespace ui
 		QMainWindow::showEvent(e);
 		// Halcon 窗口在首次 showEvent 中懒创建。
 		// 由于 GenRectangle1 在 Halcon 窗口创建之前调用会返回空区域，
-		// 匹配范围的 HObject 创建被推迟到此处——Halcon 窗口已就绪后执行。
+		// 识别范围的 HObject 创建被推迟到此处——Halcon 窗口已就绪后执行。
 		QMetaObject::invokeMethod(this, [this]() {
-			deferredCreateMatchRegion();
+			refreshMatchRegionDisplay();
 		}, Qt::QueuedConnection);
 	}
 
@@ -957,11 +661,6 @@ namespace ui
 
 	void PunchPress::onDebugClicked()
 	{
-		if (drawingMode_)
-		{
-			ui->rbtn_debug->setChecked(false);
-			return;
-		}
 		if (ui->rbtn_debug->isChecked())
 		{
 			ui->rbtn_work->setChecked(false);
@@ -983,11 +682,6 @@ namespace ui
 
 	void PunchPress::onWorkClicked()
 	{
-		if (drawingMode_)
-		{
-			ui->rbtn_work->setChecked(false);
-			return;
-		}
 		if (ui->rbtn_work->isChecked())
 		{
 			ui->rbtn_debug->setChecked(false);

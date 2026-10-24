@@ -233,7 +233,8 @@ namespace Config
 			double angleStart, double angleExtent,
 			int contrast, int minContrast, double minScore,
 			const std::string& modelPath,
-			const std::string& stampPatternId)
+			const std::string& stampPatternId,
+			const std::vector<global::MatchRegionRect>& matchRegions)
 		{
 			fs::create_directories(filePath.parent_path());
 			fs::path tmp = filePath;
@@ -270,6 +271,16 @@ namespace Config
 			ofs << "minScore=" << minScore << '\n';
 			ofs << "modelPath=" << modelPath << '\n';
 			ofs << "stampPatternId=" << stampPatternId << '\n';
+			// 识别范围（每模板独立）：count + 每行一个矩形 "row1,col1,row2,col2"
+			ofs << "matchRegionCount=" << matchRegions.size() << '\n';
+			for (size_t i = 0; i < matchRegions.size(); ++i)
+			{
+				ofs << "matchRegion." << i << '='
+					<< matchRegions[i].row1 << ','
+					<< matchRegions[i].col1 << ','
+					<< matchRegions[i].row2 << ','
+					<< matchRegions[i].col2 << '\n';
+			}
 			ofs.close();
 			replaceFile(tmp, filePath);
 		}
@@ -279,6 +290,34 @@ namespace Config
 			if (!s.empty() && s.back() == '\r')
 				return s.substr(0, s.size() - 1);
 			return s;
+		}
+
+		// 解析 "row1,col1,row2,col2" 为矩形；格式不符返回 false
+		bool parseRegionRect(const std::string& s, global::MatchRegionRect& out)
+		{
+			double vals[4];
+			size_t begin = 0;
+			for (int i = 0; i < 4; ++i)
+			{
+				const size_t comma = (i < 3) ? s.find(',', begin) : std::string::npos;
+				if (i < 3 && comma == std::string::npos)
+					return false;
+				const std::string token = (i < 3) ? s.substr(begin, comma - begin) : s.substr(begin);
+				try
+				{
+					vals[i] = std::stod(token);
+				}
+				catch (...)
+				{
+					return false;
+				}
+				begin = comma + 1;
+			}
+			out.row1 = vals[0];
+			out.col1 = vals[1];
+			out.row2 = vals[2];
+			out.col2 = vals[3];
+			return true;
 		}
 
 		bool readParamsSafe(const fs::path& filePath,
@@ -297,8 +336,10 @@ namespace Config
 			double& angleStart, double& angleExtent,
 			int& contrast, int& minContrast, double& minScore,
 			std::string& modelPath,
-			std::string& stampPatternId)
+			std::string& stampPatternId,
+			std::vector<global::MatchRegionRect>& matchRegions)
 		{
+			matchRegions.clear();
 			if (!fs::exists(filePath))
 				return false;
 			std::ifstream ifs(filePath);
@@ -375,6 +416,13 @@ namespace Config
 						modelPath = value;
 					else if (key == "stampPatternId")
 						stampPatternId = value;
+					else if (key.rfind("matchRegion.", 0) == 0)
+					{
+						// matchRegion.N=row1,col1,row2,col2（N 为序号，乱序/缺号均容忍）
+						global::MatchRegionRect r;
+						if (parseRegionRect(value, r))
+							matchRegions.push_back(r);
+					}
 				}
 				catch (...)
 				{
@@ -495,7 +543,8 @@ namespace Config
 				angleStart, angleExtent,
 				contrast, minContrast, minScore,
 				modelPath,
-				stampPatternId);
+				stampPatternId,
+				matchRegions);
 
 			// 加载图像
 			readImageSafe(dirPath / kTemplateImageFile, _templateMatImage);
@@ -575,7 +624,8 @@ namespace Config
 				angleStart, angleExtent,
 				contrast, minContrast, minScore,
 				modelPath,
-				stampPatternId);
+				stampPatternId,
+				matchRegions);
 
 			// 保存图像（逐个 try-catch 防止一个失败导致后续全部跳过）
 			if (_templateMatImage.IsInitialized())

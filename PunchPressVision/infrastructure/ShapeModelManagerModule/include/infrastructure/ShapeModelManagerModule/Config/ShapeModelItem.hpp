@@ -4,6 +4,8 @@
 
 #include "halconcpp/HalconCpp.h"
 
+#include "global/GlobalType.hpp"
+
 namespace Config
 {
 	struct ShapeModelData
@@ -82,6 +84,9 @@ namespace Config
 		int contrast = 30;
 		int minContrast = 10;
 		double minScore = 0.5;
+
+		// 识别范围（每模板独立，图像像素坐标；空 = 全图搜索）
+		std::vector<global::MatchRegionRect> matchRegions;
 
 		std::string modelPath{};
 

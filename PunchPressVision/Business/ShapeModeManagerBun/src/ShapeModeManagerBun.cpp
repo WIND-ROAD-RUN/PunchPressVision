@@ -20,6 +20,35 @@
 
 namespace bun
 {
+	namespace
+	{
+		// 将多个识别范围矩形 Union 合并为单个 Halcon 区域对象；空列表返回未初始化对象
+		HalconCpp::HObject unionMatchRegionRects(const std::vector<global::MatchRegionRect>& regions)
+		{
+			HalconCpp::HObject result;
+			if (regions.empty())
+				return result;
+			try
+			{
+				HalconCpp::GenRectangle1(&result,
+					regions[0].row1, regions[0].col1,
+					regions[0].row2, regions[0].col2);
+				for (size_t i = 1; i < regions.size(); ++i)
+				{
+					HalconCpp::HObject r;
+					HalconCpp::GenRectangle1(&r,
+						regions[i].row1, regions[i].col1,
+						regions[i].row2, regions[i].col2);
+					HalconCpp::HObject merged;
+					HalconCpp::Union2(result, r, &merged);
+					result = merged;
+				}
+			}
+			catch (...) {}
+			return result;
+		}
+	}
+
 	ShapeModeManagerBun::ShapeModeManagerBun(inf::infrastructure& inf, infTool::infTool& infTool)
 		: inf_(inf)
 		, inf_tool_(infTool)
@@ -29,8 +58,7 @@ namespace bun
 	// ===== 纯静态训练函数（线程安全，无 QObject / 基础设施依赖）=====
 
 	TrainShapeModelResult ShapeModeManagerBun::trainShapeModel(
-		const CreateModelRequest& req,
-		const MatchRegionCfg& matchRegion)
+		const CreateModelRequest& req)
 	{
 		using namespace HalconCpp;
 		TrainShapeModelResult result;
@@ -154,6 +182,9 @@ namespace bun
 			outData.contrast = req.contrast;
 			outData.minContrast = req.minContrast;
 			outData.minScore = req.minScore;
+
+			// 识别范围（每模板独立，随模板持久化）
+			outData.matchRegions = req.matchRegions;
 
 			// ROI 列表（逐个保存为 HObject，支持回撤）
 			outData._paintCreateRoiList = req._paintCreateRoiList;
@@ -333,6 +364,9 @@ namespace bun
 
 		inf_.shape_model_manager_module_->changeShapeModelItem(id, result.data);
 
+		// 若该模型已加载，同步内存缓存（含识别范围等非训练参数），生产匹配立即生效
+		updateLoadedModelCache(id, result.data);
+
 		emit modelListChanged();
 		return true;
 	}
@@ -341,28 +375,14 @@ namespace bun
 	bool ShapeModeManagerBun::createModel(const CreateModelRequest& req,
 		Config::ShapeModelInfo& outInfo, std::string* errorMsg)
 	{
-		MatchRegionCfg matchRegion;
-		if (inf_.config_module_ && !inf_.config_module_->matchRegions.empty())
-		{
-			matchRegion.valid = true;
-			matchRegion.regions = inf_.config_module_->matchRegions;
-		}
-
-		auto result = trainShapeModel(req, matchRegion);
+		auto result = trainShapeModel(req);
 		return persistNewModel(result, req, outInfo, errorMsg);
 	}
 
 	bool ShapeModeManagerBun::updateModel(const std::string& id,
 		const CreateModelRequest& req, std::string* errorMsg)
 	{
-		MatchRegionCfg matchRegion;
-		if (inf_.config_module_ && !inf_.config_module_->matchRegions.empty())
-		{
-			matchRegion.valid = true;
-			matchRegion.regions = inf_.config_module_->matchRegions;
-		}
-
-		auto result = trainShapeModel(req, matchRegion);
+		auto result = trainShapeModel(req);
 		return persistUpdatedModel(result, id, errorMsg);
 	}
 
@@ -928,15 +948,12 @@ namespace bun
 				if (!fallbackPreprocessedImage.IsInitialized())
 					fallbackPreprocessedImage = processedForDisplay;
 
-				// 如果设置了匹配范围（多个区域 Union 合并），限制搜索区域
-				if (inf_.config_module_ && !inf_.config_module_->matchRegions.empty())
+				// 该模板独立的识别范围（多个矩形 Union 合并），限制搜索区域
+				if (!model.data.matchRegions.empty())
 				{
 					try
 					{
-						MatchRegionCfg mrc;
-						mrc.valid = true;
-						mrc.regions = inf_.config_module_->matchRegions;
-						HalconCpp::HObject joined = mrc.unionRegion();
+						HalconCpp::HObject joined = unionMatchRegionRects(model.data.matchRegions);
 						if (joined.IsInitialized())
 						{
 							HalconCpp::HImage reduced;
@@ -1337,31 +1354,37 @@ namespace bun
 		}
 	}
 
-	HalconCpp::HObject MatchRegionCfg::unionRegion() const
+	std::vector<global::MatchRegionRect> ShapeModeManagerBun::loadedMatchRegions() const
 	{
-		HalconCpp::HObject result;
-		if (!valid || regions.empty())
-			return result;
-		try
+		std::shared_lock<std::shared_mutex> lk(modelCacheMutex_);
+		std::vector<global::MatchRegionRect> all;
+		for (const auto& m : loadedModels_)
+			all.insert(all.end(), m.data.matchRegions.begin(), m.data.matchRegions.end());
+		return all;
+	}
+
+	void ShapeModeManagerBun::updateLoadedModelCache(const std::string& modelId,
+		const Config::ShapeModelData& data)
+	{
+		bool found = false;
 		{
-			// 将第一个坐标矩形转换为 HObject
-			HalconCpp::GenRectangle1(&result,
-				regions[0].row1, regions[0].col1,
-				regions[0].row2, regions[0].col2);
-			// Union 合并后续矩形
-			for (size_t i = 1; i < regions.size(); ++i)
+			std::unique_lock<std::shared_mutex> lk(modelCacheMutex_);
+			for (auto& m : loadedModels_)
 			{
-				HalconCpp::HObject r;
-				HalconCpp::GenRectangle1(&r,
-					regions[i].row1, regions[i].col1,
-					regions[i].row2, regions[i].col2);
-				HalconCpp::HObject merged;
-				HalconCpp::Union2(result, r, &merged);
-				result = merged;
+				if (m.modelId == modelId)
+				{
+					// 数据未携带有效句柄时保留原句柄（重训练路径会携带新句柄）
+					if (data.hv_ModelID.Length() > 0)
+						m.handle = data.hv_ModelID;
+					m.data = data;
+					m.data.hv_ModelID = m.handle;
+					found = true;
+					break;
+				}
 			}
 		}
-		catch (...) {}
-		return result;
+		if (found)
+			emit modelListChanged();
 	}
 
 	void ShapeModeManagerBun::loadLastLoadedModels()

@@ -29,6 +29,7 @@ namespace ui
 			FreehandMask,   ///< 屏蔽区域（Halcon 自由绘制）
 			CenterPoint,    ///< 定义模板中心点
 			StampPattern,   ///< 套版对齐编辑（拖动平移 / 滚轮旋转 / Ctrl+滚轮缩放）
+			MatchRegion,    ///< 识别范围（青色矩形，可绘制多个，右键确认）
 		};
 
 		/// 操作类型，用于统一回撤栈
@@ -36,6 +37,7 @@ namespace ui
 		{
 			ROI,   ///< 感兴趣区域
 			Mask,  ///< 屏蔽区域
+			MatchRegion,  ///< 识别范围
 		};
 
 		explicit ShapeEditor(QWidget* parent = nullptr);
@@ -126,7 +128,7 @@ namespace ui
 		/// 清除模型轮廓
 		void clearModelContours();
 
-		// === 匹配范围（持久化只读显示） ===
+		// === 匹配范围（cyan 色边框；Tool::MatchRegion 下可编辑） ===
 
 		/// 设置匹配范围（只读显示，cyan 色边框）
 		void setMatchRegion(const HalconCpp::HObject& region);
@@ -150,6 +152,7 @@ namespace ui
 		void roiChanged();
 		void maskChanged();
 		void centerPointChanged();
+		void matchRegionChanged();
 		void toolChanged(Tool tool);
 		/// 套版对齐参数被拖动/旋转/缩放编辑后发出。
 		void stampPatternChanged();

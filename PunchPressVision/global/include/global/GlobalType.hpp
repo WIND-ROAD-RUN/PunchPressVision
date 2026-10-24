@@ -9,6 +9,16 @@ namespace global
 		Camera2     // 右相机 / 相机 B
 	};
 
+	// 模板识别范围矩形（图像像素坐标，row1/col1 = 左上，row2/col2 = 右下）
+	// 每个模板各自持有（ShapeModelData::matchRegions），空列表 = 全图搜索
+	struct MatchRegionRect
+	{
+		double row1{ 0.0 };
+		double col1{ 0.0 };
+		double row2{ 0.0 };
+		double col2{ 0.0 };
+	};
+
 	// 运行模式（App 层）
 	// 注意：畸变矫正、九点标定、双相机拼接已下沉至 infTool 层，不再作为 App 层模式。
 	// 相关功能由独立工具程序提供，标定结果被主应用生产模式消费。
@@ -18,7 +28,7 @@ namespace global
 		Debug,              // 调试模式（FR-005 ~ FR-007）
 		Production,         // 工作模式（FR-008 ~ FR-010）
 		CreateModel,        // 创建模型模式：相机自由运行取流，图像实时刷新到模型编辑器
-		DrawMatchRegion     // 绘制匹配范围模式：相机自由运行取流，用户在主界面绘制模板匹配的搜索范围
+		DrawMatchRegion     // 已废弃：识别范围改为按模板存储，在模板编辑器中绘制，主界面不再进入该模式
 	};
 
 	// 触发源

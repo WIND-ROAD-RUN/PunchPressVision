@@ -68,15 +68,6 @@ namespace ui
 		// 高度参数（双相机拼接）
 		void onHeightClicked();
 
-		// 匹配范围绘制
-		void onMatchRegionClicked();
-		void onAddRegionClicked();
-		void onDelRegionClicked();
-		void onDrawConfirm();
-		void onDrawCancel();
-		void onDrawClear();
-		void onDrawRedraw();
-
 		// 系统
 		void onExit();
 
@@ -105,14 +96,10 @@ namespace ui
 		// 标定板描述文件自动发现
 		void loadCaltabDescrPath();
 
-		// 匹配范围：配置加载/显示/持久化
-		void loadMatchRegionConfig();
-		void deferredCreateMatchRegion();
-		void saveMatchRegion(const HalconCpp::HObject& region);
-		void drawMatchRegion();
-		void showDrawingToolbar(bool visible);
+		// 识别范围只读显示：汇总所有已加载模板的识别范围并叠加到主画面
+		//（识别范围按模板存储，在模板编辑器中绘制，主界面不提供编辑入口）
+		void refreshMatchRegionDisplay();
 		void updateMatchRegionButton();
-		void exitDrawMode();
 
 		// 弹出数字键盘编辑整数参数（带范围校验）
 		bool inputIntegerParam(QPushButton* button, int& value, int min, int max);
@@ -135,13 +122,6 @@ namespace ui
 		// 右侧栏：已加载模型表格
 		QGroupBox* loadedModelsGroup_{ nullptr };
 		QTableWidget* loadedModelsTable_{ nullptr };
-
-		// 绘制模式状态
-		bool drawingMode_{ false };
-		bool isAddingRegion_{ false };  // true=添加新区域模式, false=整体编辑模式
-		global::RunMode previousMode_{ global::RunMode::Idle };
-		std::vector<inf::MatchRegionRect> originalMatchRegions_;  // 取消时恢复用
-		std::vector<inf::MatchRegionRect> matchRegions_;          // 运行时区域列表
 
 		// 本地缓存的 UI 所需配置
 		Config::cameraCfg cameraCfg_;
