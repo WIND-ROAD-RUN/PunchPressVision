@@ -28,7 +28,6 @@ namespace global
 		Debug,              // 调试模式（FR-005 ~ FR-007）
 		Production,         // 工作模式（FR-008 ~ FR-010）
 		CreateModel,        // 创建模型模式：相机自由运行取流，图像实时刷新到模型编辑器
-		DrawMatchRegion     // 已废弃：识别范围改为按模板存储，在模板编辑器中绘制，主界面不再进入该模式
 	};
 
 	// 触发源
