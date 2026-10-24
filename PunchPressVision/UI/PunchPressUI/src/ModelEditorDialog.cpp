@@ -111,6 +111,10 @@ namespace ui
 			this, &ModelEditorDialog::onPaintMask);
 		connect(ui->btn_paintMatchRegion, &QPushButton::clicked,
 			this, &ModelEditorDialog::onPaintMatchRegion);
+		connect(ui->btn_delMatchRegion, &QPushButton::clicked,
+			this, &ModelEditorDialog::onDelMatchRegion);
+		connect(ui->btn_clearMatchRegion, &QPushButton::clicked,
+			this, &ModelEditorDialog::onClearMatchRegion);
 		connect(ui->btn_paintCenterPoint, &QPushButton::clicked,
 			this, &ModelEditorDialog::onPaintCenterPoint);
 		connect(ui->btn_clearRegion, &QPushButton::clicked,
@@ -308,6 +312,27 @@ namespace ui
 			app_.switchToMode(global::RunMode::Idle);
 			shapeEditor_->setTool(ShapeEditor::Tool::MatchRegion);
 		}
+	}
+
+	void ModelEditorDialog::onDelMatchRegion()
+	{
+		if (!shapeEditor_) return;
+		if (!shapeEditor_->hasMatchRegion())
+		{
+			rw::rqwu::MessageBox::warning(this,
+				QStringLiteral("提示"), QStringLiteral("当前没有可删除的识别范围"));
+			return;
+		}
+		// 栈式删除：移除最近一次绘制/加载的识别范围（与「回撤」语义一致）
+		shapeEditor_->removeLastMatchRegion();
+	}
+
+	void ModelEditorDialog::onClearMatchRegion()
+	{
+		if (!shapeEditor_ || !shapeEditor_->hasMatchRegion())
+			return;
+		// 仅清空识别范围（清空后该模板恢复全图搜索），不影响 ROI/屏蔽区域
+		shapeEditor_->clearMatchRegion();
 	}
 
 	void ModelEditorDialog::onPaintCenterPoint()

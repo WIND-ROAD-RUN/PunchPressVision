@@ -7,6 +7,7 @@
 #include <QResizeEvent>
 #include <QWheelEvent>
 
+#include <algorithm>
 #include <cmath>
 
 namespace
@@ -1018,14 +1019,18 @@ namespace ui
 
 	void ShapeEditor::removeLastMatchRegion()
 	{
-		if (!matchRegions_.empty())
-		{
-			matchRegions_.pop_back();
-			if (!actionHistory_.isEmpty() && actionHistory_.last() == ActionType::MatchRegion)
-				actionHistory_.takeLast();
-			refreshOverlay();
-			emit matchRegionChanged();
-		}
+		if (matchRegions_.empty())
+			return;
+
+		matchRegions_.pop_back();
+		// 移除回撤栈中最近一条 MatchRegion 记录（不一定位于栈顶，
+		// 中途可能穿插了 ROI/Mask 操作），保持与 matchRegions_ 一一对应
+		const auto it = std::find_if(actionHistory_.rbegin(), actionHistory_.rend(),
+			[](ActionType t) { return t == ActionType::MatchRegion; });
+		if (it != actionHistory_.rend())
+			actionHistory_.erase(std::next(it).base());
+		refreshOverlay();
+		emit matchRegionChanged();
 	}
 
 	void ShapeEditor::clearMatchRegion()

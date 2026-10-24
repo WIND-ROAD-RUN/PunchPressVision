@@ -39,6 +39,8 @@ namespace ui
 		void onPaintRegion();
 		void onPaintMask();
 		void onPaintMatchRegion();
+		void onDelMatchRegion();
+		void onClearMatchRegion();
 		void onPaintCenterPoint();
 		void onClearRegion();
 		void onUndo();
