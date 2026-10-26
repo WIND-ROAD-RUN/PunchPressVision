@@ -39,6 +39,7 @@ namespace ui
 		void onPaintRegion();
 		void onPaintMask();
 		void onPaintCenterPoint();
+		void onPaintCenterPoint2();
 		void onClearRegion();
 		void onUndo();
 

@@ -60,6 +60,7 @@ namespace ui
 		drawAllROIs();
 		drawAllMasks();
 		drawCenterPoint();
+		drawCenterPoint2();
 		drawMarker();
 		drawMatchRegion();
 	}
@@ -355,6 +356,15 @@ namespace ui
 		emit centerPointChanged();
 	}
 
+	void ShapeEditor::setCenterPoint2(const QPointF& point)
+	{
+		// 中心点2 与中心点1 相互独立：不做套版跟随（套版只跟随中心点1）
+		centerPoint2_ = point;
+		hasCenterPoint2_ = true;
+		refreshOverlay();
+		emit centerPoint2Changed();
+	}
+
 	// === 工具切换 ===
 
 	void ShapeEditor::setTool(Tool tool)
@@ -441,6 +451,13 @@ namespace ui
 		emit centerPointChanged();
 	}
 
+	void ShapeEditor::clearCenterPoint2()
+	{
+		hasCenterPoint2_ = false;
+		refreshOverlay();
+		emit centerPoint2Changed();
+	}
+
 	void ShapeEditor::clearAll()
 	{
 		roiObjects_.clear();
@@ -448,6 +465,7 @@ namespace ui
 		matchRegions_.clear();
 		actionHistory_.clear();
 		hasCenterPoint_ = false;
+		hasCenterPoint2_ = false;
 		drawing_ = false;
 		showMarker_ = false;
 		showModelContours_ = false;
@@ -456,6 +474,7 @@ namespace ui
 		emit roiChanged();
 		emit maskChanged();
 		emit centerPointChanged();
+		emit centerPoint2Changed();
 		emit matchRegionChanged();
 	}
 
@@ -639,6 +658,11 @@ namespace ui
 					setCenterPoint(widgetToImage(me->pos()));
 					return true;
 				}
+				else if (tool_ == Tool::CenterPoint2)
+				{
+					setCenterPoint2(widgetToImage(me->pos()));
+					return true;
+				}
 				else if (tool_ == Tool::StampPattern && hasStampPattern_)
 				{
 					// 左键拖动：平移套版
@@ -809,6 +833,7 @@ namespace ui
 		drawAllROIs();
 		drawAllMasks();
 		drawCenterPoint();
+		drawCenterPoint2();
 		drawMarker();
 		drawFoundContours();
 		drawMatchRegion();
@@ -946,6 +971,21 @@ namespace ui
 			HalconCpp::SetLineWidth(imageLabel_->halconHandle(), 2);
 			HalconCpp::DispCross(imageLabel_->halconHandle(),
 				centerPoint_.y(), centerPoint_.x(), 40, 0.785398);
+		}
+		catch (...) {}
+	}
+
+	void ShapeEditor::drawCenterPoint2()
+	{
+		if (!hasCenterPoint2_ || !imageLabel_ || !imageLabel_->isReady())
+			return;
+
+		try
+		{
+			HalconCpp::SetColor(imageLabel_->halconHandle(), "green");
+			HalconCpp::SetLineWidth(imageLabel_->halconHandle(), 2);
+			HalconCpp::DispCross(imageLabel_->halconHandle(),
+				centerPoint2_.y(), centerPoint2_.x(), 40, 0.785398);
 		}
 		catch (...) {}
 	}

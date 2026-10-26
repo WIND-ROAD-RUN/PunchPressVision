@@ -1129,6 +1129,22 @@ namespace ui
 				QString::number(it->score, 'f', 3));
 			sItem->setFlags(sItem->flags() & ~Qt::ItemIsEditable);
 			table->setItem(0, 4, sItem);
+
+			// 中心点2 第二组位置（未定义中心点2 的模板回退为组1 的值）
+			auto* x2Item = new QTableWidgetItem(
+				QString::number(it->offset2X, 'f', 3));
+			x2Item->setFlags(x2Item->flags() & ~Qt::ItemIsEditable);
+			table->setItem(0, 5, x2Item);
+
+			auto* y2Item = new QTableWidgetItem(
+				QString::number(it->offset2Y, 'f', 3));
+			y2Item->setFlags(y2Item->flags() & ~Qt::ItemIsEditable);
+			table->setItem(0, 6, y2Item);
+
+			auto* a2Item = new QTableWidgetItem(
+				QString::number(it->angle2, 'f', 3));
+			a2Item->setFlags(a2Item->flags() & ~Qt::ItemIsEditable);
+			table->setItem(0, 7, a2Item);
 		}
 
 		// 限制最大行数，超出时删除旧行
@@ -1145,13 +1161,16 @@ namespace ui
 		auto* table = ui->tableWidget_info;
 		if (!table) return;
 
-		table->setColumnCount(5);
+		table->setColumnCount(8);
 		table->setHorizontalHeaderLabels({
 			QStringLiteral("时间"),
 			QStringLiteral("X(mm)"),
 			QStringLiteral("Y(mm)"),
 			QStringLiteral("角度(°)"),
-			QStringLiteral("分数")
+			QStringLiteral("分数"),
+			QStringLiteral("X2(mm)"),
+			QStringLiteral("Y2(mm)"),
+			QStringLiteral("角度2(°)")
 		});
 		table->horizontalHeader()->setVisible(true);
 		table->verticalHeader()->setVisible(false);
@@ -1396,17 +1415,23 @@ namespace ui
 		// 弹出编辑对话框
 		OffsetEditorDialog dlg(modelName,
 			current.offsetX, current.offsetY, current.offsetAngle,
+			current.offset2X, current.offset2Y, current.offset2Angle,
 			matchParams.numMatches, matchParams.minScore,
 			minAngleDeg, maxAngleDeg,
 			this);
 		if (dlg.exec() != QDialog::Accepted)
 			return;
 
-		// 保存偏移量
+		// 保存偏移量（两组中心点各自的 X/Y/角度）
 		std::string err;
-		if (!bun->setUserOffset(id,
-			dlg.offsetX(), dlg.offsetY(), dlg.offsetAngle(),
-			&err))
+		bun::ModelUserOffset newOffset;
+		newOffset.offsetX = dlg.offsetX();
+		newOffset.offsetY = dlg.offsetY();
+		newOffset.offsetAngle = dlg.offsetAngle();
+		newOffset.offset2X = dlg.offset2X();
+		newOffset.offset2Y = dlg.offset2Y();
+		newOffset.offset2Angle = dlg.offset2Angle();
+		if (!bun->setUserOffset(id, newOffset, &err))
 		{
 			rw::rqwu::MessageBox::warning(this,
 				QStringLiteral("保存偏移量失败"),

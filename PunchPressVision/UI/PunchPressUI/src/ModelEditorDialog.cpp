@@ -111,6 +111,8 @@ namespace ui
 			this, &ModelEditorDialog::onPaintMask);
 		connect(ui->btn_paintCenterPoint, &QPushButton::clicked,
 			this, &ModelEditorDialog::onPaintCenterPoint);
+		connect(ui->btn_paintCenterPoint2, &QPushButton::clicked,
+			this, &ModelEditorDialog::onPaintCenterPoint2);
 		connect(ui->btn_clearRegion, &QPushButton::clicked,
 			this, &ModelEditorDialog::onClearRegion);
 		connect(ui->btn_clearRegion2, &QPushButton::clicked,
@@ -296,6 +298,15 @@ namespace ui
 			shapeEditor_->setTool(ShapeEditor::Tool::View);
 		else
 			shapeEditor_->setTool(ShapeEditor::Tool::CenterPoint);
+	}
+
+	void ModelEditorDialog::onPaintCenterPoint2()
+	{
+		if (!shapeEditor_) return;
+		if (shapeEditor_->tool() == ShapeEditor::Tool::CenterPoint2)
+			shapeEditor_->setTool(ShapeEditor::Tool::View);
+		else
+			shapeEditor_->setTool(ShapeEditor::Tool::CenterPoint2);
 	}
 
 	void ModelEditorDialog::onClearRegion()
@@ -582,6 +593,11 @@ namespace ui
 			{
 				req.centerPoint = shapeEditor_->centerPoint();
 				req.hasCenterPoint = true;
+			}
+			if (shapeEditor_->hasCenterPoint2())
+			{
+				req.centerPoint2 = shapeEditor_->centerPoint2();
+				req.hasCenterPoint2 = true;
 			}
 		}
 
@@ -1095,7 +1111,11 @@ namespace ui
 		ui->btn_paintCenterPoint->setText(
 			tool == ShapeEditor::Tool::CenterPoint
 				? QStringLiteral("退出定义")
-				: QStringLiteral("定义中心点"));
+				: QStringLiteral("定义中心点1"));
+		ui->btn_paintCenterPoint2->setText(
+			tool == ShapeEditor::Tool::CenterPoint2
+				? QStringLiteral("退出定义")
+				: QStringLiteral("定义中心点2"));
 	}
 
 	// ===== 修改模式：加载已有模型 ==============================================
@@ -1169,6 +1189,10 @@ namespace ui
 		// 恢复中心点
 		if (data.centerX != 0.0 || data.centerY != 0.0)
 			shapeEditor_->setCenterPoint(QPointF(data.centerX, data.centerY));
+
+		// 恢复中心点2（与中心点1相互独立，不参与套版跟随）
+		if (data.hasCenter2)
+			shapeEditor_->setCenterPoint2(QPointF(data.center2X, data.center2Y));
 
 		// 恢复关联的套版并叠加显示
 		if (!data.stampPatternId.empty() && biz.stamp_pattern_bun)
@@ -1367,6 +1391,14 @@ namespace ui
 			{
 				data.centerX = shapeEditor_->centerPoint().x();
 				data.centerY = shapeEditor_->centerPoint().y();
+			}
+
+			// 中心点2：无条件同步（clearAll 清除后保存即取消定义）
+			data.hasCenter2 = shapeEditor_->hasCenterPoint2();
+			if (data.hasCenter2)
+			{
+				data.center2X = shapeEditor_->centerPoint2().x();
+				data.center2Y = shapeEditor_->centerPoint2().y();
 			}
 
 			// 同时更新相机参数（用户可能在创建后调整了曝光/增益）

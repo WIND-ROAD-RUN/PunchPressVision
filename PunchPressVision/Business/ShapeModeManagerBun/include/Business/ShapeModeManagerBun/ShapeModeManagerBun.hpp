@@ -32,6 +32,8 @@ namespace bun
 		std::vector<HalconCpp::HObject> _paintShieldRoiList;  // Mask 列表（逐个保存，支持回撤）
 		QPointF centerPoint;                 // 手动指定的中心点（可选）
 		bool hasCenterPoint{ false };        // 是否使用手动中心点
+		QPointF centerPoint2;                // 手动指定的中心点2（可选，与中心点1相互独立）
+		bool hasCenterPoint2{ false };       // 是否使用手动中心点2
 		std::string stampPatternId;          // 关联的套版 id（空 = 不使用套版）
 
 		// 识别范围（每模板独立，图像像素坐标；空 = 全图搜索）
@@ -82,6 +84,11 @@ namespace bun
 
 		double offsetX{ 0.0 };
 		double offsetY{ 0.0 };
+		// 中心点2 的第二组位置输出（世界坐标 mm / 角度 deg；模板未定义中心点2时回退为组1的值）
+		double offset2X{ 0.0 };
+		double offset2Y{ 0.0 };
+		double angle2{ 0.0 };
+		bool hasCenter2{ false };            // 模板是否定义了中心点2
 		bool found{ false };
 		HalconCpp::HObject matchedContours;  // 匹配后变换到位的轮廓 XLD（用于主界面显示）
 		HalconCpp::HImage preprocessedImage; // 预处理后的图像（通道提取+形态学运算，用于主界面显示）
@@ -133,12 +140,16 @@ namespace bun
 	/// <summary>
 	/// 用户可配置的模型偏移量。
 	/// 值从 ShapeModelData.offsetX/Y/Angle 读取，通过 model_params.txt 持久化。
+	/// 中心点1 与中心点2 各自独立一组 X/Y/角度。
 	/// </summary>
 	struct ModelUserOffset
 	{
 		double offsetX{ 0.0 };
 		double offsetY{ 0.0 };
 		double offsetAngle{ 0.0 };
+		double offset2X{ 0.0 };
+		double offset2Y{ 0.0 };
+		double offset2Angle{ 0.0 };
 	};
 
 	/// <summary>
@@ -229,9 +240,9 @@ namespace bun
 		// 模型偏移量（FR-035）
 		/// <summary>获取指定模型的用户偏移量。</summary>
 		ModelUserOffset getUserOffset(const std::string& modelId) const;
-		/// <summary>设置指定模型的用户偏移量，更新内存并持久化到磁盘。</summary>
+		/// <summary>设置指定模型的用户偏移量（两组中心点各自的 X/Y/角度），更新内存并持久化到磁盘。</summary>
 		bool setUserOffset(const std::string& modelId,
-			double offsetX, double offsetY, double offsetAngle,
+			const ModelUserOffset& offset,
 			std::string* errorMsg = nullptr);
 
 		// 模板匹配参数（查找数量、最低分数、角度范围）

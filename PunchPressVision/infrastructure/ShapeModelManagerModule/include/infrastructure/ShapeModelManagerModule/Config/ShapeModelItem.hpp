@@ -42,12 +42,22 @@ namespace Config
 		double findCenterX = 0;
 		double findCenterY = 0;
 
+		// 自定义中心点2（与中心点1相互独立；hasCenter2=false 时生产输出回退为中心点1的结果）
+		double center2X = 0;
+		double center2Y = 0;
+		bool hasCenter2 = false;
+
 		// 左右偏差（X 方向，单位：mm 或像素，取决于业务定义）
 		double offsetX = 0;
 		// 前后偏差（Y 方向，单位：mm 或像素，取决于业务定义）
 		double offsetY = 0;
 		// 角度偏差（单位：deg 或 rad，取决于业务定义）
 		double offsetAngle = 0;
+
+		// 中心点2 的独立偏移（语义同中心点1 的 offsetX/Y/Angle）
+		double offset2X = 0;
+		double offset2Y = 0;
+		double offset2Angle = 0;
 
 		int findnumber = 1;
 

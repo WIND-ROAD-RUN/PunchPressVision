@@ -330,19 +330,6 @@ namespace app
 		emit cameraConnectionChanged(idx, connected, reason);
 	}
 
-	// TODO(多模型PLC): 根据实际需求决定每个模型的 PLC 地址映射策略。
-	// 当前实现：仅取最佳匹配写入已有 PLC 地址。若需要多模型独立 PLC 地址，
-	// 可扩展 plcAddressCfg 为数组映射，在此函数中遍历 matches 分别写入。
-	static void writePositionToPLC(
-		const global::PositionResult& result,
-		inf::ControlModule& ctrl, const Config::PlcAddressCfg& plc)
-	{
-		ctrl.writeFloat(plc.regOffsetX, static_cast<float>(result.offsetX * 100.0));
-		ctrl.writeFloat(plc.regOffsetY, static_cast<float>(result.offsetY * 100.0));
-		ctrl.writeFloat(plc.regAngle, static_cast<float>(result.angle * 100.0));
-		ctrl.writeRegister(plc.regValid, result.valid ? 1 : 0);
-	}
-
 	void PunchPressApp::processProductionFrame(const HalconCpp::HImage& image)
 	{
 		if (!business_.shape_mode_manager_bun)
@@ -377,6 +364,11 @@ namespace app
 			r.offsetX = m.offsetX;
 			r.offsetY = m.offsetY;
 			r.angle = m.angle;  // 已为角度制
+			// 中心点2 的第二组位置（未定义中心点2时已回退为组1的值）
+			r.offset2X = m.offset2X;
+			r.offset2Y = m.offset2Y;
+			r.angle2 = m.angle2;
+			r.hasCenter2 = m.hasCenter2;
 			allResults.push_back(r);
 		}
 
@@ -404,25 +396,35 @@ namespace app
 
 			if (!allResults.empty())
 			{
-				// 写入有效结果
+				// 写入有效结果（组1：regOffsetX 起；组2：regOffset2X 起，槽位布局相同）
 				for (size_t i = 0; i < allResults.size() && i < kMaxSlots; ++i)
 				{
 					const int base = plc.regOffsetX + static_cast<int>(i) * kRegSpacing;
+					const int base2 = plc.regOffset2X + static_cast<int>(i) * kRegSpacing;
 					const auto& r = allResults[i];
 					inf.control_module_->writeFloat(base,      static_cast<float>(r.offsetX * 100.0));
 					inf.control_module_->writeFloat(base + 2,  static_cast<float>(-r.offsetY * 100.0));
 					inf.control_module_->writeFloat(base + 4,  static_cast<float>(-r.angle   * 100.0));
 					inf.control_module_->writeRegister(base + 6, r.valid ? 1 : 0);  // valid
+					inf.control_module_->writeFloat(base2,     static_cast<float>(r.offset2X * 100.0));
+					inf.control_module_->writeFloat(base2 + 2, static_cast<float>(-r.offset2Y * 100.0));
+					inf.control_module_->writeFloat(base2 + 4, static_cast<float>(-r.angle2   * 100.0));
+					inf.control_module_->writeRegister(base2 + 6, r.valid ? 1 : 0);
 				}
 
 				// 清空剩余槽位
 				for (size_t i = allResults.size(); i < kMaxSlots; ++i)
 				{
 					const int base = plc.regOffsetX + static_cast<int>(i) * kRegSpacing;
+					const int base2 = plc.regOffset2X + static_cast<int>(i) * kRegSpacing;
 					inf.control_module_->writeFloat(base,     0.0f);
 					inf.control_module_->writeFloat(base + 2, 0.0f);
 					inf.control_module_->writeFloat(base + 4, 0.0f);
 					inf.control_module_->writeRegister(base + 6, 0);
+					inf.control_module_->writeFloat(base2,     0.0f);
+					inf.control_module_->writeFloat(base2 + 2, 0.0f);
+					inf.control_module_->writeFloat(base2 + 4, 0.0f);
+					inf.control_module_->writeRegister(base2 + 6, 0);
 				}
 
 				// 发送完成信号：有数据
@@ -434,7 +436,9 @@ namespace app
 				for (size_t i = 0; i < kMaxSlots; ++i)
 				{
 					const int base = plc.regOffsetX + static_cast<int>(i) * kRegSpacing;
+					const int base2 = plc.regOffset2X + static_cast<int>(i) * kRegSpacing;
 					inf.control_module_->writeRegister(base + 6, 0);
+					inf.control_module_->writeRegister(base2 + 6, 0);
 				}
 
 				// 发送完成信号：无数据

@@ -221,7 +221,9 @@ namespace Config
 			int createModelPreProcessType,
 			double centerX, double centerY,
 			double findCenterX, double findCenterY,
+			double center2X, double center2Y, bool hasCenter2,
 			double offsetX, double offsetY, double offsetAngle,
+			double offset2X, double offset2Y, double offset2Angle,
 			int findNumber,
 			int singleChannelType,
 			double createModelExposureTime, double createModelGain,
@@ -247,9 +249,15 @@ namespace Config
 			ofs << "centerY=" << centerY << '\n';
 			ofs << "findCenterX=" << findCenterX << '\n';
 			ofs << "findCenterY=" << findCenterY << '\n';
+			ofs << "center2X=" << center2X << '\n';
+			ofs << "center2Y=" << center2Y << '\n';
+			ofs << "hasCenter2=" << (hasCenter2 ? 1 : 0) << '\n';
 			ofs << "offsetX=" << offsetX << '\n';
 			ofs << "offsetY=" << offsetY << '\n';
 			ofs << "offsetAngle=" << offsetAngle << '\n';
+			ofs << "offset2X=" << offset2X << '\n';
+			ofs << "offset2Y=" << offset2Y << '\n';
+			ofs << "offset2Angle=" << offset2Angle << '\n';
 			ofs << "findnumber=" << findNumber << '\n';
 			ofs << "singleChannelType=" << singleChannelType << '\n';
 			ofs << "createModelExposureTime=" << createModelExposureTime << '\n';
@@ -324,7 +332,9 @@ namespace Config
 			int& createModelPreProcessType,
 			double& centerX, double& centerY,
 			double& findCenterX, double& findCenterY,
+			double& center2X, double& center2Y, bool& hasCenter2,
 			double& offsetX, double& offsetY, double& offsetAngle,
+			double& offset2X, double& offset2Y, double& offset2Angle,
 			int& findNumber,
 			int& singleChannelType,
 			double& createModelExposureTime, double& createModelGain,
@@ -368,12 +378,24 @@ namespace Config
 						findCenterX = std::stod(value);
 					else if (key == "findCenterY")
 						findCenterY = std::stod(value);
+					else if (key == "center2X")
+						center2X = std::stod(value);
+					else if (key == "center2Y")
+						center2Y = std::stod(value);
+					else if (key == "hasCenter2")
+						hasCenter2 = std::stoi(value) != 0;
 					else if (key == "offsetX")
 						offsetX = std::stod(value);
 					else if (key == "offsetY")
 						offsetY = std::stod(value);
 					else if (key == "offsetAngle")
 						offsetAngle = std::stod(value);
+					else if (key == "offset2X")
+						offset2X = std::stod(value);
+					else if (key == "offset2Y")
+						offset2Y = std::stod(value);
+					else if (key == "offset2Angle")
+						offset2Angle = std::stod(value);
 					else if (key == "findnumber")
 						findNumber = std::stoi(value);
 					else if (key == "singleChannelType")
@@ -531,7 +553,9 @@ namespace Config
 				_createModelPreProcessType,
 				centerX, centerY,
 				findCenterX, findCenterY,
+				center2X, center2Y, hasCenter2,
 				offsetX, offsetY, offsetAngle,
+				offset2X, offset2Y, offset2Angle,
 				findnumber,
 				_SingleChannelType,
 				_createModelExposureTime, _createModelGain,
@@ -612,7 +636,9 @@ namespace Config
 				_createModelPreProcessType,
 				centerX, centerY,
 				findCenterX, findCenterY,
+				center2X, center2Y, hasCenter2,
 				offsetX, offsetY, offsetAngle,
+				offset2X, offset2Y, offset2Angle,
 				findnumber,
 				_SingleChannelType,
 				_createModelExposureTime, _createModelGain,

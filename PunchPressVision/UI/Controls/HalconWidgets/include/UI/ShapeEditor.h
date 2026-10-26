@@ -28,6 +28,7 @@ namespace ui
 			RectangleMask,  ///< 屏蔽区域（品红色矩形）
 			FreehandMask,   ///< 屏蔽区域（Halcon 自由绘制）
 			CenterPoint,    ///< 定义模板中心点
+			CenterPoint2,   ///< 定义模板中心点2（与中心点1相互独立）
 			StampPattern,   ///< 套版对齐编辑（拖动平移 / 滚轮旋转 / Ctrl+滚轮缩放）
 			MatchRegion,    ///< 识别范围（青色矩形，可绘制多个，右键确认）
 		};
@@ -78,6 +79,15 @@ namespace ui
 		/// 设置手动中心点（修改模式时从已有模型恢复）
 		void setCenterPoint(const QPointF& point);
 		bool hasCenterPoint() const { return hasCenterPoint_; }
+
+		// === 中心点2（与中心点1相互独立，不参与套版跟随） ===
+
+		QPointF centerPoint2() const { return centerPoint2_; }
+		/// 设置手动中心点2（修改模式时从已有模型恢复）
+		void setCenterPoint2(const QPointF& point);
+		bool hasCenterPoint2() const { return hasCenterPoint2_; }
+		/// 清除中心点2
+		void clearCenterPoint2();
 
 		// === 套版（StampPattern）叠加与对齐编辑 ===
 
@@ -152,6 +162,7 @@ namespace ui
 		void roiChanged();
 		void maskChanged();
 		void centerPointChanged();
+		void centerPoint2Changed();
 		void matchRegionChanged();
 		void toolChanged(Tool tool);
 		/// 套版对齐参数被拖动/旋转/缩放编辑后发出。
@@ -165,6 +176,7 @@ namespace ui
 		void drawAllROIs();
 		void drawAllMasks();
 		void drawCenterPoint();
+		void drawCenterPoint2();     ///< 绘制中心点2（绿色十字）
 		void drawMarker();             ///< 绘制识别匹配结果标记
 		void drawFoundContours();      ///< 绘制模型轮廓
 
@@ -220,6 +232,9 @@ namespace ui
 
 		QPointF centerPoint_;
 		bool hasCenterPoint_{ false };
+
+		QPointF centerPoint2_;
+		bool hasCenterPoint2_{ false };
 
 		// 套版叠加：基图与 RGBA 套版图、手动对齐参数（参考图像坐标）
 		HalconCpp::HImage baseImage_;

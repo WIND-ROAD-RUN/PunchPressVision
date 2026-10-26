@@ -161,6 +161,10 @@ namespace bun
 			outData.centerY = centerY;
 			outData.findCenterX = findcenterX;
 			outData.findCenterY = findcenterY;
+			// 中心点2（与中心点1相互独立；未定义时 hasCenter2=false，生产输出回退为中心点1）
+			outData.hasCenter2 = req.hasCenterPoint2;
+			outData.center2X = req.hasCenterPoint2 ? req.centerPoint2.x() : 0.0;
+			outData.center2Y = req.hasCenterPoint2 ? req.centerPoint2.y() : 0.0;
 			outData.stampPatternId = req.stampPatternId;
 			outData.offsetX = req.offsetX;
 			outData.offsetY = req.offsetY;
@@ -357,6 +361,12 @@ namespace bun
 		result.data.angleStart = oldData.angleStart;
 		result.data.angleExtent = oldData.angleExtent;
 		result.data.minScore = oldData.minScore;
+
+		// 保留中心点2 的偏移（编辑界面不编辑组2 偏移、req 不携带，重训时必须保留旧值，
+		// 否则重训会清零用户在主界面设置的组2 偏移）
+		result.data.offset2X = oldData.offset2X;
+		result.data.offset2Y = oldData.offset2Y;
+		result.data.offset2Angle = oldData.offset2Angle;
 
 		// 发布轮廓信号
 		if (result.contours.IsInitialized())
@@ -684,6 +694,9 @@ namespace bun
 				o.offsetX = m.data.offsetX;
 				o.offsetY = m.data.offsetY;
 				o.offsetAngle = m.data.offsetAngle;
+				o.offset2X = m.data.offset2X;
+				o.offset2Y = m.data.offset2Y;
+				o.offset2Angle = m.data.offset2Angle;
 				return o;
 			}
 		}
@@ -691,7 +704,7 @@ namespace bun
 	}
 
 	bool ShapeModeManagerBun::setUserOffset(const std::string& modelId,
-		double offsetX, double offsetY, double offsetAngle,
+		const ModelUserOffset& offset,
 		std::string* errorMsg)
 	{
 		try
@@ -702,9 +715,12 @@ namespace bun
 				{
 					if (m.modelId == modelId)
 					{
-						m.data.offsetX = offsetX;
-						m.data.offsetY = offsetY;
-						m.data.offsetAngle = offsetAngle;
+						m.data.offsetX = offset.offsetX;
+						m.data.offsetY = offset.offsetY;
+						m.data.offsetAngle = offset.offsetAngle;
+						m.data.offset2X = offset.offset2X;
+						m.data.offset2Y = offset.offset2Y;
+						m.data.offset2Angle = offset.offset2Angle;
 						break;
 					}
 				}
@@ -713,9 +729,12 @@ namespace bun
 			// 持久化到磁盘（model_params.txt）
 			// 需要从 infra 重新加载完整 item，替换 data 后写回
 			auto item = inf_.shape_model_manager_module_->getShapeModelItem(modelId);
-			item.data.offsetX = offsetX;
-			item.data.offsetY = offsetY;
-			item.data.offsetAngle = offsetAngle;
+			item.data.offsetX = offset.offsetX;
+			item.data.offsetY = offset.offsetY;
+			item.data.offsetAngle = offset.offsetAngle;
+			item.data.offset2X = offset.offset2X;
+			item.data.offset2Y = offset.offset2Y;
+			item.data.offset2Angle = offset.offset2Angle;
 			inf_.shape_model_manager_module_->changeShapeModelItem(modelId, item.data);
 
 			emit modelOffsetChanged(QString::fromStdString(modelId));
@@ -1014,83 +1033,103 @@ namespace bun
 						const double refRow = model.data.findCenterY;
 						const double refCol = model.data.findCenterX;
 
-						// 自定义点（创建模板时画的点，像素坐标）
-						double customRow = model.data.centerY;
-						double customCol = model.data.centerX;
+						// 角度补偿系数（matchAngle 为 Halcon 弧度制，统一转为角度制存储）
+						constexpr double kRadToDeg = 180.0 / 3.14159265358979323846;
 
-						// 偏移量单位是 mm，这里先换算成像素偏移量，再加到自定义点上
-						// （与 findShapemodel 一致：mm→pixel 后在旋转变换前叠加，使偏移随工件旋转）
-						if (hasNinePoint
-							&& (std::abs(model.data.offsetX) > 1e-9 || std::abs(model.data.offsetY) > 1e-9))
+						// 一组位置的完整计算管线：自定义中心点(像素) + 用户偏移(mm)
+						//   → mm 偏移先换算成像素并叠加到自定义点（旋转变换前叠加，使偏移随工件旋转）
+						//   → 以模板参考中心(refRow/refCol)为原点刚体变换到当前匹配位姿
+						//   → 像素坐标经九点标定转世界坐标(mm)，角度减用户角度偏移
+						// 中心点1/中心点2 两组输出共用此管线。
+						auto computePosition = [&](double customR, double customC,
+							double offX, double offY, double offAngle,
+							double& outPixRow, double& outPixCol,
+							double& outWorldX, double& outWorldY, double& outAngleDeg)
 						{
-							try
+							if (hasNinePoint
+								&& (std::abs(offX) > 1e-9 || std::abs(offY) > 1e-9))
 							{
-								HalconCpp::HTuple invHomMat2D;
-								HalconCpp::HomMat2dInvert(homMat2D, &invHomMat2D);
-
-								HalconCpp::HTuple basePixRow, basePixCol;
-								HalconCpp::HTuple offsetPixRow, offsetPixCol;
-
-								HalconCpp::AffineTransPoint2d(invHomMat2D, 0.0, 0.0,
-									&basePixRow, &basePixCol);
-								HalconCpp::AffineTransPoint2d(invHomMat2D,
-									-model.data.offsetY, model.data.offsetX,
-									&offsetPixRow, &offsetPixCol);
-
-								if (basePixRow.TupleLength() > 0 && basePixCol.TupleLength() > 0 &&
-									offsetPixRow.TupleLength() > 0 && offsetPixCol.TupleLength() > 0)
+								try
 								{
-									const double deltaRow = offsetPixRow[0].D() - basePixRow[0].D();
-									const double deltaCol = offsetPixCol[0].D() - basePixCol[0].D();
-									customRow += deltaRow;
-									customCol += deltaCol;
+									HalconCpp::HTuple invHomMat2D;
+									HalconCpp::HomMat2dInvert(homMat2D, &invHomMat2D);
+
+									HalconCpp::HTuple basePixRow, basePixCol;
+									HalconCpp::HTuple offsetPixRow, offsetPixCol;
+
+									HalconCpp::AffineTransPoint2d(invHomMat2D, 0.0, 0.0,
+										&basePixRow, &basePixCol);
+									HalconCpp::AffineTransPoint2d(invHomMat2D,
+										-offY, offX,
+										&offsetPixRow, &offsetPixCol);
+
+									if (basePixRow.TupleLength() > 0 && basePixCol.TupleLength() > 0 &&
+										offsetPixRow.TupleLength() > 0 && offsetPixCol.TupleLength() > 0)
+									{
+										customR += offsetPixRow[0].D() - basePixRow[0].D();
+										customC += offsetPixCol[0].D() - basePixCol[0].D();
+									}
+								}
+								catch (...)
+								{
+									// fallback: 使用原始自定义点
 								}
 							}
-							catch (...)
+
+							const bool canTransform =
+								(std::abs(refCol) > 1e-9) || (std::abs(refRow) > 1e-9) ||
+								(std::abs(customC) > 1e-9) || (std::abs(customR) > 1e-9);
+
+							// 将自定义点从模板参考系变换到当前匹配位置
+							outPixRow = matchRow;
+							outPixCol = matchCol;
+							if (canTransform)
 							{
-								// fallback: 使用原始 customRow/customCol
-							}
-						}
-
-						const bool canTransform =
-							(std::abs(refCol) > 1e-9) || (std::abs(refRow) > 1e-9) ||
-							(std::abs(customCol) > 1e-9) || (std::abs(customRow) > 1e-9);
-
-						// 将自定义点从模板参考系变换到当前匹配位置（与 findShapemodel 一致）
-						double outRow = matchRow, outCol = matchCol;
-						if (canTransform)
-						{
-							try
-							{
-								HalconCpp::HTuple h;
-								HalconCpp::VectorAngleToRigid(
-									refRow, refCol, 0.0,
-									matchRow, matchCol, matchAngle,
-									&h);
-
-								HalconCpp::HTuple r, c;
-								HalconCpp::AffineTransPoint2d(h, customRow, customCol, &r, &c);
-
-								if (r.TupleLength() > 0 && c.TupleLength() > 0)
+								try
 								{
-									outRow = r[0].D();
-									outCol = c[0].D();
+									HalconCpp::HTuple h;
+									HalconCpp::VectorAngleToRigid(
+										refRow, refCol, 0.0,
+										matchRow, matchCol, matchAngle,
+										&h);
+
+									HalconCpp::HTuple r, c;
+									HalconCpp::AffineTransPoint2d(h, customR, customC, &r, &c);
+
+									if (r.TupleLength() > 0 && c.TupleLength() > 0)
+									{
+										outPixRow = r[0].D();
+										outPixCol = c[0].D();
+									}
+								}
+								catch (...)
+								{
+									// fallback: 使用匹配中心
 								}
 							}
-							catch (...)
+
+							// 像素 → 世界坐标（九点标定）
+							double wx = outPixCol, wy = outPixRow;
+							if (hasNinePoint)
 							{
-								// fallback: 使用匹配中心
+								if (!inf_tool_.nine_point_bun->pixToWorld(homMat2D,
+									outPixCol, outPixRow, wx, wy))
+								{
+									// 标定转换失败，回退到像素坐标
+									wx = outPixCol;
+									wy = outPixRow;
+								}
 							}
-						}
+							outWorldX = wx;
+							outWorldY = wy;
+							outAngleDeg = matchAngle * kRadToDeg - offAngle;
+						};
 
 						MatchResult result;
 						result.found = true;
 						result.modelId = model.modelId;
 						result.modelName = model.modelName;
 						result.preprocessedImage = processedForDisplay;  // 预处理后的图像，供 UI 显示
-						// 自定义中心点的像素坐标（供上层绘图）
-						result.row = outRow;
-						result.column = outCol;
 						result.score = score[i].D();
 
 						// 原始匹配位姿 + 模板参考中心（供生产帧套版自动对齐叠加）
@@ -1101,28 +1140,33 @@ namespace bun
 						result.refCol = model.data.findCenterX;
 						result.stampPatternId = model.data.stampPatternId;
 
-						// 像素 → 世界坐标（九点标定）
-						double worldX = outCol, worldY = outRow;
-						if (hasNinePoint)
-						{
-							if (!inf_tool_.nine_point_bun->pixToWorld(homMat2D,
-								outCol, outRow, worldX, worldY))
-							{
-								// 标定转换失败，回退到像素坐标
-								worldX = outCol;
-								worldY = outRow;
-							}
-						}
+						// 组1：中心点1 + 组1 偏移
+						double worldX = 0.0, worldY = 0.0;
+						computePosition(model.data.centerY, model.data.centerX,
+							model.data.offsetX, model.data.offsetY, model.data.offsetAngle,
+							result.row, result.column, worldX, worldY, result.angle);
 						result.realX = worldX;
 						result.realY = worldY;
 
-						// 偏移量已在像素域叠加到 customRow/customCol 中，realX/Y 已包含偏移
+						// 偏移量已在像素域叠加到自定义点中，realX/Y 已包含偏移
 						result.offsetX = result.realX;
 						result.offsetY = result.realY;
 
-						// 角度补偿（matchAngle 为 Halcon 弧度制，统一转为角度制存储）
-						constexpr double kRadToDeg = 180.0 / 3.14159265358979323846;
-						result.angle = matchAngle * kRadToDeg - model.data.offsetAngle;
+						// 组2：中心点2 + 组2 偏移；模板未定义中心点2 时回退为组1 输出
+						result.hasCenter2 = model.data.hasCenter2;
+						if (model.data.hasCenter2)
+						{
+							double outRow2 = 0.0, outCol2 = 0.0;
+							computePosition(model.data.center2Y, model.data.center2X,
+								model.data.offset2X, model.data.offset2Y, model.data.offset2Angle,
+								outRow2, outCol2, result.offset2X, result.offset2Y, result.angle2);
+						}
+						else
+						{
+							result.offset2X = result.offsetX;
+							result.offset2Y = result.offsetY;
+							result.angle2 = result.angle;
+						}
 
 						// 生成匹配轮廓 XLD（与 findShapemodel 一致），供主界面叠加显示
 						try
@@ -1140,7 +1184,7 @@ namespace bun
 
 							// 叠加自定义中心点十字
 							HalconCpp::HXLDCont ho_Cross;
-							HalconCpp::GenCrossContourXld(&ho_Cross, outRow, outCol, 24.0, matchAngle);
+							HalconCpp::GenCrossContourXld(&ho_Cross, result.row, result.column, 24.0, matchAngle);
 							HalconCpp::ConcatObj(ho_TransContours, ho_Cross, &result.matchedContours);
 						}
 						catch (...)

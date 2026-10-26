@@ -16,6 +16,7 @@ namespace ui
 {
 	OffsetEditorDialog::OffsetEditorDialog(const QString& modelName,
 		double offsetX, double offsetY, double offsetAngle,
+		double offset2X, double offset2Y, double offset2Angle,
 		int numMatches, double minScore,
 		double minAngleDeg, double maxAngleDeg,
 		QWidget* parent)
@@ -24,6 +25,9 @@ namespace ui
 		, offsetX_(offsetX)
 		, offsetY_(offsetY)
 		, offsetAngle_(offsetAngle)
+		, offset2X_(offset2X)
+		, offset2Y_(offset2Y)
+		, offset2Angle_(offset2Angle)
 		, numMatches_(numMatches)
 		, minScore_(minScore)
 		, minAngleDeg_(minAngleDeg)
@@ -147,6 +151,12 @@ namespace ui
 
 		// ---- 偏移量区域（带方向步进按钮） ----
 
+		// ---- 中心点1 偏移分隔线 ----
+		auto* sepLabel1 = new QLabel(QStringLiteral("── 中心点1偏移 ──"), this);
+		sepLabel1->setStyleSheet("font-size: 14px; font-weight: bold; color: #2196F3; padding: 4px 0 4px 0;");
+		sepLabel1->setAlignment(Qt::AlignCenter);
+		formLayout->addRow(sepLabel1);
+
 		createStepRow(QStringLiteral("左右偏移 (mm):"),
 			btnOffsetX_, btnMinusX_, btnPlusX_,
 			QStringLiteral("向左"), QStringLiteral("向右"),
@@ -176,6 +186,42 @@ namespace ui
 		connect(btnOffsetAngle_, &QPushButton::clicked, this, &OffsetEditorDialog::onOffsetAngleClicked);
 		connect(btnMinusAngle_, &QPushButton::clicked, this, [this]() { onStepOffsetAngle(false); });
 		connect(btnPlusAngle_, &QPushButton::clicked, this, [this]() { onStepOffsetAngle(true); });
+
+		// ---- 中心点2 偏移分隔线 ----
+		auto* sepLabel2 = new QLabel(QStringLiteral("── 中心点2偏移 ──"), this);
+		sepLabel2->setStyleSheet("font-size: 14px; font-weight: bold; color: #4CAF50; padding: 12px 0 4px 0;");
+		sepLabel2->setAlignment(Qt::AlignCenter);
+		formLayout->addRow(sepLabel2);
+
+		createStepRow(QStringLiteral("左右偏移2 (mm):"),
+			btnOffset2X_, btnMinus2X_, btnPlus2X_,
+			QStringLiteral("向左"), QStringLiteral("向右"),
+			QStringLiteral("向左偏移 0.1mm"), QStringLiteral("向右偏移 0.1mm"),
+			QStringLiteral("中心点2 左右偏移 (mm)，范围 -9999.999 ~ 9999.999"),
+			offset2X_, 3);
+		connect(btnOffset2X_, &QPushButton::clicked, this, &OffsetEditorDialog::onOffset2XClicked);
+		connect(btnMinus2X_, &QPushButton::clicked, this, [this]() { onStepOffset2X(false); });
+		connect(btnPlus2X_, &QPushButton::clicked, this, [this]() { onStepOffset2X(true); });
+
+		createStepRow(QStringLiteral("上下偏移2 (mm):"),
+			btnOffset2Y_, btnMinus2Y_, btnPlus2Y_,
+			QStringLiteral("向下"), QStringLiteral("向上"),
+			QStringLiteral("向下偏移 0.1mm"), QStringLiteral("向上偏移 0.1mm"),
+			QStringLiteral("中心点2 上下偏移 (mm)，范围 -9999.999 ~ 9999.999"),
+			offset2Y_, 3);
+		connect(btnOffset2Y_, &QPushButton::clicked, this, &OffsetEditorDialog::onOffset2YClicked);
+		connect(btnMinus2Y_, &QPushButton::clicked, this, [this]() { onStepOffset2Y(false); });
+		connect(btnPlus2Y_, &QPushButton::clicked, this, [this]() { onStepOffset2Y(true); });
+
+		createStepRow(QStringLiteral("角度偏移2 (\xc2\xb0):"),
+			btnOffset2Angle_, btnMinus2Angle_, btnPlus2Angle_,
+			QStringLiteral("左转"), QStringLiteral("右转"),
+			QStringLiteral("向左旋转 0.1\xc2\xb0"), QStringLiteral("向右旋转 0.1\xc2\xb0"),
+			QStringLiteral("中心点2 角度偏移 (°)，范围 -360.0 ~ 360.0"),
+			offset2Angle_, 3);
+		connect(btnOffset2Angle_, &QPushButton::clicked, this, &OffsetEditorDialog::onOffset2AngleClicked);
+		connect(btnMinus2Angle_, &QPushButton::clicked, this, [this]() { onStepOffset2Angle(false); });
+		connect(btnPlus2Angle_, &QPushButton::clicked, this, [this]() { onStepOffset2Angle(true); });
 
 		// ---- 匹配参数分隔线 ----
 		auto* sepLabel = new QLabel(QStringLiteral("\xe2\x94\x80\xe2\x94\x80 匹配参数 \xe2\x94\x80\xe2\x94\x80"), this);
@@ -255,6 +301,36 @@ namespace ui
 	void OffsetEditorDialog::onStepOffsetAngle(bool plus)
 	{
 		applyStep(btnOffsetAngle_, offsetAngle_, plus ? 1.0 : -1.0, -360.0, 360.0, 3);
+	}
+
+	void OffsetEditorDialog::onOffset2XClicked()
+	{
+		inputDoubleParam(btnOffset2X_, offset2X_, -9999.999, 9999.999, 3);
+	}
+
+	void OffsetEditorDialog::onOffset2YClicked()
+	{
+		inputDoubleParam(btnOffset2Y_, offset2Y_, -9999.999, 9999.999, 3);
+	}
+
+	void OffsetEditorDialog::onOffset2AngleClicked()
+	{
+		inputDoubleParam(btnOffset2Angle_, offset2Angle_, -360.0, 360.0, 3);
+	}
+
+	void OffsetEditorDialog::onStepOffset2X(bool plus)
+	{
+		applyStep(btnOffset2X_, offset2X_, plus ? 1.0 : -1.0, -9999.999, 9999.999, 3);
+	}
+
+	void OffsetEditorDialog::onStepOffset2Y(bool plus)
+	{
+		applyStep(btnOffset2Y_, offset2Y_, plus ? 1.0 : -1.0, -9999.999, 9999.999, 3);
+	}
+
+	void OffsetEditorDialog::onStepOffset2Angle(bool plus)
+	{
+		applyStep(btnOffset2Angle_, offset2Angle_, plus ? 1.0 : -1.0, -360.0, 360.0, 3);
 	}
 
 	void OffsetEditorDialog::onOK()
