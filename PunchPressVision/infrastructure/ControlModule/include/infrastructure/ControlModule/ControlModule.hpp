@@ -20,11 +20,10 @@ namespace inf
 	// PLC 控制网关：封装 Modbus TCP 通信（rw::hoep::ModbusDevice）。
 	// 寄存器地址映射由 ConfigModule::plcAddressCfg 提供（oso 持久化），
 	// 默认值对应 LLD 附录：
-	//   regOffsetX          (6100) float  中心点1 结果槽位起始（每槽 10 寄存器：X/Y/角度/valid）
+	//   regOffsetX          (6100) float  定位结果槽位起始（中心点1/2 输出合并排序后统一发送，每槽 10 寄存器：X/Y/角度/valid）
 	//   regOffsetY          (6102) float  Y 偏移量（仅兼容旧约定，生产写路径按槽位布局）
 	//   regAngle            (6104) float  旋转角度 Angle（同上）
 	//   regValid            (6106) int    定位结果有效标志（同上）
-	//   regOffset2X         (6700) float  中心点2 结果块低端地址（块内槽位从大到小：槽 i = 6700+(49-i)*10，槽0 在最高地址 7190）
 	//   regNinePointArrived (6600) int    九点标定到位确认（PLC→系统）
 	//   regNinePointIndex   (6601) int    九点标定当前点位序号
 	//   regNinePointCoordsStart (6602~) float  九点点位机械坐标

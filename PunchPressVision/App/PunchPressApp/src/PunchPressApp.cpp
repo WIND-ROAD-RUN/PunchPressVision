@@ -372,7 +372,7 @@ namespace app
 			allResults.push_back(r);
 		}
 
-		// 写 PLC：每个匹配结果占一组寄存器（间隔 10），无效槽位清零
+		// 写 PLC：中心点1/2 输出合并后的每条数据占一组寄存器（间隔 10），无效槽位清零
 		auto& inf = business_.infrastructure();
 		// 读取 m330 线圈决定 X 排序方向（true=升序，false=降序）
 		bool sortByXAsc = false;
@@ -393,42 +393,44 @@ namespace app
 			const auto& plc = inf.config_module_->plcAddressCfg;
 			constexpr int kRegSpacing = 10;   // 每组结果的寄存器间隔
 			constexpr size_t kMaxSlots = 50;  // 最大结果槽位数
-			// 组2 槽位地址从大到小：槽0 在组2 块最高地址，槽 i 地址 = regOffset2X + (kMaxSlots-1-i)*10
-			auto slotBase2 = [&](size_t i) {
-				return plc.regOffset2X + static_cast<int>(kMaxSlots - 1 - i) * kRegSpacing;
-			};
 
 			if (!allResults.empty())
 			{
-				// 写入有效结果（组1：regOffsetX 起从小到大；组2：regOffset2X 块内从大到小）
-				for (size_t i = 0; i < allResults.size() && i < kMaxSlots; ++i)
+				// 中心点1/2 输出合并为统一条目流（组2 仅模板定义了中心点2 时才有），
+				// 按条目自身 X 排序（方向同 m330），全部写入组1 地址区（regOffsetX 起从小到大）
+				struct PlcEntry { double x; double y; double angle; };
+				std::vector<PlcEntry> entries;
+				entries.reserve(allResults.size() * 2);
+				for (const auto& r : allResults)
+				{
+					entries.push_back({ r.offsetX, r.offsetY, r.angle });
+					if (r.hasCenter2)
+						entries.push_back({ r.offset2X, r.offset2Y, r.angle2 });
+				}
+				std::sort(entries.begin(), entries.end(),
+					[sortByXAsc](const PlcEntry& a, const PlcEntry& b) {
+						return sortByXAsc ? (a.x < b.x) : (a.x > b.x);
+					});
+
+				// 写入有效条目
+				for (size_t i = 0; i < entries.size() && i < kMaxSlots; ++i)
 				{
 					const int base = plc.regOffsetX + static_cast<int>(i) * kRegSpacing;
-					const int base2 = slotBase2(i);
-					const auto& r = allResults[i];
-					inf.control_module_->writeFloat(base,      static_cast<float>(r.offsetX * 100.0));
-					inf.control_module_->writeFloat(base + 2,  static_cast<float>(-r.offsetY * 100.0));
-					inf.control_module_->writeFloat(base + 4,  static_cast<float>(-r.angle   * 100.0));
-					inf.control_module_->writeRegister(base + 6, r.valid ? 1 : 0);  // valid
-					inf.control_module_->writeFloat(base2,     static_cast<float>(r.offset2X * 100.0));
-					inf.control_module_->writeFloat(base2 + 2, static_cast<float>(-r.offset2Y * 100.0));
-					inf.control_module_->writeFloat(base2 + 4, static_cast<float>(-r.angle2   * 100.0));
-					inf.control_module_->writeRegister(base2 + 6, r.valid ? 1 : 0);
+					const auto& e = entries[i];
+					inf.control_module_->writeFloat(base,     static_cast<float>(e.x * 100.0));
+					inf.control_module_->writeFloat(base + 2, static_cast<float>(-e.y * 100.0));
+					inf.control_module_->writeFloat(base + 4, static_cast<float>(-e.angle * 100.0));
+					inf.control_module_->writeRegister(base + 6, 1);  // valid
 				}
 
 				// 清空剩余槽位
-				for (size_t i = allResults.size(); i < kMaxSlots; ++i)
+				for (size_t i = entries.size(); i < kMaxSlots; ++i)
 				{
 					const int base = plc.regOffsetX + static_cast<int>(i) * kRegSpacing;
-					const int base2 = slotBase2(i);
 					inf.control_module_->writeFloat(base,     0.0f);
 					inf.control_module_->writeFloat(base + 2, 0.0f);
 					inf.control_module_->writeFloat(base + 4, 0.0f);
 					inf.control_module_->writeRegister(base + 6, 0);
-					inf.control_module_->writeFloat(base2,     0.0f);
-					inf.control_module_->writeFloat(base2 + 2, 0.0f);
-					inf.control_module_->writeFloat(base2 + 4, 0.0f);
-					inf.control_module_->writeRegister(base2 + 6, 0);
 				}
 
 				// 发送完成信号：有数据
@@ -440,9 +442,7 @@ namespace app
 				for (size_t i = 0; i < kMaxSlots; ++i)
 				{
 					const int base = plc.regOffsetX + static_cast<int>(i) * kRegSpacing;
-					const int base2 = slotBase2(i);
 					inf.control_module_->writeRegister(base + 6, 0);
-					inf.control_module_->writeRegister(base2 + 6, 0);
 				}
 
 				// 发送完成信号：无数据
@@ -542,6 +542,15 @@ namespace app
 					// m.angle 为角度制，Halcon DispCross 需要弧度
 					HalconCpp::DispCross(bufWin, m.row, m.column, 75.0,
 						m.angle * 3.14159265358979323846 / 180.0);
+
+					// 中心点2 标记：绿色十字（与模板编辑器一致），仅模板定义了中心点2 时绘制
+					if (m.hasCenter2)
+					{
+						HalconCpp::SetColor(bufWin, "green");
+						HalconCpp::SetLineWidth(bufWin, 6);
+						HalconCpp::DispCross(bufWin, m.row2, m.column2, 75.0,
+							m.angle2 * 3.14159265358979323846 / 180.0);
+					}
 				}
 
 				HalconCpp::DumpWindowImage(&displayImage, bufWin);

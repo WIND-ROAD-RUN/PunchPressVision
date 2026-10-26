@@ -6,7 +6,6 @@ namespace Config{
 		regOffsetY : int : default = 6102;
 		regAngle : int : default = 6104;
 		regValid : int : default = 6106;
-		regOffset2X : int : default = 6700;
 		regNinePointArrived : int : default = 6600;
 		regNinePointIndex : int : default = 6601;
 		regNinePointCoordsStart : int : default = 6602;

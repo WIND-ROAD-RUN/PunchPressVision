@@ -89,6 +89,9 @@ namespace bun
 		double offset2Y{ 0.0 };
 		double angle2{ 0.0 };
 		bool hasCenter2{ false };            // 模板是否定义了中心点2
+		// 中心点2 在图像中的像素位置（仅 hasCenter2 时有效；用于主界面绘制第二中心点标记）
+		double row2{ 0.0 };
+		double column2{ 0.0 };
 		bool found{ false };
 		HalconCpp::HObject matchedContours;  // 匹配后变换到位的轮廓 XLD（用于主界面显示）
 		HalconCpp::HImage preprocessedImage; // 预处理后的图像（通道提取+形态学运算，用于主界面显示）

@@ -1160,6 +1160,8 @@ namespace bun
 							computePosition(model.data.center2Y, model.data.center2X,
 								model.data.offset2X, model.data.offset2Y, model.data.offset2Angle,
 								outRow2, outCol2, result.offset2X, result.offset2Y, result.angle2);
+							result.row2 = outRow2;
+							result.column2 = outCol2;
 						}
 						else
 						{
