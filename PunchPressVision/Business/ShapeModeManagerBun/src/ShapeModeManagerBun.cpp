@@ -1363,6 +1363,17 @@ namespace bun
 		return all;
 	}
 
+	std::vector<global::MatchRegionRect> ShapeModeManagerBun::modelMatchRegions(const std::string& modelId) const
+	{
+		std::shared_lock<std::shared_mutex> lk(modelCacheMutex_);
+		for (const auto& m : loadedModels_)
+		{
+			if (m.modelId == modelId)
+				return m.data.matchRegions;
+		}
+		return {};
+	}
+
 	void ShapeModeManagerBun::updateLoadedModelCache(const std::string& modelId,
 		const Config::ShapeModelData& data)
 	{

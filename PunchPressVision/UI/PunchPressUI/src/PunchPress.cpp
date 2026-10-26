@@ -168,14 +168,9 @@ namespace ui
 		// 插入到右侧控制栏：gBox_tools 之后、gBox_table 之前（索引 3）
 		ui->vLayout_control->insertWidget(3, loadedModelsGroup_);
 
-		// 识别范围改为按模板存储（模板编辑器中绘制），主界面不再提供绘制入口：
-		// 隐藏原绘制相关按钮；pbtn_matchRegion 保留为只读状态指示
-		ui->pbtn_addRegion->setVisible(false);
-		ui->pbtn_delRegion->setVisible(false);
-		ui->pbtn_redraw->setVisible(false);
-		ui->pbtn_clearRegion->setVisible(false);
-		ui->pbtn_drawCancel->setVisible(false);
-		ui->pbtn_drawConfirm->setVisible(false);
+		// 识别范围编辑在主界面进行（目标为「已加载模型」表格选中的模板）：
+		// 绘制工具栏（重新绘制/清空/取消/确认）仅在绘制会话中可见
+		showDrawingToolbar(false);
 	}
 
 	PunchPress::~PunchPress()
@@ -250,6 +245,22 @@ namespace ui
 		connect(ui->pbtn_modelManager, &QPushButton::clicked, this, &PunchPress::onModelManager);
 		connect(ui->pbtn_stampPattern, &QPushButton::clicked, this, &PunchPress::onStampPatternManager);
 		connect(ui->pbtn_exit, &QPushButton::clicked, this, &PunchPress::onExit);
+
+		// 识别范围编辑（目标：「已加载模型」表格选中的模板）
+		connect(ui->pbtn_matchRegion, &QPushButton::clicked, this, &PunchPress::onMatchRegionClicked);
+		connect(ui->pbtn_addRegion, &QPushButton::clicked, this, &PunchPress::onAddRegionClicked);
+		connect(ui->pbtn_delRegion, &QPushButton::clicked, this, &PunchPress::onDelRegionClicked);
+		connect(ui->pbtn_drawConfirm, &QPushButton::clicked, this, &PunchPress::onDrawConfirm);
+		connect(ui->pbtn_drawCancel, &QPushButton::clicked, this, &PunchPress::onDrawCancel);
+		connect(ui->pbtn_clearRegion, &QPushButton::clicked, this, &PunchPress::onDrawClear);
+		connect(ui->pbtn_redraw, &QPushButton::clicked, this, &PunchPress::onDrawRedraw);
+
+		// 右键确认一个矩形后工具回到 View → 更新绘制入口按钮文本
+		if (imageView_)
+		{
+			connect(imageView_, &ShapeEditor::toolChanged,
+				this, [this](ShapeEditor::Tool) { updateMatchRegionButton(); });
+		}
 
 		// 模型加载/卸载 → 刷新右侧栏列表
 		auto& bun = app_.business().shape_mode_manager_bun;
@@ -388,11 +399,15 @@ namespace ui
 		ui->pbtn_height->setText(QString::number(diffHeight_, 'f', 3));
 	}
 
-	// ===== 识别范围：只读显示（按模板存储，模板编辑器中绘制）=====
+	// ===== 识别范围：显示与按模板编辑（目标为「已加载模型」表格选中的模板）=====
 
 	void PunchPress::refreshMatchRegionDisplay()
 	{
 		if (!imageView_)
+			return;
+
+		// 绘制会话中编辑器持有目标模板的范围，不覆盖为并集显示
+		if (matchRegionDrawing_)
 			return;
 
 		auto& biz = app_.business();
@@ -419,41 +434,360 @@ namespace ui
 
 	void PunchPress::updateMatchRegionButton()
 	{
-		// pbtn_matchRegion 仅作状态显示，不可点击
-		ui->pbtn_matchRegion->setEnabled(false);
-
-		int count = 0;
-		auto& bun = app_.business().shape_mode_manager_bun;
-		if (bun)
-			count = static_cast<int>(bun->loadedMatchRegions().size());
-
-		if (count > 0)
+		// pbtn_matchRegion 兼具状态显示与绘制入口：
+		// 空闲时点击进入编辑；会话中在 绘制/暂停 之间切换
+		if (matchRegionDrawing_)
 		{
-			ui->pbtn_matchRegion->setText(QStringLiteral("识别范围: %1 个").arg(count));
+			const bool active = imageView_
+				&& imageView_->tool() == ShapeEditor::Tool::MatchRegion;
+			ui->pbtn_matchRegion->setText(active
+				? QStringLiteral("退出绘制")
+				: QStringLiteral("继续绘制"));
 			ui->pbtn_matchRegion->setStyleSheet(QStringLiteral(
 				"QPushButton {"
 				"  padding: 6px 14px;"
-				"  border: 2px solid #4CAF50;"
+				"  border: 2px solid #FF9800;"
 				"  border-radius: 4px;"
-				"  background-color: #E8F5E9;"
-				"  color: #2E7D32;"
+				"  background-color: #FFF3E0;"
+				"  color: #E65100;"
 				"  font-size: 18px;"
 				"  font-weight: bold;"
 				"}"));
 		}
 		else
 		{
-			ui->pbtn_matchRegion->setText(QStringLiteral("识别范围: 0 个"));
+			ui->pbtn_matchRegion->setText(QStringLiteral("绘制识别范围"));
 			ui->pbtn_matchRegion->setStyleSheet(QStringLiteral(
 				"QPushButton {"
 				"  padding: 6px 14px;"
-				"  border: 2px solid #DDD;"
+				"  border: 2px solid #CCC;"
 				"  border-radius: 4px;"
-				"  background-color: #FAFAFA;"
-				"  color: #999;"
+				"  background-color: white;"
+				"  color: #444;"
 				"  font-size: 18px;"
+				"}"
+				"QPushButton:hover {"
+				"  border-color: #999;"
+				"  background-color: #F5F5F5;"
+				"}"
+				"QPushButton:pressed {"
+				"  border-color: #777;"
+				"  background-color: #EEE;"
 				"}"));
 		}
+	}
+
+	void PunchPress::showDrawingToolbar(bool visible)
+	{
+		// 绘制工具栏（重新绘制/清空/取消/确认）仅在绘制会话中可见
+		ui->pbtn_redraw->setVisible(visible);
+		ui->pbtn_clearRegion->setVisible(visible);
+		ui->pbtn_drawCancel->setVisible(visible);
+		ui->pbtn_drawConfirm->setVisible(visible);
+	}
+
+	std::string PunchPress::matchRegionTargetModel() const
+	{
+		auto& bun = app_.business().shape_mode_manager_bun;
+		if (!bun || !bun->isModelLoaded())
+			return {};
+
+		// 优先使用「已加载模型」表格中用户选中的行
+		if (loadedModelsTable_)
+		{
+			const int row = loadedModelsTable_->currentRow();
+			if (row >= 0)
+			{
+				if (auto* item = loadedModelsTable_->item(row, 0))
+				{
+					const QString id = item->data(Qt::UserRole).toString();
+					if (!id.isEmpty())
+						return id.toStdString();
+				}
+			}
+		}
+
+		// 未选中时：仅加载一个模板则自动选定
+		const auto ids = bun->getLoadedModelIds();
+		if (ids.size() == 1)
+			return ids.front();
+
+		return {};
+	}
+
+	bool PunchPress::persistMatchRegionsToModel(const std::string& modelId,
+		const std::vector<global::MatchRegionRect>& rects)
+	{
+		if (modelId.empty())
+			return false;
+
+		auto& biz = app_.business();
+		const auto& inf = biz.infrastructure();
+		if (!inf.shape_model_manager_module_ || !biz.shape_mode_manager_bun)
+			return false;
+
+		try
+		{
+			auto item = inf.shape_model_manager_module_->getShapeModelItem(modelId);
+			if (item.info.getId().empty())
+				return false;
+
+			// 识别范围无需重新训练即可生效，直接写回模板文件
+			item.data.matchRegions = rects;
+			inf.shape_model_manager_module_->changeShapeModelItem(modelId, item.data);
+
+			// 该模型已加载（目标必然来自已加载集合），同步业务层缓存，
+			// 生产匹配立即使用新识别范围；modelListChanged 触发显示刷新
+			biz.shape_mode_manager_bun->updateLoadedModelCache(modelId, item.data);
+			return true;
+		}
+		catch (...)
+		{
+			return false;
+		}
+	}
+
+	// ===== 识别范围绘制会话：进入 / 退出 =====
+
+	void PunchPress::enterMatchRegionDrawMode()
+	{
+		if (matchRegionDrawing_ || !imageView_)
+			return;
+
+		auto& biz = app_.business();
+		auto& bun = biz.shape_mode_manager_bun;
+		if (!bun || !bun->isModelLoaded())
+		{
+			rw::rqwu::MessageBox::information(this, QStringLiteral("提示"),
+				QStringLiteral("请先加载模板模型，再编辑识别范围"));
+			return;
+		}
+
+		const std::string targetId = matchRegionTargetModel();
+		if (targetId.empty())
+		{
+			rw::rqwu::MessageBox::information(this, QStringLiteral("提示"),
+				QStringLiteral("已加载多个模板，请先在右侧「已加载模型」列表中\n"
+					"选中要编辑识别范围的模板"));
+			return;
+		}
+
+		// 保存现场
+		previousMode_ = app_.currentMode();
+		matchRegionDrawing_ = true;
+		matchRegionTargetId_ = targetId;
+
+		// 在表格中高亮目标模板行，给出明确的编辑对象反馈
+		if (loadedModelsTable_)
+		{
+			for (int row = 0; row < loadedModelsTable_->rowCount(); ++row)
+			{
+				if (auto* item = loadedModelsTable_->item(row, 0))
+				{
+					if (item->data(Qt::UserRole).toString().toStdString() == targetId)
+					{
+						loadedModelsTable_->setCurrentCell(row, 0);
+						break;
+					}
+				}
+			}
+		}
+
+		// 预载目标模板已有的识别范围（cyan，可在此基础上追加/删除）
+		imageView_->clearMatchRegion();
+		std::vector<HalconCpp::HObject> hRegions;
+		for (const auto& r : bun->modelMatchRegions(targetId))
+		{
+			try
+			{
+				HalconCpp::HObject obj;
+				HalconCpp::GenRectangle1(&obj, r.row1, r.col1, r.row2, r.col2);
+				if (obj.IsInitialized())
+					hRegions.push_back(obj);
+			}
+			catch (...) {}
+		}
+		if (!hRegions.empty())
+			imageView_->setMatchRegions(hRegions);
+
+		// 停止实时采集，当前帧保持显示
+		app_.switchToMode(global::RunMode::Idle);
+
+		// 进入识别范围绘制工具
+		imageView_->setTool(ShapeEditor::Tool::MatchRegion);
+
+		showDrawingToolbar(true);
+		updateMatchRegionButton();
+		statusBar()->showMessage(QStringLiteral(
+			"识别范围编辑中：左键拖拽绘制矩形，右键确认每个矩形，完成后点击「确认」保存"));
+	}
+
+	void PunchPress::exitMatchRegionDrawMode()
+	{
+		if (imageView_)
+			imageView_->setTool(ShapeEditor::Tool::View);
+
+		showDrawingToolbar(false);
+
+		matchRegionDrawing_ = false;
+		matchRegionTargetId_.clear();
+
+		// 恢复进入编辑前的运行模式
+		app_.switchToMode(previousMode_);
+
+		// 恢复只读并集显示：取消时回到原范围，确认后显示新保存的范围
+		refreshMatchRegionDisplay();
+		updateMatchRegionButton();
+	}
+
+	// ===== 识别范围绘制：入口 / 确认 / 取消 / 清空 / 重绘 / 删除 =====
+
+	void PunchPress::onMatchRegionClicked()
+	{
+		if (!matchRegionDrawing_)
+		{
+			enterMatchRegionDrawMode();
+			return;
+		}
+
+		// 会话中：切换绘制工具（右键确认一个矩形后回到 View，可再次点击继续绘制）
+		if (!imageView_)
+			return;
+		if (imageView_->tool() == ShapeEditor::Tool::MatchRegion)
+			imageView_->setTool(ShapeEditor::Tool::View);
+		else
+			imageView_->setTool(ShapeEditor::Tool::MatchRegion);
+	}
+
+	void PunchPress::onAddRegionClicked()
+	{
+		if (!matchRegionDrawing_)
+		{
+			enterMatchRegionDrawMode();
+			return;
+		}
+
+		// 会话中：直接激活工具绘制下一个范围
+		if (imageView_ && imageView_->tool() != ShapeEditor::Tool::MatchRegion)
+			imageView_->setTool(ShapeEditor::Tool::MatchRegion);
+	}
+
+	void PunchPress::onDelRegionClicked()
+	{
+		if (!imageView_)
+			return;
+
+		if (matchRegionDrawing_)
+		{
+			// 会话中：栈式删除编辑器内最近一个识别范围
+			imageView_->removeLastMatchRegion();
+			return;
+		}
+
+		// 非会话：直接删除目标模板最近一次保存的识别范围并持久化
+		auto& biz = app_.business();
+		auto& bun = biz.shape_mode_manager_bun;
+		if (!bun || !bun->isModelLoaded())
+		{
+			rw::rqwu::MessageBox::information(this, QStringLiteral("提示"),
+				QStringLiteral("请先加载模板模型"));
+			return;
+		}
+
+		const std::string targetId = matchRegionTargetModel();
+		if (targetId.empty())
+		{
+			rw::rqwu::MessageBox::information(this, QStringLiteral("提示"),
+				QStringLiteral("已加载多个模板，请先在右侧「已加载模型」列表中\n"
+					"选中要删除识别范围的模板"));
+			return;
+		}
+
+		auto rects = bun->modelMatchRegions(targetId);
+		if (rects.empty())
+		{
+			rw::rqwu::MessageBox::information(this, QStringLiteral("提示"),
+				QStringLiteral("当前模板没有可删除的识别范围"));
+			return;
+		}
+
+		rects.pop_back();
+		persistMatchRegionsToModel(targetId, rects);
+		// 显示与表格刷新由 modelListChanged 信号自动触发
+	}
+
+	void PunchPress::onDrawConfirm()
+	{
+		if (!matchRegionDrawing_ || !imageView_)
+			return;
+
+		// 工具仍处于激活状态时可能存在未右键确认的矩形，提示先完成绘制
+		if (imageView_->tool() == ShapeEditor::Tool::MatchRegion)
+		{
+			rw::rqwu::MessageBox::warning(this, QStringLiteral("提示"),
+				QStringLiteral("请先右键完成当前绘制（或点击「退出绘制」），再点击确认"));
+			return;
+		}
+
+		// 编辑器中的识别范围 HObject 列表 → 矩形坐标列表（图像像素坐标）
+		std::vector<global::MatchRegionRect> rects;
+		for (const auto& obj : imageView_->matchRegions())
+		{
+			if (!obj.IsInitialized())
+				continue;
+			try
+			{
+				HalconCpp::HTuple r1, c1, r2, c2;
+				HalconCpp::SmallestRectangle1(obj, &r1, &c1, &r2, &c2);
+				global::MatchRegionRect mr;
+				mr.row1 = r1[0].D();
+				mr.col1 = c1[0].D();
+				mr.row2 = r2[0].D();
+				mr.col2 = c2[0].D();
+				rects.push_back(mr);
+			}
+			catch (...) {}
+		}
+
+		if (!persistMatchRegionsToModel(matchRegionTargetId_, rects))
+		{
+			// 保存失败不退出会话，允许重试
+			rw::rqwu::MessageBox::warning(this, QStringLiteral("识别范围"),
+				QStringLiteral("识别范围保存失败，请重试"));
+			return;
+		}
+
+		statusBar()->showMessage(QStringLiteral("识别范围已保存: %1 个").arg(rects.size()));
+		exitMatchRegionDrawMode();
+	}
+
+	void PunchPress::onDrawCancel()
+	{
+		if (!matchRegionDrawing_)
+			return;
+
+		// 未持久化任何修改，退出会话后 refreshMatchRegionDisplay 恢复原有并集显示
+		exitMatchRegionDrawMode();
+		statusBar()->showMessage(QStringLiteral("已取消识别范围编辑"));
+	}
+
+	void PunchPress::onDrawClear()
+	{
+		if (!matchRegionDrawing_ || !imageView_)
+			return;
+
+		// 清空会话内全部识别范围（确认后该模板恢复全图搜索）
+		imageView_->clearMatchRegion();
+	}
+
+	void PunchPress::onDrawRedraw()
+	{
+		if (!matchRegionDrawing_ || !imageView_)
+			return;
+
+		// 清空会话内全部识别范围并重新进入绘制
+		imageView_->clearMatchRegion();
+		imageView_->setTool(ShapeEditor::Tool::MatchRegion);
 	}
 
 	bool PunchPress::inputIntegerParam(QPushButton* button, int& value, int min, int max)
@@ -661,6 +995,15 @@ namespace ui
 
 	void PunchPress::onDebugClicked()
 	{
+		// 识别范围绘制会话中禁止切换模式，先确认或取消编辑
+		if (matchRegionDrawing_)
+		{
+			rw::rqwu::MessageBox::information(this, QStringLiteral("提示"),
+				QStringLiteral("正在编辑识别范围，请先点击「确认」或「取消」"));
+			onModeChanged(app_.currentMode());  // 恢复单选按钮到实际模式
+			return;
+		}
+
 		if (ui->rbtn_debug->isChecked())
 		{
 			ui->rbtn_work->setChecked(false);
@@ -682,6 +1025,15 @@ namespace ui
 
 	void PunchPress::onWorkClicked()
 	{
+		// 识别范围绘制会话中禁止切换模式，先确认或取消编辑
+		if (matchRegionDrawing_)
+		{
+			rw::rqwu::MessageBox::information(this, QStringLiteral("提示"),
+				QStringLiteral("正在编辑识别范围，请先点击「确认」或「取消」"));
+			onModeChanged(app_.currentMode());  // 恢复单选按钮到实际模式
+			return;
+		}
+
 		if (ui->rbtn_work->isChecked())
 		{
 			ui->rbtn_debug->setChecked(false);
@@ -883,6 +1235,17 @@ namespace ui
 		if (!loadedModelsTable_)
 			return;
 
+		// 刷新前记住选中行的模型 id，重建后恢复选中（识别范围编辑以选中行为目标）
+		QString selectedId;
+		{
+			const int curRow = loadedModelsTable_->currentRow();
+			if (curRow >= 0)
+			{
+				if (auto* item = loadedModelsTable_->item(curRow, 0))
+					selectedId = item->data(Qt::UserRole).toString();
+			}
+		}
+
 		// 断开双击信号避免刷新时触发
 		disconnect(loadedModelsTable_, &QTableWidget::cellDoubleClicked,
 			this, &PunchPress::openOffsetEditor);
@@ -983,6 +1346,22 @@ namespace ui
 		// 恢复双击连接
 		connect(loadedModelsTable_, &QTableWidget::cellDoubleClicked,
 			this, &PunchPress::openOffsetEditor);
+
+		// 恢复刷新前的选中行
+		if (!selectedId.isEmpty())
+		{
+			for (int row = 0; row < loadedModelsTable_->rowCount(); ++row)
+			{
+				if (auto* item = loadedModelsTable_->item(row, 0))
+				{
+					if (item->data(Qt::UserRole).toString() == selectedId)
+					{
+						loadedModelsTable_->setCurrentCell(row, 0);
+						break;
+					}
+				}
+			}
+		}
 	}
 
 	void PunchPress::openOffsetEditor(int row, int /*column*/)

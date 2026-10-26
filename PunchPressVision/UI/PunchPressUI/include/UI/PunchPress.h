@@ -2,6 +2,8 @@
 
 #include <QMainWindow>
 #include <memory>
+#include <string>
+#include <vector>
 
 #include "halconcpp/HalconCpp.h"
 
@@ -68,6 +70,15 @@ namespace ui
 		// 高度参数（双相机拼接）
 		void onHeightClicked();
 
+		// 识别范围编辑（作用于「已加载模型」表格选中的模板）
+		void onMatchRegionClicked();
+		void onAddRegionClicked();
+		void onDelRegionClicked();
+		void onDrawConfirm();
+		void onDrawCancel();
+		void onDrawClear();
+		void onDrawRedraw();
+
 		// 系统
 		void onExit();
 
@@ -96,10 +107,21 @@ namespace ui
 		// 标定板描述文件自动发现
 		void loadCaltabDescrPath();
 
-		// 识别范围只读显示：汇总所有已加载模板的识别范围并叠加到主画面
-		//（识别范围按模板存储，在模板编辑器中绘制，主界面不提供编辑入口）
+		// 识别范围显示与编辑：
+		// 空闲时汇总所有已加载模板的识别范围只读叠加到主画面；
+		// 绘制会话中编辑目标模板的范围，确认后随模板持久化（按模板存储）
 		void refreshMatchRegionDisplay();
 		void updateMatchRegionButton();
+
+		// 识别范围绘制会话：进入/退出、绘制工具栏显隐
+		void enterMatchRegionDrawMode();
+		void exitMatchRegionDrawMode();
+		void showDrawingToolbar(bool visible);
+		/// 绘制/删除操作的目标模板：取表格选中行的模型 id；仅加载一个模板时自动选定
+		std::string matchRegionTargetModel() const;
+		/// 将识别范围写入模板文件并同步已加载缓存（生产匹配立即生效）
+		bool persistMatchRegionsToModel(const std::string& modelId,
+			const std::vector<global::MatchRegionRect>& rects);
 
 		// 弹出数字键盘编辑整数参数（带范围校验）
 		bool inputIntegerParam(QPushButton* button, int& value, int min, int max);
@@ -122,6 +144,11 @@ namespace ui
 		// 右侧栏：已加载模型表格
 		QGroupBox* loadedModelsGroup_{ nullptr };
 		QTableWidget* loadedModelsTable_{ nullptr };
+
+		// 识别范围绘制会话状态
+		bool matchRegionDrawing_{ false };
+		std::string matchRegionTargetId_;  ///< 会话目标模板 id
+		global::RunMode previousMode_{ global::RunMode::Idle };
 
 		// 本地缓存的 UI 所需配置
 		Config::cameraCfg cameraCfg_;

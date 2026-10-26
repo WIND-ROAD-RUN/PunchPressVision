@@ -109,12 +109,6 @@ namespace ui
 			this, &ModelEditorDialog::onPaintRegion);
 		connect(ui->btn_shiledRegion, &QPushButton::clicked,
 			this, &ModelEditorDialog::onPaintMask);
-		connect(ui->btn_paintMatchRegion, &QPushButton::clicked,
-			this, &ModelEditorDialog::onPaintMatchRegion);
-		connect(ui->btn_delMatchRegion, &QPushButton::clicked,
-			this, &ModelEditorDialog::onDelMatchRegion);
-		connect(ui->btn_clearMatchRegion, &QPushButton::clicked,
-			this, &ModelEditorDialog::onClearMatchRegion);
 		connect(ui->btn_paintCenterPoint, &QPushButton::clicked,
 			this, &ModelEditorDialog::onPaintCenterPoint);
 		connect(ui->btn_clearRegion, &QPushButton::clicked,
@@ -293,46 +287,6 @@ namespace ui
 			else
 				shapeEditor_->setTool(ShapeEditor::Tool::RectangleMask);
 		}
-	}
-
-	void ModelEditorDialog::onPaintMatchRegion()
-	{
-		if (!shapeEditor_) return;
-		if (shapeEditor_->tool() == ShapeEditor::Tool::MatchRegion)
-		{
-			// 退出识别范围工具，保持停止采集（继续使用同一张图片）
-			shapeEditor_->setTool(ShapeEditor::Tool::View);
-		}
-		else
-		{
-			// 进入绘制前：检查图像是否就绪
-			if (!requireImage(QStringLiteral("绘制识别范围")))
-				return;
-			// 停止实时采集，当前帧保持显示
-			app_.switchToMode(global::RunMode::Idle);
-			shapeEditor_->setTool(ShapeEditor::Tool::MatchRegion);
-		}
-	}
-
-	void ModelEditorDialog::onDelMatchRegion()
-	{
-		if (!shapeEditor_) return;
-		if (!shapeEditor_->hasMatchRegion())
-		{
-			rw::rqwu::MessageBox::warning(this,
-				QStringLiteral("提示"), QStringLiteral("当前没有可删除的识别范围"));
-			return;
-		}
-		// 栈式删除：移除最近一次绘制/加载的识别范围（与「回撤」语义一致）
-		shapeEditor_->removeLastMatchRegion();
-	}
-
-	void ModelEditorDialog::onClearMatchRegion()
-	{
-		if (!shapeEditor_ || !shapeEditor_->hasMatchRegion())
-			return;
-		// 仅清空识别范围（清空后该模板恢复全图搜索），不影响 ROI/屏蔽区域
-		shapeEditor_->clearMatchRegion();
 	}
 
 	void ModelEditorDialog::onPaintCenterPoint()
@@ -1138,11 +1092,6 @@ namespace ui
 				? QStringLiteral("退出屏蔽")
 				: QStringLiteral("绘制屏蔽区域"));
 
-		ui->btn_paintMatchRegion->setText(
-			tool == ShapeEditor::Tool::MatchRegion
-				? QStringLiteral("退出绘制")
-				: QStringLiteral("绘制识别范围"));
-
 		ui->btn_paintCenterPoint->setText(
 			tool == ShapeEditor::Tool::CenterPoint
 				? QStringLiteral("退出定义")
@@ -1198,7 +1147,7 @@ namespace ui
 		if (!data._paintShieldRoiList.empty())
 			shapeEditor_->setMaskObjects(data._paintShieldRoiList);
 
-		// 恢复该模板的识别范围（cyan 只读显示，可用「绘制识别范围」继续添加）
+		// 恢复该模板的识别范围（cyan 只读显示；编辑入口在主界面，此处仅用于保留显示与随保存写回）
 		if (!data.matchRegions.empty())
 		{
 			std::vector<HalconCpp::HObject> hRegions;
@@ -1460,8 +1409,7 @@ bool ModelEditorDialog::isInDrawingTool() const
 		return false;
 	const auto tool = shapeEditor_->tool();
 	return tool == ShapeEditor::Tool::RectangleROI || tool == ShapeEditor::Tool::FreehandROI ||
-	       tool == ShapeEditor::Tool::RectangleMask || tool == ShapeEditor::Tool::FreehandMask ||
-	       tool == ShapeEditor::Tool::MatchRegion;
+	       tool == ShapeEditor::Tool::RectangleMask || tool == ShapeEditor::Tool::FreehandMask;
 }
 
 } // namespace ui

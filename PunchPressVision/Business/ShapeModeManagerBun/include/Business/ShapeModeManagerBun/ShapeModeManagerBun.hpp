@@ -216,6 +216,9 @@ namespace bun
 		/// <summary>所有已加载模型的识别范围汇总（供主界面只读叠加显示）。</summary>
 		std::vector<global::MatchRegionRect> loadedMatchRegions() const;
 
+		/// <summary>指定已加载模型的识别范围（供主界面按模板编辑）。模型未加载返回空列表。</summary>
+		std::vector<global::MatchRegionRect> modelMatchRegions(const std::string& modelId) const;
+
 		/// <summary>
 		/// 用最新数据同步已加载模型的内存缓存（若该模型已加载），并发射 modelListChanged。
 		/// 用于编辑器免训练保存路径（识别范围/中心点等非训练参数）后让生产匹配立即生效。
