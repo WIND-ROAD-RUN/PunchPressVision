@@ -393,14 +393,18 @@ namespace app
 			const auto& plc = inf.config_module_->plcAddressCfg;
 			constexpr int kRegSpacing = 10;   // 每组结果的寄存器间隔
 			constexpr size_t kMaxSlots = 50;  // 最大结果槽位数
+			// 组2 槽位地址从大到小：槽0 在组2 块最高地址，槽 i 地址 = regOffset2X + (kMaxSlots-1-i)*10
+			auto slotBase2 = [&](size_t i) {
+				return plc.regOffset2X + static_cast<int>(kMaxSlots - 1 - i) * kRegSpacing;
+			};
 
 			if (!allResults.empty())
 			{
-				// 写入有效结果（组1：regOffsetX 起；组2：regOffset2X 起，槽位布局相同）
+				// 写入有效结果（组1：regOffsetX 起从小到大；组2：regOffset2X 块内从大到小）
 				for (size_t i = 0; i < allResults.size() && i < kMaxSlots; ++i)
 				{
 					const int base = plc.regOffsetX + static_cast<int>(i) * kRegSpacing;
-					const int base2 = plc.regOffset2X + static_cast<int>(i) * kRegSpacing;
+					const int base2 = slotBase2(i);
 					const auto& r = allResults[i];
 					inf.control_module_->writeFloat(base,      static_cast<float>(r.offsetX * 100.0));
 					inf.control_module_->writeFloat(base + 2,  static_cast<float>(-r.offsetY * 100.0));
@@ -416,7 +420,7 @@ namespace app
 				for (size_t i = allResults.size(); i < kMaxSlots; ++i)
 				{
 					const int base = plc.regOffsetX + static_cast<int>(i) * kRegSpacing;
-					const int base2 = plc.regOffset2X + static_cast<int>(i) * kRegSpacing;
+					const int base2 = slotBase2(i);
 					inf.control_module_->writeFloat(base,     0.0f);
 					inf.control_module_->writeFloat(base + 2, 0.0f);
 					inf.control_module_->writeFloat(base + 4, 0.0f);
@@ -436,7 +440,7 @@ namespace app
 				for (size_t i = 0; i < kMaxSlots; ++i)
 				{
 					const int base = plc.regOffsetX + static_cast<int>(i) * kRegSpacing;
-					const int base2 = plc.regOffset2X + static_cast<int>(i) * kRegSpacing;
+					const int base2 = slotBase2(i);
 					inf.control_module_->writeRegister(base + 6, 0);
 					inf.control_module_->writeRegister(base2 + 6, 0);
 				}

@@ -24,7 +24,7 @@ namespace inf
 	//   regOffsetY          (6102) float  Y 偏移量（仅兼容旧约定，生产写路径按槽位布局）
 	//   regAngle            (6104) float  旋转角度 Angle（同上）
 	//   regValid            (6106) int    定位结果有效标志（同上）
-	//   regOffset2X         (6700) float  中心点2 结果槽位起始（布局同组1）
+	//   regOffset2X         (6700) float  中心点2 结果块低端地址（块内槽位从大到小：槽 i = 6700+(49-i)*10，槽0 在最高地址 7190）
 	//   regNinePointArrived (6600) int    九点标定到位确认（PLC→系统）
 	//   regNinePointIndex   (6601) int    九点标定当前点位序号
 	//   regNinePointCoordsStart (6602~) float  九点点位机械坐标
