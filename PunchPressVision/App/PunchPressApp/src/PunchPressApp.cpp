@@ -372,7 +372,7 @@ namespace app
 			allResults.push_back(r);
 		}
 
-		// 写 PLC：中心点1/2 输出合并后的每条数据占一组寄存器（间隔 10），无效槽位清零
+		// 写 PLC：组1 点位升序、组2 点位降序依次发送，每条数据占一组寄存器（间隔 10），无效槽位清零
 		auto& inf = business_.infrastructure();
 		// 读取 m330 线圈决定 X 排序方向（true=升序，false=降序）
 		bool sortByXAsc = false;
@@ -396,21 +396,27 @@ namespace app
 
 			if (!allResults.empty())
 			{
-				// 中心点1/2 输出合并为统一条目流（组2 仅模板定义了中心点2 时才有），
-				// 按条目自身 X 排序（方向同 m330），全部写入组1 地址区（regOffsetX 起从小到大）
+				// 先发第一点位识别到的所有点位（X 升序），再发第二点位识别到的所有点位
+				// （X 降序，仅模板定义了中心点2 时才有），统一写入组1 地址区（regOffsetX 起从小到大）
 				struct PlcEntry { double x; double y; double angle; };
-				std::vector<PlcEntry> entries;
-				entries.reserve(allResults.size() * 2);
+				std::vector<PlcEntry> group1Entries, group2Entries;
+				group1Entries.reserve(allResults.size());
+				group2Entries.reserve(allResults.size());
 				for (const auto& r : allResults)
 				{
-					entries.push_back({ r.offsetX, r.offsetY, r.angle });
+					group1Entries.push_back({ r.offsetX, r.offsetY, r.angle });
 					if (r.hasCenter2)
-						entries.push_back({ r.offset2X, r.offset2Y, r.angle2 });
+						group2Entries.push_back({ r.offset2X, r.offset2Y, r.angle2 });
 				}
-				std::sort(entries.begin(), entries.end(),
-					[sortByXAsc](const PlcEntry& a, const PlcEntry& b) {
-						return sortByXAsc ? (a.x < b.x) : (a.x > b.x);
-					});
+				std::sort(group1Entries.begin(), group1Entries.end(),
+					[](const PlcEntry& a, const PlcEntry& b) { return a.x < b.x; });
+				std::sort(group2Entries.begin(), group2Entries.end(),
+					[](const PlcEntry& a, const PlcEntry& b) { return a.x > b.x; });
+
+				std::vector<PlcEntry> entries;
+				entries.reserve(group1Entries.size() + group2Entries.size());
+				entries.insert(entries.end(), group1Entries.begin(), group1Entries.end());
+				entries.insert(entries.end(), group2Entries.begin(), group2Entries.end());
 
 				// 写入有效条目
 				for (size_t i = 0; i < entries.size() && i < kMaxSlots; ++i)
